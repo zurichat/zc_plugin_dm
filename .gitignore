@@ -2,6 +2,7 @@ db.sqlite3
 
 # virtual environment
 env/
+/.env
 
 # Django
 *.log
