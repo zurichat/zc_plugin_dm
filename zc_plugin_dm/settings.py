@@ -25,7 +25,7 @@ SECRET_KEY = '=d0@crzz66g2ba%_y)!15z%tad9hjhca+qvlt=+h!s90-*f4w@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['207.154.216.100']
+ALLOWED_HOSTS = ["dm.zuri.chat"]
 
 
 # Application definition
