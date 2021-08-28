@@ -1,1 +1,13 @@
 db.sqlite3
+
+# virtual environment
+env/
+
+# Django
+*.log
+*.pot
+*.pyc
+*__pycache__
+
+# *media
+*.DS_Store
