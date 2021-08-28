@@ -40,8 +40,13 @@ git checkout -b issue-name-id
 
 ## Setup Development Environment
 To setup the development environment to run project run:
+#### install pipenv
 ```
-pipenv install
+pip install pipenv
+```
+#### install required modules
+```
+pipenv install -r requirements.txt
 ```
 
 ## Migrate Database
