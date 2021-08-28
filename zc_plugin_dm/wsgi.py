@@ -1,5 +1,5 @@
 """
-WSGI config for direct_message project.
+WSGI config for zc_plugin_dm project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'direct_message.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zc_plugin_dm.settings')
 
 application = get_wsgi_application()

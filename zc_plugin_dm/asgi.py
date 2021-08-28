@@ -1,5 +1,5 @@
 """
-ASGI config for direct_message project.
+ASGI config for zc_plugin_dm project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'direct_message.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'zc_plugin_dm.settings')
 
 application = get_asgi_application()
