@@ -1,5 +1,8 @@
-# zc_dm
-This is a direct message (DM) plugin created by Team Orpheus for the overall HNGi8 project
+# ZC-DM PLUGIN
+## Team Orpheus
+This is a direct message (DM) plugin created by Team Orpheus for the overall HNGi8 project. The DM plugin is will give the users of Zuri chat the ability to send private messages and messages in group chat, use different functionalities such as emoji's, attach files, mention functionalities, change fonts, use ordered lists amongst other various functionalities to send messages. This plugin aims to serve the entire Zuri Chat.
+
+This project is a monolith application.
 
 ## Technologies used
 <ul>
