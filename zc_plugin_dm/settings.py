@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-# import os
+import os
 from pathlib import Path
 
 # from dotenv import load_dotenv
@@ -29,9 +29,10 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(os.getenv('DEBUG'))
 
-ALLOWED_HOSTS = ["dm.zuri.chat"]
+
+ALLOWED_HOSTS = ["dm.zuri.chat", '127.0.0.1']
 
 # Application definition
 
