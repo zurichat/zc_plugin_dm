@@ -23,5 +23,5 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            cd /var/www/zc_plugin_dm
+            cd ~/zc_plugin_dm
             git pull
