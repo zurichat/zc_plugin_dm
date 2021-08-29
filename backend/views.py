@@ -5,4 +5,6 @@ from django.http import HttpResponse
 
 
 def index(request):
-    return HttpResponse('<h1>DM Plugin</h1>')
+    context = {}
+    # return HttpResponse('<h1>DM Plugin</h1>')
+    return render(request, 'index.html', context)

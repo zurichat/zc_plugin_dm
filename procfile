@@ -1,0 +1,1 @@
+web: gunicorn zc_plugin_dm.wsgi
