@@ -27,5 +27,8 @@ jobs:
             cd ~/zc_plugin_dm
             git pull
             python3 manage.py collectstatic --noinput
+            cd ~
+            pwd
+            echo $USER
             pkill gunicorn
             gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
