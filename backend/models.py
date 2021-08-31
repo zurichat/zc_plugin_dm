@@ -1,21 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-"""
-    Main entities
-    1.User
-            all users can be senders or recievers 
-    2.Message
-    
 
-"""
-# user model==> one to relationship with the Default django users
-# first scenarion sender-->message--> recipient
 class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
-    # any required filed here
-    
-    # def __str__(self):
-    #     return self.User.username
     
     
 class Messages(models.Model):
@@ -30,12 +17,8 @@ class Messages(models.Model):
     
     class  Meta:
         ordering = ('timestamp',)
-        # ordering = ("timestamp")
         
-class Delivery(models.Model):
-    reciver = models.ForeignKey(User, on_delete=models.CASCADE)
-    # recipient_group = 
-
+        
 
 class Media(models.Model):
     MessagesId=models.ForeignKey(Messages,on_delete=models.CASCADE)

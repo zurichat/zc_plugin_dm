@@ -29,6 +29,7 @@ Checkout develop branch by running
 git checkout develop
 ```
 
+
 ## Checkout Your Feature Branch
 Feature Branching Workflow means you create a new branch for every feature or issue you are working on.
 It is goood practice for the branch name to end with the issue id.
