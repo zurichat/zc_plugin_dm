@@ -24,3 +24,14 @@ border-radius:24px;
     padding:0px 5px;   
     transform: rotate(90deg) !important;
 }
+
+/* message component design */
+.message_user_icon{
+    width:32px;
+    margin-right: 1%;
+}
+
+.actions{
+    border:2px solid lightgray;
+    border-radius: 10px;
+}
