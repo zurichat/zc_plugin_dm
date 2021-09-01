@@ -1,7 +1,6 @@
 from django.db import models
-<<<<<<< HEAD
 from django.contrib.auth.models import User
-
+# this is optional, I used this for enabling me create relationship with the messages and file media
 class Profile(models.Model):
     user=models.OneToOneField(User,on_delete=models.CASCADE)
     
@@ -30,7 +29,6 @@ class Media(models.Model):
     class  Meta:
         ordering = ('timestamp',)
         
-=======
 from django.contrib.auth import get_user_model
 
 
@@ -63,4 +61,3 @@ class Room(models.Model):
 
     def __str__(self) -> str:
         return f"sender:{self.sender}\treceiver:{self.receiver}\tseen:{self.seen}\tdeleted:{self.deleted}"
->>>>>>> 701a0dd0937344b29bde3c5b279cb5b9d29f93e4
