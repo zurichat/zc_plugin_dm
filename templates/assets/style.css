@@ -1,0 +1,10 @@
+/* message component design */
+.message_user_icon{
+    width:32px;
+    margin-right: 1%;
+}
+
+.actions{
+    border:2px solid lightgray;
+    border-radius: 10px;
+}
