@@ -122,11 +122,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # STATIC_ROOT  =   os.path.join(BASE_DIR, 'staticfiles')
-<<<<<<< HEAD
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # this is for auto incrementing id's in the model
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-=======
->>>>>>> 701a0dd0937344b29bde3c5b279cb5b9d29f93e4
