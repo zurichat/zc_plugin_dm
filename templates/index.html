@@ -13,6 +13,9 @@
     <!-- Vue.js cdn -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 
+    <!-- vuex cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
+
     <!-- Axios cdn -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
         integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
@@ -25,20 +28,16 @@
     <h1>Team Orpheus</h1>
     <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
 
-    <div id="app">[[message]]</div>
+    <div id="app">
+       <div class="container">
+            <h3>[[message]]</h3>
+            <p>[[ $store.state.message ]]</p>
+       </div>
+    </div>
 
     <!-- LoadBootstrapVue -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
 </body>
-<script>
-    var app = new Vue({
-        el: '#app',
-        delimiters: ["[[", "]]"],
-        data: {
-            message: 'Hello Vue!'
-        }
-    });
-
-</script>
+<script src="./js/main.js"></script>
 
 </html>
