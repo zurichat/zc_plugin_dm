@@ -1,13 +1,10 @@
 /*----------------------divider-line styling-------------------*/
 .divider-line{
-text-align: center;
 margin-top:20px;
 width:100% !important;
-box-sizing: border-box;
 font-weight: 700;
 }
 .divider-line .timeline {
-position:relative;
 font-size: 13px;
 padding:0px 10px;
 top:-14.6px;
@@ -17,7 +14,6 @@ background-color: white;
 }
 .chevron{
     font-size: 13px;
-    display: inline-block;
     padding:0px 5px;   
     transform: rotate(90deg) !important;
 }
