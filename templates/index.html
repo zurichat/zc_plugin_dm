@@ -48,28 +48,34 @@
     <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
 
     <div id="app">
-<<<<<<< HEAD
-        <div class="w-100">
+       
+        <div class="container">
+          <h3>[[message]]</h3>
+          <p>[[ $store.state.message ]]</p>
+
+          <divider></divider>
+          <div class="w-100">
             <message></message>
 
         </div>
+     </div>
     </div>
-=======
-       <div class="container">
-            <h3>[[message]]</h3>
-            <p>[[ $store.state.message ]]</p>
->>>>>>> d6ae6a770cffc9d2873cf017c382a627a4986af2
 
-            <divider></divider>
-       </div>
-
-    </div>
     <!-- LoadBootstrapVue -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
-<<<<<<< HEAD
-  </body>
-  <script>
-    // REUSABLE COMPONENTS
+    <script src="./js/main.js"></script>
+</body>
+</html>
+
+<script>
+
+    //divider component
+  Vue.component('divider', {
+    props: [],
+    template: '<div class="divider-line"><button>Wednesday, 1st September <span class="chevron">&#x203A;</span> </button></div>'
+})
+
+// Message Ccomponent 
     Vue.component("message", {
       template: `<div>
             <div class="d-flex flex-wrap-xs align-items-start bg-light p-2" v-for="(messages, index) in message_data" >
@@ -87,7 +93,7 @@
           message_data:[
             {
               user_name:'MammaGee',
-              user_icon:'assets/big.jpg', 
+              user_icon:'images/big.jpg', 
               main_message:'Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque natus magni consequuntur aut ducimus odit veniam voluptatum necessitatibus! Ipsum eum voluptates neque ipsa, reiciendis distinctio hic aliquid blanditiis vel iusto.', 
               time_stamp:'5:55pm'
             }
@@ -96,20 +102,6 @@
         };
       },
     });
-
-    
-=======
-    <script src="./js/main.js"></script>
-</body>
-<script>
-
-    //divider component
-  Vue.component('divider', {
-    props: [],
-    template: '<div class="divider-line"><button>Wednesday, 1st September <span class="chevron">&#x203A;</span> </button></div>'
-})
-
-
     var app = new Vue({
         el: '#app',
         delimiters: ["[[", "]]"],
@@ -119,16 +111,4 @@
         }
     });
 
-
 </script>
->>>>>>> d6ae6a770cffc9d2873cf017c382a627a4986af2
-
-    var app = new Vue({
-      el: "#app",
-      delimiters: ["[[", "]]"],
-      data: {
-        // message: 'Hello Vue!'
-      },
-    });
-  </script>
-</html>
