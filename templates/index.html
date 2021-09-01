@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="stylesheet" href="css/style.css">
+
     <!-- Load required Bootstrap and BootstrapVue CSS -->
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
@@ -25,20 +27,33 @@
     <h1>Team Orpheus</h1>
     <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
 
-    <div id="app">[[message]]</div>
+    <div id="app">
+        [[message]]
+            <divider></divider>
 
+    </div>
     <!-- LoadBootstrapVue -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
 </body>
 <script>
+
+    //divider component 
+  Vue.component('divider', {
+    props: [],
+    template: '<div class="divider-line"><button>Wednesday, 1st September <span class="chevron">&#x203A;</span> </button></div>'
+})
+
+
     var app = new Vue({
         el: '#app',
         delimiters: ["[[", "]]"],
         data: {
-            message: 'Hello Vue!'
+            message: 'Hello Vue!',
+         
         }
     });
-
+    
+  
 </script>
 
 </html>
