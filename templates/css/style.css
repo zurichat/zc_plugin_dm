@@ -1,0 +1,26 @@
+/*----------------------divider-line styling-------------------*/
+.divider-line{
+    border-top: 1px solid rgba(153, 153, 153, 0.6) ;
+    color:red;
+    text-align: center;
+position:relative;
+z-index:1;
+margin-top:20px;
+width:100% !important;
+}
+.divider-line button{
+margin-top:-5;
+height:26px;
+position:relative;
+font-size: 13px;
+top:-13px;
+z-index:2;
+border: 1px solid rgba(151, 151, 151, 0.4);
+border-radius:24px;
+}
+.chevron{
+    font-size: 15px;
+    display: inline-block;
+    padding:0px 5px;   
+    transform: rotate(90deg) !important;
+}

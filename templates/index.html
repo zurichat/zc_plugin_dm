@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+
+
     <!-- Load required Bootstrap and BootstrapVue CSS -->
     <link
       type="text/css"
@@ -17,8 +19,8 @@
       href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css"
     />
 
-    <!-- Vue.js cdn -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+      <!-- Vue.js cdn -->
+      <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 
     <!-- Axios cdn -->
     <script
@@ -34,6 +36,10 @@
     <!-- Custom css -->
     <link rel="stylesheet" href="assets/style.css" />
 
+    <!-- vuex cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
     <title>Orpheus</title>
   </head>
 
@@ -42,14 +48,25 @@
     <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
 
     <div id="app">
+<<<<<<< HEAD
         <div class="w-100">
             <message></message>
 
         </div>
     </div>
+=======
+       <div class="container">
+            <h3>[[message]]</h3>
+            <p>[[ $store.state.message ]]</p>
+>>>>>>> d6ae6a770cffc9d2873cf017c382a627a4986af2
 
+            <divider></divider>
+       </div>
+
+    </div>
     <!-- LoadBootstrapVue -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<<<<<<< HEAD
   </body>
   <script>
     // REUSABLE COMPONENTS
@@ -81,6 +98,30 @@
     });
 
     
+=======
+    <script src="./js/main.js"></script>
+</body>
+<script>
+
+    //divider component
+  Vue.component('divider', {
+    props: [],
+    template: '<div class="divider-line"><button>Wednesday, 1st September <span class="chevron">&#x203A;</span> </button></div>'
+})
+
+
+    var app = new Vue({
+        el: '#app',
+        delimiters: ["[[", "]]"],
+        data: {
+            message: 'Hello Vue!',
+
+        }
+    });
+
+
+</script>
+>>>>>>> d6ae6a770cffc9d2873cf017c382a627a4986af2
 
     var app = new Vue({
       el: "#app",
