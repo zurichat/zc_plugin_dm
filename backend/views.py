@@ -88,3 +88,23 @@ def room_files(request):
 
 def room_file(request):
     pass
+
+def filter_user(request):
+    filter_user = [
+        {
+            'user_id':'1',
+            'message':'Hey, how are you doing'
+        },
+
+        {
+            'user_id':'1',
+            'message':'I need to have some rest'
+        }, 
+
+        {
+            'user_id':'1',
+            'message':'I would see you later'
+        }
+    ]
+
+    return JsonResponse(filter_user, safe=False)
