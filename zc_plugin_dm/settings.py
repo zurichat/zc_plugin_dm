@@ -134,4 +134,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+<<<<<<< HEAD
 # STATIC_ROOT  =   os.path.join(BASE_DIR, 'staticfiles')
+=======
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'webpack_bundles/',  # must end with slash
+        'STATS_FILE': BASE_DIR.joinpath('frontend', 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+    }
+}
+>>>>>>> 3b1b561a4c0546a1136a9115f9cd7f62c28cee94

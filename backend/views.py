@@ -1,7 +1,10 @@
 from django.http.response import JsonResponse
 from django.shortcuts import render
+<<<<<<< HEAD
 from django.http import HttpResponse
 from .serializers import UserSerializer
+=======
+>>>>>>> 3b1b561a4c0546a1136a9115f9cd7f62c28cee94
 
 # Create your views here.
 
