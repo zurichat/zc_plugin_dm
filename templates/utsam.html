@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Load required Bootstrap and BootstrapVue CSS -->
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+
+    <!-- Vue.js cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <!-- Axios cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Font Awsome  -->
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+        integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+
+    <!-- Custom css -->
+    <link rel="stylesheet" href="assets/style.css" />
+
+    <!-- vuex cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <title>Orpheus</title>
+</head>
+
+<body>
+    <h1>Team Orpheus</h1>
+    <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
+
+    <div id="app">
+
+        <h3>[[message]]</h3>
+        <p>[[ $store.state.message ]]</p>
+        <nav-bar>
+
+        </nav-bar>
+        <div class="container">
+
+        </div>
+    </div>
+    </div>
+    
+
+    <!-- LoadBootstrapVue -->
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+
+</html>
+
+<script>
+
+
+    // Nav Bar Ccomponent 
+    Vue.component("nav-bar", {
+        template: `
+        <nav class="py-3 px-4 nav-container" style="background: #F6F6F6" v-for="(data, i) in nav_data" :key="i">
+        <div class="search-bar">
+            <input class="search-input" type="text" placeholder="Search here">
+            <div class="search-icon">
+                <img class="rounded-circle" :src="data.search_icon">
+            </div>
+        </div>
+        <div class="setting-icon">
+            <img class="rounded-circle" :src="data.setting_icon">
+        </div>
+        <div class="avatar-icon">
+            <img class="rounded-circle" :src="data.avatar_icon">
+        </div>
+    </nav>
+            `,
+        data: function () {
+            return {
+                nav_data: [
+                    {
+                        search_icon: 'images/search_icon.png',
+                        avatar_icon: 'images/avatar_icon.png',
+                        setting_icon: 'images/setting_icon.png',
+                    }
+                ],
+
+
+            };
+        },
+    });
+    var app = new Vue({
+        el: '#app',
+        delimiters: ["[[", "]]"],
+        data: {
+            message: 'Hello Vue!',
+
+        }
+    });
+
+</script>
