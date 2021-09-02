@@ -52,5 +52,6 @@ urlpatterns = [
 
 
     path('messages', views.messages, name='messages'),
+    path('star_messages', views.star_messages, name='star_messages'),
 
 ]
