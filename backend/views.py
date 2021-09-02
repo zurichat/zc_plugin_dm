@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .serializers import UserSerializer
 
+
 # Create your views here.
 
 
@@ -27,6 +28,7 @@ def messages(request):
         }]
 
     return JsonResponse(messages, safe=False)
+
 
 def info(request):
     info = {
@@ -53,38 +55,69 @@ def organizations(request):
 
     return JsonResponse(organizations, safe=False)
 
+
+def list_archives(request):
+    archived_messages = [
+        {
+            'id': '13',
+            'from': 'Korede',
+            'to': ['mark', ],
+            'archived': True
+        },
+        {
+            'id': '21',
+            'from': 'Xylum',
+            'to': ['KoredeDavid', ],
+            'archived': True
+        }
+    ]
+
+    return JsonResponse(archived_messages, safe=False)
+
+
 def organization(request):
     pass
+
 
 def users(request):
     pass
 
+
 def user(request):
     pass
+
 
 def rooms(request):
     pass
 
+
 def room(request):
     pass
+
 
 def room_users(request):
     pass
 
+
 def room_messages(request):
     pass
+
 
 def room_message(request):
     pass
 
+
 def room_medias(request):
     pass
+
 
 def room_media(request):
     pass
 
+
 def room_files(request):
     pass
+
 
 def room_file(request):
     pass
