@@ -1,26 +1,70 @@
 /*----------------------divider-line styling-------------------*/
-.divider-line{
-    border-top: 1px solid rgba(153, 153, 153, 0.6) ;
-    color:red;
-    text-align: center;
-position:relative;
-z-index:1;
-margin-top:20px;
-width:100% !important;
+#reminder ul{
+    padding-left:0rem;
+    position: relative;
+    left: 20%;
+    width: 30%;
+    height:10%;
+    background-color:'white';
+    box-shadow: 2px 2px 3px 3px #c5c4c48e;
 }
-.divider-line button{
-margin-top:-5;
-height:26px;
-position:relative;
-font-size: 13px;
-top:-13px;
-z-index:2;
-border: 1px solid rgba(151, 151, 151, 0.4);
-border-radius:24px;
+#reminder li{
+    list-style-type: none;
+    text-align: left;
+    color:rgba(41, 41, 41, 0.9);
+    font-weight: bold;
+    padding:10px;
 }
-.chevron{
-    font-size: 15px;
-    display: inline-block;
-    padding:0px 5px;   
-    transform: rotate(90deg) !important;
+#reminder li:hover{
+    background-color:green;
+    color:white;
+    cursor:pointer;
+}
+
+
+/* div 2 */
+#reminder1 ul{
+    padding-left:0rem;
+    position: relative;
+    left: 2%;
+    margin-top:-23%;
+    width: 15%;
+    height:10%;
+    background-color:'white';
+    box-shadow: 2px 2px 3px 3px #c5c4c48e;
+}
+#reminder1 li{
+    list-style-type: none;
+    text-align: left;
+    color:rgba(41, 41, 41, 0.9);
+    font-weight: bold;
+    padding:5px 10px;
+}
+#reminder1 li:hover,
+#reminder2 li:hover{
+    background-color:green;
+    color:white;
+    cursor:pointer;
+}
+
+/* div 3 */
+#reminder2 ul{
+    padding-left:0rem;
+    position: relative;
+    left: 25%;
+    width: 25%;
+    background-color:'white';
+    box-shadow: 2px 2px 3px 3px #c5c4c48e;
+}
+#reminder2 li{
+    list-style-type: none;
+    text-align: left;
+    color:rgba(41, 41, 41, 0.795);
+    font-weight: bold;
+}
+#reminder2 p{
+    margin:10px;
+    text-align: left;
+    color:rgba(41, 41, 41, 0.322);
+    font-weight: bold;
 }
