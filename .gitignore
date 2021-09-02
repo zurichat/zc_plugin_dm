@@ -1,4 +1,6 @@
 db.sqlite3
+Pipfile
+Pipfile.lock
 
 # virtual environment
 env/
