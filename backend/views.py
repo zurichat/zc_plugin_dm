@@ -32,7 +32,7 @@ def info(request):
     info = {
         'plugin_id': 201982982,
         'plugin_name': 'DM plugin',
-        'about': 'serves the ability for users to send messages to each other privately'
+        'about': 'serves the ability for users to send messages to each other within an organization'
     }
 
 
