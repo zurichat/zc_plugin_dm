@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from django.contrib.auth.model import User
+
 
 
 class book_mark(models.Model):
-    user = models.ForeignKey(User, on_delete= models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete= models.CASCADE)
     link = models.CharField(max_length=900)
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
 
@@ -55,11 +55,11 @@ In The message model we have the following fields:
         -   last_updated: The date at which the message was last updated
 """
 class Message(models.Model):
-    sender_id = models.ForeignKey(User,on_delete=models.CASCADE)
-    receiver_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    sender_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="sent")
+    receiver_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="received")
     message = models.TextField()
     meta = models.JSONField()
-    deleted_user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    deleted_user_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
