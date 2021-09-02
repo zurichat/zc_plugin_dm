@@ -45,11 +45,11 @@ In The message model we have the following fields:
         -   last_updated: The date at which the message was last updated
 """
 class Message(models.Model):
-    sender_id = models.ForeignKey(User,on_delete=models.CASCADE)
-    receiver_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    sender_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="sent")
+    receiver_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="received")
     message = models.TextField()
     meta = models.JSONField()
-    deleted_user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    deleted_user_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now=True)
     last_updated = models.DateTimeField(auto_now_add=True)
 
