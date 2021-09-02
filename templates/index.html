@@ -28,7 +28,8 @@
     <link rel="stylesheet" href="assets/style.css" />
 
     <!-- vuex cdn -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script> -->
+    <script src="https://unpkg.com/vuex"></script>
 
     <link rel="stylesheet" href="css/style.css">
     <title>Orpheus</title>
@@ -37,7 +38,7 @@
 <body>
 
 
-    <div id="app" class="bg-light" >
+    <div id="app" class="bg-light">
         <div class="container bg-white w-75 pa-6 dm_layout shadow-sm p-3 mb-5 bg-grey rounded">
             <div class="container message-layout">
                 <!-- <h1>Team Orpheus</h1>
@@ -46,18 +47,25 @@
                 <p>[[ $store.state.message ]]</p> -->
 
                 <div class="row">
-                   <div class="col">
+                    <div class="col">
                         <divider></divider>
-                        <!-- <div for=`message in $store.state.zuri_message` :key="message.name">
-                            <p>[[message]]</p>
-                        </div> -->
-                        <!-- <p>
-                            [[$store.state.zuri_message]]
-                        </p> -->
-
+                        <div v-for="message in $store.state.zuri_message" :key="message"
+                            class="d-flex flex-wrap-xs align-items-start p-2 my-2">
+                            <div>
+                                <b-avatar badge badge-top badge-variant="success"
+                                    src="https://res.cloudinary.com/mogaka-dev/image/upload/v1630499063/avatar_fco1z2.png"
+                                    badge-offset="-0.5em" size="45px"></b-avatar>
+                            </div>
+                            <div>
+                                <b>[[message.receiverName]]</b>&nbsp;&nbsp;[[message.time]]
+                                <div>
+                                    [[message.text]]
+                                </div>
+                            </div>
+                        </div>
                         <message></message>
 
-                   </div>
+                    </div>
                 </div>
             </div>
             <div class="container form-section mb-2">
@@ -65,8 +73,7 @@
                     <div class="col">
                         <div class="textarea-input w-80">
                             <form action="" class="form-control shadow-sm p-3  bg-white rounded">
-                                <b-form-input  size="lg"
-                                    placeholder="Send to ...">
+                                <b-form-input size="lg" placeholder="Send to ...">
                                 </b-form-input>
                             </form>
                         </div>
@@ -93,7 +100,8 @@
 
     // Message Ccomponent
     Vue.component("message", {
-        template: `<div>
+        template:
+            `<div>
             <div class="d-flex flex-wrap-xs align-items-start bg-light p-2" v-for="(messages, index) in message_data" >
                 <div><b-avatar badge badge-top badge-variant="success" src="https://res.cloudinary.com/mogaka-dev/image/upload/v1630499063/avatar_fco1z2.png" badge-offset="-0.5em" size="45px"></b-avatar></div>
                     <div>
