@@ -1,0 +1,30 @@
+/*----------------------divider-line styling-------------------*/
+.divider-line{
+margin-top:20px;
+width:100% !important;
+font-weight: 700;
+}
+.divider-line .timeline {
+font-size: 13px;
+padding:0px 10px;
+top:-14.6px;
+z-index:2;
+border-radius:24px;
+background-color: white;
+}
+.chevron{
+    font-size: 13px;
+    padding:0px 5px;   
+    transform: rotate(90deg) !important;
+}
+
+/* message component design */
+.message_user_icon{
+    width:32px;
+    margin-right: 1%;
+}
+
+.actions{
+    border:2px solid lightgray;
+    border-radius: 10px;
+}
