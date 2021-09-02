@@ -24,6 +24,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             cd ~/zc_plugin_dm
+            git stash
             git checkout main
             git stash
             git pull
