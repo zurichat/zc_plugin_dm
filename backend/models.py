@@ -1,22 +1,33 @@
 from django.db import models
 from django.contrib.auth.models import User
-# this is optional, I used this for enabling me create relationship with the messages and file media
-class Profile(models.Model):
-    user=models.OneToOneField(User,on_delete=models.CASCADE)
-    
-    
-class Messages(models.Model):
-    message=models.CharField(max_length=1200)
-    file=models.FileField(upload_to=None, max_length=100)
-    sender = models.ForeignKey(Profile,on_delete=models.CASCADE)
-    reciever = models.ForeignKey(User,on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True) 
-    
+from django.contrib.auth import get_user_model
+
+
+class Message(models.Model):
+    """
+The message model simulates the Messages being sent by users to one another.
+In The message model we have the following fields:
+        -   sender_id: This is senders id and references the user model via a foreignkey
+        -   receiver_id: This is receivers id and references the user model via a foreignkey
+        -   deleted_user_id: This is users id that deletes a particular message and references the user model via a foreignkey
+        -   message: This is the message being sent to each other.
+        -   meta: This is a Json Object which contains more detailed info about the message being sent
+        -   created_at: The date at which the message was created
+        -   last_updated: The date at which the message was last updated
+"""
+    sender_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    receiver_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    message = models.TextField()
+    meta = models.JSONField()
+    deleted_user_id = models.ForeignKey(User,on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now=True)
+    last_updated = models.DateTimeField(auto_now_add=True)
+
+
     def __str__(self):
-        return self.message
+        return f"{self.sender_id.username} sent '{self.message} ' to {self.receiver_id} "
     
-    class  Meta:
-        ordering = ('timestamp',)
+
         
         
 
@@ -29,7 +40,6 @@ class Media(models.Model):
     class  Meta:
         ordering = ('timestamp',)
         
-from django.contrib.auth import get_user_model
 
 
 class Room(models.Model):
@@ -61,3 +71,6 @@ class Room(models.Model):
 
     def __str__(self) -> str:
         return f"sender:{self.sender}\treceiver:{self.receiver}\tseen:{self.seen}\tdeleted:{self.deleted}"
+
+
+User = get_user_model()
