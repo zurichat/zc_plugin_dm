@@ -28,12 +28,30 @@ def messages(request):
 
     return JsonResponse(messages, safe=False)
 
+# Gives information about the plugin
 def info(request):
     info = {
-        'plugin_id': 201982982,
-        'plugin_name': 'DM plugin',
-        'about': 'serves the ability for users to send messages to each other within an organization'
+        "message": "Plugin Information Retrieved",
+        "data": {
+            "type": "Plugin Information",
+            "plugin_info": {"name": "DM Plugin",
+                            "description": ["Zuri.chat plugin", "DM plugin for Zuri Chat that enables users to send direct messages to each other"]
+                            },
+            "scaffold_structure": "Monolith",
+            "team": "HNG 8.0/Team Orpheus",
+            "sidebar_url": "https://dm.zuri.chat/api/sideBar",
+            "homepage_url": "https://dm.zuri.chat"
+        },
+        "success": "true"
     }
+    return JsonResponse(info, safe=False)
+
+
+
+def side_bar(request):
+    pass
+
+
 
 
 def organizations(request):
