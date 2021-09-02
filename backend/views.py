@@ -53,6 +53,41 @@ def organizations(request):
 
     return JsonResponse(organizations, safe=False)
 
+def send_media(request):
+    media = [
+            {
+                # original message being sent
+                "message":
+                {
+                    "attachment": {
+                        "type": "image",
+                        "payload": {
+                        "is_reusable": True  #makes it possible to send the media file to another person via the app 
+                        }
+                    },
+                    "mediaLocation":"./media/funny.jpeg",
+                    "type": "image/png"
+                },
+
+
+                # resending the media file to another person
+                "message1": 
+                {
+                    "attachment": {
+                        "type": "image",
+                        "payload": {
+                        "is_reusable": True #makes it possible to send the media file to another person via the app 
+                        }
+                    },
+                    "mediaLocation": "./media/cat_image.png",
+                    "type": "image/png"
+                }
+            }
+        ]
+
+    return JsonResponse(media, safe=False)
+
+
 def organization(request):
     pass
 
@@ -88,3 +123,4 @@ def room_files(request):
 
 def room_file(request):
     pass
+
