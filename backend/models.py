@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-
 class Room(models.Model):
     """
     The idea here is that a room is a single hub that holds messages between two parties.
