@@ -1,3 +1,34 @@
+
+*{
+    padding: 0;
+    margin: 0;
+    font-family: 'poppins';
+}
+#app{
+    padding: 20px;
+    margin: auto;
+}
+
+.dm_layout{
+    display: flex;
+    flex-direction: column;
+    min-height: 90vh;
+    position: relative;
+    padding:10px;
+    margin: auto;
+}
+.form-section{
+    min-height: 10vh;
+    /* position: absolute ;
+    bottom: 0; */
+}
+.message-layout{
+    display: flex;
+    flex-direction: column;
+    min-height: 85vh;
+}
+
+
 /*----------------------divider-line styling-------------------*/
 .divider-line{
 margin-top:20px;
@@ -14,7 +45,7 @@ background-color: white;
 }
 .chevron{
     font-size: 13px;
-    padding:0px 5px;   
+    padding:0px 5px;
     transform: rotate(90deg) !important;
 }
 
@@ -28,3 +59,42 @@ background-color: white;
     border:2px solid lightgray;
     border-radius: 10px;
 }
+
+/* sidebar  */
+
+.sidebar_container {
+    width: 241px;
+    height: 100vh;
+    position: absolute;
+    left: 0%;
+    right: 83.26%;
+    top: 0%;
+    bottom: 0%;
+    background: #fff;
+    border: 1px solid grey;
+}
+
+.zuri {
+    font-family: Lato;
+    font-weight: 900;
+    line-height: 30.77px;
+    size: 23.08px;
+    margin-left: 8px;
+    padding-top: 30px;
+}
+
+i {
+    padding-right: 8px;
+}
+
+/* input form */
+.textarea-input{
+    align-self: flex-end;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+ }
