@@ -63,6 +63,26 @@ def star_messages(request):
 
 
 
+def message_reminder(request):
+    message_reminder = [
+        {
+            'sender_id': 'KFC',
+            'is_ready_to_send': False,
+            'Time_to_send_message': "2:01:00",
+            'is_active': False,
+            'is_media': False,
+            'message': 'The message that you set to send some hours ago...'
+        },
+        {
+            'sender_id': 'KFC',
+            'is_ready_to_send': True,
+            'Time_to_send_message': "2:01:00",
+            'is_active': True,
+            'is_media': True,
+            'message': 'The message that you set to send some hours ago is ready to send...'
+        }]
+    return JsonResponse(message_reminder, safe=False)
+
 def organization(request):
     pass
 
