@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+        integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+    <title>Document</title>
+</head>
+<style>
+    *,
+    *::after,
+    *::before {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    p {
+        margin-bottom: 0;
+    }
+
+    body {
+        background-color: #f5f5f5;
+    }
+
+    .popup-notification {
+        position: relative;
+        display: block;
+        width: 100%;
+        max-width: 306px;
+        height: auto;
+        background: #ffffff;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.18);
+        border-radius: 8px;
+        line-height: 0.7;
+    }
+
+    .popup-timer {
+        position: absolute;
+        width: 100%;
+        max-width: 210px;
+        height: auto;
+        background: #FEFEFE;
+        border: 1px solid #C4C4C4;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.18);
+        border-radius: 5px;
+        line-height: 1.4;
+    }
+
+    span.left-popupbar,
+    span i.far.fa-external-link {
+        color: #999999;
+        font-weight: 400;
+    }
+
+    p:hover {
+        background: #00B87C;
+        color: #ffffff;
+    }
+
+    .active {
+        background: #00B87C;
+        color: #fff;
+    }
+
+    span.left-popupbar:hover,
+    span i.far.fa-external-link:hover {
+        color: #fff;
+    }
+
+    div.popup-navbar {
+        font-size: 14px;
+        color: #3A3A3A;
+    }
+</style>
+
+<body>
+    <div class="popup-navbar">
+        <div class="popup-content clearfix mx-auto popup-notification">
+            <b-modal id="modal-1" title="BootsrapVue" class="d-flex flex-column">
+                <p class="d-inline-flex p-3 justify-content-between">Turn off notifications for replies</p>
+                <p class="d-inline-flex p-3 justify-content-between"><span>Mark unread</span> <span
+                        class="left-popupbar">U</span></p>
+                <p class="d-inline-flex p-3 justify-content-between active">Remind me about this</p>
+                <p class="d-inline-flex p-3 justify-content-between">Copy link</p>
+                <p class="d-inline-flex p-3 justify-content-between"><span>Pin to this
+                        conversation</span><span class="left-popupbar">P</span>
+                </p>
+                <p class="d-inline-flex p-3 justify-content-between">Turn question into poll</p>
+                <p class="d-inline-flex p-3 justify-content-between"><span>More message shortcuts</span><span><i
+                            class="far fa-external-link"></i></span>
+                </p>
+            </b-modal>
+        </div>
+        <div class="popup-timer clearfix mx-auto mt-2 py-3">
+            <b-modal id="modal-1" title="BootsrapVue" class="d-flex flex-column">
+                <p class="d-inline-flex px-4 py-2 justify-content-between">In 20 minutes</p>
+                <p class="d-inline-flex px-4 py-2 justify-content-between">In 1 hour</p>
+                <p class="d-inline-flex px-4 py-2 justify-content-between">In 3 hours</p>
+                <p class="d-inline-flex px-4 py-2 justify-content-between">Tomorrow</p>
+                <p class="d-inline-flex px-4 py-2 justify-content-between">Next week
+                </p>
+                <p class="d-inline-flex px-4 py-2 justify-content-between"><span>Custom...</span><span>M</span>
+                </p>
+            </b-modal>
+        </div>
+    </div>
+
+    <!-- Required scripts -->
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+</body>
+
+</html>
