@@ -28,6 +28,32 @@ def messages(request):
 
     return JsonResponse(messages, safe=False)
 
+def new_messages(request):
+    messages = [
+        {
+            'id': '10',
+            'sender_id': '1',
+            'receiver_id': '2',
+            'message': 'Hi, dude',
+            'meta': 'dm_message_304303848',
+            'deleted_user_id': 'null',
+            'created_at': '2021,9,2,0,0',
+            'last_updated_at': 'null',
+        },
+        {
+            'id': '11',
+            'sender_id': '1',
+            'receiver_id': '2',
+            'message': 'Its been awhile',
+            'meta': 'dm_message_304303849',
+            'deleted_user_id': 'null',
+            'created_at': '2021,9,1,0,0',
+            'last_updated_at': 'null',
+        }]
+
+    return JsonResponse(messages, safe=False)
+
+
 def info(request):
     info = {
         'plugin_id': 201982982,
