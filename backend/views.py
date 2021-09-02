@@ -61,7 +61,6 @@ def star_messages(request):
 
 	return JsonResponse(star_messages, safe=False)
 
-
 def organization(request):
     pass
 
