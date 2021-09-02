@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Load required Bootstrap and BootstrapVue CSS -->
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+
+      <!-- Vue.js cdn -->
+      <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <!-- Axios cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- vuex cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <title>Orpheus</title>
+</head>
+
+<body style="text-align: center;">
+    <!-- <h1>Team Orpheus</h1>
+    <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3> -->
+    <h3>DM Reminder</h3>
+
+    <div id="reminder">
+        <ul v-show="show">
+            <li>Turn off notification for replies</li>
+            <li>Mark unread</li>
+            <li onclick="showIt()">Remind me about this</li>
+            <li>Copy link</li>
+            <li>Pin to this conversation</li>
+            <li>Turn question into pool</li>
+            <li>More message shortcuts</li>
+        </ul>
+
+        <div id="reminder1" style="display:none;" >
+            <ul v-show="show">
+                <li @click="show = !show">30 min</li>
+                <li @click="show = !show">1 hour</li>
+                <li @click="show = !show">3 hours</li>
+                <li @click="show = !show">Tomorrow</li>
+                <li @click="show = !show">Next Week</li>
+                <li>Custom</li>
+            </ul>
+        </div>
+
+        <div id="reminder2">
+            <ul v-show="!show">
+                <p>Schedule message</p>
+                <li>Later today at 9:00AM</li>
+                <li>Monday at 9:00 AM</li>
+                <hr>
+                <li>Custom time</li>
+            </ul>
+        </div>
+
+    </div>
+    <!-- LoadBootstrapVue -->
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="./js/main.js"></script>
+</body>
+</html>
