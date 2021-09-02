@@ -27,10 +27,10 @@ jobs:
             cd ~/zc_plugin_dm
             git pull
             pip install -r requirements.txt --upgrade
-            python3 manage.py collectstatic --noinput
             cd ~/zc_plugin_dm/frontend
             npm install
             npm run build
             cd ~/zc_plugin_dm
-            pkill gunicorn
+            python3 manage.py collectstatic --noinput
+            kill $(lsof -t -i:9090)
             gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
