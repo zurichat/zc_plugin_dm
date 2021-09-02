@@ -1,3 +1,4 @@
+from typing_extensions import Unpack
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -34,18 +35,19 @@ class Room(models.Model):
 
 
 User = get_user_model()
-"""
-The message model simulates the Messages being sent by users to one another.
-In The message model we have the following fields:
-        -   sender_id: This is senders id and references the user model via a foreignkey
-        -   receiver_id: This is receivers id and references the user model via a foreignkey
-        -   deleted_user_id: This is users id that deletes a particular message and references the user model via a foreignkey
-        -   message: This is the message being sent to each other.
-        -   meta: This is a Json Object which contains more detailed info about the message being sent
-        -   created_at: The date at which the message was created
-        -   last_updated: The date at which the message was last updated
-"""
+
 class Message(models.Model):
+    """
+    The message model simulates the Messages being sent by users to one another.
+    In The message model we have the following fields:
+            -   sender_id: This is senders id and references the user model via a foreignkey
+            -   receiver_id: This is receivers id and references the user model via a foreignkey
+            -   deleted_user_id: This is users id that deletes a particular message and references the user model via a foreignkey
+            -   message: This is the message being sent to each other.
+            -   meta: This is a Json Object which contains more detailed info about the message being sent
+            -   created_at: The date at which the message was created
+            -   last_updated: The date at which the message was last updated
+    """
     sender_id = models.ForeignKey(User,on_delete=models.CASCADE)
     receiver_id = models.ForeignKey(User,on_delete=models.CASCADE)
     message = models.TextField()
@@ -58,3 +60,16 @@ class Message(models.Model):
     def __str__(self):
         return f"{self.sender_id.username} sent '{self.message} ' to {self.receiver_id} "
     
+class AutoResponder(models.Model):
+    """
+    The AutoResponder Model consists of the following fields: 
+            -   user_id: This is the user's id and references the user model via a foreignkey
+            -   message: This is the message content of the autoresponder and it is a TextField
+            -   Created_at: This is the timestamp for the message creation
+    """
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return F"{self.user_id.username}'s Auto response"
