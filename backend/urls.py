@@ -19,7 +19,7 @@ urlpatterns = [
     path('api/organizations/id/rooms/id/media/id', views.room_media, name='room_media'),
     path('api/organizations/id/rooms/id/files', views.room_files, name='room_files'),
     path('api/organizations/id/rooms/id/files/id', views.room_file, name='room_file'),
-    
+
     # Specific Routes for tasks
     path('api/users',views.index),
     path('api/newMessages',views.index),
@@ -47,10 +47,11 @@ urlpatterns = [
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.index),
     path('api/autoResponse',views.index),
-    path('api/setReminder',views.index),
-    
+    path('api/setReminder',views.message_reminder, name = "message_reminder"),
+
 
 
     path('messages', views.messages, name='messages'),
+    path('star_messages', views.star_messages, name='star_messages'),
 
 ]
