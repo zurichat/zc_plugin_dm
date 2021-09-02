@@ -1,5 +1,15 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.contrib.auth.model import User
+
+
+class book_mark(models.Model):
+    user = models.ForeignKey(User, on_delete= models.CASCADE)
+    link = models.CharField(max_length=900)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+
+    def __str__(self):
+        return self.user
 
 class Room(models.Model):
     """
