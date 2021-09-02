@@ -1,5 +1,8 @@
+{% load render_bundle from webpack_loader %}
+
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD
 
 <head>
     <meta charset="UTF-8" />
@@ -136,3 +139,24 @@
     });
 
 </script>
+=======
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% render_bundle 'app' 'css' %}
+    <title>Orpheus</title>
+</head>
+
+<body style="text-align: center;">
+    <h1>Team Orpheus</h1>
+    <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
+
+    <div id="app"></div>
+
+    {% render_bundle 'app' 'js' %}
+</body>
+
+</html>
+>>>>>>> 7e61113ff0f94e5709737e2bf692cfd5450f4f51

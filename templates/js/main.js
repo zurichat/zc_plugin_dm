@@ -3,49 +3,65 @@ var app = new Vue({
 'store': new Vuex.Store(
     {
       state: {
-        message: 'Welcome, Vuex is now available for this app',
-        zuri_message: [
-          {
-            "senderName": "Romanric",
-            "receiverName": "Phosah",
-            "HasProfileImage": false,
-            "text": "Hello, Are you busy? We have to continue our discussions on the project. It's mandatory that we finish it before our next meeting",
-            "hasEmoji": true,
-            "time": "6:03pm",
-
-          },
-          {
-            "senderName": "Eniola",
-            "receiverName": "Thomas",
-            "HasProfileImage": true,
-            "text": "Just don't forget to do it. You've been procastinating for so long. It's beginning to seem as if we aren't making any headway",
-            "time": "9:33pm"
-          },
-          {
-            "senderName": "Jane",
-            "receiverName": "Tessy",
-            "HasProfileImage": false,
-            "hasEmoji": true,
-            "text": "Goodmorning dear, Hope your day is going well. I'd like to inform on the impromptu travel for next week. I'm very sorry its coming late but its really urgent and i promise to caught up on work",
-            "time": "7:45am"
-          },
-          {
-            "senderName": "Timi",
-            "receiverName": "Mark",
-            "HasProfileImage": false,
-            "hasEmoji": false,
-            "text": "With regards to the message you sent i'd let to find out my options. Is it possible i work in both departments or i make a choice and stick to my fort point?",
-            "time": "8:15pm"
-          },
-          {
-            "senderName": "Belrah",
-            "receiverName": "Jane",
-            "HasProfileImage": false,
-            "hasEmoji": true,
-            "text": "Why are you not picking my calls. You know we have a meeting for 8:00am tommorrow and you're refusing to pick calls. Have you pushed your project?",
-            "time": "10:10pm"
-          },
-        ]
+        zuri_messages: {
+          message: [
+            {
+              "id": "001",
+              "profile_photo": "user.png",
+              "sender": "Romanric",
+              "receiver": "Phosah",
+              "message": "There will be an urgent meeting with the frontend team today at 8:00pm. Everyone should try to attend. We will be discussing majorly on how best to move the project forward.",
+              "delivered": true,
+              "media_file": false,
+              "has_emoji": true,
+              "time": "3:18pm",
+            },
+            {
+              "id": "002",
+              "profile_photo": "user.png",
+              "sender": "Belrah",
+              "receiver": "blac_dev",
+              "message": "Hello, Are you busy? We have to continue our discussions on the project. It's mandatory we finish it before our next meeting.",
+              "delivered": true,
+              "media_file": true,
+              "has_emoji": false,
+              "time": "10:28am",
+            },
+            {
+              "id": "003",
+              "profile_photo": "user.png",
+              "sender": "Psami",
+              "receiver": "HeizelCodes",
+              "message": "Just don't forget to do it. You've been procastinating for so long. It's beginning to seem as if we aren't making any headway",
+              "delivered": true,
+              "media_file": true,
+              "has_emoji": true,
+              "time": "6:15am",
+            },
+            {
+              "id": "004",
+              "profile_photo": "user.png",
+              "sender": "Zxenon",
+              "receiver": "Ej",
+              "message": "I just finished the first part of the project. Will start work on the rest immediately. Is there any other thing you'd like for me to do? We're behind schedule.",
+              "delivered": false,
+              "media_file": false,
+              "has_emoji": true,
+              "time": "4:24pm",
+            },
+            {
+              "id": "005",
+              "profile_photo": "user.png",
+              "sender": "Geegee",
+              "receiver": "Delight",
+              "message": "Why are you not picking my calls. You know we have a meeting for 8:00am tommorrow and you're refusing to pick calls. Have you pushed to the repo?",
+              "delivered": true,
+              "media_file": false,
+              "has_emoji": false,
+              "time": "8:18pm",
+            }
+          ]
+        }
       },
       mutations: {
       },
@@ -59,8 +75,7 @@ var app = new Vue({
   ),
 delimiters: ["[[", "]]"],
 data: {
-  message: 'Hello Vue!',
-
+  message: 'Hello Vue!',  
 },
 
 });

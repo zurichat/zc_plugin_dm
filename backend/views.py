@@ -1,7 +1,5 @@
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from django.http import HttpResponse
-from .serializers import UserSerializer
 
 # Create your views here.
 
@@ -27,6 +25,7 @@ def messages(request):
         }]
 
     return JsonResponse(messages, safe=False)
+<<<<<<< HEAD
 
 def info(request):
     info = {
@@ -118,3 +117,5 @@ def room_files(request):
 
 def room_file(request):
     pass
+=======
+>>>>>>> 7e61113ff0f94e5709737e2bf692cfd5450f4f51
