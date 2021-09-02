@@ -1,7 +1,7 @@
 const BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = {
-    publicPath: "http://localhost:8080/",
+    publicPath: "http://localhost:8000/static",
     outputDir: "./dist/",
     productionSourceMap: false,
 
@@ -17,7 +17,7 @@ module.exports = {
         config.resolve.alias.set('__STATIC__', 'static')
 
         config.devServer
-            .public('http://localhost:8080/')
+            .public('http://localhost:8000/')
             .host('0.0.0.0')
             .port(8080)
             .hotOnly(true)
