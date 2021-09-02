@@ -92,12 +92,16 @@ def list_archives(request):
             'id': '13',
             'from': 'Korede',
             'to': ['mark', ],
+            'message': 'Are you now in stage 5?',
+            'date_sent': '2021-05-15T10:49:59.581770Z',
             'archived': True
         },
         {
             'id': '21',
             'from': 'Xylum',
             'to': ['KoredeDavid', ],
+            'date_sent': '2021-05-17T18:27:24.376865Z',
+            'message': 'I need your help sir',
             'archived': True
         }
     ]
