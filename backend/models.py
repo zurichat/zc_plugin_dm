@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
-<<<<<<< HEAD
 # Create your models here.
 class book_mark(models.Model):
     user = models.ForeignKey(User, on_delete= models.CASCADE)
@@ -10,7 +10,6 @@ class book_mark(models.Model):
 
     def __str__(self):
         return self.user
-=======
 class Room(models.Model):
     """
     The idea here is that a room is a single hub that holds messages between two parties.
@@ -67,4 +66,3 @@ class Message(models.Model):
     def __str__(self):
         return f"{self.sender_id.username} sent '{self.message} ' to {self.receiver_id} "
     
->>>>>>> faa825e0e20d8693fde3de75d47c3683274fd48d
