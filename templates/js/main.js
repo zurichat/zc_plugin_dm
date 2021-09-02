@@ -43,7 +43,7 @@ var app = new Vue({
               "profile_photo": "user.png",
               "sender": "Zxenon",
               "receiver": "Ej",
-              "message": "Goodmorning, Hope your day is going well. I'd like to inform on my impromptu travel scheduled for next week wednesday. I'm very sorry its coming late but its really urgent and i promise to caught up on work.",
+              "message": "I just finished the first part of the project. Will start work on the rest immediately. Is there any other thing you'd like for me to do? We're behind schedule.",
               "delivered": false,
               "media_file": false,
               "has_emoji": true,
@@ -59,9 +59,7 @@ var app = new Vue({
               "media_file": false,
               "has_emoji": false,
               "time": "8:18pm",
-            },
-
-
+            }
           ]
         }
       },
