@@ -34,7 +34,7 @@ DEBUG = str(os.getenv('DEBUG'))
 ALLOWED_HOSTS = ["dm.zuri.chat", '127.0.0.1']
 
 CORS_ALLOWED_ORIGINS = [
-    "http://dm.zuri.chat",
+    "https://dm.zuri.chat",
     "http://127.0.0.1:8000"
 ]
 
