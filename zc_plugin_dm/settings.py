@@ -19,7 +19,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 DEBUG = str(os.getenv('DEBUG'))
 
 
-ALLOWED_HOSTS = ["dm.zuri.chat"]
+ALLOWED_HOSTS = ["127.0.0.1","dm.zuri.chat"]
 
 CORS_ALLOWED_ORIGINS = [
     "https://dm.zuri.chat",
@@ -122,14 +122,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-<<<<<<< HEAD
 # STATIC_ROOT  =   os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # this is for auto incrementing id's in the model
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-=======
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # vue static folder
@@ -149,4 +147,3 @@ WEBPACK_LOADER = {
         'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
     }
 }
->>>>>>> 6b0090ba93b61725d4ba6f40e08cd385abc42066

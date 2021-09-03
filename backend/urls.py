@@ -1,5 +1,6 @@
 from . import views
 from django.urls import path
+from django.conf.urls import url
 
 app_name = 'backend'
 
@@ -44,6 +45,8 @@ urlpatterns = [
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.index),
     path('api/editMessage',views.index),
+    # using url and regular expressions to do GET/PUT/DELETE
+    url(r'^api/message_list/(?P<pk>[0-9]+)$', views.messages_list),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
     path('api/autoResponse',views.index),

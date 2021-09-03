@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
 
+
+# acting for user
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
 class Message(models.Model):
     """
 The message model simulates the Messages being sent by users to one another.

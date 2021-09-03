@@ -4,8 +4,10 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
-from .serializers import UserSerializer
+from .serializers import UserSerializer,MessageSerializer
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import JSONParser 
 from rest_framework import status
 
 # Create your views here.
@@ -224,3 +226,29 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
+
+
+# get delete and post for messages view task 
+
+@api_view(['GET', 'POST', 'DELETE'])
+def messages_list(request):
+    if request.method == 'GET':
+        data = Message.objects.all()
+        
+        text = request.query_params.get('message', None)
+       
+        message_serializer = MessageSerializer(text, many=True)
+        return JsonResponse(message_serializer.data, safe=False)
+        # 'safe=False' for objects serialization
+ 
+    elif request.method == 'POST':
+        message_data = JSONParser().parse(request)
+        message_serializer = MessageSerializer(data=message_data)
+        if message_serializer.is_valid():
+            message_serializer.save()
+            return JsonResponse(message_serializer.data, status=status.HTTP_201_CREATED) 
+        return JsonResponse(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        count = Message.objects.all().delete()
+        return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
