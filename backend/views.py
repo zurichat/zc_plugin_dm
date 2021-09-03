@@ -363,3 +363,23 @@ def replyMessage(request):
         }
     ]
     return Response(reply_message, status=status.HTTP_200_OK)
+
+@api_view(['GET'],)
+def get_starred(request):
+    get_starred = [
+        {
+            'sender_id': 'Laurie',
+            'message': 'Hello',
+            'created_at': '0800hrs',
+            'star_messages': True,
+        },
+
+        {
+            'sender_id': 'Barney',
+            'message': 'Assignment due',
+            'created_at': '1500hrs',
+            'star_messages': True,
+        }
+
+    ]
+    return JsonResponse(get_starred, safe=False)
