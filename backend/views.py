@@ -72,11 +72,11 @@ def user(request):
 def user_profile(request):
     user_profile = [
         {
-            'username': get_username () ,
-            'fullname': get_full_name () ,
-            'image': image,
-            'email': get_email_user () ,
-            'date joined': get_date_joined () ,
+            'username': 'Derin' ,
+            'fullname': 'Derin Aslin' ,
+            'image': 'templates/images/big.jpg',
+            'email': 'derino@zuri.com' ,
+            'date joined': '22/08/2021' ,
 
         }
     ]

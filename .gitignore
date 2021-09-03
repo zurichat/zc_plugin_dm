@@ -10,6 +10,7 @@ env/
 *.pot
 *.pyc
 *__pycache__
+/__pycahe__
 
 # *media
 *.DS_Store
