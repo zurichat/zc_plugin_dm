@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/messagesByDate',views.index),
     path('api/messageByUser',views.index),
     path('api/messageByKeywords',views.index),
-    path('api/pagination',views.index),
+    path('api/pagination/',views.pagination),
     path('api/userProfile',views.index),
     path('api/editUserProfile',views.index),
     path('api/forwardMessages',views.index),
