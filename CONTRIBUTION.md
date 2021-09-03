@@ -26,7 +26,7 @@ git remote add upstream https://github.com/zurichat/zc_plugin_dm
 ## Checkout Develop Branch
 Checkout develop branch by running
 ```
-git checkout develop
+git checkout develop_test_2
 ```
 
 ## Checkout Your Feature Branch
