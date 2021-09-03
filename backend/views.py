@@ -135,7 +135,80 @@ def organization(request):
 
 
 def users(request):
-    pass
+    users = [
+        {
+            'name': 'Seye Olowo',
+            'is_active': True,
+            'last_message_snippet': 'How are you man?',
+            'user_info': {
+                'username': 'blaco',
+                'id': 1,
+                'email': 'blac@gmail.com'
+            }
+        },
+        {
+            'name': 'Roman Reigns',
+            'is_active': False,
+            'last_message_snippet': 'Have you made your pull request?',
+            'user_info': {
+                'username': 'Romanric',
+                'id': 12,
+                'email': 'roman@gmail.com'
+            }
+        },
+        {
+            'name': 'Florence Girl',
+            'is_active': True,
+            'last_message_snippet': 'Thank You...',
+            'user_info': {
+                'username': 'Fae',
+                'id': 14,
+                'email': 'florence@gmail.com'
+            }
+        },
+        {
+            'name': 'Timmy Joe',
+            'is_active': False,
+            'last_message_snippet': 'Good evening boss, I want....',
+            'user_info': {
+                'username': 'manofmind',
+                'id': 4,
+                'email': 'timmy@gmail.com'
+            }
+        },
+        {
+            'name': 'Jeff Jones',
+            'is_active': True,
+            'last_message_snippet': 'My king',
+            'user_info': {
+                'username': 'Jiggy',
+                'id': 6,
+                'email': 'jonzy@gmail.com'
+            }
+        },
+        {
+            'name': 'Mamba Joy',
+            'is_active': True,
+            'last_message_snippet': 'i dey go school now',
+            'user_info': {
+                'username': 'mamba',
+                'id': 100,
+                'email': 'ogblaq@gmail.com'
+            }
+        },
+        {
+            'name': 'Destiny Delight',
+            'is_active': False,
+            'last_message_snippet': 'Good day to you, I want to ask a que.....',
+            'user_info': {
+                'username': 'Delight',
+                'id': 189,
+                'email': 'delight@gmail.com'
+            }
+        },
+    ]
+
+    return JsonResponse({'users': users})
 
 
 def user(request):
