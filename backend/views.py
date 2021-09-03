@@ -127,7 +127,7 @@ def user(request):
     pass
 
 
-<<<<<<< HEAD
+
 def user_profile(request):
     user_profile = [
         {
@@ -142,8 +142,7 @@ def user_profile(request):
     return JsonResponse ( user_profile , safe=False )
 
 
-=======
->>>>>>> b62a262db31a4eedfc68ee6097e810a6cce8bebd
+
 def rooms(request):
     pass
 
