@@ -1,4 +1,4 @@
-name: Zuri DM Deployment
+name: Zuri DM Deployment File
 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -23,14 +23,15 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            cd /home/orpheus
-            source zc_plugin_dm_venv/bin/activate
-            cd /home/orpheus/zc_plugin_dm
+            cd ~/zc_plugin_dm
+            git clean -fd
+            git stash
             git pull
+            source env/bin/activate
+            pip install -r requirements.txt --upgrade
+            cd ~/zc_plugin_dm/frontend
+            yarn install
+            yarn run build
+            cd ~/zc_plugin_dm
             python3 manage.py collectstatic --noinput
-            cd /home/orpheus/zc_plugin_dm/frontend
-            npm install
-            npm run build
-            cd /home/orpheus/zc_plugin_dm
-            pkill gunicorn
-            gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
+            fuser -k -HUP 9090/tcp
