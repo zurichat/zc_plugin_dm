@@ -26,7 +26,16 @@ def messages(request):
 
     return JsonResponse(messages, safe=False)
 
-
+def edit_message(request):
+    messages = [
+        {
+            'user':'Victor',
+            'location': 'Finland',
+            'is_active': True,
+        }
+    ]
+    return JsonResponse(messages, safe=False)
+    
 def side_bar(request):
     pass
 
