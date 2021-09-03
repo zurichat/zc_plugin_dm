@@ -1,8 +1,11 @@
+from backend.models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse
+from rest_framework.decorators import api_view
 from .serializers import UserSerializer
-
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 
@@ -118,3 +121,66 @@ def room_files(request):
 
 def room_file(request):
     pass
+
+    
+@api_view(['GET'],)
+def pagination(request):
+    limit = int(request.query_params.get('limit', 2))
+    page = int(request.query_params.get('page', 1))
+    total_messages = {
+        "page":page,
+        "limit":limit,
+         "messages":   [
+            {
+                'sender': 'Victor',
+                'receiver': 'Samuel',
+                'message': 'Hello, dude',
+                'seen':True
+            },
+            {
+                'sender': 'Samuel',
+                'receiver': 'Vctor',
+                'message': 'Hello!!!',
+                'seen':True
+            },
+                {
+                'sender': 'Victor',
+                'receiver': 'Samuel',
+                'message': 'How was today ?',
+                'seen':True
+            },
+            {
+                'sender': 'Samuel',
+                'receiver': 'Victor',
+                'message': 'Good, good!!!, Yours ?',
+                'seen':True
+            },
+            {
+                'sender': 'Victor',
+                'receiver': 'Samuel',
+                'message': 'Great',
+                'seen':True
+            },
+            {
+                'sender': 'Samuel',
+                'receiver': 'Victor',
+                'message': 'How was your day',
+                'seen':True
+            },
+            {
+                'sender': 'Victor',
+                'receiver': 'Samuel',
+                'message': 'Fine',
+                'seen':True
+            }
+        ]
+            }
+    
+    if limit > 7:
+        return Response("Limit cannot exceed number of messages", status=status.HTTP_400_BAD_REQUEST)
+    else:
+        total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
+        return Response(total_messages, status=status.HTTP_200_OK)
+        
+    
+    
