@@ -316,3 +316,17 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def send_file(request):
+    file = [
+             {
+                 
+            'id': '1',
+            'message_id': '2',
+            'file_name': 'dbdiagram',
+            'file_path': 'media/dbdiagram.pdf',
+            'created_at': '20-09-21 19:03:01'
+             }
+        ]
+    return Response(file, status=status.HTTP_200_OK)
