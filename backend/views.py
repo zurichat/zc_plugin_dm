@@ -26,10 +26,6 @@ def messages(request):
 
     return JsonResponse(messages, safe=False)
 
-# Gives information about the plugin
-def info(request):
-    pass
-
 
 def side_bar(request):
     pass
