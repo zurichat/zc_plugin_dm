@@ -224,3 +224,29 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'],)
+def reply_message(request):
+    messageList = {
+        "message1": [{
+            "message_id": "001",
+            "user": "Mykie",
+            "content": "Hello Mark"
+        }],
+        "message2": [{
+            "message_id": "002",
+            "user": "Mark",
+            "content": "Hi Mykie, how are you doing?"
+        }]
+    }
+    mesSage = messageList["message2"]
+    reply_message = [
+        {
+            'reply_id': "003",
+            'replied_to': mesSage,
+            'content': 'I am fine Mark thank you',
+        }
+    ]
+
+    return Response(reply_message, status=status.HTTP_200_OK)
