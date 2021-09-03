@@ -10,6 +10,6 @@ env/
 *.pot
 *.pyc
 *__pycache__
-
+*.idea
 # *media
 *.DS_Store

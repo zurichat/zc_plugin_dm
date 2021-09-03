@@ -1,6 +1,7 @@
 from backend.models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
+
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
@@ -31,7 +32,13 @@ def messages(request):
             'message': 'I\'m on my way home'
         }]
 
-    return JsonResponse(messages, safe=False)
+    return HttpResponse(f"{messages}")
+
+
+def side_bar(request):
+    pass
+
+
 
 def info(request):
     info = {
@@ -39,7 +46,7 @@ def info(request):
         'plugin_name': 'DM plugin',
         'about': 'serves the ability for users to send messages to each other privately'
     }
-    
+
     return JsonResponse(info, safe=False)
 
 
@@ -58,16 +65,10 @@ def organizations(request):
             'about': 'Supermarket'
         }]
 
-    return JsonResponse(organizations, safe=False)
-	
-@api_view(['GET'],)
-def star_messages(request):
-    star_messages = {
-        'msgID': 134,
-        'starred': True,
-    }
 
-    return Response(star_messages, status=status.HTTP_200_OK)
+    return JsonResponse(organizations, safe=False)
+
+
 
 def message_reminder(request):
     message_reminder = [
@@ -90,7 +91,7 @@ def message_reminder(request):
     return JsonResponse(message_reminder, safe=False)
 
 def organization(request):
-    pass
+    return HttpResponse("<h1>Is this working?</h1>")
 
 def users(request):
     pass
@@ -141,7 +142,6 @@ def room_file(request):
     pass
 
 
-
 def sort_message(request):
     #Use the below when the message object is ready and also delete the dummy data.
     # messages = Message.objects.order_by('-created_at')
@@ -153,7 +153,7 @@ def sort_message(request):
     #     messagedict['created_at']=message_.created_at
     #     messagedict['meta']=message_.meta
     # return  JsonResponse(messagedict)
-        
+
     messages = [
         {
             'user': 'Fortunate',
@@ -171,7 +171,17 @@ def sort_message(request):
         }]
     return JsonResponse(messages,safe=False)
 
-    
+
+@api_view(['GET'],)
+def star_messages(request):
+    star_messages = {
+        'msgID': 134,
+        'starred': True,
+    }
+
+    return Response(star_messages, status=status.HTTP_200_OK)
+
+
 @api_view(['GET'],)
 def pagination(request):
     limit = int(request.query_params.get('limit', 2))
@@ -224,11 +234,9 @@ def pagination(request):
             }
         ]
             }
-    
+
     if limit > 7:
         return Response("Limit cannot exceed number of messages", status=status.HTTP_400_BAD_REQUEST)
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-        
-    
