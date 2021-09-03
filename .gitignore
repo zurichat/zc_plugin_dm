@@ -11,6 +11,10 @@ env/
 *.pyc
 *__pycache__
 
+*.idea
+=======
+.idea
+
 # *media
 *.DS_Store
 
