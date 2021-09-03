@@ -88,6 +88,7 @@ def message_reminder(request):
         }]
     return JsonResponse(message_reminder, safe=False)
 
+@api_view(['GET'])
 def send_media(request):
     media = [
             {
@@ -103,24 +104,10 @@ def send_media(request):
                     "mediaLocation":"./media/funny.jpeg",
                     "type": "image/png"
                 },
-
-
-                # resending the media file to another person
-                "message1": 
-                {
-                    "attachment": {
-                        "type": "image",
-                        "payload": {
-                        "is_reusable": True #makes it possible to send the media file to another person via the app 
-                        }
-                    },
-                    "mediaLocation": "./media/cat_image.png",
-                    "type": "image/png"
-                }
             }
         ]
 
-    return JsonResponse(media, safe=False)
+    return Response(media, status=status.HTTP_200_OK)
 
 
 def organization(request):
