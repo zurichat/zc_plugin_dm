@@ -64,7 +64,7 @@ def info(request):
         },
         "success": "true"
     }]
-    return JsonResponse(messages, safe=False)
+    return JsonResponse(info, safe=False)
 
 def organization(request):
     pass
