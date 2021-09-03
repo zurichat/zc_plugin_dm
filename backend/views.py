@@ -69,7 +69,7 @@ def star_messages(request):
 def archive_message(request):
 	archive_message={
 	'msgID'=121,
-	archived=True}
+	'archived'=True}
 	return JsonResponse(archive_message, safe=False)
 
 
