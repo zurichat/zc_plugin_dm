@@ -30,7 +30,7 @@ urlpatterns = [
     path('api/sendFile',views.send_file),
     path('api/sendMedia',views.send_media),
     path('api/messagesByDate',views.index),
-    path('api/messageByUser',views.index),
+    path('api/messageByUser',views.filter_user),
     path('api/messageByKeywords',views.index),
     path('api/pagination/',views.pagination),
     path('api/userProfile',views.user_profile, name = 'user_profile'),
