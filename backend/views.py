@@ -40,6 +40,7 @@ def info(request):
     }
     
     return JsonResponse(info, safe=False)
+    
 def edit_message(request):
     messages = [
         {
