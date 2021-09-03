@@ -45,7 +45,7 @@ urlpatterns = [
     path('api/archivedMessages',views.index),
     path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
-    path('api/sortMessage',views.sort_message),
+    path('api/sortMessage',views.index),
     path('api/autoResponse',views.index),
     path('api/setReminder',views.message_reminder, name = "message_reminder"),
 

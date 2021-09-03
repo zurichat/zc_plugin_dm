@@ -6,7 +6,6 @@ from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
-
 # Create your views here.
 
 
@@ -123,37 +122,6 @@ def room_files(request):
 def room_file(request):
     pass
 
-
-
-def sort_message(request):
-    #Use the below when the message object is ready and also delete the dummy data.
-    # messages = Message.objects.order_by('-created_at')
-    # messagedict = {}
-    # for message_ in messagedict:
-    #     messagedict['sender']=message_.sender_id
-    #     messagedict['receiver']=message_.receiver_id
-    #     messagedict['message']=message_.message
-    #     messagedict['created_at']=message_.created_at
-    #     messagedict['meta']=message_.meta
-    # return  JsonResponse(messagedict)
-        
-    messages = [
-        {
-            'user': 'Fortunate',
-            'location': 'Finland',
-            'is_active': True,
-            'message': 'Hi, dude',
-            'created_at':"2020-5-10"
-        },
-        {
-            'name': 'Asyncdeveloper',
-            'location': 'Nigeria',
-            'is_active': True,
-            'message': 'I\'m on my way home',
-            'created_at':"2021-5-10"
-        }]
-    return JsonResponse(messages,safe=False)
-
     
 @api_view(['GET'],)
 def pagination(request):
@@ -214,4 +182,5 @@ def pagination(request):
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
         
+    
     
