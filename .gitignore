@@ -13,3 +13,5 @@ env/
 
 # *media
 *.DS_Store
+
+*yarn.lock
