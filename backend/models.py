@@ -11,6 +11,7 @@ class book_mark(models.Model):
     def __str__(self):
         return self.user
 
+
 class Room(models.Model):
     """
     The idea here is that a room is a single hub that holds messages between two parties.
@@ -43,6 +44,10 @@ class Room(models.Model):
 
 
 User = get_user_model()
+
+class profile_image():
+    image = models.URLField(blank=True)
+
 """
 The message model simulates the Messages being sent by users to one another.
 In The message model we have the following fields:
