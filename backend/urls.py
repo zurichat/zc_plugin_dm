@@ -36,7 +36,7 @@ urlpatterns = [
     path('api/userProfile',views.user_profile, name = 'user_profile'),
     path('api/editUserProfile',views.index),
     path('api/forwardMessages',views.index),
-    path('api/replyMessage',views.index),
+    path('api/replyMessage',views.replyMessage, name='reply_message'),
     path('api/userStatus',views.index),
     path('api/DMList',views.index),
     path('api/pinMessage',views.index),
