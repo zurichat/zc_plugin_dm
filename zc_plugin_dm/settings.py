@@ -19,7 +19,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 DEBUG = str(os.getenv('DEBUG'))
 
 
-ALLOWED_HOSTS = ["127.0.0.1","dm.zuri.chat"]
+ALLOWED_HOSTS = ["dm.zuri.chat"]
 
 CORS_ALLOWED_ORIGINS = [
     "https://dm.zuri.chat",

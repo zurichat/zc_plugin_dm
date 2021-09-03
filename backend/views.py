@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.parsers import JSONParser 
 from rest_framework import status
 
+
 # Create your views here.
 
 
@@ -38,6 +39,7 @@ def messages(request):
 
 def side_bar(request):
     pass
+
 
 
 
@@ -70,6 +72,12 @@ def organizations(request):
     return JsonResponse(organizations, safe=False)
 
 
+def archive_message(request):
+	archive_message={
+	'msgID':121,
+	'archived':True}
+	return JsonResponse(archive_message, safe=False)
+
 
 def message_reminder(request):
     message_reminder = [
@@ -91,38 +99,162 @@ def message_reminder(request):
         }]
     return JsonResponse(message_reminder, safe=False)
 
+
+def list_archives(request):
+    archived_messages = [
+        {
+            'id': '13',
+            'from': 'Korede',
+            'to': ['mark', ],
+            'message': 'Are you now in stage 5?',
+            'date_sent': '2021-05-15T10:49:59.581770Z',
+            'archived': True
+        },
+        {
+            'id': '21',
+            'from': 'Xylum',
+            'to': ['KoredeDavid', ],
+            'date_sent': '2021-05-17T18:27:24.376865Z',
+            'message': 'I need your help sir',
+            'archived': True
+        }
+    ]
+
+    return JsonResponse(archived_messages, safe=False)
+
+
 def organization(request):
     return HttpResponse("<h1>Is this working?</h1>")
 
+
 def users(request):
-    pass
+    users = [
+        {
+            'name': 'Seye Olowo',
+            'is_active': True,
+            'last_message_snippet': 'How are you man?',
+            'user_info': {
+                'username': 'blaco',
+                'id': 1,
+                'email': 'blac@gmail.com'
+            }
+        },
+        {
+            'name': 'Roman Reigns',
+            'is_active': False,
+            'last_message_snippet': 'Have you made your pull request?',
+            'user_info': {
+                'username': 'Romanric',
+                'id': 12,
+                'email': 'roman@gmail.com'
+            }
+        },
+        {
+            'name': 'Florence Girl',
+            'is_active': True,
+            'last_message_snippet': 'Thank You...',
+            'user_info': {
+                'username': 'Fae',
+                'id': 14,
+                'email': 'florence@gmail.com'
+            }
+        },
+        {
+            'name': 'Timmy Joe',
+            'is_active': False,
+            'last_message_snippet': 'Good evening boss, I want....',
+            'user_info': {
+                'username': 'manofmind',
+                'id': 4,
+                'email': 'timmy@gmail.com'
+            }
+        },
+        {
+            'name': 'Jeff Jones',
+            'is_active': True,
+            'last_message_snippet': 'My king',
+            'user_info': {
+                'username': 'Jiggy',
+                'id': 6,
+                'email': 'jonzy@gmail.com'
+            }
+        },
+        {
+            'name': 'Mamba Joy',
+            'is_active': True,
+            'last_message_snippet': 'i dey go school now',
+            'user_info': {
+                'username': 'mamba',
+                'id': 100,
+                'email': 'ogblaq@gmail.com'
+            }
+        },
+        {
+            'name': 'Destiny Delight',
+            'is_active': False,
+            'last_message_snippet': 'Good day to you, I want to ask a que.....',
+            'user_info': {
+                'username': 'Delight',
+                'id': 189,
+                'email': 'delight@gmail.com'
+            }
+        },
+    ]
+
+    return JsonResponse({'users': users})
+
 
 def user(request):
     pass
 
+
+
+def user_profile(request):
+    user_profile = [
+        {
+            'username': 'Derin' ,
+            'fullname': 'Derin Aslin' ,
+            'image': 'templates/images/big.jpg',
+            'email': 'derino@zuri.com' ,
+            'date joined': '22/08/2021' ,
+
+        }
+    ]
+    return JsonResponse ( user_profile , safe=False )
+
+
+
 def rooms(request):
     pass
+
 
 def room(request):
     pass
 
+
 def room_users(request):
     pass
+
 
 def room_messages(request):
     pass
 
+
 def room_message(request):
     pass
+
 
 def room_medias(request):
     pass
 
+
 def room_media(request):
     pass
 
+
 def room_files(request):
     pass
+
 
 def room_file(request):
     pass
@@ -166,6 +298,39 @@ def star_messages(request):
     }
 
     return Response(star_messages, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'], )
+def auto_response(request):
+    auto_response_message = {
+        'userId': 23,
+        'auto_response': True,
+        'message': "Brian is currently offline. Please leave your message. He will reply you as soon as he's back "
+                   "online "
+    }
+
+    return Response(auto_response_message, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def send_media(request):
+    media = [
+             {
+                 # original message being sent
+                 "message":
+                 {
+                     "attachment": {
+                         "type": "image",
+                         "payload": {
+                         "is_reusable": True  #makes it possible to send the media file to another person via the app 
+                         }
+                     },
+                     "mediaLocation":"./media/funny.jpeg",
+                     "type": "image/png"
+                 },
+             }
+        ]
+    return Response(media, status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'],)
@@ -252,3 +417,40 @@ def messages_list(request):
     elif request.method == 'DELETE':
         count = Message.objects.all().delete()
         return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
+@api_view(['GET'])
+def send_file(request):
+    file = [
+             {
+                 
+            'id': '1',
+            'message_id': '2',
+            'file_name': 'dbdiagram',
+            'file_path': 'media/dbdiagram.pdf',
+            'created_at': '20-09-21 19:03:01'
+             }
+        ]
+    return Response(file, status=status.HTTP_200_OK)
+
+@api_view(['GET'],)
+def replyMessage(request):
+    messageList = {
+        "message1": [{
+            "message_id": "001",
+            "user": "Mykie",
+            "content": "Hello Mark"
+        }],
+        "message2": [{
+            "message_id": "002",
+            "user": "Mark",
+            "content": "Hi Mykie, how are you doing?"
+        }]
+    }
+    mesSage = messageList["message2"]
+    reply_message = [
+        {
+            'reply_id': "003",
+            'replied_to': mesSage,
+            'content': 'I am fine Mark thank you',
+        }
+    ]
+    return Response(reply_message, status=status.HTTP_200_OK)

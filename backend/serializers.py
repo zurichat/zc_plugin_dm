@@ -14,7 +14,6 @@ class BookmarkSerializer(serializers.ModelSerializer):
         model = book_mark
         fields = '__all__'
 
-# @author https:github.com/Murithijoshua
 """
     serializer that takes in messages model to facilitate 
     GET,PUT and Update
