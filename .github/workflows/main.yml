@@ -28,9 +28,9 @@ jobs:
             cd /home/orpheus/zc_plugin_dm
             git pull
             python3 manage.py collectstatic --noinput
-            cd /home/orpheus/zc_plugin_dm/frontend
+            cd ~/zc_plugin_dm/frontend
             npm install
             npm run build
-            cd /home/orpheus/zc_plugin_dm
+            cd ~/zc_plugin_dm
             pkill gunicorn
             gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
