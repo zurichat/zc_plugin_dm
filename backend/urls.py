@@ -25,8 +25,6 @@ urlpatterns = [
     path('api/newMessages',views.index),
     path('api/searchUser',views.index),
     path('api/messages',views.index),
-    path('api/editmessages',views.edit_message, name='edit_message'),
-
     path('api/starMessage',views.index),
     path('api/starredMessages',views.index),
     path('api/sendFile',views.index),
@@ -45,7 +43,6 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.index),
-    path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.index),
     path('api/autoResponse',views.index),
@@ -54,5 +51,7 @@ urlpatterns = [
 
 
     path('messages', views.messages, name='messages'),
+    path('api/editMessage',views.edit_message, name='edit_message'),
+
 
 ]
