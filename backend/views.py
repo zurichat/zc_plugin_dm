@@ -48,7 +48,7 @@ def info(request):
         'plugin_name': 'DM plugin',
         'about': 'serves the ability for users to send messages to each other privately'
     }
-    
+
     return JsonResponse(info, safe=False)
 >>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
 
@@ -68,12 +68,9 @@ def organizations(request):
             'about': 'Supermarket'
         }]
 
-<<<<<<< HEAD
 
-
-=======
     return JsonResponse(organizations, safe=False)
-	
+
 @api_view(['GET'],)
 def star_messages(request):
     star_messages = {
@@ -172,7 +169,7 @@ def sort_message(request):
     #     messagedict['created_at']=message_.created_at
     #     messagedict['meta']=message_.meta
     # return  JsonResponse(messagedict)
-        
+
     messages = [
         {
             'user': 'Fortunate',
@@ -190,7 +187,7 @@ def sort_message(request):
         }]
     return JsonResponse(messages,safe=False)
 
-    
+
 @api_view(['GET'],)
 def pagination(request):
     limit = int(request.query_params.get('limit', 2))
@@ -243,12 +240,12 @@ def pagination(request):
             }
         ]
             }
-    
+
     if limit > 7:
         return Response("Limit cannot exceed number of messages", status=status.HTTP_400_BAD_REQUEST)
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-        
-    
+
+
 >>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
