@@ -25,8 +25,11 @@ jobs:
           script: |
             cd ~/zc_plugin_dm
             git stash
+<<<<<<< HEAD
             git checkout main
             git stash
+=======
+>>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
             git pull
             source env/bin/activate
             pip install -r requirements.txt --upgrade

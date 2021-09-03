@@ -4,7 +4,6 @@ var app = new Vue({
     {
       state: {
         message: 'Welcome, Vuex is now available for this app',
-        zuri_messages: {
         zuri_message: [
           {
             "senderName": "Romanric",
@@ -47,7 +46,6 @@ var app = new Vue({
             "time": "10:10pm"
           },
         ]
-  }
       },
       mutations: {
       },
@@ -62,7 +60,7 @@ var app = new Vue({
 delimiters: ["[[", "]]"],
 data: {
   message: 'Hello Vue!',
-  
+
 },
 
 });
