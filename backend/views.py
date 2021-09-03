@@ -28,7 +28,8 @@ def messages(request):
 
 # Gives information about the plugin
 def info(request):
-    pass
+    context = {}
+    return render(request, 'index.html', context)
 
 
 def side_bar(request):
