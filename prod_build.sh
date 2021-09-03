@@ -7,6 +7,7 @@ export BASE_URL="http://127.0.0.1:8000/static"
 
 #change to frontend directory and build app with npm
 cd frontend
+npm install
 npm run build
 
 #change to root directory
