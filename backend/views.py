@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from .models import User , profile_image
 
 # Create your views here.
 
@@ -96,6 +97,21 @@ def users(request):
 
 def user(request):
     pass
+
+
+def user_profile(request):
+    user_profile = [
+        {
+            'username': 'Derin' ,
+            'fullname': 'Derin Aslin' ,
+            'image': 'templates/images/big.jpg',
+            'email': 'derino@zuri.com' ,
+            'date joined': '22/08/2021' ,
+
+        }
+    ]
+    return JsonResponse ( user_profile , safe=False )
+
 
 def rooms(request):
     pass

@@ -43,6 +43,10 @@ class Room(models.Model):
 
 
 User = get_user_model()
+
+class profile_image():
+    image = models.ImageField ( default='big.jpg' , blank=True )
+
 """
 The message model simulates the Messages being sent by users to one another.
 In The message model we have the following fields:
