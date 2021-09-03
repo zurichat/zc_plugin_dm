@@ -1,24 +1,13 @@
 
+{% load render_bundle from webpack_loader %}
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Load required Bootstrap and BootstrapVue CSS -->
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
-    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
-
-    <!-- Vue.js cdn -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
-
-    <!-- Axios cdn -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
-        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    {% render_bundle 'app' 'css' %}
     <title>Orpheus</title>
 </head>
 
@@ -26,20 +15,9 @@
     <h1>Team Orpheus</h1>
     <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3>
 
-    <div id="app">[[message]]</div>
+    <div id="app"></div>
 
-    <!-- LoadBootstrapVue -->
-    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    {% render_bundle 'app' 'js' %}
 </body>
-<script>
-    var app = new Vue({
-        el: '#app',
-        delimiters: ["[[", "]]"],
-        data: {
-            message: 'Hello Vue!'
-        }
-    });
-
-</script>
 
 </html>
