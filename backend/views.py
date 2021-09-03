@@ -48,8 +48,22 @@ def organizations(request):
             'about': 'Supermarket'
         }]
 
+
 def info(request):
-    pass
+    {
+        "message": "Plugin Information Retrieved",
+        "data": {
+            "type": "Plugin Information",
+            "plugin_info": {"name": "DM Plugin",
+                            "description": ["Zuri.chat plugin", "DM plugin for Zuri Chat that enables users to send messages to each other"]
+                            },
+            "scaffold_structure": "Monolith",
+            "team": "HNG 8.0/Team Orpheus",
+            "sidebar_url": "https://dm.zuri.chat/api/sideBar",
+            "homepage_url": "https://dm.zuri.chat/"
+        },
+        "success": "true"
+    }
 
 def organization(request):
     pass
