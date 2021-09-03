@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/searchUser',views.index),
     path('api/messages',views.index),
     path('api/starMessage',views.star_messages),
-    path('api/starredMessages',views.index),
+    path('api/getstarred',views.get_starred, name = "get_starred"),
     path('api/sendFile',views.send_file),
     path('api/sendMedia',views.send_media),
     path('api/messagesByDate',views.index),
