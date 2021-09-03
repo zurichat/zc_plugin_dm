@@ -89,28 +89,6 @@ def message_reminder(request):
         }]
     return JsonResponse(message_reminder, safe=False)
 
-@api_view(['GET'])
-def send_media(request):
-    media = [
-            {
-                # original message being sent
-                "message":
-                {
-                    "attachment": {
-                        "type": "image",
-                        "payload": {
-                        "is_reusable": True  #makes it possible to send the media file to another person via the app 
-                        }
-                    },
-                    "mediaLocation":"./media/funny.jpeg",
-                    "type": "image/png"
-                },
-            }
-        ]
-
-    return Response(media, status=status.HTTP_200_OK)
-
-
 def organization(request):
     return HttpResponse("<h1>Is this working?</h1>")
 
@@ -246,4 +224,3 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-        
