@@ -8,6 +8,7 @@ from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 
+
 # Create your views here.
 
 
@@ -36,6 +37,7 @@ def messages(request):
 
 def side_bar(request):
     pass
+
 
 
 
@@ -89,16 +91,43 @@ def message_reminder(request):
         }]
     return JsonResponse(message_reminder, safe=False)
 
+
+def list_archives(request):
+    archived_messages = [
+        {
+            'id': '13',
+            'from': 'Korede',
+            'to': ['mark', ],
+            'message': 'Are you now in stage 5?',
+            'date_sent': '2021-05-15T10:49:59.581770Z',
+            'archived': True
+        },
+        {
+            'id': '21',
+            'from': 'Xylum',
+            'to': ['KoredeDavid', ],
+            'date_sent': '2021-05-17T18:27:24.376865Z',
+            'message': 'I need your help sir',
+            'archived': True
+        }
+    ]
+
+    return JsonResponse(archived_messages, safe=False)
+
+
 def organization(request):
     return HttpResponse("<h1>Is this working?</h1>")
 
+
 def users(request):
     pass
+
 
 def user(request):
     pass
 
 
+<<<<<<< HEAD
 def user_profile(request):
     user_profile = [
         {
@@ -113,29 +142,39 @@ def user_profile(request):
     return JsonResponse ( user_profile , safe=False )
 
 
+=======
+>>>>>>> b62a262db31a4eedfc68ee6097e810a6cce8bebd
 def rooms(request):
     pass
+
 
 def room(request):
     pass
 
+
 def room_users(request):
     pass
+
 
 def room_messages(request):
     pass
 
+
 def room_message(request):
     pass
+
 
 def room_medias(request):
     pass
 
+
 def room_media(request):
     pass
 
+
 def room_files(request):
     pass
+
 
 def room_file(request):
     pass
