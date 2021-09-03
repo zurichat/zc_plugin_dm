@@ -32,7 +32,7 @@ In The message model we have the following fields:
         
 
 class Media(models.Model):
-    MessagesId=models.ForeignKey(Messages,on_delete=models.CASCADE)
+    MessagesId=models.ForeignKey(Message,on_delete=models.CASCADE)
     # saving file with date
     media = models.FileField(upload_to='media/%Y/%m/%d', max_length=100)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -41,6 +41,14 @@ class Media(models.Model):
         ordering = ('timestamp',)
         
 
+
+class book_mark(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete= models.CASCADE)
+    link = models.CharField(max_length=900)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+
+    def __str__(self):
+        return self.user
 
 class Room(models.Model):
     """
