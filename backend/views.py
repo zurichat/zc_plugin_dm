@@ -38,6 +38,8 @@ def info(request):
         'plugin_name': 'DM plugin',
         'about': 'serves the ability for users to send messages to each other privately'
     }
+    
+    return JsonResponse(info, safe=False)
 
 
 def organizations(request):
@@ -57,15 +59,14 @@ def organizations(request):
 
     return JsonResponse(organizations, safe=False)
 	
+@api_view(['GET'],)
 def star_messages(request):
-	star_messages = {
-		'msgID': 134,
-		'starred': True,
-	}
+    star_messages = {
+        'msgID': 134,
+        'starred': True,
+    }
 
-	return JsonResponse(star_messages, safe=False)
-
-
+    return Response(star_messages, status=status.HTTP_200_OK)
 
 def message_reminder(request):
     message_reminder = [
