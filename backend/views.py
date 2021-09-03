@@ -390,6 +390,26 @@ def replyMessage(request):
     ]
     return Response(reply_message, status=status.HTTP_200_OK)
 
+def filter_user(request):
+    filter_user = [
+        {
+            'user_id':'1',
+            'message':'Hey, how are you doing'
+        },
+
+        {
+            'user_id':'1',
+            'message':'I need to have some rest'
+        }, 
+
+        {
+            'user_id':'1',
+            'message':'I would see you later'
+        }
+    ]
+
+    return JsonResponse(filter_user, safe=False)
+
 @api_view(['GET'],)
 def get_starred(request):
     get_starred = [
@@ -409,3 +429,4 @@ def get_starred(request):
 
     ]
     return JsonResponse(get_starred, safe=False)
+
