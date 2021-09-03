@@ -125,6 +125,19 @@ def room_files(request):
 def room_file(request):
     pass
 
+def send_file(request):
+    sent_file = [
+        {
+            'id': '1',
+            'message_id': '2',
+            'file_name': 'dbdiagram',
+            'file_path': 'media/dbdiagram.pdf',
+            'created_at': '20-09-21 19:03:01'
+        },
+        ]
+
+
+    return JsonResponse(sent_file, safe=False)
 
 def sort_message(request):
     #Use the below when the message object is ready and also delete the dummy data.
