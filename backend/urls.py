@@ -5,7 +5,7 @@ app_name = 'backend'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('info', views.info, name='info'),
+    path('api/sidebar', views.side_bar, name='sidebar'),
     path('api/organizations', views.organizations, name='organizations'),
     path('api/organizations/id', views.organization, name='organization'),
     path('api/organizations/id/users', views.users, name='users'),
@@ -43,7 +43,6 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.index),
-    path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
     path('api/autoResponse',views.index),
@@ -53,5 +52,6 @@ urlpatterns = [
 
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
+    path('api/editMessage',views.edit_message, name='edit_message'),
 
 ]

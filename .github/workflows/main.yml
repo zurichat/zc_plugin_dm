@@ -1,4 +1,4 @@
-name: Zuri DM Deployment
+name: Zuri DM Deployment File
 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -24,7 +24,11 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             cd ~/zc_plugin_dm
+<<<<<<< HEAD
             git stash
+=======
+            git clean -fd
+>>>>>>> editmessage
             git pull
             source env/bin/activate
             pip install -r requirements.txt --upgrade
