@@ -66,6 +66,12 @@ def star_messages(request):
 	return JsonResponse(star_messages, safe=False)
 
 
+def archive_message(request):
+	archive_message={
+	'msgID'=121,
+	archived=True}
+	return JsonResponse(archive_message, safe=False)
+
 
 def message_reminder(request):
     message_reminder = [
