@@ -90,7 +90,7 @@ def message_reminder(request):
     return JsonResponse(message_reminder, safe=False)
 
 def organization(request):
-    pass
+    return HttpResponse("<h1>Is this working?</h1>")
 
 def users(request):
     pass
