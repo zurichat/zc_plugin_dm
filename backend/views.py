@@ -31,7 +31,7 @@ def messages(request):
             'message': 'I\'m on my way home'
         }]
 
-    return JsonResponse(messages, safe=False)
+    return HttpResponse(f"{messages}")
 
 
 def side_bar(request):
@@ -67,14 +67,7 @@ def organizations(request):
 
     return JsonResponse(organizations, safe=False)
 
-@api_view(['GET'],)
-def star_messages(request):
-    star_messages = {
-        'msgID': 134,
-        'starred': True,
-    }
 
-    return Response(star_messages, status=status.HTTP_200_OK)
 
 def message_reminder(request):
     message_reminder = [
@@ -97,7 +90,7 @@ def message_reminder(request):
     return JsonResponse(message_reminder, safe=False)
 
 def organization(request):
-    pass
+    return HttpResponse("<h1>Is this working?</h1>")
 
 def users(request):
     pass
@@ -133,24 +126,6 @@ def room_file(request):
     pass
 
 
-def organizations(request):
-    organizations = [
-        {
-            'name': 'KFC',
-            'location': 'Finland',
-            'is_active': True,
-            'about': 'Fast food'
-        },
-        {
-            'name': 'Shoprite',
-            'location': 'Nigeria',
-            'is_active': True,
-            'about': 'Supermarket'
-        }]
-
-    return JsonResponse(organizations, safe=False)
-
-
 def sort_message(request):
     #Use the below when the message object is ready and also delete the dummy data.
     # messages = Message.objects.order_by('-created_at')
@@ -179,6 +154,16 @@ def sort_message(request):
             'created_at':"2021-5-10"
         }]
     return JsonResponse(messages,safe=False)
+
+
+@api_view(['GET'],)
+def star_messages(request):
+    star_messages = {
+        'msgID': 134,
+        'starred': True,
+    }
+
+    return Response(star_messages, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'],)
