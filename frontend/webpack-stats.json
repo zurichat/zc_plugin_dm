@@ -4,22 +4,22 @@
     "css/app.1e9a4c12.css": {
       "name": "css/app.1e9a4c12.css",
       "path": "D:\\Web Development\\HNG\\resolve\\zc_plugin_dm\\frontend\\dist\\css\\app.1e9a4c12.css",
-      "publicPath": "http://dm.zuri.chat/static/css/app.1e9a4c12.css"
+      "publicPath": "https://dm.zuri.chat/static/css/app.1e9a4c12.css"
     },
     "js/app.9ed16301.js": {
       "name": "js/app.9ed16301.js",
       "path": "D:\\Web Development\\HNG\\resolve\\zc_plugin_dm\\frontend\\dist\\js\\app.9ed16301.js",
-      "publicPath": "http://dm.zuri.chat/static/js/app.9ed16301.js"
+      "publicPath": "https://dm.zuri.chat/static/js/app.9ed16301.js"
     },
     "index.html": {
       "name": "index.html",
       "path": "D:\\Web Development\\HNG\\resolve\\zc_plugin_dm\\frontend\\dist\\index.html",
-      "publicPath": "http://dm.zuri.chat/static/index.html"
+      "publicPath": "https://dm.zuri.chat/static/index.html"
     },
     "favicon.ico": {
       "name": "favicon.ico",
       "path": "D:\\Web Development\\HNG\\resolve\\zc_plugin_dm\\frontend\\dist\\favicon.ico",
-      "publicPath": "http://dm.zuri.chat/static/favicon.ico"
+      "publicPath": "https://dm.zuri.chat/static/favicon.ico"
     }
   },
   "chunks": {
@@ -28,7 +28,7 @@
       "js/app.9ed16301.js"
     ]
   },
-  "publicPath": "http://dm.zuri.chat/static/"
+  "publicPath": "https://dm.zuri.chat/static/"
 }
 
-{"status":"done","chunks":{"app":["css/app.42c5e101.css","js/app.d384920d.js"]},"publicPath":"http://dm.zuri.chat/static/","assets":{"css/app.42c5e101.css":{"name":"css/app.42c5e101.css","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/css/app.42c5e101.css","publicPath":"http://dm.zuri.chat/static/css/app.42c5e101.css"},"js/app.d384920d.js":{"name":"js/app.d384920d.js","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/js/app.d384920d.js","publicPath":"http://dm.zuri.chat/static/js/app.d384920d.js"},"index.html":{"name":"index.html","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/index.html","publicPath":"http://dm.zuri.chat/static/index.html"},"favicon.ico":{"name":"favicon.ico","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/favicon.ico","publicPath":"http://dm.zuri.chat/static/favicon.ico"}}}
+{"status":"done","chunks":{"app":["css/app.42c5e101.css","js/app.d384920d.js"]},"publicPath":"https://dm.zuri.chat/static/","assets":{"css/app.42c5e101.css":{"name":"css/app.42c5e101.css","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/css/app.42c5e101.css","publicPath":"https://dm.zuri.chat/static/css/app.42c5e101.css"},"js/app.d384920d.js":{"name":"js/app.d384920d.js","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/js/app.d384920d.js","publicPath":"https://dm.zuri.chat/static/js/app.d384920d.js"},"index.html":{"name":"index.html","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/index.html","publicPath":"https://dm.zuri.chat/static/index.html"},"favicon.ico":{"name":"favicon.ico","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/favicon.ico","publicPath":"https://dm.zuri.chat/static/favicon.ico"}}}
