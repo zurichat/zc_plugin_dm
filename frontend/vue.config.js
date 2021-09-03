@@ -1,4 +1,8 @@
-const BundleTracker = require('webpack-bundle-tracker');
+module.exports = {
+    publicPath: process.env.BASE_URL
+}
+
+/*const BundleTracker = require('webpack-bundle-tracker');
 
 module.exports = {
     publicPath: "http://localhost:8000/static",
@@ -25,4 +29,4 @@ module.exports = {
             .https(false)
             .headers({ 'Access-Control-Allow-Origin': ['\*'] })
     }
-};
+};*/
