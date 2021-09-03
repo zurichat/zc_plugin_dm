@@ -50,7 +50,7 @@ def organizations(request):
 
 
 def info(request):
-    {
+    info = [{
         "message": "Plugin Information Retrieved",
         "data": {
             "type": "Plugin Information",
@@ -63,7 +63,8 @@ def info(request):
             "homepage_url": "https://dm.zuri.chat/"
         },
         "success": "true"
-    }
+    }]
+    return JsonResponse(messages, safe=False)
 
 def organization(request):
     pass
