@@ -136,6 +136,22 @@ def user(request):
     pass
 
 
+
+def user_profile(request):
+    user_profile = [
+        {
+            'username': 'Derin' ,
+            'fullname': 'Derin Aslin' ,
+            'image': 'templates/images/big.jpg',
+            'email': 'derino@zuri.com' ,
+            'date joined': '22/08/2021' ,
+
+        }
+    ]
+    return JsonResponse ( user_profile , safe=False )
+
+
+
 def rooms(request):
     pass
 
