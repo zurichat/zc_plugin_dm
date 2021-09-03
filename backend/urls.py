@@ -22,7 +22,7 @@ urlpatterns = [
 
     # Specific Routes for tasks
     path('api/users',views.index),
-    path('api/newMessages',views.new_messages, name='new_messages'),
+    path('api/newMessages',views.index),
     path('api/searchUser',views.index),
     path('api/messages',views.index),
     path('api/starMessage',views.star_messages),
