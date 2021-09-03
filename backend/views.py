@@ -8,6 +8,7 @@ from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
 
+
 # Create your views here.
 
 
@@ -36,6 +37,7 @@ def messages(request):
 
 def side_bar(request):
     pass
+
 
 
 
@@ -89,60 +91,73 @@ def message_reminder(request):
         }]
     return JsonResponse(message_reminder, safe=False)
 
-@api_view(['GET'])
-def send_media(request):
-    media = [
-            {
-                # original message being sent
-                "message":
-                {
-                    "attachment": {
-                        "type": "image",
-                        "payload": {
-                        "is_reusable": True  #makes it possible to send the media file to another person via the app 
-                        }
-                    },
-                    "mediaLocation":"./media/funny.jpeg",
-                    "type": "image/png"
-                },
-            }
-        ]
 
-    return Response(media, status=status.HTTP_200_OK)
+def list_archives(request):
+    archived_messages = [
+        {
+            'id': '13',
+            'from': 'Korede',
+            'to': ['mark', ],
+            'message': 'Are you now in stage 5?',
+            'date_sent': '2021-05-15T10:49:59.581770Z',
+            'archived': True
+        },
+        {
+            'id': '21',
+            'from': 'Xylum',
+            'to': ['KoredeDavid', ],
+            'date_sent': '2021-05-17T18:27:24.376865Z',
+            'message': 'I need your help sir',
+            'archived': True
+        }
+    ]
+
+    return JsonResponse(archived_messages, safe=False)
 
 
 def organization(request):
     return HttpResponse("<h1>Is this working?</h1>")
 
+
 def users(request):
     pass
+
 
 def user(request):
     pass
 
+
 def rooms(request):
     pass
+
 
 def room(request):
     pass
 
+
 def room_users(request):
     pass
+
 
 def room_messages(request):
     pass
 
+
 def room_message(request):
     pass
+
 
 def room_medias(request):
     pass
 
+
 def room_media(request):
     pass
 
+
 def room_files(request):
     pass
+
 
 def room_file(request):
     pass
@@ -246,4 +261,3 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-        
