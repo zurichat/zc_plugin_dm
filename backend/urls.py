@@ -19,20 +19,20 @@ urlpatterns = [
     path('api/organizations/id/rooms/id/media/id', views.room_media, name='room_media'),
     path('api/organizations/id/rooms/id/files', views.room_files, name='room_files'),
     path('api/organizations/id/rooms/id/files/id', views.room_file, name='room_file'),
-    
+
     # Specific Routes for tasks
     path('api/users',views.index),
     path('api/newMessages',views.index),
     path('api/searchUser',views.index),
     path('api/messages',views.index),
-    path('api/starMessage',views.index),
+    path('api/starMessage',views.star_messages),
     path('api/starredMessages',views.index),
     path('api/sendFile',views.index),
     path('api/sendMedia',views.index),
     path('api/messagesByDate',views.index),
     path('api/messageByUser',views.index),
     path('api/messageByKeywords',views.index),
-    path('api/pagination',views.index),
+    path('api/pagination/',views.pagination),
     path('api/userProfile',views.index),
     path('api/editUserProfile',views.index),
     path('api/forwardMessages',views.index),
@@ -45,12 +45,13 @@ urlpatterns = [
     path('api/archivedMessages',views.index),
     path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
-    path('api/sortMessage',views.index),
+    path('api/sortMessage',views.sort_message),
     path('api/autoResponse',views.index),
-    path('api/setReminder',views.index),
-    
+    path('api/setReminder',views.message_reminder, name = "message_reminder"),
+
 
 
     path('messages', views.messages, name='messages'),
+    path('star_messages', views.star_messages, name='star_messages'),
 
 ]
