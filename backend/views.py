@@ -31,7 +31,7 @@ def messages(request):
             'message': 'I\'m on my way home'
         }]
 
-    return JsonResponse(messages, safe=False)
+    return HttpResponse(messages, safe=False)
 
 
 def side_bar(request):
