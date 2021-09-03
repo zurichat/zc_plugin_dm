@@ -19,7 +19,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-
+FRONTEND_DIR = BASE_DIR / 'frontend'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -31,11 +31,11 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 DEBUG = str(os.getenv('DEBUG'))
 
 
-ALLOWED_HOSTS = ["dm.zuri.chat", '127.0.0.1']
+ALLOWED_HOSTS = ["dm.zuri.chat"]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://dm.zuri.chat",
-    "http://127.0.0.1:8000"
+    "https://dm.zuri.chat",
+    "dm.zuri.chat"
 ]
 
 # Application definition
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'webpack_loader',
     'backend',
 
 ]
@@ -69,7 +70,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, "frontend", "dist")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -95,7 +96,6 @@ DATABASES = {
     }
 }
 
-DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -134,4 +134,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT  =   os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# vue static folder
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "frontend", "dist")
+]
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'webpack_bundles/',  # must end with slash
+        'STATS_FILE': BASE_DIR.joinpath('frontend', 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
+    }
+}
