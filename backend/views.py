@@ -16,7 +16,7 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-def foward_messages(request):
+def foward_message(request):
     forwarded_messages = [
         {
             'user': 'Itz_salemm',
