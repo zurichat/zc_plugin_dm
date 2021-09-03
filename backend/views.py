@@ -202,6 +202,17 @@ def star_messages(request):
 
     return Response(star_messages, status=status.HTTP_200_OK)
 
+@api_view(['GET'], )
+def auto_response(request):
+    auto_response_message = {
+        'userId': 23,
+        'auto_response': True,
+        'message': "Brian is currently offline. Please leave your message. He will reply you as soon as he's back "
+                   "online "
+    }
+
+    return Response(auto_response_message, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'],)
 def pagination(request):
