@@ -79,6 +79,12 @@ def organizations(request):
     return JsonResponse(organizations, safe=False)
 
 
+def archive_message(request):
+	archive_message={
+	'msgID'=121,
+	'archived'=True}
+	return JsonResponse(archive_message, safe=False)
+
 
 def message_reminder(request):
     message_reminder = [
@@ -134,6 +140,22 @@ def users(request):
 
 def user(request):
     pass
+
+
+
+def user_profile(request):
+    user_profile = [
+        {
+            'username': 'Derin' ,
+            'fullname': 'Derin Aslin' ,
+            'image': 'templates/images/big.jpg',
+            'email': 'derino@zuri.com' ,
+            'date joined': '22/08/2021' ,
+
+        }
+    ]
+    return JsonResponse ( user_profile , safe=False )
+
 
 
 def rooms(request):

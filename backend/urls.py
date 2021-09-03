@@ -34,7 +34,7 @@ urlpatterns = [
     path('api/messageByUser',views.index),
     path('api/messageByKeywords',views.index),
     path('api/pagination/',views.pagination),
-    path('api/userProfile',views.index),
+    path('api/userProfile',views.user_profile, name = 'user_profile'),
     path('api/editUserProfile',views.index),
     path('api/forwardMessages',views.index),
     path('api/replyMessage',views.index),
@@ -54,5 +54,5 @@ urlpatterns = [
 
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-
+path('archive_message', views.archive_message,name="archive_message"),
 ]
