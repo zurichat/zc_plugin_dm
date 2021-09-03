@@ -3,7 +3,7 @@
 #static files route set to remote host
 #change this to your remote host address + /static
 #example: https://dm.zuri.chat/static
-export BASE_URL="http://127.0.0.1:8000/static"
+export BASE_URL="https://dm.zuri.chat/static"
 
 #change to frontend directory and build app with npm
 cd frontend

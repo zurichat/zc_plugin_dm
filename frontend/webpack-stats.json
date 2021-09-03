@@ -1,1 +1,0 @@
-{"status":"error","chunks":{},"publicPath":"http://localhost:8000/static/","error":"ModuleNotFoundError","message":"Module not found: Error: Can't resolve './src/main.js' in '/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend'"}
