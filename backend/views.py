@@ -81,8 +81,8 @@ def organizations(request):
 
 def archive_message(request):
 	archive_message={
-	'msgID'=121,
-	'archived'=True}
+	'msgID':121,
+	'archived':True}
 	return JsonResponse(archive_message, safe=False)
 
 
