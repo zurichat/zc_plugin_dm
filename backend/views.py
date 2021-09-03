@@ -26,30 +26,9 @@ def messages(request):
 
     return JsonResponse(messages, safe=False)
 
+# Gives information about the plugin
 def info(request):
-    info = {
-        'plugin_id': 201982982,
-        'plugin_name': 'DM plugin',
-        'about': 'serves the ability for users to send messages to each other privately'
-    }
-
-
-def organizations(request):
-    organizations = [
-        {
-            'name': 'KFC',
-            'location': 'Finland',
-            'is_active': True,
-            'about': 'Fast food'
-        },
-        {
-            'name': 'Shoprite',
-            'location': 'Nigeria',
-            'is_active': True,
-            'about': 'Supermarket'
-        }]
-
-    return JsonResponse(organizations, safe=False)
+    pass
 
 def organization(request):
     pass
@@ -86,3 +65,22 @@ def room_files(request):
 
 def room_file(request):
     pass
+
+
+def organizations(request):
+    organizations = [
+        {
+            'name': 'KFC',
+            'location': 'Finland',
+            'is_active': True,
+            'about': 'Fast food'
+        },
+        {
+            'name': 'Shoprite',
+            'location': 'Nigeria',
+            'is_active': True,
+            'about': 'Supermarket'
+        }]
+
+    return JsonResponse(organizations, safe=False)
+

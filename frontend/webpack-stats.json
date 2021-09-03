@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "status": "done",
   "assets": {
@@ -30,3 +31,6 @@
   },
   "publicPath": "http://localhost:8000/static/"
 }
+=======
+{"status":"done","chunks":{"app":["css/app.42c5e101.css","js/app.d384920d.js"]},"publicPath":"http://localhost:8000/static/","assets":{"css/app.42c5e101.css":{"name":"css/app.42c5e101.css","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/css/app.42c5e101.css","publicPath":"http://localhost:8000/static/css/app.42c5e101.css"},"js/app.d384920d.js":{"name":"js/app.d384920d.js","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/js/app.d384920d.js","publicPath":"http://localhost:8000/static/js/app.d384920d.js"},"index.html":{"name":"index.html","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/index.html","publicPath":"http://localhost:8000/static/index.html"},"favicon.ico":{"name":"favicon.ico","path":"/home/deucalion/Documents/zuri/ZURI_DM/zc_plugin_dm/frontend/dist/favicon.ico","publicPath":"http://localhost:8000/static/favicon.ico"}}}
+>>>>>>> 7e61113ff0f94e5709737e2bf692cfd5450f4f51
