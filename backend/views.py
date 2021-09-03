@@ -34,6 +34,32 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
+def new_messages(request):
+    messages = [
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'been awhile',
+            'meta': 'dm_message38384739',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-3 00:00:00',
+            'last_updated_at':'null'
+        },
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'Hi, dude',
+            'meta': 'dm_message38384738',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-2 00:00:00',
+            'last_updated_at':'null'
+        }]
+
+    return HttpResponse(f"{messages}")
+
+
 
 def side_bar(request):
     pass
