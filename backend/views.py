@@ -202,6 +202,7 @@ def star_messages(request):
 
     return Response(star_messages, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'], )
 def auto_response(request):
     auto_response_message = {
@@ -212,6 +213,27 @@ def auto_response(request):
     }
 
     return Response(auto_response_message, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def send_media(request):
+    media = [
+             {
+                 # original message being sent
+                 "message":
+                 {
+                     "attachment": {
+                         "type": "image",
+                         "payload": {
+                         "is_reusable": True  #makes it possible to send the media file to another person via the app 
+                         }
+                     },
+                     "mediaLocation":"./media/funny.jpeg",
+                     "type": "image/png"
+                 },
+             }
+        ]
+    return Response(media, status=status.HTTP_200_OK)
+
 
 
 @api_view(['GET'],)
