@@ -72,8 +72,8 @@ def organizations(request):
 
 def archive_message(request):
 	archive_message={
-	'msgID'=121,
-	'archived'=True}
+	'msgID':121,
+	'archived':True}
 	return JsonResponse(archive_message, safe=False)
 
 
@@ -330,3 +330,27 @@ def send_file(request):
              }
         ]
     return Response(file, status=status.HTTP_200_OK)
+
+@api_view(['GET'],)
+def replyMessage(request):
+    messageList = {
+        "message1": [{
+            "message_id": "001",
+            "user": "Mykie",
+            "content": "Hello Mark"
+        }],
+        "message2": [{
+            "message_id": "002",
+            "user": "Mark",
+            "content": "Hi Mykie, how are you doing?"
+        }]
+    }
+    mesSage = messageList["message2"]
+    reply_message = [
+        {
+            'reply_id': "003",
+            'replied_to': mesSage,
+            'content': 'I am fine Mark thank you',
+        }
+    ]
+    return Response(reply_message, status=status.HTTP_200_OK)
