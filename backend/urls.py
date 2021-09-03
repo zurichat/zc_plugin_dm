@@ -32,7 +32,7 @@ urlpatterns = [
     path('api/messagesByDate',views.index),
     path('api/messageByUser',views.index),
     path('api/messageByKeywords',views.index),
-    path('api/pagination',views.index),
+    path('api/pagination/',views.pagination),
     path('api/userProfile',views.index),
     path('api/editUserProfile',views.index),
     path('api/forwardMessages',views.index),
@@ -45,7 +45,7 @@ urlpatterns = [
     path('api/archivedMessages',views.index),
     path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
-    path('api/sortMessage',views.index),
+    path('api/sortMessage',views.sort_message),
     path('api/autoResponse',views.index),
     path('api/setReminder',views.message_reminder, name = "message_reminder"),
 
