@@ -39,7 +39,7 @@ urlpatterns = [
     path('api/forwardMessages',views.index),
     path('api/replyMessage',views.replyMessage, name='reply_message'),
     path('api/userStatus',views.index),
-    path('api/DMList',views.index),
+    path('api/DMList',views.dm_list),
     path('api/pinMessage',views.index),
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),

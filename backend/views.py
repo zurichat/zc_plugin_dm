@@ -390,6 +390,14 @@ def replyMessage(request):
     ]
     return Response(reply_message, status=status.HTTP_200_OK)
 
+
+def dm_list(request):
+    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
+               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
+               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
+    return JsonResponse(dm_lists)
+  
+  
 def filter_user(request):
     filter_user = [
         {
