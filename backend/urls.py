@@ -42,7 +42,7 @@ urlpatterns = [
     path('api/pinMessage',views.index),
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
-    path('api/archivedMessages',views.index),
+    path('api/archivedMessages',views.list_archives, name='list_archives'),
     path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
