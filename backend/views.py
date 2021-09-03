@@ -1,14 +1,12 @@
 from backend.models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
-<<<<<<< HEAD
-=======
+
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
->>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
 
 # Create your views here.
 
@@ -35,13 +33,12 @@ def messages(request):
 
     return JsonResponse(messages, safe=False)
 
-<<<<<<< HEAD
 
 def side_bar(request):
     pass
 
 
-=======
+
 def info(request):
     info = {
         'plugin_id': 201982982,
@@ -50,7 +47,6 @@ def info(request):
     }
 
     return JsonResponse(info, safe=False)
->>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
 
 
 def organizations(request):
@@ -99,7 +95,6 @@ def message_reminder(request):
             'message': 'The message that you set to send some hours ago is ready to send...'
         }]
     return JsonResponse(message_reminder, safe=False)
->>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
 
 def organization(request):
     pass
@@ -138,7 +133,6 @@ def room_file(request):
     pass
 
 
-<<<<<<< HEAD
 def organizations(request):
     organizations = [
         {
@@ -156,7 +150,6 @@ def organizations(request):
 
     return JsonResponse(organizations, safe=False)
 
-=======
 
 def sort_message(request):
     #Use the below when the message object is ready and also delete the dummy data.
@@ -246,6 +239,3 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-
-
->>>>>>> d53d9fa635a9c711ddb156ded3e891a316d2fb8b
