@@ -146,11 +146,6 @@ def room_files(request):
 def room_file(request):
     pass
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 591d97e5e2df6db7afc1d238ee4f0dbd2d977e27
 def sort_message(request):
     #Use the below when the message object is ready and also delete the dummy data.
     # messages = Message.objects.order_by('-created_at')
@@ -239,8 +234,4 @@ def pagination(request):
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-<<<<<<< HEAD
         
-    
-=======
->>>>>>> 591d97e5e2df6db7afc1d238ee4f0dbd2d977e27
