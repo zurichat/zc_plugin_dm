@@ -13,5 +13,3 @@ env/
 
 # *media
 *.DS_Store
-__pycache__/
-*.pyo
