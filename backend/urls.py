@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/starMessage',views.star_messages),
     path('api/starredMessages',views.index),
     path('api/sendFile',views.index),
-    path('api/sendMedia',views.index),
+    path('api/sendMedia',views.send_media),
     path('api/messagesByDate',views.index),
     path('api/messageByUser',views.index),
     path('api/messageByKeywords',views.index),
@@ -43,11 +43,11 @@ urlpatterns = [
     path('api/pinMessage',views.index),
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
-    path('api/archivedMessages',views.index),
+    path('api/archivedMessages',views.list_archives, name='list_archives'),
     path('api/editMessage',views.index),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
-    path('api/autoResponse',views.index),
+    path('api/autoResponse', views.auto_response, name="auto_response"),
     path('api/setReminder',views.message_reminder, name = "message_reminder"),
 
 
