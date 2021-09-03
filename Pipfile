@@ -11,6 +11,7 @@ sqlparse = "==0.4.1"
 Django = "==3.2.6"
 djangorestframework = "==3.12.4"
 django-cors-headers = "==3.8.0"
+django-webpack-loader = "*"
 
 [dev-packages]
 
