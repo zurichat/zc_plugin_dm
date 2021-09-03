@@ -32,6 +32,7 @@ def edit_message(request):
             'user':'Victor',
             'location': 'Finland',
             'is_active': True,
+            'message': 'Im not home'
         }
     ]
     return JsonResponse(messages, safe=False)
