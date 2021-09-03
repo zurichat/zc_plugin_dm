@@ -27,6 +27,30 @@ def messages(request):
     return JsonResponse(messages, safe=False)
 
 # Gives information about the plugin
+def info(request):
+    pass
+
+
+def side_bar(request):
+    pass
+
+
+
+
+def organizations(request):
+    organizations = [
+        {
+            'name': 'KFC',
+            'location': 'Finland',
+            'is_active': True,
+            'about': 'Fast food'
+        },
+        {
+            'name': 'Shoprite',
+            'location': 'Nigeria',
+            'is_active': True,
+            'about': 'Supermarket'
+        }]
 
 def info(request):
     pass
