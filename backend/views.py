@@ -16,6 +16,24 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
+def foward_messages(request):
+    forwarded_messages = [
+        {
+            'user': 'Itz_salemm',
+            'location': 'Switzerland',
+            'forwarded_to': ['mark', ],
+            'forward': True
+        },
+        {
+            'user': 'Samuel',
+            'location': 'UK',
+            'forwarded_to': ['naza', ],
+            'forward': True
+        }
+    ]
+
+    return JsonResponse(forwarded_messages, safe=False)
+
 
 def messages(request):
     messages = [
