@@ -49,7 +49,7 @@ def organizations(request):
         }]
 
 
-def dm_info(request):
+def info(request):
     {
         "message": "Plugin Information Retrieved",
         "data": {
