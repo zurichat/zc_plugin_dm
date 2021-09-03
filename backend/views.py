@@ -34,6 +34,32 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
+def new_messages(request):
+    messages = [
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'been awhile',
+            'meta': 'dm_message38384739',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-3 00:00:00',
+            'last_updated_at':'null'
+        },
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'Hi, dude',
+            'meta': 'dm_message38384738',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-2 00:00:00',
+            'last_updated_at':'null'
+        }]
+
+    return HttpResponse(f"{messages}")
+
+
 
 def side_bar(request):
     pass
@@ -43,9 +69,18 @@ def side_bar(request):
 
 def info(request):
     info = {
-        'plugin_id': 201982982,
-        'plugin_name': 'DM plugin',
-        'about': 'serves the ability for users to send messages to each other privately'
+        "message": "Plugin Information Retrieved",
+        "data": {
+            "type": "Plugin Information",
+            "plugin_info": {"name": "DM Plugin",
+                            "description": ["Zuri.chat plugin", "DM plugin for Zuri Chat that enables users to send messages to each other"]
+                            },
+            "scaffold_structure": "Monolith",
+            "team": "HNG 8.0/Team Orpheus",
+            "sidebar_url": "https://dm.zuri.chat/api/sideBar",
+            "homepage_url": "https://dm.zuri.chat/"
+        },
+        "success": "true"
     }
 
     return JsonResponse(info, safe=False)

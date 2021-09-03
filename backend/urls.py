@@ -5,6 +5,7 @@ app_name = 'backend'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('api/info', views.info, name='plugin_info'),
     path('api/sidebar', views.side_bar, name='sidebar'),
     path('api/organizations', views.organizations, name='organizations'),
     path('api/organizations/id', views.organization, name='organization'),
@@ -22,7 +23,7 @@ urlpatterns = [
 
     # Specific Routes for tasks
     path('api/users',views.index),
-    path('api/newMessages',views.index),
+    path('api/newMessages',views.new_messages, name='new_messages'),
     path('api/searchUser',views.index),
     path('api/messages',views.index),
     path('api/starMessage',views.star_messages),
