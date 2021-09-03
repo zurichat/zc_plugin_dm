@@ -23,13 +23,14 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            source zc_plugin_dm_venv/bin/activate
             cd ~/zc_plugin_dm
+            git stash
             git pull
-            python3 manage.py collectstatic --noinput
+            source env/bin/activate
+            pip install -r requirements.txt --upgrade
             cd ~/zc_plugin_dm/frontend
             npm install
             npm run build
             cd ~/zc_plugin_dm
-            pkill gunicorn
-            gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
+            python3 manage.py collectstatic --noinput
+            fuser -k -HUP 9090/tcp
