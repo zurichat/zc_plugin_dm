@@ -55,7 +55,6 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
-
 def new_messages(request):
     messages = [
         {
@@ -66,7 +65,7 @@ def new_messages(request):
             'meta': 'dm_message38384739',
             'deleted_user_id': 'null',
             'created_at': '2021-09-3 00:00:00',
-            'last_updated_at': 'null'
+            'last_updated_at':'null'
         },
         {
             'id': '1',
@@ -76,10 +75,11 @@ def new_messages(request):
             'meta': 'dm_message38384738',
             'deleted_user_id': 'null',
             'created_at': '2021-09-2 00:00:00',
-            'last_updated_at': 'null'
+            'last_updated_at':'null'
         }]
 
     return HttpResponse(f"{messages}")
+
 
 
 def side_bar(request):
@@ -128,7 +128,6 @@ def archive_message(request):
         'msgID': 121,
         'archived': True
     }
-
     return JsonResponse(archive_message, safe=False)
 
 
@@ -181,7 +180,80 @@ def organization(request):
 
 
 def users(request):
-    pass
+    users = [
+        {
+            'name': 'Seye Olowo',
+            'is_active': True,
+            'last_message_snippet': 'How are you man?',
+            'user_info': {
+                'username': 'blaco',
+                'id': 1,
+                'email': 'blac@gmail.com'
+            }
+        },
+        {
+            'name': 'Roman Reigns',
+            'is_active': False,
+            'last_message_snippet': 'Have you made your pull request?',
+            'user_info': {
+                'username': 'Romanric',
+                'id': 12,
+                'email': 'roman@gmail.com'
+            }
+        },
+        {
+            'name': 'Florence Girl',
+            'is_active': True,
+            'last_message_snippet': 'Thank You...',
+            'user_info': {
+                'username': 'Fae',
+                'id': 14,
+                'email': 'florence@gmail.com'
+            }
+        },
+        {
+            'name': 'Timmy Joe',
+            'is_active': False,
+            'last_message_snippet': 'Good evening boss, I want....',
+            'user_info': {
+                'username': 'manofmind',
+                'id': 4,
+                'email': 'timmy@gmail.com'
+            }
+        },
+        {
+            'name': 'Jeff Jones',
+            'is_active': True,
+            'last_message_snippet': 'My king',
+            'user_info': {
+                'username': 'Jiggy',
+                'id': 6,
+                'email': 'jonzy@gmail.com'
+            }
+        },
+        {
+            'name': 'Mamba Joy',
+            'is_active': True,
+            'last_message_snippet': 'i dey go school now',
+            'user_info': {
+                'username': 'mamba',
+                'id': 100,
+                'email': 'ogblaq@gmail.com'
+            }
+        },
+        {
+            'name': 'Destiny Delight',
+            'is_active': False,
+            'last_message_snippet': 'Good day to you, I want to ask a que.....',
+            'user_info': {
+                'username': 'Delight',
+                'id': 189,
+                'email': 'delight@gmail.com'
+            }
+        },
+    ]
+
+    return JsonResponse({'users': users})
 
 
 def user(request):
@@ -408,10 +480,9 @@ def send_file(request):
             'file_name': 'dbdiagram',
             'file_path': 'media/dbdiagram.pdf',
             'created_at': '20-09-21 19:03:01'
-        }
-    ]
+             }
+        ]
     return Response(file, status=status.HTTP_200_OK)
-
 
 @api_view(['GET'],)
 def replyMessage(request):
@@ -439,33 +510,31 @@ def replyMessage(request):
 
 
 def dm_list(request):
-    dm_lists = [{"user": "Cheeqito", "isActive": True, "last_message": "10 minutes Ago"},
-                {"user": "Cheediogo", "isActive": False,
-                    "last_message": "2Hours Ago"},
-                {"user": "James", "isActive": True, "last_message": "2 minutes Ago"}, ]
+    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
+               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
+               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
     return JsonResponse(dm_lists)
-
-
+  
+  
 def filter_user(request):
     filter_user = [
         {
-            'user_id': '1',
-            'message': 'Hey, how are you doing'
+            'user_id':'1',
+            'message':'Hey, how are you doing'
         },
 
         {
-            'user_id': '1',
-            'message': 'I need to have some rest'
-        },
+            'user_id':'1',
+            'message':'I need to have some rest'
+        }, 
 
         {
-            'user_id': '1',
-            'message': 'I would see you later'
+            'user_id':'1',
+            'message':'I would see you later'
         }
     ]
 
     return JsonResponse(filter_user, safe=False)
-
 
 @api_view(['GET'],)
 def get_starred(request):
@@ -486,6 +555,15 @@ def get_starred(request):
 
     ]
     return JsonResponse(get_starred, safe=False)
+
+def edit_message(request):
+    messages = [{
+        'user_id': '2',
+        'message_id': '34',
+        'message': 'I just edited this message'
+
+    }]
+    return JsonResponse(messaages, safe=False)
 
 
 def date_message(request):

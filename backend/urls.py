@@ -1,6 +1,5 @@
 from . import views
 from django.urls import path
-from django.conf.urls import url
 
 app_name = 'backend'
 
@@ -56,6 +55,7 @@ urlpatterns = [
     url(r'^api/message_list/(?P<pk>[0-9]+)$', views.messages_list),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
+    # Specific Routes for tasks
     path('api/users', views.index),
     path('api/newMessages', views.new_messages, name='new_messages'),
     path('api/searchUser', views.index),
@@ -70,8 +70,7 @@ urlpatterns = [
     path('api/pagination/', views.pagination),
     path('api/userProfile', views.user_profile, name='user_profile'),
     path('api/editUserProfile', views.index),
-    path('api/forwardMessages', views.forward_messages, name='forward_messages'),
-    path('api/replyMessage', views.index),
+    path('api/forwardMessages', views.forward_message, name='forward_message'),
     path('api/forwardMessages', views.index),
     path('api/replyMessage', views.replyMessage, name='reply_message'),
     path('api/userStatus', views.index),
@@ -80,7 +79,7 @@ urlpatterns = [
     path('api/pinnedMessages', views.index),
     path('api/archiveMessage', views.index),
     path('api/archivedMessages', views.list_archives, name='list_archives'),
-    path('api/editMessage', views.index),
+    path('api/editMessage', views.edit_message, name='edit_messages'),
     path('api/deleteMessage', views.index),
     path('api/sortMessage', views.sort_message),
     path('api/autoResponse', views.auto_response, name="auto_response"),
@@ -88,5 +87,5 @@ urlpatterns = [
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
     path('archive_message', views.archive_message, name="archive_message"),
-    path('api/dateMessage', views.date_message, name='date_message')
+
 ]
