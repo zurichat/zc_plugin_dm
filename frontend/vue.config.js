@@ -1,3 +1,3 @@
 module.exports = {
-    publicPath: process.env.BASE_URL
+    publicPath: process.env.BASE_URL ?? "https://dm.zuri.chat/static"
 }

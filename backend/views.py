@@ -16,6 +16,24 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
+def forward_message(request):
+    forwarded_messages = [
+        {
+            'user': 'Itz_salemm',
+            'location': 'Switzerland',
+            'forwarded_to': ['mark', ],
+            'forward': True
+        },
+        {
+            'user': 'Samuel',
+            'location': 'UK',
+            'forwarded_to': ['naza', ],
+            'forward': True
+        }
+    ]
+
+    return JsonResponse(forwarded_messages, safe=False)
+
 
 def messages(request):
     messages = [
@@ -33,6 +51,32 @@ def messages(request):
         }]
 
     return HttpResponse(f"{messages}")
+
+def new_messages(request):
+    messages = [
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'been awhile',
+            'meta': 'dm_message38384739',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-3 00:00:00',
+            'last_updated_at':'null'
+        },
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'Hi, dude',
+            'meta': 'dm_message38384738',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-2 00:00:00',
+            'last_updated_at':'null'
+        }]
+
+    return HttpResponse(f"{messages}")
+
 
 
 def side_bar(request):
@@ -334,6 +378,78 @@ def send_file(request):
             'file_name': 'dbdiagram',
             'file_path': 'media/dbdiagram.pdf',
             'created_at': '20-09-21 19:03:01'
+             }
+        ]
+    return Response(file, status=status.HTTP_200_OK)
+
+@api_view(['GET'],)
+def replyMessage(request):
+    messageList = {
+        "message1": [{
+            "message_id": "001",
+            "user": "Mykie",
+            "content": "Hello Mark"
+        }],
+        "message2": [{
+            "message_id": "002",
+            "user": "Mark",
+            "content": "Hi Mykie, how are you doing?"
+        }]
+    }
+    mesSage = messageList["message2"]
+    reply_message = [
+        {
+            'reply_id': "003",
+            'replied_to': mesSage,
+            'content': 'I am fine Mark thank you',
         }
     ]
-    return Response(file, status=status.HTTP_200_OK)
+    return Response(reply_message, status=status.HTTP_200_OK)
+
+
+def dm_list(request):
+    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
+               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
+               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
+    return JsonResponse(dm_lists)
+  
+  
+def filter_user(request):
+    filter_user = [
+        {
+            'user_id':'1',
+            'message':'Hey, how are you doing'
+        },
+
+        {
+            'user_id':'1',
+            'message':'I need to have some rest'
+        }, 
+
+        {
+            'user_id':'1',
+            'message':'I would see you later'
+        }
+    ]
+
+    return JsonResponse(filter_user, safe=False)
+
+@api_view(['GET'],)
+def get_starred(request):
+    get_starred = [
+        {
+            'sender_id': 'Laurie',
+            'message': 'Hello',
+            'created_at': '0800hrs',
+            'star_messages': True,
+        },
+
+        {
+            'sender_id': 'Barney',
+            'message': 'Assignment due',
+            'created_at': '1500hrs',
+            'star_messages': True,
+        }
+
+    ]
+    return JsonResponse(get_starred, safe=False)
