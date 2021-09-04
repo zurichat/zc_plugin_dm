@@ -4,10 +4,8 @@ from django.shortcuts import render
 
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
-from .serializers import UserSerializer,MessageSerializer
+from .serializers import UserSerializer
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.parsers import JSONParser 
 from rest_framework import status
 
 
@@ -54,7 +52,6 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
-
 def new_messages(request):
     messages = [
         {
@@ -65,7 +62,7 @@ def new_messages(request):
             'meta': 'dm_message38384739',
             'deleted_user_id': 'null',
             'created_at': '2021-09-3 00:00:00',
-            'last_updated_at': 'null'
+            'last_updated_at':'null'
         },
         {
             'id': '1',
@@ -75,10 +72,11 @@ def new_messages(request):
             'meta': 'dm_message38384738',
             'deleted_user_id': 'null',
             'created_at': '2021-09-2 00:00:00',
-            'last_updated_at': 'null'
+            'last_updated_at':'null'
         }]
 
     return HttpResponse(f"{messages}")
+
 
 
 def side_bar(request):
@@ -127,7 +125,6 @@ def archive_message(request):
         'msgID': 121,
         'archived': True
     }
-
     return JsonResponse(archive_message, safe=False)
 
 
@@ -444,32 +441,6 @@ def pagination(request):
         return Response(total_messages, status=status.HTTP_200_OK)
 
 
-
-# get delete and post for messages view task 
-
-@api_view(['GET', 'POST', 'DELETE'])
-def messages_list(request):
-    if request.method == 'GET':
-        data = Message.objects.all()
-        
-        text = request.query_params.get('message', None)
-       
-        message_serializer = MessageSerializer(text, many=True)
-        return JsonResponse(message_serializer.data, safe=False)
-        # 'safe=False' for objects serialization
- 
-    elif request.method == 'POST':
-        message_data = JSONParser().parse(request)
-        message_serializer = MessageSerializer(data=message_data)
-        if message_serializer.is_valid():
-            message_serializer.save()
-            return JsonResponse(message_serializer.data, status=status.HTTP_201_CREATED) 
-        return JsonResponse(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
-        count = Message.objects.all().delete()
-        return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
-
 @api_view(['GET'])
 def send_file(request):
     file = [
@@ -480,10 +451,9 @@ def send_file(request):
             'file_name': 'dbdiagram',
             'file_path': 'media/dbdiagram.pdf',
             'created_at': '20-09-21 19:03:01'
-        }
-    ]
+             }
+        ]
     return Response(file, status=status.HTTP_200_OK)
-
 
 @api_view(['GET'],)
 def replyMessage(request):
@@ -511,33 +481,31 @@ def replyMessage(request):
 
 
 def dm_list(request):
-    dm_lists = [{"user": "Cheeqito", "isActive": True, "last_message": "10 minutes Ago"},
-                {"user": "Cheediogo", "isActive": False,
-                    "last_message": "2Hours Ago"},
-                {"user": "James", "isActive": True, "last_message": "2 minutes Ago"}, ]
+    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
+               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
+               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
     return JsonResponse(dm_lists)
-
-
+  
+  
 def filter_user(request):
     filter_user = [
         {
-            'user_id': '1',
-            'message': 'Hey, how are you doing'
+            'user_id':'1',
+            'message':'Hey, how are you doing'
         },
 
         {
-            'user_id': '1',
-            'message': 'I need to have some rest'
-        },
+            'user_id':'1',
+            'message':'I need to have some rest'
+        }, 
 
         {
-            'user_id': '1',
-            'message': 'I would see you later'
+            'user_id':'1',
+            'message':'I would see you later'
         }
     ]
 
     return JsonResponse(filter_user, safe=False)
-
 
 @api_view(['GET'],)
 def get_starred(request):
@@ -558,7 +526,6 @@ def get_starred(request):
 
     ]
     return JsonResponse(get_starred, safe=False)
-
 
 def edit_message(request):
     messages = [{
