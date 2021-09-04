@@ -45,13 +45,13 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
-    path('api/editMessage',views.edit_message, names='edit_messages'),
+    path('api/editMessage',views.edit_message, name='edit_messages'),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
     path('api/autoResponse', views.auto_response, name="auto_response"),
     path('api/setReminder',views.message_reminder, name = "message_reminder"),
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-path('archive_message', views.archive_message,name="archive_message"),
+    path('archive_message', views.archive_message,name="archive_message"),
   
 ]
