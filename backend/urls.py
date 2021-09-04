@@ -32,7 +32,7 @@ urlpatterns = [
     # Specific Routes for task
     path('api/users',views.index),
     path('api/newMessages',views.new_messages, name='new_messages'),
-    path('api/searchUser',views.index),
+    path('api/searchUser',views.search_users, name='search_user'),
     path('api/messages',views.index),
     path('api/starMessage',views.star_messages),
     path('api/getstarred',views.get_starred, name = "get_starred"),
@@ -72,7 +72,7 @@ urlpatterns = [
     path('api/pagination/', views.pagination),
     path('api/userProfile', views.user_profile, name='user_profile'),
     path('api/editUserProfile', views.index),
-    path('api/forwardMessages', views.forward_messages, name='forward_messages'),
+    #path('api/forwardMessages', views.forward_messages, name='forward_messages'),
     path('api/replyMessage', views.index),
     path('api/forwardMessages', views.index),
     path('api/replyMessage', views.replyMessage, name='reply_message'),
