@@ -66,6 +66,7 @@ urlpatterns = [
     path('api/setReminder', views.message_reminder, name="message_reminder"),
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-    path('archive_message', views.archive_message, name="archive_message"),
-
+    path('archive_message', views.archive_message,name="archive_message"),
+    #for search message
+    path('api/search_message/<phrase>/',views.SearchMessagesAPI.as_view()),
 ]
