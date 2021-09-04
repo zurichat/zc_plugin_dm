@@ -613,6 +613,7 @@ def edit_message(request):
     messages = [{
         'user_id': '2',
         'message_id': '34',
+        'last_updated': '2021-09-04 19:11:35',
         'message': 'I just edited this message'
 
     }]
