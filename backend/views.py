@@ -30,7 +30,14 @@ def messages(request):
             'message': 'I\'m on my way home'
         }]
 
-    return JsonResponse(messages, safe=False)
+    return HttpResponse(f"{messages}")
+
+
+def side_bar(request):
+    pass
+
+
+
 
 def info(request):
     info = {
@@ -38,24 +45,8 @@ def info(request):
         'plugin_name': 'DM plugin',
         'about': 'serves the ability for users to send messages to each other privately'
     }
-    
+
     return JsonResponse(info, safe=False)
-    
-def edit_message(request):
-    messages = [
-        {
-            'user':'Victor',
-            'location': 'Finland',
-            'is_active': True,
-            'message': 'Im not home'
-        }
-    ]
-    return JsonResponse(messages, safe=False)
-    
-def side_bar(request):
-    pass
-
-
 
 
 def organizations(request):
@@ -74,15 +65,8 @@ def organizations(request):
         }]
 
     return JsonResponse(organizations, safe=False)
-	
-@api_view(['GET'],)
-def star_messages(request):
-    star_messages = {
-        'msgID': 134,
-        'starred': True,
-    }
 
-    return Response(star_messages, status=status.HTTP_200_OK)
+
 
 def message_reminder(request):
     message_reminder = [
@@ -104,42 +88,92 @@ def message_reminder(request):
         }]
     return JsonResponse(message_reminder, safe=False)
 
+
+def list_archives(request):
+    archived_messages = [
+        {
+            'id': '13',
+            'from': 'Korede',
+            'to': ['mark', ],
+            'message': 'Are you now in stage 5?',
+            'date_sent': '2021-05-15T10:49:59.581770Z',
+            'archived': True
+        },
+        {
+            'id': '21',
+            'from': 'Xylum',
+            'to': ['KoredeDavid', ],
+            'date_sent': '2021-05-17T18:27:24.376865Z',
+            'message': 'I need your help sir',
+            'archived': True
+        }
+    ]
+
+    return JsonResponse(archived_messages, safe=False)
+
+
 def organization(request):
-    pass
+    return HttpResponse("<h1>Is this working?</h1>")
+
 
 def users(request):
     pass
 
+
 def user(request):
     pass
+
+
+
+def user_profile(request):
+    user_profile = [
+        {
+            'username': 'Derin' ,
+            'fullname': 'Derin Aslin' ,
+            'image': 'templates/images/big.jpg',
+            'email': 'derino@zuri.com' ,
+            'date joined': '22/08/2021' ,
+
+        }
+    ]
+    return JsonResponse ( user_profile , safe=False )
+
+
 
 def rooms(request):
     pass
 
+
 def room(request):
     pass
+
 
 def room_users(request):
     pass
 
+
 def room_messages(request):
     pass
+
 
 def room_message(request):
     pass
 
+
 def room_medias(request):
     pass
+
 
 def room_media(request):
     pass
 
+
 def room_files(request):
     pass
 
+
 def room_file(request):
     pass
-
 
 
 def sort_message(request):
@@ -153,7 +187,7 @@ def sort_message(request):
     #     messagedict['created_at']=message_.created_at
     #     messagedict['meta']=message_.meta
     # return  JsonResponse(messagedict)
-        
+
     messages = [
         {
             'user': 'Fortunate',
@@ -171,7 +205,50 @@ def sort_message(request):
         }]
     return JsonResponse(messages,safe=False)
 
-    
+
+@api_view(['GET'],)
+def star_messages(request):
+    star_messages = {
+        'msgID': 134,
+        'starred': True,
+    }
+
+    return Response(star_messages, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'], )
+def auto_response(request):
+    auto_response_message = {
+        'userId': 23,
+        'auto_response': True,
+        'message': "Brian is currently offline. Please leave your message. He will reply you as soon as he's back "
+                   "online "
+    }
+
+    return Response(auto_response_message, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def send_media(request):
+    media = [
+             {
+                 # original message being sent
+                 "message":
+                 {
+                     "attachment": {
+                         "type": "image",
+                         "payload": {
+                         "is_reusable": True  #makes it possible to send the media file to another person via the app 
+                         }
+                     },
+                     "mediaLocation":"./media/funny.jpeg",
+                     "type": "image/png"
+                 },
+             }
+        ]
+    return Response(media, status=status.HTTP_200_OK)
+
+
+
 @api_view(['GET'],)
 def pagination(request):
     limit = int(request.query_params.get('limit', 2))
@@ -224,11 +301,9 @@ def pagination(request):
             }
         ]
             }
-    
+
     if limit > 7:
         return Response("Limit cannot exceed number of messages", status=status.HTTP_400_BAD_REQUEST)
     else:
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
-        
-    

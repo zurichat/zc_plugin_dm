@@ -9,4 +9,7 @@ gunicorn==20.1.0
 idna==3.2
 pytz==2021.1
 sqlparse==0.4.1
+<<<<<<< HEAD
 urllib3==1.26.6
+=======
+>>>>>>> 9d921ba58e9abda1b638a28e3cd87efcac8b49fd

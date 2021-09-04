@@ -25,16 +25,21 @@ jobs:
           script: |
             cd ~/zc_plugin_dm
 <<<<<<< HEAD
+<<<<<<< HEAD
             git stash
 =======
             git clean -fd
 >>>>>>> editmessage
+=======
+            git clean -fd
+            git stash
+>>>>>>> 9d921ba58e9abda1b638a28e3cd87efcac8b49fd
             git pull
             source env/bin/activate
             pip install -r requirements.txt --upgrade
             cd ~/zc_plugin_dm/frontend
-            npm install
-            npm run build
+            yarn install
+            yarn run build
             cd ~/zc_plugin_dm
             python3 manage.py collectstatic --noinput
             fuser -k -HUP 9090/tcp
