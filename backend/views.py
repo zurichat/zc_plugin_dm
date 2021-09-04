@@ -16,7 +16,7 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-def foward_messages(request):
+def forward_messages(request):
     forwarded_messages = [
         {
             'user': 'Itz_salemm',
@@ -455,4 +455,57 @@ def get_starred(request):
 
     ]
     return JsonResponse(get_starred, safe=False)
+
+
+@api_view(['GET'], )
+def filter_keywords(request):
+    keyword = "tomorrow"
+    queryset = [
+            {
+                'sender': 'Groot',
+                'message': 'Hello, dude! can we meet tomorrow?',
+            },
+            {
+                'sender': 'Florence',
+                'message': 'Hello!!! I know what you are doing',
+            },
+            {
+                'sender': 'Grace',
+                'message': 'I have no plans for tomorrow',
+            },
+            {
+                'sender': 'Samuel',
+                'message': 'Good, good!!!, Yours ?',
+            },
+            {
+                'sender': 'Maria',
+                'message': 'Great',
+            },
+            {
+                'sender': 'Samuel',
+                'message': 'How was your day'
+            },
+            {
+                'sender': 'Victor',
+                'message': 'Fine'
+            }
+    ]
+
+    filtered = [
+        {
+                'sender': 'Groot',
+                'message': 'Hello, dude! can we meet tomorrow?',
+        },
+
+        {
+            'sender': 'Grace',
+            'message': 'I have no plans for tomorrow',
+        },
+    ]
+
+    return JsonResponse(filtered, safe=False)
+
+
+
+
 
