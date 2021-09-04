@@ -31,7 +31,7 @@ urlpatterns = [
          views.room_file, name='room_file'),
 
     # Specific Routes for task
-    path('api/users',views.index),
+    path('api/users',views.users, name="users"),
     path('api/newMessages',views.new_messages, name='new_messages'),
     path('api/searchUser',views.index),
     path('api/messages',views.index),
