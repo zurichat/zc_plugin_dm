@@ -523,7 +523,7 @@ def messages_list(request):
         return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def send_file(request):
     file = [
         {
