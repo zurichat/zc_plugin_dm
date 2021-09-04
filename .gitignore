@@ -14,8 +14,11 @@ env/
 */node_modules
 
 *.idea
-=======
-.idea
+
 
 # *media
 *.DS_Store
+
+/__pycache__
+
+

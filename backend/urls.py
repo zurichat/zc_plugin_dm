@@ -5,6 +5,7 @@ app_name = 'backend'
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('api/info', views.info, name='plugin_info'),
     path('api/sidebar', views.side_bar, name='sidebar'),
     path('api/organizations', views.organizations, name='organizations'),
     path('api/organizations/id', views.organization, name='organization'),
@@ -22,23 +23,25 @@ urlpatterns = [
 
     # Specific Routes for tasks
     path('api/users',views.index),
-    path('api/newMessages',views.index),
+    path('api/newMessages',views.new_messages, name='new_messages'),
     path('api/searchUser',views.index),
     path('api/messages',views.index),
     path('api/starMessage',views.star_messages),
-    path('api/starredMessages',views.index),
-    path('api/sendFile',views.index),
+    path('api/getstarred',views.get_starred, name = "get_starred"),
+    path('api/sendFile',views.send_file),
     path('api/sendMedia',views.send_media),
     path('api/messagesByDate',views.index),
-    path('api/messageByUser',views.index),
+    path('api/messageByUser',views.filter_user),
     path('api/messageByKeywords',views.index),
     path('api/pagination/',views.pagination),
     path('api/userProfile',views.user_profile, name = 'user_profile'),
     path('api/editUserProfile',views.index),
-    path('api/forwardMessages',views.index),
+    path('api/forwardMessages',views.forward_message, name='forward_message'),
     path('api/replyMessage',views.index),
+    path('api/forwardMessages',views.index),
+    path('api/replyMessage',views.replyMessage, name='reply_message'),
     path('api/userStatus',views.index),
-    path('api/DMList',views.index),
+    path('api/DMList',views.dm_list),
     path('api/pinMessage',views.index),
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
@@ -53,6 +56,10 @@ urlpatterns = [
 
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
+<<<<<<< HEAD
     path('api/editMessage',views.edit_message, name='edit_message'),
 
+=======
+path('archive_message', views.archive_message,name="archive_message"),
+>>>>>>> 7dba286db107b3480ef6da421d7f2a5b9b7313b8
 ]
