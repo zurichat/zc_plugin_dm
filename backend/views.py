@@ -14,7 +14,7 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-def foward_messages(request):
+def forward_message(request):
     forwarded_messages = [
         {
             'user': 'Itz_salemm',
@@ -75,7 +75,17 @@ def new_messages(request):
 
     return HttpResponse(f"{messages}")
 
-
+def edit_message(request):
+    messages = [
+        {
+            'id': '1',
+            'sender_id': '3',
+            'receiver_id': '4',
+            'message_id': '34',
+            'message': 'edited this message'
+        }
+    ]
+    return JsonResponse(messages, safe=False)
 
 def side_bar(request):
     pass

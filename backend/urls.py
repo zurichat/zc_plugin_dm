@@ -38,7 +38,6 @@ urlpatterns = [
     path('api/editUserProfile',views.index),
     path('api/forwardMessages',views.forward_message, name='forward_message'),
     path('api/replyMessage',views.index),
-    path('api/forwardMessages',views.index),
     path('api/replyMessage',views.replyMessage, name='reply_message'),
     path('api/userStatus',views.index),
     path('api/DMList',views.dm_list),
@@ -47,6 +46,7 @@ urlpatterns = [
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
+    path('api/editMessages', views.edit_message, name='edit_message'),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
     path('api/autoResponse', views.auto_response, name="auto_response"),
@@ -56,10 +56,5 @@ urlpatterns = [
 
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-<<<<<<< HEAD
-    path('api/editMessage',views.edit_message, name='edit_message'),
-
-=======
 path('archive_message', views.archive_message,name="archive_message"),
->>>>>>> 7dba286db107b3480ef6da421d7f2a5b9b7313b8
 ]
