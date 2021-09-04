@@ -9,11 +9,9 @@ env/
 *.log
 *.pot
 *.pyc
-*__pycache__
+*__pycache__/
 
 *.idea
-=======
-.idea
 
 # *media
 *.DS_Store
