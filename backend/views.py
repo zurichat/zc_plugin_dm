@@ -130,6 +130,22 @@ def archive_message(request):
     }
     return JsonResponse(archive_message, safe=False)
 
+def pin_message(request):
+    pinned_message=[{
+             'msgID':121,
+            'pinned':True       
+    }, {
+             'msgID':122,
+            'pinned':True       
+    }, {
+             'msgID':123,
+            'pinned':True} ,   
+        {
+             'msgID':124,
+            'pinned':True } 
+        ]
+
+    return JsonResponse(pinned_message, safe=False)
 
 def message_reminder(request):
     message_reminder = [
@@ -596,70 +612,33 @@ def edit_message(request):
     }]
     return JsonResponse(messages, safe=False)
 
-
 class SearchMessagesAPI(APIView):
-    def get_match(self, phrase):
+    def get_match(self,phrase):
         try:
-            # here we serch through the messages for a phrase.
+            #here we serch through the messages for a phrase.
             pass
         except Exception as e:
             pass
 
     def get(self, request, phrase):
-        # we search the message
-        matchedMessages = self.get_match(phrase)
+        #we search the message
+        matchedMessages= self.get_match(phrase)
 
-        # expected outcome for the phrase home
-        matchedMessages = [
-            {
-                'message_id': '1',
-                'name': 'Vitor',
-                'message': 'home is where my heart is.'
-            },
-            {
-                'message_id': '65',
-                'name': 'Mykie',
-                'message': 'I\'m on my way home'
-            },
-            {
-                'message_id': '8',
-                'name': 'john',
-                'message': 'home file.'
-            }]
+        #expected outcome for the phrase home
+        matchedMessages=[
+        {
+            'message_id': '1',
+            'name': 'Vitor',
+            'message': 'home is where my heart is.'
+        },
+        {
+            'message_id': '65',
+            'name': 'Mykie',
+            'message': 'I\'m on my way home'
+        },
+        {
+            'message_id': '8',
+            'name': 'john',
+            'message': 'home file.'
+        }]
         return Response(matchedMessages, status=status.HTTP_200_OK)
-
-
-def date_message(request):
-    '''
-    Returns filtered messages between a date range: [before date] and [after date]
-    '''
-
-    results = [
-        {
-            'user_id': 'Mark',
-            'message': 'Hello',
-            'created_at': '2021-09-01 04:20:35',
-            'date_timestamps': 1538697600
-        },
-        {
-            'user_id': 'Oluwaseye',
-            'message': 'Assignment due',
-            'created_at': '2021-09-01 06:15:14',
-            'date_timestamps': 1538697500
-
-        },
-        {
-            'user_id': 'Oluwaseye',
-            'message': 'They are the best',
-            'created_at': '2021-09-01 08:15:14',
-            'date_timestamps': 1538297500
-        },
-        {
-            'user_id': 'Mark',
-            'message': 'Restart the server',
-            'created_at': '2021-09-01 09:15:14',
-            'date_timestamps': 1538297900
-        },
-
-    ]
-    return JsonResponse(results, safe=False)
