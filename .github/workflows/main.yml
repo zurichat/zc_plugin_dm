@@ -24,7 +24,6 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             cd ~/zc_plugin_dm
-            git clean -fd
             git stash
             git pull
             source env/bin/activate
