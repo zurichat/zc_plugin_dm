@@ -26,7 +26,7 @@ git remote add upstream https://github.com/zurichat/zc_plugin_dm
 ## Checkout Develop Branch
 Checkout develop branch by running
 ```
-git checkout develop
+git checkout develop_test_2
 ```
 
 ## Checkout Your Feature Branch
@@ -92,7 +92,7 @@ git commit -m "descriptive commit message"
 ## Pull Update from Remote
 Pull latest update from the upstream remote repo by running:
 ```
-git pull upstream develop
+git pull upstream develop_test_2
 ```
 
 ## Push Local Changes to origin
