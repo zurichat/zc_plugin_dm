@@ -19,66 +19,38 @@
       rel="stylesheet"
       href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
     />
-    <link href="https://cdn.quilljs.com/1.3.5/quill.snow.css" rel="stylesheet"> 
-    <link rel="stylesheet" type="text/css" href="../dist/quill-emoji.css">
+
     <!-- Load polyfills to support older browsers -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
 
     <!-- Required scripts -->
     <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
-    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
-    
-    <script src="https://cdn.quilljs.com/1.3.5/quill.js"></script>
-    <script src="../dist/quill-emoji.js"></script>
- 
+
   </head>
   <body>
     <!-- Our application root element -->
     <div id="app">
-      <b-row>
-        <b-col cols="3">1</b-col>
-        <b-col cols="6">
-          <b-col class="editor-wrapper">
-            <b-col id="editor-container">
+      <b-container>
+        <b-row class="text-center">
+            <b-col></b-col>
+            <b-col cols="8" id="text-container">
+                <!-----Input text boxer and emoji here-->
             </b-col>
-          </b-col>
-        </b-col>
-        <b-col cols="3">3</b-col>
-      </b-row>   
+            <b-col></b-col>
+        </b-row>
+      </b-container>
     </div>
 
     <!--Our applications styling-->
     <style>
-        
-        #editor-container {
-          margin-top: 650px;
-          height: 75px;
-          border-color: #00B87C;
-          border-top: 0.5px solid  #00B87C;;
-          border-top-left-radius: 5px;
-          border-top-right-radius: 5px;
-          
+        #text-container{
+           margin-top: 700px;
+           font-style: normal;
+           border: 1px solid gray;
+           padding: 40px;
+           border-radius: 5px;
         }
-
-        .editor-wrapper {
-          position: relative;
-          border-top: 2px;
-      
-        }
-
-        .ql-toolbar {
-          position: absolute;
-          bottom: 0;
-          width: 100%;
-          transform: translateY(100%);
-          border-bottom-right-radius: 5px ;
-          border-bottom-left-radius: 5px ;
-          background-color: whitesmoke;
-          
-        }
-
-  
     </style>
 
     <!-- Start running your app -->
@@ -92,32 +64,6 @@
           
         }
       })
-    </script>
-    <script type="text/javascript">
-       
-    
-      var toolbarOptions = {
-        container: [
-          ['bold', 'italic', 'underline', 'strike'],
-          ['code-block'],
-          ['emoji'],
-          ['link', 'image', 'video']
-        ],
-        handlers: {
-          'emoji': function () {}
-        }
-      }
-
-      var quill = new Quill('#editor-container', {
-        modules: {
-          "toolbar": toolbarOptions,
-          "emoji-toolbar": true,
-          "emoji-shortname": true,
-          "emoji-textarea": true
-        },
-        placeholder: 'Compose an epic...',
-        theme: 'snow',
-      });
     </script>
   </body>
 </html>

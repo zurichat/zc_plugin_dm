@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import book_mark,Message
+from .models import book_mark, Message
 
 # User serializer
 class UserSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 
 
 
@@ -86,5 +86,27 @@ class Room(models.Model):
         return f"sender:{self.sender}\treceiver:{self.receiver}\tseen:{self.seen}\tdeleted:{self.deleted}"
 
 
+# # User = get_user_model()
 # User = get_user_model()
+
+# """
+# The message model simulates the Messages being sent by users to one another.
+# In The message model we have the following fields:
+#         -   sender_id: This is senders id and references the user model via a foreignkey
+#         -   receiver_id: This is receivers id and references the user model via a foreignkey
+#         -   deleted_user_id: This is users id that deletes a particular message and references the user model via a foreignkey
+#         -   message: This is the message being sent to each other.
+#         -   meta: This is a Json Object which contains more detailed info about the message being sent
+#         -   created_at: The date at which the message was created
+#         -   last_updated: The date at which the message was last updated
+# """
+# class Message(models.Model):
+#     sender_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="sent")
+#     receiver_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE, related_name="received")
+#     message = models.TextField()
+#     meta = models.JSONField()
+#     deleted_user_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now=True)
+#     last_updated = models.DateTimeField(auto_now_add=True)
+
 
