@@ -534,7 +534,7 @@ def edit_message(request):
         'message': 'I just edited this message'
 
     }]
-    return JsonResponse(messaages, safe=False)
+    return JsonResponse(messages, safe=False)
 
 
 def date_message(request):
