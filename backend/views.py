@@ -18,6 +18,24 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
+def foward_messages(request):
+    forwarded_messages = [
+        {
+            'user': 'Itz_salemm',
+            'location': 'Switzerland',
+            'forwarded_to': ['mark', ],
+            'forward': True
+        },
+        {
+            'user': 'Samuel',
+            'location': 'UK',
+            'forwarded_to': ['naza', ],
+            'forward': True
+        }
+    ]
+
+    return JsonResponse(forwarded_messages, safe=False)
+
 
 def messages(request):
     messages = [
@@ -36,6 +54,32 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
+def new_messages(request):
+    messages = [
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'been awhile',
+            'meta': 'dm_message38384739',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-3 00:00:00',
+            'last_updated_at':'null'
+        },
+        {
+            'id': '1',
+            'sender_id': '5',
+            'receiver_id': '4',
+            'message': 'Hi, dude',
+            'meta': 'dm_message38384738',
+            'deleted_user_id': 'null',
+            'created_at': '2021-09-2 00:00:00',
+            'last_updated_at':'null'
+        }]
+
+    return HttpResponse(f"{messages}")
+
+
 
 def side_bar(request):
     pass
@@ -45,9 +89,18 @@ def side_bar(request):
 
 def info(request):
     info = {
-        'plugin_id': 201982982,
-        'plugin_name': 'DM plugin',
-        'about': 'serves the ability for users to send messages to each other privately'
+        "message": "Plugin Information Retrieved",
+        "data": {
+            "type": "Plugin Information",
+            "plugin_info": {"name": "DM Plugin",
+                            "description": ["Zuri.chat plugin", "DM plugin for Zuri Chat that enables users to send messages to each other"]
+                            },
+            "scaffold_structure": "Monolith",
+            "team": "HNG 8.0/Team Orpheus",
+            "sidebar_url": "https://dm.zuri.chat/api/sideBar",
+            "homepage_url": "https://dm.zuri.chat/"
+        },
+        "success": "true"
     }
 
     return JsonResponse(info, safe=False)
@@ -128,80 +181,7 @@ def organization(request):
 
 
 def users(request):
-    users = [
-        {
-            'name': 'Seye Olowo',
-            'is_active': True,
-            'last_message_snippet': 'How are you man?',
-            'user_info': {
-                'username': 'blaco',
-                'id': 1,
-                'email': 'blac@gmail.com'
-            }
-        },
-        {
-            'name': 'Roman Reigns',
-            'is_active': False,
-            'last_message_snippet': 'Have you made your pull request?',
-            'user_info': {
-                'username': 'Romanric',
-                'id': 12,
-                'email': 'roman@gmail.com'
-            }
-        },
-        {
-            'name': 'Florence Girl',
-            'is_active': True,
-            'last_message_snippet': 'Thank You...',
-            'user_info': {
-                'username': 'Fae',
-                'id': 14,
-                'email': 'florence@gmail.com'
-            }
-        },
-        {
-            'name': 'Timmy Joe',
-            'is_active': False,
-            'last_message_snippet': 'Good evening boss, I want....',
-            'user_info': {
-                'username': 'manofmind',
-                'id': 4,
-                'email': 'timmy@gmail.com'
-            }
-        },
-        {
-            'name': 'Jeff Jones',
-            'is_active': True,
-            'last_message_snippet': 'My king',
-            'user_info': {
-                'username': 'Jiggy',
-                'id': 6,
-                'email': 'jonzy@gmail.com'
-            }
-        },
-        {
-            'name': 'Mamba Joy',
-            'is_active': True,
-            'last_message_snippet': 'i dey go school now',
-            'user_info': {
-                'username': 'mamba',
-                'id': 100,
-                'email': 'ogblaq@gmail.com'
-            }
-        },
-        {
-            'name': 'Destiny Delight',
-            'is_active': False,
-            'last_message_snippet': 'Good day to you, I want to ask a que.....',
-            'user_info': {
-                'username': 'Delight',
-                'id': 189,
-                'email': 'delight@gmail.com'
-            }
-        },
-    ]
-
-    return JsonResponse({'users': users})
+    pass
 
 
 def user(request):
@@ -454,3 +434,52 @@ def replyMessage(request):
         }
     ]
     return Response(reply_message, status=status.HTTP_200_OK)
+
+
+def dm_list(request):
+    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
+               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
+               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
+    return JsonResponse(dm_lists)
+  
+  
+def filter_user(request):
+    filter_user = [
+        {
+            'user_id':'1',
+            'message':'Hey, how are you doing'
+        },
+
+        {
+            'user_id':'1',
+            'message':'I need to have some rest'
+        }, 
+
+        {
+            'user_id':'1',
+            'message':'I would see you later'
+        }
+    ]
+
+    return JsonResponse(filter_user, safe=False)
+
+@api_view(['GET'],)
+def get_starred(request):
+    get_starred = [
+        {
+            'sender_id': 'Laurie',
+            'message': 'Hello',
+            'created_at': '0800hrs',
+            'star_messages': True,
+        },
+
+        {
+            'sender_id': 'Barney',
+            'message': 'Assignment due',
+            'created_at': '1500hrs',
+            'star_messages': True,
+        }
+
+    ]
+    return JsonResponse(get_starred, safe=False)
+
