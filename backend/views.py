@@ -496,32 +496,6 @@ def message_list(request):
         return JsonResponse({'message': '{} messages were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
 
 
-# get delete and post for messages view task
-
-@api_view(['GET', 'POST', 'DELETE'])
-def messages_list(request):
-    if request.method == 'GET':
-        data = Message.objects.all()
-
-        text = request.query_params.get('message', None)
-
-        message_serializer = MessageSerializer(text, many=True)
-        return JsonResponse(message_serializer.data, safe=False)
-        # 'safe=False' for objects serialization
-
-    elif request.method == 'POST':
-        message_data = JSONParser().parse(request)
-        message_serializer = MessageSerializer(data=message_data)
-        if message_serializer.is_valid():
-            message_serializer.save()
-            return JsonResponse(message_serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        count = Message.objects.all().delete()
-        return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
-
-
 @api_view(['GET', 'POST'])
 def send_file(request):
     file = [
