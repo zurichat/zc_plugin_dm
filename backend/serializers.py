@@ -23,10 +23,5 @@ class MessageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Message
-        fields = ('id',
-                  'sender_id',
-                  'receiver_id',
-                  'message',
-                  'created_at',
-                  'last_updated')
+        fields = "__all__"
     

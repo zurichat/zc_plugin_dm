@@ -44,7 +44,7 @@ urlpatterns = [
     path('api/pagination/',views.pagination),
     path('api/userProfile',views.user_profile, name = 'user_profile'),
     path('api/editUserProfile',views.index),
-    path('api/forwardMessages',views.forward_message, name='forward_message'),
+    # path('api/forwardMessages',views.forward_message, name='forward_message'),
     path('api/replyMessage',views.index),
     path('api/forwardMessages',views.index),
     path('api/replyMessage',views.replyMessage, name='reply_message'),
@@ -56,7 +56,9 @@ urlpatterns = [
     path('api/archivedMessages',views.list_archives, name='list_archives'),
     path('api/editMessage',views.index),
     # using url and regular expressions to do GET/PUT/DELETE
-    url(r'^api/message_list/(?P<pk>[0-9]+)$', views.messages_list),
+    url(r'^api/message_list/(?P<pk>[0-9]+)$', views.message_detail),
+    url(r'^api/message_list/', views.message_list),
+
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
     path('api/users', views.index),
