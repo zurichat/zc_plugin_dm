@@ -487,6 +487,16 @@ def get_starred(request):
     return JsonResponse(get_starred, safe=False)
 
 
+def edit_message(request):
+    messages = [{
+        'user_id': '2',
+        'message_id': '34',
+        'message': 'I just edited this message'
+
+    }]
+    return JsonResponse(messaages, safe=False)
+
+
 def date_message(request):
     '''
     Returns filtered messages between a date range: [before date] and [after date]

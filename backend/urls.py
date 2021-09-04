@@ -53,9 +53,7 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
-    path('api/editMessage',views.index),
-    # using url and regular expressions to do GET/PUT/DELETE
-    url(r'^api/message_list/(?P<pk>[0-9]+)$', views.messages_list),
+    path('api/editMessage',views.edit_message, names='edit_messages'),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
     path('api/users', views.index),
