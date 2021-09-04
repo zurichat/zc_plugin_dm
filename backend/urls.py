@@ -57,7 +57,7 @@ urlpatterns = [
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
 #     path('api/editMessage',views.index),
-    path('api/editMessage', views.edit_message, name='edit_messages'),
+    #path('api/editMessage', views.edit_message, name='edit_messages'),
 
     # using url and regular expressions to do GET/PUT/DELETE
     url(r'^api/messageList/(?P<pk>[0-9]+)$', views.message_detail),
@@ -68,11 +68,7 @@ urlpatterns = [
     path('api/setReminder', views.message_reminder, name="message_reminder"),
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-<<<<<<< HEAD
     path('archive_message', views.archive_message,name="archive_message"),
-    path('api/search_message',views.SearchMessagesAPI.as_view())
-=======
-    path('archive_message', views.archive_message, name="archive_message"),
-
->>>>>>> f0b6ec61de6f7fa90a9a1f1e0f63cc4ce956b32f
+    #for search message
+    path('api/search_message/<phrase>/',views.SearchMessagesAPI.as_view()),
 ]

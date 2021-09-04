@@ -1,18 +1,14 @@
 from .models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
-
+from rest_framework.parsers import JSONParser
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 
 from .serializers import UserSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
-<<<<<<< HEAD
 from rest_framework.views import APIView
-=======
-from rest_framework.parsers import JSONParser
->>>>>>> f0b6ec61de6f7fa90a9a1f1e0f63cc4ce956b32f
 
 
 # Create your views here.
@@ -613,10 +609,20 @@ def get_starred(request):
     ]
     return JsonResponse(get_starred, safe=False)
 
-<<<<<<< HEAD
 
 class SearchMessagesAPI(APIView):
-    def get(self, request):
+    def get_match(self,phrase):
+        try:
+            #here we serch through the messages for a phrase.
+            pass
+        except Exception as e:
+            pass
+
+    def get(self, request, phrase):
+        #we search the message
+        matchedMessages= self.get_match(phrase)
+
+        #expected outcome for the phrase home
         matchedMessages=[
         {
             'message_id': '1',
@@ -634,50 +640,3 @@ class SearchMessagesAPI(APIView):
             'message': 'home file.'
         }]
         return Response(matchedMessages, status=status.HTTP_200_OK)
-=======
-def edit_message(request):
-    messages = [{
-        'user_id': '2',
-        'message_id': '34',
-        'last_updated': '2021-09-04 19:11:35',
-        'message': 'I just edited this message'
-
-    }]
-    return JsonResponse(messages, safe=False)
-
-
-def date_message(request):
-    '''
-    Returns filtered messages between a date range: [before date] and [after date]
-    '''
-
-    results = [
-        {
-            'user_id': 'Mark',
-            'message': 'Hello',
-            'created_at': '2021-09-01 04:20:35',
-            'date_timestamps': 1538697600
-        },
-        {
-            'user_id': 'Oluwaseye',
-            'message': 'Assignment due',
-            'created_at': '2021-09-01 06:15:14',
-            'date_timestamps': 1538697500
-
-        },
-        {
-            'user_id': 'Oluwaseye',
-            'message': 'They are the best',
-            'created_at': '2021-09-01 08:15:14',
-            'date_timestamps': 1538297500
-        },
-        {
-            'user_id': 'Mark',
-            'message': 'Restart the server',
-            'created_at': '2021-09-01 09:15:14',
-            'date_timestamps': 1538297900
-        },
-
-    ]
-    return JsonResponse(results, safe=False)
->>>>>>> f0b6ec61de6f7fa90a9a1f1e0f63cc4ce956b32f
