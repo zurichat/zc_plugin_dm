@@ -139,31 +139,31 @@
         </div>
       </div>
 
-      <script>
-          Vue.use(EmojiPicker)
+<script>
+    Vue.use(EmojiPicker)
 
-new Vue({
-  el: '#app',
-  data() {
-    return {
-      input: '',
-      search: '',
-    }
-  },
-  methods: {
-    append(emoji) {
-      this.input += emoji
+    new Vue({
+    el: '#app',
+    data() {
+        return {
+        input: '',
+        search: '',
+        }
     },
-  },
-  directives: {
-    focus: {
-      inserted(el) {
-        el.focus()
-      },
+    methods: {
+        append(emoji) {
+        this.input += emoji
+        },
     },
-  },
-})
-      </script>
+    directives: {
+        focus: {
+        inserted(el) {
+            el.focus()
+        },
+        },
+    },
+    })
+</script>
 </body>
 </html>
 
