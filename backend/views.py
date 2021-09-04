@@ -270,7 +270,19 @@ def user_profile(request):
         }
     ]
     return JsonResponse(user_profile, safe=False)
-
+def pinned_messages(request):
+    pinned_messages = [
+      {
+           'user': 'tonye',
+           'is_active': True,
+           'pinned_message': 'I am home'
+      },
+      {
+           'user': 'praise',
+           'is_active': True,
+           'pinned_message': 'avoid Canada'
+      }]
+    return JsonResponse(pinned_messages, safe=False)
 
 def rooms(request):
     pass

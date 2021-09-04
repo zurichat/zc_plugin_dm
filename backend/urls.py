@@ -51,7 +51,7 @@ urlpatterns = [
     path('api/userStatus',views.index),
     path('api/DMList',views.dm_list),
     path('api/pinMessage',views.index),
-    path('api/pinnedMessages',views.index),
+    path('api/pinnedMessages',views.pinned_messages),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
     path('api/editMessage',views.index),
@@ -123,5 +123,6 @@ urlpatterns = [
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
     path('archive_message', views.archive_message, name="archive_message"),
-
+    
+path('pinned_messages', views.pinned_messages, name='pinned_messages'),
 ]
