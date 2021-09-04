@@ -36,7 +36,7 @@ urlpatterns = [
     path('api/pagination/',views.pagination),
     path('api/userProfile',views.user_profile, name = 'user_profile'),
     path('api/editUserProfile',views.index),
-    path('api/forwardMessages',views.forward_message, name='forward_message'),
+    path('api/forwardMessages',views.forward_messages, name='forward_messages'),
     path('api/replyMessage',views.index),
     path('api/forwardMessages',views.index),
     path('api/replyMessage',views.replyMessage, name='reply_message'),

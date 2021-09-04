@@ -16,7 +16,8 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-def foward_messages(request):
+
+def forward_messages(request):
     forwarded_messages = [
         {
             'user': 'Itz_salemm',
@@ -52,6 +53,7 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
+
 def new_messages(request):
     messages = [
         {
@@ -62,7 +64,7 @@ def new_messages(request):
             'meta': 'dm_message38384739',
             'deleted_user_id': 'null',
             'created_at': '2021-09-3 00:00:00',
-            'last_updated_at':'null'
+            'last_updated_at': 'null'
         },
         {
             'id': '1',
@@ -72,17 +74,14 @@ def new_messages(request):
             'meta': 'dm_message38384738',
             'deleted_user_id': 'null',
             'created_at': '2021-09-2 00:00:00',
-            'last_updated_at':'null'
+            'last_updated_at': 'null'
         }]
 
     return HttpResponse(f"{messages}")
 
 
-
 def side_bar(request):
     pass
-
-
 
 
 def info(request):
@@ -119,15 +118,16 @@ def organizations(request):
             'about': 'Supermarket'
         }]
 
-
     return JsonResponse(organizations, safe=False)
 
 
 def archive_message(request):
-	archive_message={
-	'msgID':121,
-	'archived':True}
-	return JsonResponse(archive_message, safe=False)
+    archive_message = {
+        'msgID': 121,
+        'archived': True
+    }
+
+    return JsonResponse(archive_message, safe=False)
 
 
 def message_reminder(request):
@@ -186,20 +186,18 @@ def user(request):
     pass
 
 
-
 def user_profile(request):
     user_profile = [
         {
-            'username': 'Derin' ,
-            'fullname': 'Derin Aslin' ,
+            'username': 'Derin',
+            'fullname': 'Derin Aslin',
             'image': 'templates/images/big.jpg',
-            'email': 'derino@zuri.com' ,
-            'date joined': '22/08/2021' ,
+            'email': 'derino@zuri.com',
+            'date joined': '22/08/2021',
 
         }
     ]
-    return JsonResponse ( user_profile , safe=False )
-
+    return JsonResponse(user_profile, safe=False)
 
 
 def rooms(request):
@@ -239,7 +237,7 @@ def room_file(request):
 
 
 def sort_message(request):
-    #Use the below when the message object is ready and also delete the dummy data.
+    # Use the below when the message object is ready and also delete the dummy data.
     # messages = Message.objects.order_by('-created_at')
     # messagedict = {}
     # for message_ in messagedict:
@@ -256,16 +254,16 @@ def sort_message(request):
             'location': 'Finland',
             'is_active': True,
             'message': 'Hi, dude',
-            'created_at':"2020-5-10"
+            'created_at': "2020-5-10"
         },
         {
             'name': 'Asyncdeveloper',
             'location': 'Nigeria',
             'is_active': True,
             'message': 'I\'m on my way home',
-            'created_at':"2021-5-10"
+            'created_at': "2021-5-10"
         }]
-    return JsonResponse(messages,safe=False)
+    return JsonResponse(messages, safe=False)
 
 
 @api_view(['GET'],)
@@ -289,26 +287,27 @@ def auto_response(request):
 
     return Response(auto_response_message, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 def send_media(request):
     media = [
-             {
-                 # original message being sent
-                 "message":
-                 {
-                     "attachment": {
-                         "type": "image",
-                         "payload": {
-                         "is_reusable": True  #makes it possible to send the media file to another person via the app 
-                         }
-                     },
-                     "mediaLocation":"./media/funny.jpeg",
-                     "type": "image/png"
-                 },
-             }
-        ]
+        {
+            # original message being sent
+            "message":
+            {
+                "attachment": {
+                    "type": "image",
+                    "payload": {
+                        # makes it possible to send the media file to another person via the app
+                        "is_reusable": True
+                    }
+                },
+                "mediaLocation": "./media/funny.jpeg",
+                "type": "image/png"
+            },
+        }
+    ]
     return Response(media, status=status.HTTP_200_OK)
-
 
 
 @api_view(['GET'],)
@@ -316,53 +315,53 @@ def pagination(request):
     limit = int(request.query_params.get('limit', 2))
     page = int(request.query_params.get('page', 1))
     total_messages = {
-        "page":page,
-        "limit":limit,
-         "messages":   [
+        "page": page,
+        "limit": limit,
+        "messages":   [
             {
                 'sender': 'Victor',
                 'receiver': 'Samuel',
                 'message': 'Hello, dude',
-                'seen':True
+                'seen': True
             },
             {
                 'sender': 'Samuel',
                 'receiver': 'Vctor',
                 'message': 'Hello!!!',
-                'seen':True
+                'seen': True
             },
-                {
+            {
                 'sender': 'Victor',
                 'receiver': 'Samuel',
                 'message': 'How was today ?',
-                'seen':True
+                'seen': True
             },
             {
                 'sender': 'Samuel',
                 'receiver': 'Victor',
                 'message': 'Good, good!!!, Yours ?',
-                'seen':True
+                'seen': True
             },
             {
                 'sender': 'Victor',
                 'receiver': 'Samuel',
                 'message': 'Great',
-                'seen':True
+                'seen': True
             },
             {
                 'sender': 'Samuel',
                 'receiver': 'Victor',
                 'message': 'How was your day',
-                'seen':True
+                'seen': True
             },
             {
                 'sender': 'Victor',
                 'receiver': 'Samuel',
                 'message': 'Fine',
-                'seen':True
+                'seen': True
             }
         ]
-            }
+    }
 
     if limit > 7:
         return Response("Limit cannot exceed number of messages", status=status.HTTP_400_BAD_REQUEST)
@@ -370,19 +369,21 @@ def pagination(request):
         total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
         return Response(total_messages, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
 def send_file(request):
     file = [
-             {
-                 
+        {
+
             'id': '1',
             'message_id': '2',
             'file_name': 'dbdiagram',
             'file_path': 'media/dbdiagram.pdf',
             'created_at': '20-09-21 19:03:01'
-             }
-        ]
+        }
+    ]
     return Response(file, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'],)
 def replyMessage(request):
@@ -410,31 +411,33 @@ def replyMessage(request):
 
 
 def dm_list(request):
-    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
-               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
-               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
+    dm_lists = [{"user": "Cheeqito", "isActive": True, "last_message": "10 minutes Ago"},
+                {"user": "Cheediogo", "isActive": False,
+                    "last_message": "2Hours Ago"},
+                {"user": "James", "isActive": True, "last_message": "2 minutes Ago"}, ]
     return JsonResponse(dm_lists)
-  
-  
+
+
 def filter_user(request):
     filter_user = [
         {
-            'user_id':'1',
-            'message':'Hey, how are you doing'
+            'user_id': '1',
+            'message': 'Hey, how are you doing'
         },
 
         {
-            'user_id':'1',
-            'message':'I need to have some rest'
-        }, 
+            'user_id': '1',
+            'message': 'I need to have some rest'
+        },
 
         {
-            'user_id':'1',
-            'message':'I would see you later'
+            'user_id': '1',
+            'message': 'I would see you later'
         }
     ]
 
     return JsonResponse(filter_user, safe=False)
+
 
 @api_view(['GET'],)
 def get_starred(request):
@@ -455,4 +458,3 @@ def get_starred(request):
 
     ]
     return JsonResponse(get_starred, safe=False)
-
