@@ -11,7 +11,14 @@ env/
 *.pyc
 *__pycache__
 
+*.idea
+=======
+.idea
+
 # *media
 *.DS_Store
 
 *yarn.lock
+/__pycache__
+
+
