@@ -35,3 +35,4 @@ jobs:
             cd ~/zc_plugin_dm
             python3 manage.py collectstatic --noinput
             fuser -k -HUP 9090/tcp
+            gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
