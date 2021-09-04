@@ -92,7 +92,7 @@ git commit -m "descriptive commit message"
 ## Pull Update from Remote
 Pull latest update from the upstream remote repo by running:
 ```
-git pull upstream develop
+git pull upstream develop_test_2
 ```
 
 ## Push Local Changes to origin

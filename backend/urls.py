@@ -1,5 +1,6 @@
 from . import views
 from django.urls import path
+from django.conf.urls import url
 
 app_name = 'backend'
 
@@ -28,7 +29,36 @@ urlpatterns = [
     path('api/organizations/id/rooms/id/files/id',
          views.room_file, name='room_file'),
 
-    # Specific Routes for tasks
+    # Specific Routes for task
+    path('api/users',views.index),
+    path('api/newMessages',views.new_messages, name='new_messages'),
+    path('api/searchUser',views.index),
+    path('api/messages',views.index),
+    path('api/starMessage',views.star_messages),
+    path('api/getstarred',views.get_starred, name = "get_starred"),
+    path('api/sendFile',views.send_file),
+    path('api/sendMedia',views.send_media),
+    path('api/messagesByDate',views.index),
+    path('api/messageByUser',views.filter_user),
+    path('api/messageByKeywords',views.index),
+    path('api/pagination/',views.pagination),
+    path('api/userProfile',views.user_profile, name = 'user_profile'),
+    path('api/editUserProfile',views.index),
+    path('api/forwardMessages',views.forward_message, name='forward_message'),
+    path('api/replyMessage',views.index),
+    path('api/forwardMessages',views.index),
+    path('api/replyMessage',views.replyMessage, name='reply_message'),
+    path('api/userStatus',views.index),
+    path('api/DMList',views.dm_list),
+    path('api/pinMessage',views.index),
+    path('api/pinnedMessages',views.index),
+    path('api/archiveMessage',views.index),
+    path('api/archivedMessages',views.list_archives, name='list_archives'),
+    path('api/editMessage',views.index),
+    # using url and regular expressions to do GET/PUT/DELETE
+    url(r'^api/message_list/(?P<pk>[0-9]+)$', views.messages_list),
+    path('api/deleteMessage',views.index),
+    path('api/sortMessage',views.sort_message),
     path('api/users', views.index),
     path('api/newMessages', views.new_messages, name='new_messages'),
     path('api/searchUser', views.index),
