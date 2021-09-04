@@ -129,7 +129,7 @@ class Room(models.Model):
 #     last_updated = models.DateTimeField(auto_now_add=True)
 
 
-=======
+
 User = get_user_model()
 
 """
