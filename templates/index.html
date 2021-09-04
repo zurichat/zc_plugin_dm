@@ -30,7 +30,7 @@
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script> -->
     <script src="https://unpkg.com/vuex"></script>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>Orpheus</title>
     <!--Our applications styling-->
     <style>
@@ -191,6 +191,7 @@
 
         var app = new Vue({
             el: "#app",
+            store:store,
             delimiters: ["[[", "]]"],
             data: {
                 message: "Hello Vue!",
