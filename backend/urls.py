@@ -13,15 +13,23 @@ urlpatterns = [
     path('api/organizations/id/users/id', views.user, name='user'),
     path('api/organizations/id/rooms', views.rooms, name='rooms'),
     path('api/organizations/id/rooms/id', views.room, name='room'),
-    path('api/organizations/id/rooms/id/users/', views.room_users, name='room_users'),
-    path('api/organizations/id/rooms/id/messages', views.room_messages, name='room_messages'),
-    path('api/organizations/id/rooms/id/messages/id', views.room_message, name='room_message'),
-    path('api/organizations/id/rooms/id/media', views.room_medias, name='room_medias'),
-    path('api/organizations/id/rooms/id/media/id', views.room_media, name='room_media'),
-    path('api/organizations/id/rooms/id/files', views.room_files, name='room_files'),
-    path('api/organizations/id/rooms/id/files/id', views.room_file, name='room_file'),
+    path('api/organizations/id/rooms/id/users/',
+         views.room_users, name='room_users'),
+    path('api/organizations/id/rooms/id/messages',
+         views.room_messages, name='room_messages'),
+    path('api/organizations/id/rooms/id/messages/id',
+         views.room_message, name='room_message'),
+    path('api/organizations/id/rooms/id/media',
+         views.room_medias, name='room_medias'),
+    path('api/organizations/id/rooms/id/media/id',
+         views.room_media, name='room_media'),
+    path('api/organizations/id/rooms/id/files',
+         views.room_files, name='room_files'),
+    path('api/organizations/id/rooms/id/files/id',
+         views.room_file, name='room_file'),
 
     # Specific Routes for tasks
+  
     path('api/users',views.users, name="users"),
     path('api/newMessages',views.new_messages, name='new_messages'),
     path('api/searchUser',views.index),
@@ -48,10 +56,11 @@ urlpatterns = [
     path('api/editMessage',views.edit_message, names='edit_messages'),
     path('api/deleteMessage',views.index),
     path('api/sortMessage',views.sort_message),
+
     path('api/autoResponse', views.auto_response, name="auto_response"),
-    path('api/setReminder',views.message_reminder, name = "message_reminder"),
+    path('api/setReminder', views.message_reminder, name="message_reminder"),
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-path('archive_message', views.archive_message,name="archive_message"),
-  
+    path('archive_message', views.archive_message, name="archive_message"),
+
 ]
