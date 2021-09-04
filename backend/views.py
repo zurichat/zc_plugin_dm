@@ -1,14 +1,14 @@
-from backend.models import Message
+from .models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
 
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
+
 from .serializers import UserSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import JSONParser
-from rest_framework import status
 
 
 # Create your views here.
@@ -444,6 +444,59 @@ def pagination(request):
         return Response(total_messages, status=status.HTTP_200_OK)
 
 
+
+# get delete and post for messages view task 
+# 1 for individual message using id
+@api_view(['GET', 'PUT', 'DELETE'])
+def message_detail(request, pk):
+    try: 
+        text = Message.objects.get(pk=pk) 
+    except Message.DoesNotExist: 
+        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND) 
+ 
+    if request.method == 'GET': 
+        message_serializer = MessageSerializer(text) 
+        return JsonResponse(message_serializer.data) 
+ 
+    elif request.method == 'PUT': 
+        message_data = JSONParser().parse(request) 
+        mess_serializer = MessageSerializer(text, data=message_data) 
+        if mess_serializer.is_valid(): 
+            mess_serializer.save() 
+            return JsonResponse(mess_serializer.data) 
+        return JsonResponse(mess_serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+ 
+    elif request.method == 'DELETE': 
+        text.delete() 
+        return JsonResponse({'message': 'Your text was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+    
+    
+    # 2. Deleting multiple messages at once or updating
+    
+@api_view(['GET', 'POST', 'DELETE'])
+def message_list(request):
+    if request.method == 'GET':
+        messag = Message.objects.all()
+        
+        text = request.query_params.get('message', None)
+        
+        messag_serializer = MessageSerializer(messag, many=True)
+        return JsonResponse(messag_serializer.data, safe=False)
+        # 'safe=False' for objects serialization
+ 
+    elif request.method == 'POST':
+        messag_data = JSONParser().parse(request)
+        messag_serializer = MessageSerializer(data=messag_data)
+        if messag_serializer.is_valid():
+            messag_serializer.save()
+            return JsonResponse(messag_serializer.data, status=status.HTTP_201_CREATED) 
+        return JsonResponse(messag_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == 'DELETE':
+        count = Message.objects.all().delete()
+        return JsonResponse({'message': '{} messages were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
+ 
+    
 # get delete and post for messages view task
 
 @api_view(['GET', 'POST', 'DELETE'])
@@ -563,7 +616,7 @@ def edit_message(request):
         'message': 'I just edited this message'
 
     }]
-    return JsonResponse(messaages, safe=False)
+    return JsonResponse(messages, safe=False)
 
 
 def date_message(request):
