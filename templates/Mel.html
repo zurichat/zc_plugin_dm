@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ <title> Issue 92</title>
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+ <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+</head>
+<body>
+  <div id="app"> 
+    <div class="wrapper">  
+        <div class="controls">
+          <input class="form-control form-control-sm w-100" v-model="newUser" @keyup.enter="addUser" type="text" placeholder=" Search DM User" autofocus>
+          <button class="btn btn-white" v-on:click="addUser">Add</button>
+        </div>
+        <ul>
+            Direct messages
+          <user-item v-for="(user, index) in users"
+                     v-bind:title="user.title"
+                     v-bind:completed="user.completed"
+                     v-on:toggle="toggle(index)"
+                    ></user-item>
+        </ul>
+      </div>
+</div>
+<style>
+button{
+  color: white;
+  background-color: white;
+}
+input{
+  background-color:green;
+}
+.sidebar_container {
+            width: 241px;
+            height: 100vh;
+            position: absolute;
+            left: 0%;
+            right: 83.26%;
+            top: 0%;
+            bottom: 0%;
+            background: #fff;
+            border: 1px solid grey;
+        }
+        
+        i {
+            padding-right: 8px;
+        }
+    </style>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script>
+Vue.component('user-item', {
+  props: ['title', 'completed'],
+  template: `
+<li>
+  <button class="btn"
+          v-bind:class="{ done: this.completed }"
+          v-on:click="$emit('toggle')">O</button>
+  <span v-bind:class="{ completed: this.completed }">
+    {{this.title}}
+  </span>
+</li>
+`,
+});
+var app = new Vue({
+ el: '#app',
+ data: {
+    newUser: '',
+    users: [{ title: '', completed: true} ]
+  },
+  methods: {
+    addUser() {
+      if (!this.newUser.trim()) return;
+      this.users.push({ title: this.newUser, completed: false });
+      this.newUser = '';
+    },   
+    toggle(index) {
+      this.users[index].completed = !this.users[index].completed;
+    }, 
+  }
+})
+</script>
+</body>
+</html>
+
