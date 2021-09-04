@@ -55,6 +55,7 @@ def messages(request):
 
     return HttpResponse(f"{messages}")
 
+
 def new_messages(request):
     messages = [
         {
@@ -65,7 +66,7 @@ def new_messages(request):
             'meta': 'dm_message38384739',
             'deleted_user_id': 'null',
             'created_at': '2021-09-3 00:00:00',
-            'last_updated_at':'null'
+            'last_updated_at': 'null'
         },
         {
             'id': '1',
@@ -75,11 +76,10 @@ def new_messages(request):
             'meta': 'dm_message38384738',
             'deleted_user_id': 'null',
             'created_at': '2021-09-2 00:00:00',
-            'last_updated_at':'null'
+            'last_updated_at': 'null'
         }]
 
     return HttpResponse(f"{messages}")
-
 
 
 def side_bar(request):
@@ -444,83 +444,56 @@ def pagination(request):
         return Response(total_messages, status=status.HTTP_200_OK)
 
 
-
-# get delete and post for messages view task 
+# get delete and post for messages view task
 # 1 for individual message using id
 @api_view(['GET', 'PUT', 'DELETE'])
 def message_detail(request, pk):
-    try: 
-        text = Message.objects.get(pk=pk) 
-    except Message.DoesNotExist: 
-        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND) 
- 
-    if request.method == 'GET': 
-        message_serializer = MessageSerializer(text) 
-        return JsonResponse(message_serializer.data) 
- 
-    elif request.method == 'PUT': 
-        message_data = JSONParser().parse(request) 
-        mess_serializer = MessageSerializer(text, data=message_data) 
-        if mess_serializer.is_valid(): 
-            mess_serializer.save() 
-            return JsonResponse(mess_serializer.data) 
-        return JsonResponse(mess_serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
- 
-    elif request.method == 'DELETE': 
-        text.delete() 
+    try:
+        text = Message.objects.get(pk=pk)
+    except Message.DoesNotExist:
+        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        message_serializer = MessageSerializer(text)
+        return JsonResponse(message_serializer.data)
+
+    elif request.method == 'PUT':
+        message_data = JSONParser().parse(request)
+        mess_serializer = MessageSerializer(text, data=message_data)
+        if mess_serializer.is_valid():
+            mess_serializer.save()
+            return JsonResponse(mess_serializer.data)
+        return JsonResponse(mess_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        text.delete()
         return JsonResponse({'message': 'Your text was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-    
-    
+
     # 2. Deleting multiple messages at once or updating
-    
+
+
 @api_view(['GET', 'POST', 'DELETE'])
 def message_list(request):
     if request.method == 'GET':
         messag = Message.objects.all()
-        
+
         text = request.query_params.get('message', None)
-        
+
         messag_serializer = MessageSerializer(messag, many=True)
         return JsonResponse(messag_serializer.data, safe=False)
         # 'safe=False' for objects serialization
- 
+
     elif request.method == 'POST':
         messag_data = JSONParser().parse(request)
         messag_serializer = MessageSerializer(data=messag_data)
         if messag_serializer.is_valid():
             messag_serializer.save()
-            return JsonResponse(messag_serializer.data, status=status.HTTP_201_CREATED) 
+            return JsonResponse(messag_serializer.data, status=status.HTTP_201_CREATED)
         return JsonResponse(messag_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     elif request.method == 'DELETE':
         count = Message.objects.all().delete()
         return JsonResponse({'message': '{} messages were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
- 
-    
-# get delete and post for messages view task
-
-@api_view(['GET', 'POST', 'DELETE'])
-def messages_list(request):
-    if request.method == 'GET':
-        data = Message.objects.all()
-
-        text = request.query_params.get('message', None)
-
-        message_serializer = MessageSerializer(text, many=True)
-        return JsonResponse(message_serializer.data, safe=False)
-        # 'safe=False' for objects serialization
-
-    elif request.method == 'POST':
-        message_data = JSONParser().parse(request)
-        message_serializer = MessageSerializer(data=message_data)
-        if message_serializer.is_valid():
-            message_serializer.save()
-            return JsonResponse(message_serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        count = Message.objects.all().delete()
-        return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET', 'POST'])
@@ -533,9 +506,10 @@ def send_file(request):
             'file_name': 'dbdiagram',
             'file_path': 'media/dbdiagram.pdf',
             'created_at': '20-09-21 19:03:01'
-             }
-        ]
+        }
+    ]
     return Response(file, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'],)
 def replyMessage(request):
@@ -563,31 +537,33 @@ def replyMessage(request):
 
 
 def dm_list(request):
-    dm_lists = [{"user":"Cheeqito","isActive":True,"last_message":"10 minutes Ago"},
-               {"user":"Cheediogo","isActive":False,"last_message":"2Hours Ago"},
-               {"user":"James","isActive":True,"last_message":"2 minutes Ago"},]    
+    dm_lists = [{"user": "Cheeqito", "isActive": True, "last_message": "10 minutes Ago"},
+                {"user": "Cheediogo", "isActive": False,
+                    "last_message": "2Hours Ago"},
+                {"user": "James", "isActive": True, "last_message": "2 minutes Ago"}, ]
     return JsonResponse(dm_lists)
-  
-  
+
+
 def filter_user(request):
     filter_user = [
         {
-            'user_id':'1',
-            'message':'Hey, how are you doing'
+            'user_id': '1',
+            'message': 'Hey, how are you doing'
         },
 
         {
-            'user_id':'1',
-            'message':'I need to have some rest'
-        }, 
+            'user_id': '1',
+            'message': 'I need to have some rest'
+        },
 
         {
-            'user_id':'1',
-            'message':'I would see you later'
+            'user_id': '1',
+            'message': 'I would see you later'
         }
     ]
 
     return JsonResponse(filter_user, safe=False)
+
 
 @api_view(['GET'],)
 def get_starred(request):
@@ -609,6 +585,16 @@ def get_starred(request):
     ]
     return JsonResponse(get_starred, safe=False)
 
+
+def edit_message(request):
+    messages = [{
+        'user_id': '2',
+        'message_id': '34',
+        'last_updated': '2021-09-04 19:11:35',
+        'message': 'I just edited this message'
+
+    }]
+    return JsonResponse(messages, safe=False)
 
 class SearchMessagesAPI(APIView):
     def get_match(self,phrase):

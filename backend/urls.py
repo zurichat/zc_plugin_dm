@@ -34,7 +34,7 @@ urlpatterns = [
     path('api/users',views.index),
     path('api/newMessages',views.new_messages, name='new_messages'),
     path('api/searchUser',views.index),
-    path('api/messages',views.index),
+    path('api/messages', views.message_detail),
     path('api/starMessage',views.star_messages),
     path('api/getstarred',views.get_starred, name = "get_starred"),
     path('api/sendFile',views.send_file),
@@ -56,11 +56,9 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
-#     path('api/editMessage',views.index),
-    #path('api/editMessage', views.edit_message, name='edit_messages'),
+    path('api/editMessage', views.edit_message, name='edit_messages'),
 
     # using url and regular expressions to do GET/PUT/DELETE
-    url(r'^api/messageList/(?P<pk>[0-9]+)$', views.message_detail),
     url(r'^api/messageList/', views.message_list),
     path('api/deleteMessage', views.index),
     path('api/sortMessage', views.sort_message),
