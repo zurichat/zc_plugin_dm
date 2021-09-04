@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.views import APIView
 
 
 # Create your views here.
@@ -456,3 +457,23 @@ def get_starred(request):
     ]
     return JsonResponse(get_starred, safe=False)
 
+
+class SearchMessagesAPI(APIView):
+    def get(self, request):
+        matchedMessages=[
+        {
+            'message_id': '1',
+            'name': 'Vitor',
+            'message': 'home is where my heart is.'
+        },
+        {
+            'message_id': '65',
+            'name': 'Mykie',
+            'message': 'I\'m on my way home'
+        },
+        {
+            'message_id': '8',
+            'name': 'john',
+            'message': 'home file.'
+        }]
+        return Response(matchedMessages, status=status.HTTP_200_OK)

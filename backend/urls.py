@@ -55,5 +55,6 @@ urlpatterns = [
 
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
-path('archive_message', views.archive_message,name="archive_message"),
+    path('archive_message', views.archive_message,name="archive_message"),
+    path('api/search_message',views.SearchMessagesAPI.as_view())
 ]
