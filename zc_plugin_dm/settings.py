@@ -13,9 +13,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
-# from dotenv import load_dotenv
-# load_dotenv()
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
@@ -31,11 +28,11 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 DEBUG = str(os.getenv('DEBUG'))
 
 
-ALLOWED_HOSTS = ["dm.zuri.chat"]
+ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
 
 CORS_ALLOWED_ORIGINS = [
     "https://dm.zuri.chat",
-    "dm.zuri.chat"
+    "http://dm.zuri.chat"
 ]
 
 # Application definition
@@ -70,7 +67,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "frontend", "dist")],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -138,18 +135,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # vue static folder
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "frontend", "dist")
+    os.path.join(BASE_DIR, "static")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'webpack_bundles/',  # must end with slash
-        'STATS_FILE': BASE_DIR.joinpath('frontend', 'webpack-stats.json'),
-        'POLL_INTERVAL': 0.1,
-        'TIMEOUT': None,
-        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
-    }
-}

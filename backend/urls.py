@@ -1,6 +1,8 @@
 from . import views
 from django.urls import path
 
+from django.conf.urls import url
+
 app_name = 'backend'
 
 urlpatterns = [
@@ -13,15 +15,22 @@ urlpatterns = [
     path('api/organizations/id/users/id', views.user, name='user'),
     path('api/organizations/id/rooms', views.rooms, name='rooms'),
     path('api/organizations/id/rooms/id', views.room, name='room'),
-    path('api/organizations/id/rooms/id/users/', views.room_users, name='room_users'),
-    path('api/organizations/id/rooms/id/messages', views.room_messages, name='room_messages'),
-    path('api/organizations/id/rooms/id/messages/id', views.room_message, name='room_message'),
-    path('api/organizations/id/rooms/id/media', views.room_medias, name='room_medias'),
-    path('api/organizations/id/rooms/id/media/id', views.room_media, name='room_media'),
-    path('api/organizations/id/rooms/id/files', views.room_files, name='room_files'),
-    path('api/organizations/id/rooms/id/files/id', views.room_file, name='room_file'),
+    path('api/organizations/id/rooms/id/users/',
+         views.room_users, name='room_users'),
+    path('api/organizations/id/rooms/id/messages',
+         views.room_messages, name='room_messages'),
+    path('api/organizations/id/rooms/id/messages/id',
+         views.room_message, name='room_message'),
+    path('api/organizations/id/rooms/id/media',
+         views.room_medias, name='room_medias'),
+    path('api/organizations/id/rooms/id/media/id',
+         views.room_media, name='room_media'),
+    path('api/organizations/id/rooms/id/files',
+         views.room_files, name='room_files'),
+    path('api/organizations/id/rooms/id/files/id',
+         views.room_file, name='room_file'),
 
-    # Specific Routes for tasks
+    # Specific Routes for task
     path('api/users',views.index),
     path('api/newMessages',views.new_messages, name='new_messages'),
     path('api/searchUser',views.index),
@@ -36,8 +45,10 @@ urlpatterns = [
     path('api/pagination/',views.pagination),
     path('api/userProfile',views.user_profile, name = 'user_profile'),
     path('api/editUserProfile',views.index),
-    path('api/forwardMessages',views.forward_message, name='forward_message'),
-    path('api/forwardMessages',views.index),
+#     path('api/forwardMessages',views.forward_messages, name='forward_message'),
+    path('api/replyMessage',views.index),
+    path('api/forwardMessages',views.forward_messages, name='forward_message'),
+#     path('api/forwardMessages',views.index),
     path('api/replyMessage',views.replyMessage, name='reply_message'),
     path('api/userStatus',views.index),
     path('api/DMList',views.dm_list),
@@ -45,16 +56,23 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
-    path('api/editMessage',views.index),
-    path('api/deleteMessage',views.index),
-    path('api/sortMessage',views.sort_message),
+#     path('api/editMessage',views.index),
+    path('api/editMessage', views.edit_message, name='edit_messages'),
+
+    # using url and regular expressions to do GET/PUT/DELETE
+    url(r'^api/messageList/(?P<pk>[0-9]+)$', views.message_detail),
+    url(r'^api/messageList/', views.message_list),
+    path('api/deleteMessage', views.index),
+    path('api/sortMessage', views.sort_message),
     path('api/autoResponse', views.auto_response, name="auto_response"),
-    path('api/setReminder',views.message_reminder, name = "message_reminder"),
-
-
-
+    path('api/setReminder', views.message_reminder, name="message_reminder"),
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
+<<<<<<< HEAD
     path('archive_message', views.archive_message,name="archive_message"),
     path('api/search_message',views.SearchMessagesAPI.as_view())
+=======
+    path('archive_message', views.archive_message, name="archive_message"),
+
+>>>>>>> f0b6ec61de6f7fa90a9a1f1e0f63cc4ce956b32f
 ]
