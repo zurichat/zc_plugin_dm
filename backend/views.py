@@ -1,11 +1,14 @@
 from backend.models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
+<<<<<<< HEAD
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
+=======
+>>>>>>> 62d786dbae51b5ec39cc906b097092eeb385c8d6
 
 # Create your views here.
 
