@@ -310,6 +310,25 @@ def room_file(request):
     pass
 
 
+def pin_message(request):
+    pinned_message=[
+        {
+             'msgID':121,
+            'pinned':True  }, 
+        {
+             'msgID':122,
+            'pinned':True  }, 
+        {
+             'msgID':123,
+            'pinned':True  },  
+        {
+             'msgID':124,
+            'pinned':True  ,
+        ]
+
+    return JsonResponse(pinned_message, safe=False)
+
+
 def sort_message(request):
     # Use the below when the message object is ready and also delete the dummy data.
     # messages = Message.objects.order_by('-created_at')
@@ -626,3 +645,5 @@ class SearchMessagesAPI(APIView):
             'message': 'home file.'
         }]
         return Response(matchedMessages, status=status.HTTP_200_OK)
+    
+    
