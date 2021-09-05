@@ -55,6 +55,7 @@ urlpatterns = [
     path('api/archiveMessage', views.index),
     path('api/archivedMessages', views.list_archives, name='list_archives'),
     path('api/editMessage', views.edit_message, name='edit_messages'),
+    path('api/filter_keywords', views.filter_keywords, name="filter_keywords"),
 
     # using url and regular expressions to do GET/PUT/DELETE
     url(r'^api/messageList/', views.message_list),
@@ -67,5 +68,5 @@ urlpatterns = [
     path('archive_message', views.archive_message, name="archive_message"),
     # for search message
     path('api/search_message/<phrase>/', views.SearchMessagesAPI.as_view()),
-    path('api/dateMessage', views.date_message, name='date_message')
+    path('api/dateMessage', views.date_message, name='date_message'),
 ]
