@@ -30,7 +30,7 @@
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script> -->
     <script src="https://unpkg.com/vuex"></script>
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>Orpheus</title>
     <!--Our applications styling-->
     <style>
@@ -75,7 +75,7 @@
                                     badge-offset="-0.5em" size="45px"></b-avatar>
                             </div>
                             <div>
-                                <b>[[message.receiverName]]</b>&nbsp;&nbsp;[[message.time]]
+                                <b>[[message.receiverName]]</b><!--&nbsp;&nbsp;-->[[message.time]]
                                 <div>
                                     [[message.text]]
                                 </div>
@@ -191,6 +191,7 @@
 
         var app = new Vue({
             el: "#app",
+            store:store,
             delimiters: ["[[", "]]"],
             data: {
                 message: "Hello Vue!",
