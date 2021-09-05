@@ -25,13 +25,9 @@ jobs:
           script: |
             cd ~/zc_plugin_dm
 <<<<<<< HEAD
-<<<<<<< HEAD
             git clean -fd
 =======
 >>>>>>> 41f9fe5fc1035bf7c96dd8e61555384e9297f77d
-=======
-            git clean -fd
->>>>>>> b33ad7aea943823ea0522f1ab82fd6d796b9ef69
             git stash
             git pull
             source env/bin/activate
