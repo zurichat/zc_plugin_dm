@@ -1,4 +1,5 @@
 from . import views
+from .views import edit_message
 from django.urls import path
 
 from django.conf.urls import url
@@ -56,7 +57,7 @@ urlpatterns = [
     path('api/pinnedMessages',views.index),
     path('api/archiveMessage',views.index),
     path('api/archivedMessages',views.list_archives, name='list_archives'),
-    path('api/editMessage', views.edit_message, name='edit_messages'),
+    path('api/editMessage', edit_message, name='edit_messages'),
 
     # using url and regular expressions to do GET/PUT/DELETE
     url(r'^api/messageList/(?P<pk>[0-9]+)$', views.message_detail),
