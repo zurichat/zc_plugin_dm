@@ -1,14 +1,14 @@
 from .models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
-
+from rest_framework.parsers import JSONParser
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 
 from .serializers import UserSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.parsers import JSONParser
+from rest_framework.views import APIView
 
 
 # Create your views here.
@@ -496,32 +496,6 @@ def message_list(request):
         return JsonResponse({'message': '{} messages were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
 
 
-# get delete and post for messages view task
-
-@api_view(['GET', 'POST', 'DELETE'])
-def messages_list(request):
-    if request.method == 'GET':
-        data = Message.objects.all()
-
-        text = request.query_params.get('message', None)
-
-        message_serializer = MessageSerializer(text, many=True)
-        return JsonResponse(message_serializer.data, safe=False)
-        # 'safe=False' for objects serialization
-
-    elif request.method == 'POST':
-        message_data = JSONParser().parse(request)
-        message_serializer = MessageSerializer(data=message_data)
-        if message_serializer.is_valid():
-            message_serializer.save()
-            return JsonResponse(message_serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(message_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        count = Message.objects.all().delete()
-        return JsonResponse({'message': '{} message was deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
-
-
 @api_view(['GET', 'POST'])
 def send_file(request):
     file = [
@@ -621,6 +595,38 @@ def edit_message(request):
 
     }]
     return JsonResponse(messages, safe=False)
+
+
+class SearchMessagesAPI(APIView):
+    def get_match(self, phrase):
+        try:
+            # here we serch through the messages for a phrase.
+            pass
+        except Exception as e:
+            pass
+
+    def get(self, request, phrase):
+        # we search the message
+        matchedMessages = self.get_match(phrase)
+
+        # expected outcome for the phrase home
+        matchedMessages = [
+            {
+                'message_id': '1',
+                'name': 'Vitor',
+                'message': 'home is where my heart is.'
+            },
+            {
+                'message_id': '65',
+                'name': 'Mykie',
+                'message': 'I\'m on my way home'
+            },
+            {
+                'message_id': '8',
+                'name': 'john',
+                'message': 'home file.'
+            }]
+        return Response(matchedMessages, status=status.HTTP_200_OK)
 
 
 def date_message(request):
