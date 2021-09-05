@@ -664,6 +664,22 @@ def date_message(request):
     ]
     return JsonResponse(results, safe=False)
 
+
+def search_users(request):
+    contacts = [
+        {"username": ["Alan ", "Bola", "Chris", "Duke"]},
+        {
+            "letters": {
+                {"a": ["Alan", "Alex", "Andrew"]},
+                {"b": ["Betty", "Bola", "Bella"]},
+                {"c": ["Cate", "Chris", "Cinda"]},
+                {"d": ["Dave", "Duke", "Dorathy"]}
+            }
+        }
+    ]
+    return JsonResponse(contacts, safe=False)
+  
+  
 @api_view(['GET'], )
 def filter_keywords(request):
     keyword = "tomorrow"
