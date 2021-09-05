@@ -13,3 +13,7 @@ sqlparse = "==0.4.1"
 Django = "==3.2.6"
 whitenoise = "*"
 
+[dev-packages]
+
+[requires]
+python_version = "3.9"
