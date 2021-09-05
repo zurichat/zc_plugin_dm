@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
-
+from django.views.generic import View
 from .serializers import UserSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -586,15 +586,16 @@ def get_starred(request):
     return JsonResponse(get_starred, safe=False)
 
 
-def edit_message(request):
-    messages = [{
-        'user_id': '2',
-        'message_id': '34',
-        'last_updated': '2021-09-04 19:11:35',
-        'message': 'I just edited this message'
+class EditMessage(View):
+    def get(self,srequest):
+        messages = [{
+            'user_id': '2',
+            'message_id': '34',
+            'last_updated': '2021-09-04 19:11:35',
+            'message': 'I just edited this message'
 
-    }]
-    return JsonResponse(messages, safe=False)
+        }]
+        return JsonResponse(messages, safe=False)
 
 
 class SearchMessagesAPI(APIView):
