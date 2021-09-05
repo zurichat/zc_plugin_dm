@@ -57,6 +57,7 @@
 
 
     <div id="app" class="bg-light">
+        <nav-bar></nav-bar>
         <div class="container bg-white w-75 pa-6 dm_layout shadow-sm p-3 mb-5 bg-grey rounded">
             <div class="container message-layout">
                 <!-- <h1>Team Orpheus</h1>
@@ -75,7 +76,8 @@
                                     badge-offset="-0.5em" size="45px"></b-avatar>
                             </div>
                             <div>
-                                <b>[[message.receiverName]]</b><!--&nbsp;&nbsp;-->[[message.time]]
+                                <b>[[message.receiverName]]</b>
+                                <!--&nbsp;&nbsp;-->[[message.time]]
                                 <div>
                                     [[message.text]]
                                 </div>
@@ -108,6 +110,38 @@
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <script>
+        // Nav Bar Component 
+        Vue.component("nav-bar", {
+            template: `
+        <nav class="py-3 px-4 nav-container" style="background: #F6F6F6" v-for="(data, i) in nav_data" :key="i">
+        <div class="search-bar">
+            <input class="search-input" type="text" placeholder="Search here">
+            <div class="search-icon">
+                <img class="rounded-circle" :src="data.search_icon">
+            </div>
+        </div>
+        <div class="setting-icon">
+            <img class="rounded-circle" :src="data.setting_icon">
+        </div>
+        <div class="avatar-icon">
+            <img class="rounded-circle" :src="data.avatar_icon">
+        </div>
+    </nav>
+            `,
+            data: function () {
+                return {
+                    nav_data: [
+                        {
+                            search_icon: 'images/search_icon.png',
+                            avatar_icon: 'images/avatar_icon.png',
+                            setting_icon: 'images/setting_icon.png',
+                        }
+                    ],
+
+
+                };
+            },
+        });
         //divider component
         Vue.component("divider", {
             props: [],
@@ -191,7 +225,7 @@
 
         var app = new Vue({
             el: "#app",
-            store:store,
+            store: store,
             delimiters: ["[[", "]]"],
             data: {
                 message: "Hello Vue!",
