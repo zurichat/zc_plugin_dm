@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+    <title>Issue 285, Add Bookmark Name</title>
+
+    <!-- Required Stylesheets -->
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"
+    />
+    <!-- Font Awsome  -->
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+    <!-- Load polyfills to support older browsers -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver"></script>
+
+    <!-- Required scripts -->
+    <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+
+     <!-- Styling For App --> 
+     <style>
+        h3 {
+          width: 40px;
+          height: 18px;
+          font-family: 'Lato';
+          font-style: normal;
+          font-size: 15px;
+          font-weight: 600;
+          line-height: 18px;
+          color: #787878;
+        }
+  
+        #app {
+          width: 502px;
+          height: 50px;
+          position: relative;
+          left: 50px;
+          top: 50px;
+        }
+  
+        #icon {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 484px;
+            height: 50px;
+            border: 1px solid black;
+            border-radius: 3%;
+        }
+      
+  
+        #textarea-small {
+          font-family: 'Lato';
+          font-style: normal;
+          font-size: 11px;
+          line-height: 13px;
+          color: #747374;
+          padding-top: 15px;  
+        }
+       
+      </style>
+  
+  </head>
+  <body>
+      <!-- Our App Root Element -->
+
+    <div id="app">
+        <b-container>
+          <h3>Name</h3>
+          <div id="icon">&nbsp;&nbsp;<i class="fas fa-link"></i>&nbsp;&nbsp;&nbsp;<i class="fas fa-angle-down "></i>
+            &nbsp;&nbsp;&nbsp;<b-form-textarea id="textarea-small" size="sm" placeholder="Ex, Project tracker ">
+            </b-form-textarea>
+          </div>
+          
+        </b-container>
+      </div>
+  
+     
+      <!-- Start Running App -->
+  
+      <script>
+        window.app = new Vue({
+          el: '#app',
+          data: {
+            name: ''
+          },
+          computed: {
+  
+          }
+        })
+      </script>
+  
+    
+  </body>
+</html>
