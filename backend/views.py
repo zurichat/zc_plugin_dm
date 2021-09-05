@@ -18,6 +18,22 @@ def index(request):
     context = {}
     return render(request, 'index.html', context)
 
+def pin_message(request):
+    pinned_message=[{
+             'msgID':121,
+            'pinned':True       
+    }, {
+             'msgID':122,
+            'pinned':True       
+    }, {
+             'msgID':123,
+            'pinned':True} ,   
+        {
+             'msgID':124,
+            'pinned':True } 
+        ]
+
+    return JsonResponse(pinned_message, safe=False)
 
 def forward_messages(request):
     forwarded_messages = [
