@@ -1,15 +1,15 @@
-{% load render_bundle from webpack_loader %}
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0591f586e46dfc499ee0bf8493ad833a65b9836e
 
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
 
     <!-- Load required Bootstrap and BootstrapVue CSS -->
     <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
@@ -28,17 +28,36 @@
         integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
 
     <!-- Custom css -->
-    <link rel="stylesheet" href="assets/style.css" />
+    <!-- <link rel="stylesheet" href="assets/style.css" /> -->
 
     <!-- vuex cdn -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/2.1.1/vuex.min.js"></script> -->
     <script src="https://unpkg.com/vuex"></script>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="{% static 'css/style.css' %}" />
     <title>Orpheus</title>
+    <!--Our applications styling-->
+    <style>
+        #header {
+            background-color: rgba(0, 184, 124, 1);
+            font-family: 'Lato';
+            font-weight: bold;
+            font-style: normal;
+            font-size: 21px;
+            color: white;
+            line-height: 25px;
+            border-radius: 3px 0 0 0;
+            width: 100%;
+            padding: 15px;
+            height: 75%;
+        }
+    </style>
+
 </head>
 
 <body>
+    <h1>Team Orpheus</h1>
+    <!-- <h3>DM PLUGIN IS OFFICIALLY WORKING, SEYE</h3> -->
 
 
     <div id="app" class="bg-light">
@@ -60,13 +79,16 @@
                                     badge-offset="-0.5em" size="45px"></b-avatar>
                             </div>
                             <div>
-                                <b>[[message.receiverName]]</b>&nbsp;&nbsp;[[message.time]]
+                                <b>[[message.receiverName]]</b><!--&nbsp;&nbsp;-->[[message.time]]
                                 <div>
                                     [[message.text]]
                                 </div>
                             </div>
                         </div>
                         <message></message>
+                        <div class="col-3">
+                            <user-sidebar-profile></user-sidebar-profile>
+                        </div>
 
                     </div>
                 </div>
@@ -85,9 +107,9 @@
             </div>
         </div>
     </div>
-
     <!-- LoadBootstrapVue -->
     <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<<<<<<< HEAD
     <script src="./js/main.js"></script>
 </body>
 
@@ -160,3 +182,101 @@
 
 </html>
 >>>>>>> 7e61113ff0f94e5709737e2bf692cfd5450f4f51
+=======
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
+        //divider component
+        Vue.component("divider", {
+            props: [],
+            template:
+                '<div class="divider-line border-top"><div class="btn py-1 timeline border position-relative">Wednesday, 1st September <span class="chevron d-inline-block">&#x203A;</span></div></div>',
+        });
+
+        // Message Ccomponent
+        Vue.component("message", {
+            template: `<div>
+              <div class="d-flex flex-wrap-xs align-items-start bg-light p-2" v-for="(messages, index) in message_data" >
+                      <img class="rounded-circle message_user_icon" style="border:2px" :src="messages.user_icon">
+                      <div>
+                          <b>{{messages.user_name}}</b>&nbsp;&nbsp;{{messages.time_stamp}}
+                          <div>
+                              {{messages.main_message}}
+                          </div>
+                      </div>
+                  </div>
+              </div>`,
+            data: function () {
+                return {
+                    message_data: [
+                        {
+                            user_name: "MammaGee",
+                            user_icon: "images/big.jpg",
+                            main_message:
+                                "Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque natus magni consequuntur aut ducimus odit veniam voluptatum necessitatibus! Ipsum eum voluptates neque ipsa, reiciendis distinctio hic aliquid blanditiis vel iusto.",
+                            time_stamp: "5:55pm",
+                        },
+                    ],
+                };
+            },
+        });
+        // User sidebar profile
+        Vue.component("user-sidebar-profile", {
+            template: `<div>
+       <b-button v-b-toggle.sidebar-1>View full profile</b-button>
+       <b-sidebar id="sidebar-1" title="Profile" right bg-variant="white"> 
+         <div slot="header" id="header">
+           <b-row>
+             <b-col md="10">
+               Profile
+             </b-col>
+             <b-col>
+               <p class=""><b-icon icon="x" class=""></b-icon></p>
+             </b-col>
+           </b-row>
+            
+        </div>
+           <b-avatar src="https://avataaars.io/?avatarStyle=Transparent&topType=LongHairDreads&accessoriesType=Round&hairColor=BrownDark&facialHairType=Blank&clotheType=ShirtCrewNeck&clotheColor=Blue03&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Black" size="18rem"></b-avatar>
+           <b-card-title class="text-center">Mama Gee</b-card-title>
+           <b-card-text class="text-center">Full stack web developer</b-card-text>
+           <b-card-text class="text-center">She/Her</b-card-text>
+           <p class="h5 mb-2 text-center"><i class="fab fa-wolf-pack-battalion text-center"></i></p>
+           
+             <b-row>
+              <b-col>
+                <b-row><p class="h2 mb-2 text-center rounded-circle"><b-icon icon="chat-text" class="rounded-circle p-2" style="background-color: #F6F6F6;"></b-icon></p></b-row>
+                <b-row><b-card-sub-title class="h6 text-center">Message</b-card-sub-title></b-row>     
+              </b-col>
+              <b-col></b-col>
+              <b-col></b-col>
+
+            </b-row>
+       </b-sidebar>
+     </div>`,
+            data: function () {
+                return {
+                    data() {
+                        return {
+                            user_name: "MammaGee",
+                            user_avatar:
+                                "https://avataaars.io/?avatarStyle=Transparent&topType=LongHairDreads&accessoriesType=Round&hairColor=BrownDark&facialHairType=Blank&clotheType=ShirtCrewNeck&clotheColor=Blue03&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Black",
+                        };
+                    },
+                };
+            },
+            delimiters: ["[[", "]]"],
+        });
+
+        var app = new Vue({
+            el: "#app",
+            store:store,
+            delimiters: ["[[", "]]"],
+            data: {
+                message: "Hello Vue!",
+            },
+        });
+    </script>
+</body>
+
+</html>
+>>>>>>> 0591f586e46dfc499ee0bf8493ad833a65b9836e

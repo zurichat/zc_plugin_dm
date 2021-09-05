@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Load required Bootstrap and BootstrapVue CSS -->
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+    
+    <!-- Load polyfills to support older browsers -->
+    <script src="//polyfill.io/v3/polyfill.min.js?features=es2015%2CIntersectionObserver" crossorigin="anonymous"></script>
+    
+    <!-- Load Vue followed by BootstrapVue -->
+    <script src="//unpkg.com/vue@latest/dist/vue.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    
+    <!-- Load the following for BootstrapVueIcons support -->
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
+    <title>Team Orpheus</title>
+</head>
+<body>
+    <div class="bg-light py-3 px-3">
+        <div class="d-flex px-4"> 
+            <div class="px-2"><img src="pin.png" alt="Pin"></div>
+            <div class="ml-3 text-secondary fs-6">Pinned by you</div>
+        </div>
+
+        <b-row class="text-dark">
+            <b-col class="text-secondary">5:57pm</b-col>
+            <b-col cols="10" class="mx-3">There will be an urgent meeting with the frontend team today at 8:00pm. Everyone should
+                try to attend.</b-col>
+        </b-row>
+    </div>
+</body>
+</html>
