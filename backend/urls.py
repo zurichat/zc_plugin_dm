@@ -72,4 +72,5 @@ urlpatterns = [
     # for search message
     path('api/search_message/<phrase>/', views.SearchMessagesAPI.as_view()),
     path('api/dateMessage', views.date_message, name='date_message'),
-]
+    path('pinned_messages', views.pinned_messages, name='pinned_messages'),
+    ]
