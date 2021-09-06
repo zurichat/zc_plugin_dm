@@ -541,7 +541,7 @@ def dm_list(request):
                 {"user": "Cheediogo", "isActive": False,
                     "last_message": "2Hours Ago"},
                 {"user": "James", "isActive": True, "last_message": "2 minutes Ago"}, ]
-    return JsonResponse(dm_lists)
+    return JsonResponse(dm_lists, safe=False)
 
 
 def filter_user(request):
