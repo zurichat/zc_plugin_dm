@@ -16,23 +16,12 @@ class BookmarkSerializer(serializers.ModelSerializer):
         model = book_mark
         fields = '__all__'
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 5013389a7158fe2e3a72cb4a93026244ca89cacc
 """
     serializer that takes in messages model to facilitate 
     GET,PUT and Update
 """
 
-<<<<<<< HEAD
-class MessageSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Message
-        fields = "__all__"
-    
-=======
 
 class MessageSerializer(serializers.ModelSerializer):
 
@@ -44,4 +33,3 @@ class MessageSerializer(serializers.ModelSerializer):
                   'message',
                   'created_at',
                   'last_updated')
->>>>>>> 5013389a7158fe2e3a72cb4a93026244ca89cacc
