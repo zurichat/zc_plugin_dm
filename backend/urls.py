@@ -1,5 +1,6 @@
 from . import views
 from django.urls import path
+
 from django.conf.urls import url
 
 app_name = 'backend'
@@ -31,49 +32,18 @@ urlpatterns = [
 
     # Specific Routes for task
 
-    path('api/users', views.index),
     path('api/newMessages', views.new_messages, name='new_messages'),
-    path('api/searchUser', views.index),
-    path('api/messages', views.index),
-    path('api/starMessage', views.star_messages),
+    path('api/searchUser',views.search_users, name='search_user'),
     path('api/getstarred', views.get_starred, name="get_starred"),
     path('api/sendFile', views.send_file),
     path('api/sendMedia', views.send_media),
-    path('api/messagesByDate', views.index),
-    path('api/messageByUser', views.filter_user),
-    path('api/messageByKeywords', views.index),
-    path('api/pagination/', views.pagination),
-    path('api/userProfile', views.user_profile, name='user_profile'),
-    path('api/editUserProfile', views.index),
-    path('api/replyMessage', views.replyMessage, name='reply_message'),
-    path('api/userStatus', views.index),
-    path('api/DMList', views.dm_list),
-    path('api/pinMessage', views.index),
-    path('api/pinnedMessages', views.index),
-    path('api/archiveMessage', views.index),
-    path('api/archivedMessages', views.list_archives, name='list_archives'),
-    path('api/editMessage', views.index),
-    # using url and regular expressions to do GET/PUT/DELETE
-    url(r'^api/message_list/(?P<pk>[0-9]+)$', views.messages_list),
-    path('api/deleteMessage', views.index),
-    path('api/sortMessage', views.sort_message),
 
-    # Specific Routes for tasks
-    path('api/users', views.index),
-    path('api/newMessages', views.new_messages, name='new_messages'),
-    path('api/searchUser', views.index),
-    path('api/messages', views.index),
-    path('api/starMessage', views.star_messages),
-    path('api/getstarred', views.get_starred, name="get_starred"),
-    path('api/sendFile', views.send_file),
-    path('api/sendMedia', views.send_media),
-    path('api/messagesByDate', views.pinned_messages),
     path('api/messageByUser', views.filter_user),
     path('api/messageByKeywords', views.index),
     path('api/pagination/', views.pagination),
     path('api/userProfile', views.user_profile, name='user_profile'),
     path('api/editUserProfile', views.index),
-    path('api/forwardMessages', views.index),
+    path('api/forwardMessages', views.forward_messages, name='forward_message'),
     path('api/replyMessage', views.replyMessage, name='reply_message'),
     path('api/userStatus', views.index),
     path('api/DMList', views.dm_list),
@@ -82,7 +52,11 @@ urlpatterns = [
     path('api/archiveMessage', views.index),
     path('api/archivedMessages', views.list_archives, name='list_archives'),
     path('api/editMessage', views.edit_message, name='edit_messages'),
-    path('api/deleteMessage', views.index),
+    path('api/filter_keywords', views.filter_keywords, name="filter_keywords"),
+    path('api/deleteMessage',views.index),
+   
+  
+  
     path('api/sortMessage', views.sort_message),
   
     path('api/users',views.users, name="users"),
@@ -114,9 +88,9 @@ urlpatterns = [
 
     path('api/autoResponse', views.auto_response, name="auto_response"),
     path('api/setReminder', views.message_reminder, name="message_reminder"),
+  
+  
     path('messages', views.messages, name='messages'),
     path('star_messages', views.star_messages, name='star_messages'),
     path('archive_message', views.archive_message, name="archive_message"),
-    
-path('pinned_messages', views.pinned_messages, name='pinned_messages'),
-]
+

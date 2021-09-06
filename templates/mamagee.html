@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link
+     rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" 
+      integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+      crossorigin="anonymous"/>
+
+    <!-- Load required Bootstrap and BootstrapVue CSS -->
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap@4.5.3/dist/css/bootstrap.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
+
+    <!-- Vue.js cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+
+    <!-- Axios cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
+        integrity="sha512-bZS47S7sPOxkjU/4Bt0zrhEtWx0y0CRkhEp8IckzK+ltifIIE9EMIMTuT/mEzoIMewUINruDBIR/jJnbguonqQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <title>Orpheus</title>
+</head>
+
+<body>
+    <div class="mother-container d-flex flex-column " >
+        <div class="sidebar_container">
+            <div class="container">
+                <div class="d-flex">
+                    <img class="mt-3" src="https://zuri.chat/zurichatlogo.svg" alt="Zuri Logo">
+                    <p class=" zuri">ZURI</p>
+                </div>
+                <div class="d-flex flex-column bd-highlight mb-3">
+                    <p class="text-secondary bd-highlight"><i class="fas fa-info"></i> Insight</p>
+                    <p class="text-secondary bd-highlight"><i class="far fa-comment-alt"></i> Threads</p>
+                    <p class="text-secondary bd-highlight"><i class="far fa-comments"></i> All DMs</p>
+                    <p class="text-secondary bd-highlight"><i class="far fa-clipboard"></i> Draft</p>
+                    <p class="text-secondary bd-highlight"><i class="far fa-file"></i> Files</p>
+                    <p class="text-secondary bd-highlight"><i class="fas fa-plus"></i> Integrate</p>
+    
+                </div>
+            </div>
+        </div>
+        <div class="dm-thread d-flex" >
+            <div class="dm-container w-50">
+            </div>
+            <div class="thread-container w-50">
+                <div class="thread-header">
+                    <div class="thread">Thread</div> 
+                    <div class="button">
+                        <button ><i class="far fa-times"></i></button>
+                    </div>
+                
+                </div>
+        
+            </div>
+        </div>
+        
+    </div>
+    
+    <style>
+        .dm-thread {
+            width: calc(100%-241px);
+            margin-left: 241px;
+        }
+        .sidebar_container {
+            width: 241px;
+            height: 100vh;
+            position: absolute;
+            left: 0%;
+            right: 83.26%;
+            top: 0%;
+            bottom: 0%;
+            background: #fff;
+            border: 1px solid grey;
+        }
+
+        .zuri {
+            font-family: Lato;
+            font-weight: 900;
+            line-height: 30.77px;
+            size: 23.08px;
+            margin-left: 8px;
+            padding-top: 30px;
+        }
+
+        i {
+            padding-right: 8px;
+        }
+        
+          
+           
+       
+       .thread-header {
+           background-color: #00B87C;
+           color: white;
+           display: flex;
+           flex-direction: row;
+           justify-content: space-between;
+           padding: 1rem;
+       } 
+       button {
+           color: white;
+           background-color: #00B87C;
+           border: none;
+       }
+    
+    
+    </style>
+    
+   
+
+    <style>
+       
+    </style>
+     
+    <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+</body>
+<script>
+
+   
+</script>
+
+</html>
