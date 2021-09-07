@@ -25,7 +25,7 @@ FRONTEND_DIR = BASE_DIR / 'frontend'
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = str(os.getenv('DEBUG'))
+DEBUG = False #str(os.getenv('DEBUG'))
 
 
 ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
@@ -68,7 +68,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [FRONTEND_DIR / 'dist'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -135,7 +135,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
+    os.path.join(FRONTEND_DIR, "static")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
