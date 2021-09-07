@@ -1,11 +1,9 @@
-from .models import Message
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 
-from .serializers import UserSerializer, MessageSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -47,6 +45,9 @@ def organizations(request):
 
 
 def user(request):
+    return render(request, "index.html")
+
+def users(request):
     return render(request, "index.html")
 
 
