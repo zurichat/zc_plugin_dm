@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 
 def index(request):
     context = {}
-    return render(request, 'index.html', context)
+    return render(request, 'utsam.html', context)
 
 
 def forward_messages(request):
@@ -83,7 +83,27 @@ def new_messages(request):
 
 
 def side_bar(request):
-    pass
+    side_bar= {
+        "message": "Sidebar Information Retrieved",
+        "data": {
+            "type": "Sidebar Information",
+            "display": {"name": "Direct Message",
+                            "Messages": [
+                                {"username":"Bolly", "message":"What's up"},
+                                {"username":"Bello", "message":"Nawa for you"},
+                                {"username":"Utsam", "message":"What did he say?"},
+                                {"username":"Maria", "message":"Yes it is"}
+                                ]
+                            },
+            "scaffold_structure": "Monolith",
+            "team": "HNG 8.0/Team Orpheus",
+            "info_url": "https://dm.zuri.chat/api/info",
+            "homepage_url": "https://dm.zuri.chat/"
+        },
+        "success": "true"
+    }
+
+    return JsonResponse(side_bar, safe=False)
 
 
 def info(request):

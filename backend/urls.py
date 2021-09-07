@@ -40,7 +40,6 @@ urlpatterns = [
     path('api/sendFile', views.send_file),
     path('api/sendMedia', views.send_media),
     path('api/searchUser', views.index),
-    path('api/messages', views.messages_list),
     path('api/starMessage', views.star_messages),
     path('api/messagesByDate', views.index),
     path('api/messageByUser', views.filter_user),
