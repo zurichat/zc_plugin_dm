@@ -41,10 +41,7 @@ def verify_user_auth(ID, token):
 	}
 	response = requests.request("GET", url, headers=headers)
 	
-	if response.status = "200":
-		return True
-	else:
-		return False
+	return response.status == "200"
 
 def side_bar(request):
     side_bar = {
