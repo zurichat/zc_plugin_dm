@@ -34,7 +34,25 @@ def info(request):
     return JsonResponse(info, safe=False)
 
 def side_bar(request):
-    return render(request, "index.html")
+    side_bar = {
+        "message": "DM sidebar Information Retrieved",
+        "data": {
+            "type": "Sidebar Information",
+            "Messages": [{"user": "Abey","message":"I dey boss"},
+            {"user": "Abike","message":"I dey boss"},
+            {"user": "Franc","message":"How's it going"},
+            {"user": "Dele","message":"Yes it is"},
+            {"user": "Abey","message":"I've not slept in days"},
+            ],
+            "scaffold_structure": "Monolith",
+            "team": "HNG 8.0/Team Orpheus",
+            "info_url": "https://dm.zuri.chat/api/info",
+            "homepage_url": "https://dm.zuri.chat/"
+        },
+        "success": "true"
+    }
+
+    return JsonResponse(side_bar, safe=False)
 
 
 def organization(request):
