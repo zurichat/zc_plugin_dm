@@ -25,7 +25,7 @@ FRONTEND_DIR = BASE_DIR / 'frontend'
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #str(os.getenv('DEBUG'))
+DEBUG = True #str(os.getenv('DEBUG'))
 
 
 ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'webpack_loader',
     'backend',
+    'dm_test',
 
 ]
 
@@ -135,7 +136,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    os.path.join(FRONTEND_DIR, "static")
+    os.path.join(FRONTEND_DIR, "dist")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
