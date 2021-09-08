@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'webpack_loader',
     'backend',
-    'dm_test',
 
 ]
 
