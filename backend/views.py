@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 
 def index(request):
     context = {}
-    return render(request, 'utsam.html', context)
+    return render(request, 'index.html', context)
 
 
 def info(request):
