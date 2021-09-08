@@ -4,6 +4,7 @@ db.sqlite3
 env/
 /.env
 .env
+static
 
 # Django
 *.log
@@ -11,5 +12,13 @@ env/
 *.pyc
 *__pycache__
 
+*.idea
+=======
+.idea
+
 # *media
 *.DS_Store
+/.vscode
+/__pycache__
+
+
