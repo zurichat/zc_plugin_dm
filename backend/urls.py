@@ -1,9 +1,6 @@
 from . import views
 from django.urls import path
 
-from django.conf import settings
-from django.conf.urls.static import static
-
 app_name = 'backend'
 
 urlpatterns = [
@@ -23,4 +20,4 @@ urlpatterns = [
     path('api/organizations/id/rooms/id/media/id', views.room_media, name='room_media'),
     path('api/organizations/id/rooms/id/files', views.room_files, name='room_files'),
     path('api/organizations/id/rooms/id/files/id', views.room_file, name='room_file'),
-    ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    ]
