@@ -5,7 +5,7 @@ export BASE_URL="http://127.0.0.1:8000/static"
 
 # change to frontend directory and build app with npm
 cd frontend
-npm run build
+yarn run build
 
 # change to root folder and run django dev server
 cd ..

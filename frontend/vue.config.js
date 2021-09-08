@@ -1,4 +1,3 @@
 module.exports = {
-    publicPath:'staticfiles',
-    outputDir:'static'
-  }
+  publicPath: process.env.BASE_URL
+}
