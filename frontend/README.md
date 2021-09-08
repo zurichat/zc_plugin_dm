@@ -1,35 +1,25 @@
-# frontend
-```
-Please go through the folder structure and try under standing what goes where, some functionalities will be placed in different components, while others will remain in thesame component with others, i have tried to layout how the interface will look basically but its not compulsory, it will obviously change based on the designs that th ui/ux team will give us, so please clone the develop branchand not the main, after cloning, run the following commands that follow :
-```
+# dm-plugin-teamorpheus
 
 ## Project setup
 ```
-yarn install or npm install
-
-if you dont have yarn
+yarn install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-yarn serve or npm run serve
-
-if you dont have yarn
+yarn serve
 ```
 
 ### Compiles and minifies for production
 ```
-yarn build or npm run build
-
-if you dont have yarn
+yarn build
 ```
 
-### Lints and fixes files
-```
-yarn lint or npm run lint
+### Vue router guide
+[VUE ROUTER GUIDE](https://router.vuejs.org/guide/#html)
 
-if you dont have yarn
-```
+### Vuex guide
+[VUEX GUIDE](https://vuex.vuejs.org/guide/#the-simplest-store)
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
