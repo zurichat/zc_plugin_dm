@@ -26,6 +26,10 @@ jobs:
             cd ~/zc_plugin_dm
             git stash
             git pull
+            cd frontend
+            yarn install
+            yarn run build
+            cd ~/zc_plugin_dm
             source env/bin/activate
             pip install -r requirements.txt --upgrade
             python3 manage.py collectstatic --noinput
