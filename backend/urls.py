@@ -39,8 +39,7 @@ urlpatterns = [
     path('api/getstarred', views.get_starred, name="get_starred"),
     path('api/sendFile', views.send_file),
     path('api/sendMedia', views.send_media),
-    path('api/searchUser', views.index),
-    path('api/messages', views.messages_list),
+    path('api/messages', views.message_list),
     path('api/starMessage', views.star_messages),
     path('api/messagesByDate', views.index),
     path('api/messageByUser', views.filter_user),
@@ -53,7 +52,7 @@ urlpatterns = [
     path('api/userStatus', views.index),
     path('api/DMList', views.dm_list),
     path('api/pinMessage', views.index),
-    path('api/pinnedMessages', views.index),
+    path('api/pinnedMessages', views.pinned_messages, name='pinned_messages'),
     path('api/archiveMessage', views.index),
     path('api/archivedMessages', views.list_archives, name='list_archives'),
     path('api/editMessage', views.edit_message, name='edit_messages'),
@@ -73,4 +72,5 @@ urlpatterns = [
     # for search message
     path('api/search_message/<phrase>/', views.SearchMessagesAPI.as_view()),
     path('api/dateMessage', views.date_message, name='date_message'),
-]
+    path('pinned_messages', views.pinned_messages, name='pinned_messages'),
+    ]
