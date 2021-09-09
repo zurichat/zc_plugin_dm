@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-
+import requests
 # Import Read Write function to Zuri Core
 from .db import DB
 
@@ -35,6 +35,17 @@ def info(request):
     }
 
     return JsonResponse(info, safe=False)
+
+ 
+def verify_user_auth(ID, token):
+	url = f"https://api.zuri.chat/users/{ID}"
+	headers = {
+		'Authorization': f'Bearer {token}',
+		'Content-Type': 'application/json'
+	}
+	response = requests.request("GET", url, headers=headers)
+	
+	return response.status == "200"
 
 
 # Returns the json data of the sidebar that will be consumed by the api
