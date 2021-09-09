@@ -1,18 +1,17 @@
 
 from django.http.response import JsonResponse
 from django.shortcuts import render
-
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-
+from datetime import datetime
 import requests
 
 # Import Read Write function to Zuri Core
-from .db import DB
+from .db import DB, get_user_rooms
 
 from .serializers import MessageSerializer
-from backend import serializers
+from .serializers import RoomSerializer
 
 
 def index(request):
@@ -55,7 +54,16 @@ def verify_user_auth(ID, token):
 # The sidebar info will be unique for each logged in user
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
+
+
+        
+
 def side_bar(request):
+    collections = "dm_rooms"
+    org_id = request.GET.get("org", None)
+    user = request.GET.get("user", None)
+    rooms = get_user_rooms(collections, org_id, user)
+
     side_bar = {
         "name" : "DM Plugin",
         "description" : "Sends messages between users",
@@ -66,66 +74,22 @@ def side_bar(request):
         "show_group" : False,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
-        "message_rooms":[
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"active",
-                "latest_message":"unread",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"active",
-                "latest_message":"unread",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"active",
-                "latest_message":"unread",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"active",
-                "latest_message":"unread",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"active",
-                "latest_message":"read",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"deleted",
-                "latest_message":"read",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"deleted",
-                "latest_message":"read",
-            },
-            {
-                "room_id":"collection_id",
-                "partner":"username of chat-partner",
-                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
-                "status":"deleted",
-                "latest_message":"read",
-            },
-        ],
+        "DMs":rooms,
     }
     return JsonResponse(side_bar, safe=False)
+
+
+@api_view(["POST"])
+def create_room(request):
+    collection_name="dm_rooms"
+    org_id = request.data["org_id"]
+    id1 = request.data["id1"]
+    id2 = request.data["id2"]
+    username1 = request.data["username1"]
+    username2 = request.data["username2"]
+    room = RoomSerializer(org_id=org_id, id1=id1, id2=id2, name1=username1,name2=username2)
+    room.serialize()
+    print(room)
 
 
 @api_view(["POST"])
