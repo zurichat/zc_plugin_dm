@@ -8,6 +8,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+import requests
+
 
 
 def index(request):
@@ -32,6 +34,16 @@ def info(request):
     }
 
     return JsonResponse(info, safe=False)
+
+def verify_user_auth(ID, token):
+	url = f"https://api.zuri.chat/users/{ID}"
+	headers = {
+		'Authorization': f'Bearer {token}',
+		'Content-Type': 'application/json'
+	}
+	response = requests.request("GET", url, headers=headers)
+	
+	return response.status == "200"
 
 def side_bar(request):
     side_bar = {
