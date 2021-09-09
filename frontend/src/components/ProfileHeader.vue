@@ -5,70 +5,27 @@
         
 
         </div>
-
         <div id="profile-info" v-if="displayProfileInfo">
-            <div id="profile-card">
+            <h1 id="profile-h1"> Profile </h1>
+            <img id="card" alt="profile card" src="../assets/profilecard.png">
+            <h1> Mama Gee </h1>
+            <p> Frontend Design Mentor </p>
+            <p> She/Her </p><br><br>
+            <img id="vector" alt="vector" src="../assets/vector.png">
 
-                 <h5 id="profile-h1"> Profile </h5>
-               
-                    <i class="fa fa-times" aria-hidden="true"></i>
-                
-                
-            </div>
-
-                <div>
-                    <img id="profileimg" alt="profile image" src="../assets/profileimg.png">
-                </div>
-
-                    <div id="user-details">
-
-                        <h4> Mama Gee </h4>
-                             <p> Frontend Design Mentor </p>
-                        <p> She/Her </p>
-
-                         <i  class="my-4  fa fas fa-dog"></i>
-
-                    </div>
-          
-
-        <div id="bookmark">
-            <div class="text-muted"> 
-                <button class="btn btn-light btn-rounded shadow-sm mb-2">
-                <i class='far fa-comment'></i>
-                </button><br>
-                Message
-            </div>
-
-            <div class="text-muted"> 
-                <button class="btn btn-light btn-rounded shadow-sm mb-2">
-            <i class="far fa-bell-slash" aria-hidden="true"></i>
-          </button><br>
-                Muted
-            </div>
-
-            <div class="text-muted"> 
-               <button class="btn btn-light btn-rounded shadow-sm mb-2">
-                 <i class="fa fa-ellipsis-h"></i>
-                </button> <br>
-                More
-            </div>
- 
-
-
-        </div><br><br>
-
-
-
-        <div class="info">
-            <p class="text-muted"> Display Name <br> Mama Gee </p>
-        
-
-            <p class="text-muted"> Local Time <br>  3:15 PM  </p>
             
 
-            <p class="text-muted"> Phone Number <br>  0213456789 </p>
-        
-        </div>
+
+
+            <p> Display Name </p>
+            <p> Mama Gee</p>
+
+            <p> Local Time </p>
+            <p> 3:15 PM </p>
+
+            <p> Phone Number </p>
+            <p> 0213456789</p>
+
 
 
 
@@ -111,19 +68,18 @@ export default {
 <style scoped>
     #profile-icon{
         position: absolute;
-        right: 19px;
-        top: 18px;
+        right: 20px;
+        top: 5px;
         border-radius: 50%;
     }
 
     #profile-info{  
         position: absolute;
-        right: 3px;
+        right: 5px;
         top: 60px;
         height: 900px;
-        width: 320px;
+        width: 300px;
         background-color: white;
-        font-family:'Lato', sans-serif;
      
     
     }
@@ -133,32 +89,11 @@ export default {
 
     }
 
-    #profile-card{
-    
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 2;
-        background-color: #00B87C;
+    #profile-h1{
+        background-color:#00B87C;
         color: white;
         height: 60px;
-    }
-
-    #user-details{
-       text-align: center;
+    
 
     }
-
-    #info{
-        text-align: left;
-        
-    }
-
-    #bookmark{
-        display: flex;
-        justify-content: space-between;
-    }
-
-
-            
 </style>
