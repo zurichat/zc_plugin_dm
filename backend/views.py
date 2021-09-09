@@ -1,21 +1,24 @@
+
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from rest_framework.parsers import JSONParser
-from django.http import HttpResponse
-from rest_framework.decorators import api_view
 
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework import status
-from rest_framework.views import APIView
+
 import requests
+
 # Import Read Write function to Zuri Core
 from .db import DB
 
+from .serializers import MessageSerializer
+from backend import serializers
 
 
 def index(request):
     context = {}
     return render(request, 'index.html', context)
+
 
 # Shows basic information about the DM plugin
 def info(request):
@@ -125,7 +128,13 @@ def side_bar(request):
     return JsonResponse(side_bar, safe=False)
 
 
-def room(request):
-    # return render(request, "index.html")
-    return HttpResponse("<h1>Work in Progress</h1>")
-
+@api_view(["POST"])
+def save_message(request):
+    serializer = MessageSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        response = DB.write("dm_messages", data=serializer.data)
+        if response and response.get("status_code") == 201:
+            return Response(
+                data=response, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
