@@ -125,55 +125,7 @@ def side_bar(request):
     return JsonResponse(side_bar, safe=False)
 
 
-
-
-
-def organization(request):
-    return render(request, "index.html")
-
-def organizations(request):
-    return render(request, "index.html")
-
-
-def user(request):
-    return render(request, "index.html")
-
-def users(request):
-    return render(request, "index.html")
-
-
-def rooms(request):
-    return render(request, "index.html")
-
-
 def room(request):
     # return render(request, "index.html")
     return HttpResponse("<h1>Work in Progress</h1>")
 
-
-def room_users(request):
-    return render(request, "index.html")
-
-
-def room_messages(request):
-    return render(request, "index.html")
-
-
-def room_message(request):
-    return render(request, "index.html")
-
-
-def room_medias(request):
-    return render(request, "index.html")
-
-
-def room_media(request):
-    return render(request, "index.html")
-
-
-def room_files(request):
-    return render(request, "index.html")
-
-
-def room_file(request):
-    return render(request, "index.html")
