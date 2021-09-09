@@ -8,13 +8,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+# Import Read Write function to Zuri Core
+from .db import DB
+
 
 
 def index(request):
     context = {}
     return render(request, 'index.html', context)
 
-
+# Shows basic information about the DM plugin
 def info(request):
     info = {
         "message": "Plugin Information Retrieved",
@@ -25,7 +28,7 @@ def info(request):
                             },
             "scaffold_structure": "Monolith",
             "team": "HNG 8.0/Team Orpheus",
-            "sidebar_url": "https://dm.zuri.chat/api/sideBar",
+            "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/"
         },
         "success": "true"
@@ -33,26 +36,85 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
+
+# Returns the json data of the sidebar that will be consumed by the api
+# The sidebar info will be unique for each logged in user
+# user_id will be gotten from the logged in user
+# All data in the message_rooms will be automatically generated from zuri core
 def side_bar(request):
     side_bar = {
-        "message": "DM sidebar Information Retrieved",
-        "data": {
-            "type": "Sidebar Information",
-            "Messages": [{"user": "Abey","message":"I dey boss"},
-            {"user": "Abike","message":"I dey boss"},
-            {"user": "Franc","message":"How's it going"},
-            {"user": "Dele","message":"Yes it is"},
-            {"user": "Abey","message":"I've not slept in days"},
-            ],
-            "scaffold_structure": "Monolith",
-            "team": "HNG 8.0/Team Orpheus",
-            "info_url": "https://dm.zuri.chat/api/info",
-            "homepage_url": "https://dm.zuri.chat/"
-        },
-        "success": "true"
+        "name" : "DM Plugin",
+        "description" : "Sends messages between users",
+        "plugin_id" : "dm-plugin-id",
+        "organisation_id" : "HNGi8",
+        "user_id" : "232",
+        "group_name" : "DM",
+        "show_group" : False,
+        # List of rooms/collections created whenever a user starts a DM chat with another user
+        # This is what will be displayed by Zuri Main on the sidebar
+        "message_rooms":[
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"active",
+                "latest_message":"unread",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"active",
+                "latest_message":"unread",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"active",
+                "latest_message":"unread",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"active",
+                "latest_message":"unread",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"active",
+                "latest_message":"read",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"deleted",
+                "latest_message":"read",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"deleted",
+                "latest_message":"read",
+            },
+            {
+                "room_id":"collection_id",
+                "partner":"username of chat-partner",
+                "room_url":"https://dm.zuri.chat/api/organizations/id/rooms/id",
+                "status":"deleted",
+                "latest_message":"read",
+            },
+        ],
     }
-
     return JsonResponse(side_bar, safe=False)
+
+
+
 
 
 def organization(request):
@@ -74,7 +136,8 @@ def rooms(request):
 
 
 def room(request):
-    return render(request, "index.html")
+    # return render(request, "index.html")
+    return HttpResponse("<h1>Work in Progress</h1>")
 
 
 def room_users(request):
