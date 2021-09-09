@@ -31,23 +31,7 @@ In The message model we have the following fields:
         -   created_at: The date at which the message was created
         -   last_updated: The date at which the message was last updated
 """
-    sender_id = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="sent")
-    receiver_id = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="received")
-    message = models.TextField()
-    # meta = models.JSONField()
-    # deleted_user_id = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now=True)
-    last_updated = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.sender_id.username} sent '{self.message} ' to {self.receiver_id} "
-
-
-class book_mark(models.Model):
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    link = models.CharField(max_length=900)
+   
     created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     def __str__(self):
