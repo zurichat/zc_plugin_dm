@@ -30,7 +30,7 @@ class DataStorage:
         except requests.exceptions.RequestException as e:
             print(e)
             return None
-        if response.status_code == 200:
+        if response.status_code == 201:
             return response.json()
         else:
             return {
