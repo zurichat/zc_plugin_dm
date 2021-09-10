@@ -12,12 +12,4 @@ class MessageSerializer(serializers.Serializer):
 
     def __str__(self):
         return str(self.message)
-
-
-class RoomSerializer(serializers.Serializer):
-    sender = serializers.CharField(max_length=128)
-    receiver = serializers.CharField(max_length=128)
-    created_at = serializers.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return str()
+    

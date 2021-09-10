@@ -10,7 +10,7 @@ import requests
 # Import Read Write function to Zuri Core
 from .db import DB
 
-from .serializers import *
+from .serializers import MessageSerializer
 from backend import serializers
 
 
@@ -151,19 +151,3 @@ def save_message(request):
             return Response(
                 data=response, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(["POST", "GET"])
-def create_room(requests):
-    serializer = RoomSerializer(data=requests.data)
-
-    if serializer.is_valid():
-         response = DB.write("dm_rooms", data=serializer.data)
-         data = response.get("data")
-         print(data)
-         if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_201_CREATED)
-         else:
-             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    return Response(status=status.HTTP_201_CREATED)
-
