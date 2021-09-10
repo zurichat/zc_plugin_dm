@@ -152,18 +152,14 @@ def save_message(request):
                 data=response, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["POST", "GET"])
+@api_view(["POST"])
 def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
          response = DB.write("dm_rooms", data=serializer.data)
-         data = response.get("data")
-         print(data)
+         data = dict(room_id=response.get("data").get("object_id"))
          if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
-         else:
-             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    return Response(status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
