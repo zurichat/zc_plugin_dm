@@ -54,15 +54,26 @@ def verify_user_auth(token):
 	
 	json_response = api_response.json()
 	
-	response = {}
+	response = {
+		'is_authenticated': False,
+		'data': json_response['message']
+	}
+	
 	if json_response['status'] == "200":
 		response['is_authenticated'] = json_response['data']['is_verified']
 		response['data'] = json_response['data']['user']
-	else:
-		response['is_authenticated'] = False
-		response['data'] = json_response['message']
 	
 	return response
+
+@api_view(['POST'])
+def test_verify_user_auth(request):
+	token_serializer = TokenSerializer(data = request.data)
+	
+	if token_serializer.is_valid():
+		response = verify_user_auth(token_serializer.data['token'])
+		
+		return Response(response, status = status.HTTP_200_OK)
+	return Response(token_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
