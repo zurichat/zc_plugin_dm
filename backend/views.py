@@ -1,5 +1,4 @@
-
-from django.http.response import HttpResponse, JsonResponse
+from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -12,6 +11,8 @@ from .serializers import MessageSerializer
 import requests
 
 
+from .serializers import *
+from backend import serializers
 
 
 def index(request):
@@ -38,17 +39,31 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
- 
-def verify_user_auth(ID, token):
-	url = f"https://api.zuri.chat/users/{ID}"
+def verify_user_auth(token):
+	"""
+	Call Endpoint for verification of JWT Token
+	Returns: py dict -> is_authenticated: boolean, & data: more info
+	"""
+	url = "https://api.zuri.chat/auth/verify-token"
+	
 	headers = {
 		'Authorization': f'Bearer {token}',
 		'Content-Type': 'application/json'
 	}
-	response = requests.request("GET", url, headers=headers)
-	
-	return response.status == "200"
 
+	api_response = requests.request("GET", url, headers=headers)
+	
+	json_response = api_response.json()
+	
+	response = {}
+	if json_response['status'] == "200":
+		response['is_authenticated'] = json_response['data']['is_verified']
+		response['data'] = json_response['data']['user']
+	else:
+		response['is_authenticated'] = False
+		response['data'] = json_response['message']
+	
+	return response
 
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
@@ -94,3 +109,15 @@ def save_message(request):
             return Response(
                 data=response, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["POST"])
+def create_room(requests):
+    serializer = RoomSerializer(data=requests.data)
+
+    if serializer.is_valid():
+         response = DB.write("dm_rooms", data=serializer.data)
+         data = dict(room_id=response.get("data").get("object_id"))
+         if response.get("status") == 200:
+            return Response(data=data, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
