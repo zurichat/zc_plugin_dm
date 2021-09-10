@@ -1,34 +1,24 @@
-from django.contrib.auth import get_user_model
+from django.utils import timezone
+
 from rest_framework import serializers
-from .models import book_mark, Message
-
-# User serializer
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = get_user_model()
-        fields = '__all__'
+class MessageSerializer(serializers.Serializer):
+    sender_id = serializers.CharField(max_length=128)
+    receiver_id = serializers.CharField(max_length=128)
+    room_id = serializers.CharField(max_length=128)
+    message = serializers.CharField()
+    created_at = serializers.DateTimeField(default=timezone.now)
 
-# Bookmark serializer
-
-
-class BookmarkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = book_mark
-        fields = '__all__'
+    def __str__(self):
+        return str(self.message)
 
 
-"""
-    serializer that takes in messages model to facilitate 
-    GET,PUT and Update
-"""
+class RoomSerializer(serializers.Serializer):
+    org_id = serializers.CharField(max_length=128)
+    room_user_ids = serializers.ListField(child=serializers.CharField(max_length=128),
+                                           allow_empty=False)
+    created_at = serializers.DateTimeField(default=timezone.now)
 
-
-class MessageSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = Message
-        fields = "__all__"
-    
-
+    def __str__(self):
+        return str()
