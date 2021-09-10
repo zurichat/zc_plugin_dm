@@ -12,4 +12,13 @@ class MessageSerializer(serializers.Serializer):
 
     def __str__(self):
         return str(self.message)
-    
+
+
+class RoomSerializer(serializers.Serializer):
+    org_id = serializers.CharField(max_length=128)
+    room_user_ids = serializers.ListField(child=serializers.CharField(max_length=128),
+                                           allow_empty=False)
+    created_at = serializers.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return str()
