@@ -1,4 +1,3 @@
-
 from django.http.response import JsonResponse
 from django.shortcuts import render
 
@@ -39,17 +38,31 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
- 
-def verify_user_auth(ID, token):
-	url = f"https://api.zuri.chat/users/{ID}"
+def verify_user_auth(token):
+	"""
+	Call Endpoint for verification of JWT Token
+	Returns: py dict -> is_authenticated: boolean, & data: more info
+	"""
+	url = "https://api.zuri.chat/auth/verify-token"
+	
 	headers = {
 		'Authorization': f'Bearer {token}',
 		'Content-Type': 'application/json'
 	}
-	response = requests.request("GET", url, headers=headers)
-	
-	return response.status == "200"
 
+	api_response = requests.request("GET", url, headers=headers)
+	
+	json_response = api_response.json()
+	
+	response = {}
+	if json_response['status'] == "200":
+		response['is_authenticated'] = json_response['data']['is_verified']
+		response['data'] = json_response['data']['user']
+	else:
+		response['is_authenticated'] = False
+		response['data'] = json_response['message']
+	
+	return response
 
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
