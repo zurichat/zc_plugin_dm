@@ -146,6 +146,14 @@ def rooms(request):
     return render(request, "index.html")
 
 
+def editRoom(request, roomName):
+    call
+    collection = "dm_rooms"
+    # use the database helper instance
+    data=DB.write(collection, data)
+    
+    return JsonResponse()
+
 def room(request):
     # return render(request, "index.html")
     return HttpResponse("<h1>Work in Progress</h1>")

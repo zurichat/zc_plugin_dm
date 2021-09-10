@@ -2,7 +2,15 @@
 from urllib.parse import urlencode
 
 import requests, json
-
+# {
+#  "plugin_id": "xxx",
+#  "organization_id": "xxx",
+#  "collection_name": "mycollection",
+#  "bulk_write": false,
+#  "object_id": "xxxx",
+#  "filter": {},
+#  "payload": {}
+# }
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
 ORG_ID = "6133c5a68006324323416896"
@@ -51,7 +59,7 @@ class DataStorage:
             collec_name=collection_name,
             query=query
         )
-
+        print(url)
         try:
             response = requests.get(url=url)
         except requests.exceptions.RequestException as e:
