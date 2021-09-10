@@ -3,16 +3,12 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-# Import Read Write function to Zuri Core
-from .db import DB, get_user_rooms
-
-from .serializers import MessageSerializer
-
 import requests
-
-
+from .db import DB,send_centrifugo_data, get_user_rooms 
+# Import Read Write function to Zuri Core
+from .serializers import MessageSerializer
 from .serializers import *
-from backend import serializers
+
 
 
 def index(request):
@@ -100,14 +96,36 @@ def side_bar(request):
 
 
 @api_view(["POST"])
-def save_message(request):
+def send_message(request):
+    """
+    this is used to send message to user in rooms
+    It checks if room already exist before sending data
+    Ir makes a publish event to centrifugo after data 
+    is persiste
+    """
     serializer = MessageSerializer(data=request.data)
     
     if serializer.is_valid():
-        response = DB.write("dm_messages", data=serializer.data)
-        if response and response.get("status_code") == 201:
-            return Response(
-                data=response, status=status.HTTP_201_CREATED)
+        data = serializer.data
+        room_id = data['room_id'] #room id gotten from client request
+        
+        rooms = DB.read("dm_rooms")
+        if type(rooms) == list:
+            is_room_avalaible = len([room for room in rooms if room.get('_id', None) == room_id]) != 0
+        
+            if is_room_avalaible:
+                response = DB.write("dm_messages", data=serializer.data)
+                if response.get("status") == 200:
+                    print("data sent to zc core")
+                    centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
+                    if centrifugo_data.get("status_code") < 400:
+                        print(centrifugo_data)
+                        return Response(data=response, status=status.HTTP_201_CREATED)
+                    
+                return Response(data="data not sent",status=status.HTTP_400_BAD_REQUEST)
+            return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
+        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
+    
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["POST"])
