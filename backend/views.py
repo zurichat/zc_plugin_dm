@@ -74,7 +74,7 @@ def verify_user_auth(token):
         
 
 def side_bar(request):
-    collections = "DM-ROOMS"
+    collections = "dm_rooms"
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
     rooms = get_user_rooms(collections, org_id, user)
