@@ -60,6 +60,12 @@ export default {
     background: transparent;
 }
 
+@media (max-width: 800px) {
+    .searchbox {
+        display: none;
+    }
+}
+
 .profile-img {
     width: 40px;
     height: 40px;
