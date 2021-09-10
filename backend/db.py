@@ -68,11 +68,11 @@ class DataStorage:
 
 DB = DataStorage()
 
-
+# Gets the rooms that a user is in
 def get_user_rooms(collection_name, org_id, user):
     room_list = list()
     rooms = DB.read(collection_name,{"org_id":org_id})
-    if rooms == None:
+    if rooms==None or "status_code" in rooms:
         return rooms
     else:
         for room in rooms:
