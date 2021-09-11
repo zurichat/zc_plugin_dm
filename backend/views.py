@@ -101,10 +101,10 @@ def side_bar(request):
 @api_view(["POST"])
 def send_message(request):
     """
-    this is used to send message to user in rooms
-    It checks if room already exist before sending data
-    Ir makes a publish event to centrifugo after data 
-    is persiste
+    This is used to send message to user in rooms.
+    It checks if room already exist before sending data.
+    It makes a publish event to centrifugo after data 
+    is persisted
     """
     serializer = MessageSerializer(data=request.data)
     
