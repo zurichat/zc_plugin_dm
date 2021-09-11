@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 import requests, json
 
 
+
 PLUGIN_ID = "6135f65de2358b02686503a7"
 ORG_ID = "6133c5a68006324323416896"
 CENTRIFUGO_TOKEN = '58c2400b-831d-411d-8fe8-31b6e337738b'
@@ -106,3 +107,17 @@ def get_user_rooms(collection_name, org_id, user):
                 else:
                     return room_list
         return room_list
+
+
+def get_rooms(user_id):
+    response = DB.read("dm_rooms")
+    data = {"data": []}
+    for room in response:
+        try:
+            users_room_list = room['room_user_ids']
+            if user_id in users_room_list:
+                data['data'].append(room)
+        except Exception:
+            pass
+    
+    return data['data']

@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
 from rest_framework.serializers import Serializer
-from .db import DB,send_centrifugo_data, get_user_rooms 
+from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
@@ -101,10 +101,10 @@ def side_bar(request):
 @api_view(["POST"])
 def send_message(request):
     """
-    this is used to send message to user in rooms
-    It checks if room already exist before sending data
-    Ir makes a publish event to centrifugo after data 
-    is persiste
+    This is used to send message to user in rooms.
+    It checks if room already exist before sending data.
+    It makes a publish event to centrifugo after data 
+    is persisted
     """
     serializer = MessageSerializer(data=request.data)
     
@@ -143,7 +143,28 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+<<<<<<< HEAD
 @api_view(["GET"])
+=======
+def get_all_rooms():
+    response = DB.read("dm_rooms")
+    return response
+
+@api_view(["GET"])
+def getUserRooms(request):
+    if request.method == "GET":
+        res = get_rooms(request.GET.get("user_id", None))
+        if request.GET.get("user_id") == None:
+            return Response(get_all_rooms())
+        else:
+            if len(res) == 0:
+                return Response(data="no such user", status=status.HTTP_204_NO_CONTENT)
+            return Response(res)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+>>>>>>> cafc26edeb690858c17ed80509a3a59dc0d14be3
 def room_info(request):
     room_id = request.GET.get("room_id", None)
     # org_id = request.GET.get("org_id", None)
@@ -153,6 +174,7 @@ def room_info(request):
     messages  = DB.read(message_collection)
     room_messages=[]
     
+<<<<<<< HEAD
     
        
     for message in messages:
@@ -180,3 +202,36 @@ def room_info(request):
             }
             return Response(data=room_data, status=status.HTTP_200_OK)
     return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+=======
+    if serializer.is_valid():
+        data = serializer.data
+        room_id = data['room_id']
+        for message in messages:
+            if 'room_id' in message and message['room_id'] == room_id:
+                room_messages.append(message)
+        for current_room in rooms:
+            if current_room['_id'] == room_id:
+                if 'room_user_ids' in current_room:
+                    room_user_ids = current_room['room_user_ids']
+                else:
+                    room_user_ids =""
+                if 'created_at' in current_room:
+                    created_at = current_room['created_at']
+                else:
+                    created_at =""
+                if 'org_id' in current_room:
+                    org_id = current_room['org_id']
+                else:
+                    org_id =""
+
+                room_data = {
+                    "room_id": room_id,
+                    "org_id": org_id,
+                    "room_user_ids": room_user_ids,
+                    "created_at": created_at,
+                    "messages": room_messages
+                }
+                return Response(data=room_data, status=status.HTTP_200_OK)
+        return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+>>>>>>> cafc26edeb690858c17ed80509a3a59dc0d14be3
