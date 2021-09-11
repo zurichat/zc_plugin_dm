@@ -118,7 +118,7 @@ def send_message(request):
                 if response.get("status") == 200:
                     print("data sent to zc core")
                     centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
-                    if centrifugo_data.get("status_code") < 400:
+                    if centrifugo_data["message"].get("error",None) == None:
                         print(centrifugo_data)
                         return Response(data=response, status=status.HTTP_201_CREATED)
                     
