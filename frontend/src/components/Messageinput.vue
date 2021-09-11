@@ -6,12 +6,14 @@
                 <input
                     type="email"
                     class="form-control"
-                    placeholder="To:  @somebody or somebody@example.com"
-                />
+                    placeholder="To:  @somebody or somebody@example.com"/>
             </div>
         </div>
     </div>
 </template>
+
+
+
 
 <script>
 export default {

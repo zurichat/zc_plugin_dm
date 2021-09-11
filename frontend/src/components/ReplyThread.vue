@@ -139,6 +139,7 @@ header .fa-times {
     cursor: pointer;
 }
 
+/*  Message Body Styles */
 .messageBody {
     padding-top: 20px;
 }
