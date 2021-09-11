@@ -24,3 +24,9 @@ class RoomSerializer(serializers.Serializer):
 
     def __str__(self):
         return str()
+
+class RoomInfoSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+
+    def __str__(self):
+        return str(self.room_id)
