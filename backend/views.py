@@ -143,43 +143,40 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def room_info(request):
-    serializer = RoomInfoSerializer(data=request.data)
+    room_id = request.GET.get("room_id", None)
+    # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
     message_collection = "dm_messages"
     messages  = DB.read(message_collection)
     room_messages=[]
     
-    if serializer.is_valid():
-        data = serializer.data
-        room_id = data['room_id']
-        for message in messages:
-            if 'room_id' in message and message['room_id'] == room_id:
-                room_messages.append(message)
-        for current_room in rooms:
-            if current_room['_id'] == room_id:
-                if 'room_user_ids' in current_room:
-                    room_user_ids = current_room['room_user_ids']
-                else:
-                    room_user_ids =""
-                if 'created_at' in current_room:
-                    created_at = current_room['created_at']
-                else:
-                    created_at =""
-                if 'org_id' in current_room:
-                    org_id = current_room['org_id']
-                else:
-                    org_id =""
-
-                room_data = {
-                    "room_id": room_id,
-                    "org_id": org_id,
-                    "room_user_ids": room_user_ids,
-                    "created_at": created_at,
-                    "messages": room_messages
-                }
-                return Response(data=room_data, status=status.HTTP_200_OK)
-        return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+       
+    for message in messages:
+        if 'room_id' in message and message['room_id'] == room_id:
+            room_messages.append(message)
+    for current_room in rooms:
+        if current_room['_id'] == room_id:
+            if 'room_user_ids' in current_room:
+                room_user_ids = current_room['room_user_ids']
+            else:
+                room_user_ids =""
+            if 'created_at' in current_room:
+                created_at = current_room['created_at']
+            else:
+                created_at =""
+            if 'org_id' in current_room:
+                org_id = current_room['org_id']
+            else:
+                org_id ="6133c5a68006324323416896"
+            room_data = {
+                "room_id": room_id,
+                "org_id": org_id,
+                "room_user_ids": room_user_ids,
+                "created_at": created_at,
+            }
+            return Response(data=room_data, status=status.HTTP_200_OK)
+    return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
