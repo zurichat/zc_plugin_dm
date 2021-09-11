@@ -15,6 +15,7 @@ class MessageSerializer(serializers.Serializer):
 
 
 class RoomSerializer(serializers.Serializer):
+    # following the room schema defined on core
     ''' OwnerId    primitive.ObjectID   `json:"ownerid,omitempty" bson:"ownerid,omitempty"` automatic
         string               
         RoomType   string                //inbox, group, channel
@@ -37,3 +38,9 @@ class RoomSerializer(serializers.Serializer):
     
     def __str__(self):
         return str()
+
+class RoomInfoSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+
+    def __str__(self):
+        return str(self.room_id)
