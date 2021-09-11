@@ -2,14 +2,6 @@ import json
 from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
-<<<<<<< HEAD
-from rest_framework.parsers import JSONParser
-from django.http import HttpResponse
-from rest_framework.decorators import api_view
-from django.views.generic import View
-from .serializers import UserSerializer, MessageSerializer
-=======
->>>>>>> 277a7d9dd2e2385b91a33481be90d95aa83b8c8b
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -100,147 +92,6 @@ def side_bar(request):
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
     }
-<<<<<<< HEAD
-    mesSage = messageList["message2"]
-    reply_message = [
-        {
-            'reply_id': "003",
-            'replied_to': mesSage,
-            'content': 'I am fine Mark thank you',
-        }
-    ]
-    return Response(reply_message, status=status.HTTP_200_OK)
-
-
-def dm_list(request):
-    dm_lists = [{"user": "Cheeqito", "isActive": True, "last_message": "10 minutes Ago"},
-                {"user": "Cheediogo", "isActive": False,
-                    "last_message": "2Hours Ago"},
-                {"user": "James", "isActive": True, "last_message": "2 minutes Ago"}, ]
-    return JsonResponse(dm_lists)
-
-
-def filter_user(request):
-    filter_user = [
-        {
-            'user_id': '1',
-            'message': 'Hey, how are you doing'
-        },
-
-        {
-            'user_id': '1',
-            'message': 'I need to have some rest'
-        },
-
-        {
-            'user_id': '1',
-            'message': 'I would see you later'
-        }
-    ]
-
-    return JsonResponse(filter_user, safe=False)
-
-
-@api_view(['GET'],)
-def get_starred(request):
-    get_starred = [
-        {
-            'sender_id': 'Laurie',
-            'message': 'Hello',
-            'created_at': '0800hrs',
-            'star_messages': True,
-        },
-
-        {
-            'sender_id': 'Barney',
-            'message': 'Assignment due',
-            'created_at': '1500hrs',
-            'star_messages': True,
-        }
-
-    ]
-    return JsonResponse(get_starred, safe=False)
-
-
-class EditMessage(View):
-    def get(self,srequest):
-        messages = [{
-            'user_id': '2',
-            'message_id': '34',
-            'last_updated': '2021-09-04 19:11:35',
-            'message': 'I just edited this message'
-
-        }]
-        return JsonResponse(messages, safe=False)
-
-
-class SearchMessagesAPI(APIView):
-    def get_match(self, phrase):
-        try:
-            # here we serch through the messages for a phrase.
-            pass
-        except Exception as e:
-            pass
-
-    def get(self, request, phrase):
-        # we search the message
-        matchedMessages = self.get_match(phrase)
-
-        # expected outcome for the phrase home
-        matchedMessages = [
-            {
-                'message_id': '1',
-                'name': 'Vitor',
-                'message': 'home is where my heart is.'
-            },
-            {
-                'message_id': '65',
-                'name': 'Mykie',
-                'message': 'I\'m on my way home'
-            },
-            {
-                'message_id': '8',
-                'name': 'john',
-                'message': 'home file.'
-            }]
-        return Response(matchedMessages, status=status.HTTP_200_OK)
-
-
-def date_message(request):
-    '''
-    Returns filtered messages between a date range: [before date] and [after date]
-    '''
-
-    results = [
-        {
-            'user_id': 'Mark',
-            'message': 'Hello',
-            'created_at': '2021-09-01 04:20:35',
-            'date_timestamps': 1538697600
-        },
-        {
-            'user_id': 'Oluwaseye',
-            'message': 'Assignment due',
-            'created_at': '2021-09-01 06:15:14',
-            'date_timestamps': 1538697500
-
-        },
-        {
-            'user_id': 'Oluwaseye',
-            'message': 'They are the best',
-            'created_at': '2021-09-01 08:15:14',
-            'date_timestamps': 1538297500
-        },
-        {
-            'user_id': 'Mark',
-            'message': 'Restart the server',
-            'created_at': '2021-09-01 09:15:14',
-            'date_timestamps': 1538297900
-        },
-
-    ]
-    return JsonResponse(results, safe=False)
-=======
     return JsonResponse(side_bar, safe=False)
 
 
@@ -332,4 +183,3 @@ def room_info(request):
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
->>>>>>> 277a7d9dd2e2385b91a33481be90d95aa83b8c8b
