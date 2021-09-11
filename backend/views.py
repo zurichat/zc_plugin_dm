@@ -1,9 +1,12 @@
+import json
+from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
+from rest_framework.serializers import Serializer
 from .db import DB,send_centrifugo_data, get_user_rooms 
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
@@ -118,7 +121,7 @@ def send_message(request):
                 if response.get("status") == 200:
                     print("data sent to zc core")
                     centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
-                    if centrifugo_data.get("status_code") < 400:
+                    if centrifugo_data["message"].get("error",None) == None:
                         print(centrifugo_data)
                         return Response(data=response, status=status.HTTP_201_CREATED)
                     
@@ -139,3 +142,44 @@ def create_room(requests):
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(["POST"])
+def room_info(request):
+    serializer = RoomInfoSerializer(data=request.data)
+    room_collection = "dm_rooms"
+    rooms = DB.read(room_collection)
+    message_collection = "dm_messages"
+    messages  = DB.read(message_collection)
+    room_messages=[]
+    
+    if serializer.is_valid():
+        data = serializer.data
+        room_id = data['room_id']
+        for message in messages:
+            if 'room_id' in message and message['room_id'] == room_id:
+                room_messages.append(message)
+        for current_room in rooms:
+            if current_room['_id'] == room_id:
+                if 'room_user_ids' in current_room:
+                    room_user_ids = current_room['room_user_ids']
+                else:
+                    room_user_ids =""
+                if 'created_at' in current_room:
+                    created_at = current_room['created_at']
+                else:
+                    created_at =""
+                if 'org_id' in current_room:
+                    org_id = current_room['org_id']
+                else:
+                    org_id =""
+
+                room_data = {
+                    "room_id": room_id,
+                    "org_id": org_id,
+                    "room_user_ids": room_user_ids,
+                    "created_at": created_at,
+                    "messages": room_messages
+                }
+                return Response(data=room_data, status=status.HTTP_200_OK)
+        return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
