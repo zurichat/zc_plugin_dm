@@ -2,12 +2,11 @@ from . import views
 from .views import EditMessage
 from django.urls import path
 
-from django.conf.urls import url
-
 app_name = 'backend'
 
 urlpatterns = [
     path('', views.index, name='index'),
+<<<<<<< HEAD
     path('api/info', views.info, name='plugin_info'),
     path('api/sidebar', views.side_bar, name='sidebar'),
     path('api/organizations', views.organizations, name='organizations'),
@@ -69,4 +68,11 @@ urlpatterns = [
     # for search message
     path('api/search_message/<phrase>/', views.SearchMessagesAPI.as_view()),
     path('api/dateMessage', views.date_message, name='date_message')
+=======
+    path('api/v1/info', views.info, name='plugin_info'),
+    path('api/v1/sidebar', views.side_bar, name='sidebar'),
+    path('api/v1/send-data', views.send_message, name="send_data"),
+    path('api/v1/createroom', views.create_room, name='createroom'),
+    path('api/v1/room-info', views.room_info, name='roominfo')
+>>>>>>> 277a7d9dd2e2385b91a33481be90d95aa83b8c8b
 ]

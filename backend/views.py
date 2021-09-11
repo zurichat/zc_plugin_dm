@@ -1,17 +1,25 @@
-from .models import Message
+import json
+from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
+<<<<<<< HEAD
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from django.views.generic import View
 from .serializers import UserSerializer, MessageSerializer
+=======
+>>>>>>> 277a7d9dd2e2385b91a33481be90d95aa83b8c8b
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from rest_framework import status
-from rest_framework.views import APIView
+import requests
+from rest_framework.serializers import Serializer
+from .db import DB,send_centrifugo_data, get_user_rooms 
+# Import Read Write function to Zuri Core
+from .serializers import MessageSerializer
+from .serializers import *
 
-
-# Create your views here.
 
 
 def index(request):
@@ -19,73 +27,7 @@ def index(request):
     return render(request, 'index.html', context)
 
 
-def forward_messages(request):
-    forwarded_messages = [
-        {
-            'user': 'Itz_salemm',
-            'location': 'Switzerland',
-            'forwarded_to': ['mark', ],
-            'forward': True
-        },
-        {
-            'user': 'Samuel',
-            'location': 'UK',
-            'forwarded_to': ['naza', ],
-            'forward': True
-        }
-    ]
-
-    return JsonResponse(forwarded_messages, safe=False)
-
-
-def messages(request):
-    messages = [
-        {
-            'user': 'Vitor',
-            'location': 'Finland',
-            'is_active': True,
-            'message': 'Hi, dude'
-        },
-        {
-            'name': 'Mykie',
-            'location': 'Nigeria',
-            'is_active': True,
-            'message': 'I\'m on my way home'
-        }]
-
-    return HttpResponse(f"{messages}")
-
-
-def new_messages(request):
-    messages = [
-        {
-            'id': '1',
-            'sender_id': '5',
-            'receiver_id': '4',
-            'message': 'been awhile',
-            'meta': 'dm_message38384739',
-            'deleted_user_id': 'null',
-            'created_at': '2021-09-3 00:00:00',
-            'last_updated_at': 'null'
-        },
-        {
-            'id': '1',
-            'sender_id': '5',
-            'receiver_id': '4',
-            'message': 'Hi, dude',
-            'meta': 'dm_message38384738',
-            'deleted_user_id': 'null',
-            'created_at': '2021-09-2 00:00:00',
-            'last_updated_at': 'null'
-        }]
-
-    return HttpResponse(f"{messages}")
-
-
-def side_bar(request):
-    pass
-
-
+# Shows basic information about the DM plugin
 def info(request):
     info = {
         "message": "Plugin Information Retrieved",
@@ -96,7 +38,7 @@ def info(request):
                             },
             "scaffold_structure": "Monolith",
             "team": "HNG 8.0/Team Orpheus",
-            "sidebar_url": "https://dm.zuri.chat/api/sideBar",
+            "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/"
         },
         "success": "true"
@@ -104,427 +46,61 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
+def verify_user_auth(token):
+	"""
+	Call Endpoint for verification of JWT Token
+	Returns: py dict -> is_authenticated: boolean, & data: more info
+	"""
+	url = "https://api.zuri.chat/auth/verify-token"
+	
+	headers = {
+		'Authorization': f'Bearer {token}',
+		'Content-Type': 'application/json'
+	}
 
-def organizations(request):
-    organizations = [
-        {
-            'name': 'KFC',
-            'location': 'Finland',
-            'is_active': True,
-            'about': 'Fast food'
-        },
-        {
-            'name': 'Shoprite',
-            'location': 'Nigeria',
-            'is_active': True,
-            'about': 'Supermarket'
-        }]
+	api_response = requests.request("GET", url, headers=headers)
+	
+	json_response = api_response.json()
+	
+	response = {}
+	if json_response['status'] == "200":
+		response['is_authenticated'] = json_response['data']['is_verified']
+		response['data'] = json_response['data']['user']
+	else:
+		response['is_authenticated'] = False
+		response['data'] = json_response['message']
+	
+	return response
 
-    return JsonResponse(organizations, safe=False)
+# Returns the json data of the sidebar that will be consumed by the api
+# The sidebar info will be unique for each logged in user
+# user_id will be gotten from the logged in user
+# All data in the message_rooms will be automatically generated from zuri core
 
 
-def archive_message(request):
-    archive_message = {
-        'msgID': 121,
-        'archived': True
+        
+
+def side_bar(request):
+    collections = "dm_rooms"
+    org_id = request.GET.get("org", None)
+    user = request.GET.get("user", None)
+    rooms = get_user_rooms(collections, org_id, user)
+
+    side_bar = {
+        "name" : "DM Plugin",
+        "description" : "Sends messages between users",
+        "plugin_id" : "dm-plugin-id",
+        "organisation_id" : "HNGi8",
+        "user_id" : "232",
+        "group_name" : "DM",
+        "show_group" : False,
+        "Public rooms":[],
+        "Joined rooms":[],
+        # List of rooms/collections created whenever a user starts a DM chat with another user
+        # This is what will be displayed by Zuri Main on the sidebar
+        "DMs":rooms,
     }
-    return JsonResponse(archive_message, safe=False)
-
-
-def message_reminder(request):
-    message_reminder = [
-        {
-            'sender_id': 'KFC',
-            'is_ready_to_send': False,
-            'Time_to_send_message': "2:01:00",
-            'is_active': False,
-            'is_media': False,
-            'message': 'The message that you set to send some hours ago...'
-        },
-        {
-            'sender_id': 'KFC',
-            'is_ready_to_send': True,
-            'Time_to_send_message': "2:01:00",
-            'is_active': True,
-            'is_media': True,
-            'message': 'The message that you set to send some hours ago is ready to send...'
-        }]
-    return JsonResponse(message_reminder, safe=False)
-
-
-def list_archives(request):
-    archived_messages = [
-        {
-            'id': '13',
-            'from': 'Korede',
-            'to': ['mark', ],
-            'message': 'Are you now in stage 5?',
-            'date_sent': '2021-05-15T10:49:59.581770Z',
-            'archived': True
-        },
-        {
-            'id': '21',
-            'from': 'Xylum',
-            'to': ['KoredeDavid', ],
-            'date_sent': '2021-05-17T18:27:24.376865Z',
-            'message': 'I need your help sir',
-            'archived': True
-        }
-    ]
-
-    return JsonResponse(archived_messages, safe=False)
-
-
-def organization(request):
-    return HttpResponse("<h1>Is this working?</h1>")
-
-
-def users(request):
-    users = [
-        {
-            'name': 'Seye Olowo',
-            'is_active': True,
-            'last_message_snippet': 'How are you man?',
-            'user_info': {
-                'username': 'blaco',
-                'id': 1,
-                'email': 'blac@gmail.com'
-            }
-        },
-        {
-            'name': 'Roman Reigns',
-            'is_active': False,
-            'last_message_snippet': 'Have you made your pull request?',
-            'user_info': {
-                'username': 'Romanric',
-                'id': 12,
-                'email': 'roman@gmail.com'
-            }
-        },
-        {
-            'name': 'Florence Girl',
-            'is_active': True,
-            'last_message_snippet': 'Thank You...',
-            'user_info': {
-                'username': 'Fae',
-                'id': 14,
-                'email': 'florence@gmail.com'
-            }
-        },
-        {
-            'name': 'Timmy Joe',
-            'is_active': False,
-            'last_message_snippet': 'Good evening boss, I want....',
-            'user_info': {
-                'username': 'manofmind',
-                'id': 4,
-                'email': 'timmy@gmail.com'
-            }
-        },
-        {
-            'name': 'Jeff Jones',
-            'is_active': True,
-            'last_message_snippet': 'My king',
-            'user_info': {
-                'username': 'Jiggy',
-                'id': 6,
-                'email': 'jonzy@gmail.com'
-            }
-        },
-        {
-            'name': 'Mamba Joy',
-            'is_active': True,
-            'last_message_snippet': 'i dey go school now',
-            'user_info': {
-                'username': 'mamba',
-                'id': 100,
-                'email': 'ogblaq@gmail.com'
-            }
-        },
-        {
-            'name': 'Destiny Delight',
-            'is_active': False,
-            'last_message_snippet': 'Good day to you, I want to ask a que.....',
-            'user_info': {
-                'username': 'Delight',
-                'id': 189,
-                'email': 'delight@gmail.com'
-            }
-        },
-    ]
-
-    return JsonResponse({'users': users})
-
-
-def user(request):
-    pass
-
-
-def user_profile(request):
-    user_profile = [
-        {
-            'username': 'Derin',
-            'fullname': 'Derin Aslin',
-            'image': 'templates/images/big.jpg',
-            'email': 'derino@zuri.com',
-            'date joined': '22/08/2021',
-
-        }
-    ]
-    return JsonResponse(user_profile, safe=False)
-
-
-def rooms(request):
-    pass
-
-
-def room(request):
-    pass
-
-
-def room_users(request):
-    pass
-
-
-def room_messages(request):
-    pass
-
-
-def room_message(request):
-    pass
-
-
-def room_medias(request):
-    pass
-
-
-def room_media(request):
-    pass
-
-
-def room_files(request):
-    pass
-
-
-def room_file(request):
-    pass
-
-
-def sort_message(request):
-    # Use the below when the message object is ready and also delete the dummy data.
-    # messages = Message.objects.order_by('-created_at')
-    # messagedict = {}
-    # for message_ in messagedict:
-    #     messagedict['sender']=message_.sender_id
-    #     messagedict['receiver']=message_.receiver_id
-    #     messagedict['message']=message_.message
-    #     messagedict['created_at']=message_.created_at
-    #     messagedict['meta']=message_.meta
-    # return  JsonResponse(messagedict)
-
-    messages = [
-        {
-            'user': 'Fortunate',
-            'location': 'Finland',
-            'is_active': True,
-            'message': 'Hi, dude',
-            'created_at': "2020-5-10"
-        },
-        {
-            'name': 'Asyncdeveloper',
-            'location': 'Nigeria',
-            'is_active': True,
-            'message': 'I\'m on my way home',
-            'created_at': "2021-5-10"
-        }]
-    return JsonResponse(messages, safe=False)
-
-
-@api_view(['GET'],)
-def star_messages(request):
-    star_messages = {
-        'msgID': 134,
-        'starred': True,
-    }
-
-    return Response(star_messages, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'], )
-def auto_response(request):
-    auto_response_message = {
-        'userId': 23,
-        'auto_response': True,
-        'message': "Brian is currently offline. Please leave your message. He will reply you as soon as he's back "
-                   "online "
-    }
-
-    return Response(auto_response_message, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def send_media(request):
-    media = [
-        {
-            # original message being sent
-            "message":
-            {
-                "attachment": {
-                    "type": "image",
-                    "payload": {
-                        # makes it possible to send the media file to another person via the app
-                        "is_reusable": True
-                    }
-                },
-                "mediaLocation": "./media/funny.jpeg",
-                "type": "image/png"
-            },
-        }
-    ]
-    return Response(media, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'],)
-def pagination(request):
-    limit = int(request.query_params.get('limit', 2))
-    page = int(request.query_params.get('page', 1))
-    total_messages = {
-        "page": page,
-        "limit": limit,
-        "messages":   [
-            {
-                'sender': 'Victor',
-                'receiver': 'Samuel',
-                'message': 'Hello, dude',
-                'seen': True
-            },
-            {
-                'sender': 'Samuel',
-                'receiver': 'Vctor',
-                'message': 'Hello!!!',
-                'seen': True
-            },
-            {
-                'sender': 'Victor',
-                'receiver': 'Samuel',
-                'message': 'How was today ?',
-                'seen': True
-            },
-            {
-                'sender': 'Samuel',
-                'receiver': 'Victor',
-                'message': 'Good, good!!!, Yours ?',
-                'seen': True
-            },
-            {
-                'sender': 'Victor',
-                'receiver': 'Samuel',
-                'message': 'Great',
-                'seen': True
-            },
-            {
-                'sender': 'Samuel',
-                'receiver': 'Victor',
-                'message': 'How was your day',
-                'seen': True
-            },
-            {
-                'sender': 'Victor',
-                'receiver': 'Samuel',
-                'message': 'Fine',
-                'seen': True
-            }
-        ]
-    }
-
-    if limit > 7:
-        return Response("Limit cannot exceed number of messages", status=status.HTTP_400_BAD_REQUEST)
-    else:
-        total_messages['messages'] = total_messages["messages"][page-1:page+limit-1:]
-        return Response(total_messages, status=status.HTTP_200_OK)
-
-
-# get delete and post for messages view task
-# 1 for individual message using id
-@api_view(['GET', 'PUT', 'DELETE'])
-def message_detail(request, pk):
-    try:
-        text = Message.objects.get(pk=pk)
-    except Message.DoesNotExist:
-        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        message_serializer = MessageSerializer(text)
-        return JsonResponse(message_serializer.data)
-
-    elif request.method == 'PUT':
-        message_data = JSONParser().parse(request)
-        mess_serializer = MessageSerializer(text, data=message_data)
-        if mess_serializer.is_valid():
-            mess_serializer.save()
-            return JsonResponse(mess_serializer.data)
-        return JsonResponse(mess_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        text.delete()
-        return JsonResponse({'message': 'Your text was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-
-    # 2. Deleting multiple messages at once or updating
-
-
-@api_view(['GET', 'POST', 'DELETE'])
-def message_list(request):
-    if request.method == 'GET':
-        messag = Message.objects.all()
-
-        text = request.query_params.get('message', None)
-
-        messag_serializer = MessageSerializer(messag, many=True)
-        return JsonResponse(messag_serializer.data, safe=False)
-        # 'safe=False' for objects serialization
-
-    elif request.method == 'POST':
-        messag_data = JSONParser().parse(request)
-        messag_serializer = MessageSerializer(data=messag_data)
-        if messag_serializer.is_valid():
-            messag_serializer.save()
-            return JsonResponse(messag_serializer.data, status=status.HTTP_201_CREATED)
-        return JsonResponse(messag_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        count = Message.objects.all().delete()
-        return JsonResponse({'message': '{} messages were deleted successfully!'.format(count[0])}, status=status.HTTP_204_NO_CONTENT)
-
-
-@api_view(['GET', 'POST'])
-def send_file(request):
-    file = [
-        {
-
-            'id': '1',
-            'message_id': '2',
-            'file_name': 'dbdiagram',
-            'file_path': 'media/dbdiagram.pdf',
-            'created_at': '20-09-21 19:03:01'
-        }
-    ]
-    return Response(file, status=status.HTTP_200_OK)
-
-
-@api_view(['GET'],)
-def replyMessage(request):
-    messageList = {
-        "message1": [{
-            "message_id": "001",
-            "user": "Mykie",
-            "content": "Hello Mark"
-        }],
-        "message2": [{
-            "message_id": "002",
-            "user": "Mark",
-            "content": "Hi Mykie, how are you doing?"
-        }]
-    }
+<<<<<<< HEAD
     mesSage = messageList["message2"]
     reply_message = [
         {
@@ -664,3 +240,96 @@ def date_message(request):
 
     ]
     return JsonResponse(results, safe=False)
+=======
+    return JsonResponse(side_bar, safe=False)
+
+
+
+
+
+@api_view(["POST"])
+def send_message(request):
+    """
+    this is used to send message to user in rooms
+    It checks if room already exist before sending data
+    Ir makes a publish event to centrifugo after data 
+    is persiste
+    """
+    serializer = MessageSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        data = serializer.data
+        room_id = data['room_id'] #room id gotten from client request
+        
+        rooms = DB.read("dm_rooms")
+        if type(rooms) == list:
+            is_room_avalaible = len([room for room in rooms if room.get('_id', None) == room_id]) != 0
+        
+            if is_room_avalaible:
+                response = DB.write("dm_messages", data=serializer.data)
+                if response.get("status") == 200:
+                    print("data sent to zc core")
+                    centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
+                    if centrifugo_data["message"].get("error",None) == None:
+                        print(centrifugo_data)
+                        return Response(data=response, status=status.HTTP_201_CREATED)
+                    
+                return Response(data="data not sent",status=status.HTTP_400_BAD_REQUEST)
+            return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
+        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
+    
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["POST"])
+def create_room(requests):
+    serializer = RoomSerializer(data=requests.data)
+
+    if serializer.is_valid():
+         response = DB.write("dm_rooms", data=serializer.data)
+         data = dict(room_id=response.get("data").get("object_id"))
+         if response.get("status") == 200:
+            return Response(data=data, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+def room_info(request):
+    serializer = RoomInfoSerializer(data=request.data)
+    room_collection = "dm_rooms"
+    rooms = DB.read(room_collection)
+    message_collection = "dm_messages"
+    messages  = DB.read(message_collection)
+    room_messages=[]
+    
+    if serializer.is_valid():
+        data = serializer.data
+        room_id = data['room_id']
+        for message in messages:
+            if 'room_id' in message and message['room_id'] == room_id:
+                room_messages.append(message)
+        for current_room in rooms:
+            if current_room['_id'] == room_id:
+                if 'room_user_ids' in current_room:
+                    room_user_ids = current_room['room_user_ids']
+                else:
+                    room_user_ids =""
+                if 'created_at' in current_room:
+                    created_at = current_room['created_at']
+                else:
+                    created_at =""
+                if 'org_id' in current_room:
+                    org_id = current_room['org_id']
+                else:
+                    org_id =""
+
+                room_data = {
+                    "room_id": room_id,
+                    "org_id": org_id,
+                    "room_user_ids": room_user_ids,
+                    "created_at": created_at,
+                    "messages": room_messages
+                }
+                return Response(data=room_data, status=status.HTTP_200_OK)
+        return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+>>>>>>> 277a7d9dd2e2385b91a33481be90d95aa83b8c8b
