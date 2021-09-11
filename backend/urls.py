@@ -9,4 +9,6 @@ urlpatterns = [
     path('api/v1/sidebar', views.side_bar, name='sidebar'),
     path('api/v1/save_message', views.save_message, name="save_message"),
     path('api/v1/createroom', views.create_room, name='createroom'),
-]
+    path('api/v1/update', views.edit_room, name='updateroom'),
+
+ ]

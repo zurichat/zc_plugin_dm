@@ -162,4 +162,3 @@ def create_room(requests):
          if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-

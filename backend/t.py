@@ -1,4 +1,4 @@
-
+v
 from urllib.parse import urlencode
 
 import requests, json
@@ -45,33 +45,3 @@ class DataStorage:
                 "status_code": response.status_code,
                 "message": response.reason
             }
-
-    def read(self, collection_name, filter={}):
-        try:
-            query = urlencode(filter)
-        except Exception as e:
-            print(e)
-            return None
-
-        url = self.read_api.format(
-            pgn_id=self.plugin_id,
-            org_id=self.organization_id,
-            collec_name=collection_name,
-            query=query
-        )
-        print(url)
-        try:
-            response = requests.get(url=url)
-        except requests.exceptions.RequestException as e:
-            print(e)
-            return None
-        if response.status_code == 200:
-            return response.json().get("data")
-        else:
-            return {
-                "status_code": response.status_code,
-                "message": response.reason
-            }
-
-
-DB = DataStorage()
