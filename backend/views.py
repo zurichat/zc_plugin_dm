@@ -1,13 +1,17 @@
+import json
 from django.http.response import JsonResponse
 from django.shortcuts import render
+from requests import api
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
-from .db import DB,send_centrifugo_data, get_user_rooms 
+from rest_framework.views import APIView
+from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
+from rest_framework import generics, mixins
 
 
 
@@ -138,4 +142,22 @@ def create_room(requests):
          if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_all_rooms():
+    response = DB.read("dm_rooms")
+    return response
+
+@api_view(["GET"])
+def getUserRooms(request):
+    if request.method == "GET":
+        res = get_rooms(request.GET.get("user_id", None))
+        if request.GET.get("user_id") == None:
+            return Response(get_all_rooms())
+        else:
+            if len(res) == 0:
+                return Response(data="no such user", status=status.HTTP_204_NO_CONTENT)
+            return Response(res)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
