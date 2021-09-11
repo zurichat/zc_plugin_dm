@@ -2,19 +2,15 @@ import json
 from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from requests import api
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
-from rest_framework.views import APIView
-from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 from rest_framework.serializers import Serializer
-from .db import DB,send_centrifugo_data, get_user_rooms 
+from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
-from rest_framework import generics, mixins
 
 
 
