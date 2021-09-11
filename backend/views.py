@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
 from rest_framework.serializers import Serializer
-from .db import DB,send_centrifugo_data, get_user_rooms 
+from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
@@ -140,6 +140,23 @@ def create_room(requests):
          data = dict(room_id=response.get("data").get("object_id"))
          if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_all_rooms():
+    response = DB.read("dm_rooms")
+    return response
+
+@api_view(["GET"])
+def getUserRooms(request):
+    if request.method == "GET":
+        res = get_rooms(request.GET.get("user_id", None))
+        if request.GET.get("user_id") == None:
+            return Response(get_all_rooms())
+        else:
+            if len(res) == 0:
+                return Response(data="no such user", status=status.HTTP_204_NO_CONTENT)
+            return Response(res)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
