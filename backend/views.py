@@ -143,7 +143,6 @@ def create_room(requests):
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
 @api_view(['GET', 'PUT', 'DELETE'])
 def edit_room(request, pk):
     try: 
@@ -164,7 +163,6 @@ def edit_room(request, pk):
 
 
         
-=======
 
 @api_view(["POST"])
 def room_info(request):
@@ -206,4 +204,3 @@ def room_info(request):
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
->>>>>>> 2a4fb93e1429c13f2f978dfb832575f58c6c0396
