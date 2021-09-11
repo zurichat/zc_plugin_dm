@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'webpack_loader',
     'backend',
+    'drf_yasg',
 
 ]
 
