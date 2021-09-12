@@ -30,8 +30,8 @@ DEBUG = True #str(os.getenv('DEBUG'))
 ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://dm.zuri.chat",
-    "http://dm.zuri.chat"
+    "https://zuri.chat",
+    "http://zuri.chat"
 ]
 
 # rest_framework global configs
