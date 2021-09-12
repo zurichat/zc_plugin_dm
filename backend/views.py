@@ -40,6 +40,7 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
+
 def verify_user_auth(token):
 	"""
 	Call Endpoint for verification of JWT Token
@@ -71,8 +72,7 @@ def verify_user_auth(token):
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-
-        
+    
 
 def side_bar(request):
     collections = "dm_rooms"
@@ -83,19 +83,54 @@ def side_bar(request):
     side_bar = {
         "name" : "DM Plugin",
         "description" : "Sends messages between users",
-        "plugin_id" : "dm-plugin-id",
-        "organisation_id" : "HNGi8",
-        "user_id" : "232",
+        "plugin_id" : "6135f65de2358b02686503a7",
+        "organisation_id" : f"{org_id}",
+        "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "Public rooms":[],
-        "Joined rooms":[],
+        "joined_rooms":[],
+        "public_rooms": [
+        {
+            "id": "6139b26959842c7444fb01f5",
+            "title": "Announcement",
+            "members": 1250,
+            "unread": 2,
+            "action": "open"
+        },
+        {
+            "id": "6139b29259842c7444fb01f6",
+            "title": "Dorime",
+            "members": 12,
+            "unread": 0,
+            "action": "open"
+        },
+        {
+            "id": "6139b35259842c7444fb01f7",
+            "title": "Ameno",
+            "members": 20,
+            "unread": 10,
+            "action": "open"
+        },
+        {
+            "id": "6139b74e59842c7444fb01fa",
+            "title": "games",
+            "members": 1250,
+            "unread": 16,
+            "action": "open"
+        },
+        {
+            "id": "6139b88359842c7444fb01fc",
+            "title": "business-ideas",
+            "members": 500,
+            "unread": 25,
+            "action": "open"
+        }
+        ],
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
     }
     return JsonResponse(side_bar, safe=False)
-
 
 
 
@@ -133,6 +168,8 @@ def send_message(request):
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
 @swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: 'Error Response'})
 @api_view(["POST"])
 def create_room(requests):
@@ -144,6 +181,7 @@ def create_room(requests):
         if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def get_all_rooms():
@@ -162,22 +200,18 @@ def getUserRooms(request):
             return Response(res)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-@swagger_auto_schema(methods=['post'], request_body=RoomInfoSerializer, responses={400: 'Error Response'})
-@api_view(["POST"])
+
+
+@api_view(["GET"])
 def room_info(request):
-    serializer = RoomInfoSerializer(data=request.data)
+    """
+    This is used to retrieve information about a room.
+    """
+    room_id = request.GET.get("room_id", None)
+    # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
-    message_collection = "dm_messages"
-    messages  = DB.read(message_collection)
-    room_messages=[]
-    
-    if serializer.is_valid():
-        data = serializer.data
-        room_id = data['room_id']
-        for message in messages:
-            if 'room_id' in message and message['room_id'] == room_id:
-                room_messages.append(message)
+    if rooms is not None:
         for current_room in rooms:
             if current_room['_id'] == room_id:
                 if 'room_user_ids' in current_room:
@@ -191,15 +225,15 @@ def room_info(request):
                 if 'org_id' in current_room:
                     org_id = current_room['org_id']
                 else:
-                    org_id =""
-
+                    org_id ="6133c5a68006324323416896"
                 room_data = {
                     "room_id": room_id,
                     "org_id": org_id,
                     "room_user_ids": room_user_ids,
                     "created_at": created_at,
-                    "messages": room_messages
+                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}"
                 }
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
+    
