@@ -31,7 +31,9 @@ ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
 
 CORS_ALLOWED_ORIGINS = [
     "https://zuri.chat",
-    "http://zuri.chat"
+    "http://zuri.chat",
+    "127.0.0.1",
+    "localhost",
 ]
 
 # rest_framework global configs
