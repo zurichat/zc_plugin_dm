@@ -77,10 +77,6 @@ def side_bar(request):
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
     rooms = get_user_rooms(collections, org_id, user)
-    channel_rooms = requests.get(f"https://channels.zuri.chat/api/v1/sidebar/?org={org_id}&user={user}")
-    print(channel_rooms.json())
-    joined_rooms = channel_rooms.json()["joined_rooms"]
-    public_rooms = channel_rooms.json()["public_rooms"]
 
     side_bar = {
         "name" : "DM Plugin",
@@ -90,8 +86,44 @@ def side_bar(request):
         "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "joined_rooms":f"{joined_rooms}",
-        "public_rooms":f"{public_rooms}",
+        "joined_rooms":[],
+        "public_rooms": [
+        {
+            "id": "6139b26959842c7444fb01f5",
+            "title": "Announcement",
+            "members": 1250,
+            "unread": 2,
+            "action": "open"
+        },
+        {
+            "id": "6139b29259842c7444fb01f6",
+            "title": "Dorime",
+            "members": 12,
+            "unread": 0,
+            "action": "open"
+        },
+        {
+            "id": "6139b35259842c7444fb01f7",
+            "title": "Ameno",
+            "members": 20,
+            "unread": 10,
+            "action": "open"
+        },
+        {
+            "id": "6139b74e59842c7444fb01fa",
+            "title": "games",
+            "members": 1250,
+            "unread": 16,
+            "action": "open"
+        },
+        {
+            "id": "6139b88359842c7444fb01fc",
+            "title": "business-ideas",
+            "members": 500,
+            "unread": 25,
+            "action": "open"
+        }
+        ],
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
