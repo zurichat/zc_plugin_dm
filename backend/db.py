@@ -108,7 +108,12 @@ def get_user_rooms(collection_name, org_id, user):
                     return room_list
         return room_list
 
+#This function helps to get all the rooms for all users from zc core.
+def get_all_rooms():
+    response = DB.read("dm_rooms")
+    return response
 
+#This function helps to get the rooms particular to a user by providing the user_id.
 def get_rooms(user_id):
     response = DB.read("dm_rooms")
     data = {"data": []}
