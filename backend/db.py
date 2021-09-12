@@ -103,7 +103,6 @@ def get_user_rooms(collection_name, org_id, user):
         for room in rooms:
             if "room_user_ids" in room:
                 if user in room.get("room_user_ids"):
-                    print(room)
                     room_list.append(room)
                 else:
                     return room_list
