@@ -3,7 +3,7 @@ from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework import status
 import requests
 from rest_framework.serializers import Serializer
@@ -11,6 +11,8 @@ from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 
@@ -37,6 +39,7 @@ def info(request):
     }
 
     return JsonResponse(info, safe=False)
+
 
 def verify_user_auth(token):
 	"""
@@ -69,8 +72,7 @@ def verify_user_auth(token):
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-
-        
+    
 
 def side_bar(request):
     collections = "dm_rooms"
@@ -132,8 +134,7 @@ def side_bar(request):
 
 
 
-
-
+@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={400: 'Error Response'})
 @api_view(["POST"])
 def send_message(request):
     """
@@ -167,16 +168,20 @@ def send_message(request):
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: 'Error Response'})
 @api_view(["POST"])
 def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
-         response = DB.write("dm_rooms", data=serializer.data)
-         data = dict(room_id=response.get("data").get("object_id"))
-         if response.get("status") == 200:
+        response = DB.write("dm_rooms", data=serializer.data)
+        data = dict(room_id=response.get("data").get("object_id"))
+        if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def get_all_rooms():
@@ -194,6 +199,7 @@ def getUserRooms(request):
                 return Response(data="no such user", status=status.HTTP_204_NO_CONTENT)
             return Response(res)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(["GET"])
