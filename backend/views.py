@@ -77,17 +77,21 @@ def side_bar(request):
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
     rooms = get_user_rooms(collections, org_id, user)
+    channel_rooms = requests.get(f"https://channels.zuri.chat/api/v1/sidebar/?org={org_id}&user={user}")
+    print(channel_rooms.json())
+    joined_rooms = channel_rooms.json()["joined_rooms"]
+    public_rooms = channel_rooms.json()["public_rooms"]
 
     side_bar = {
         "name" : "DM Plugin",
         "description" : "Sends messages between users",
-        "plugin_id" : "dm-plugin-id",
-        "organisation_id" : "HNGi8",
-        "user_id" : "232",
+        "plugin_id" : "6135f65de2358b02686503a7",
+        "organisation_id" : f"{org_id}",
+        "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "Public rooms":[],
-        "Joined rooms":[],
+        "joined_rooms":f"{joined_rooms}",
+        "public_rooms":f"{public_rooms}",
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
