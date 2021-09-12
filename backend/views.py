@@ -81,13 +81,49 @@ def side_bar(request):
     side_bar = {
         "name" : "DM Plugin",
         "description" : "Sends messages between users",
-        "plugin_id" : "dm-plugin-id",
-        "organisation_id" : "HNGi8",
-        "user_id" : "232",
+        "plugin_id" : "6135f65de2358b02686503a7",
+        "organisation_id" : f"{org_id}",
+        "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "Public rooms":[],
-        "Joined rooms":[],
+        "joined_rooms":[],
+        "public_rooms": [
+        {
+            "id": "6139b26959842c7444fb01f5",
+            "title": "Announcement",
+            "members": 1250,
+            "unread": 2,
+            "action": "open"
+        },
+        {
+            "id": "6139b29259842c7444fb01f6",
+            "title": "Dorime",
+            "members": 12,
+            "unread": 0,
+            "action": "open"
+        },
+        {
+            "id": "6139b35259842c7444fb01f7",
+            "title": "Ameno",
+            "members": 20,
+            "unread": 10,
+            "action": "open"
+        },
+        {
+            "id": "6139b74e59842c7444fb01fa",
+            "title": "games",
+            "members": 1250,
+            "unread": 16,
+            "action": "open"
+        },
+        {
+            "id": "6139b88359842c7444fb01fc",
+            "title": "business-ideas",
+            "members": 500,
+            "unread": 25,
+            "action": "open"
+        }
+        ],
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
