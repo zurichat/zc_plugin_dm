@@ -3,7 +3,7 @@ from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework import status
 import requests
 from rest_framework.serializers import Serializer
@@ -11,6 +11,8 @@ from .db import *
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 
 
@@ -37,6 +39,7 @@ def info(request):
     }
 
     return JsonResponse(info, safe=False)
+
 
 def verify_user_auth(token):
 	"""
@@ -69,8 +72,7 @@ def verify_user_auth(token):
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-
-        
+    
 
 def side_bar(request):
     collections = "dm_rooms"
@@ -81,13 +83,49 @@ def side_bar(request):
     side_bar = {
         "name" : "DM Plugin",
         "description" : "Sends messages between users",
-        "plugin_id" : "dm-plugin-id",
-        "organisation_id" : "HNGi8",
-        "user_id" : "232",
+        "plugin_id" : "6135f65de2358b02686503a7",
+        "organisation_id" : f"{org_id}",
+        "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "Public rooms":[],
-        "Joined rooms":[],
+        "joined_rooms":[],
+        "public_rooms": [
+        {
+            "id": "6139b26959842c7444fb01f5",
+            "title": "Announcement",
+            "members": 1250,
+            "unread": 2,
+            "action": "open"
+        },
+        {
+            "id": "6139b29259842c7444fb01f6",
+            "title": "Dorime",
+            "members": 12,
+            "unread": 0,
+            "action": "open"
+        },
+        {
+            "id": "6139b35259842c7444fb01f7",
+            "title": "Ameno",
+            "members": 20,
+            "unread": 10,
+            "action": "open"
+        },
+        {
+            "id": "6139b74e59842c7444fb01fa",
+            "title": "games",
+            "members": 1250,
+            "unread": 16,
+            "action": "open"
+        },
+        {
+            "id": "6139b88359842c7444fb01fc",
+            "title": "business-ideas",
+            "members": 500,
+            "unread": 25,
+            "action": "open"
+        }
+        ],
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
@@ -96,8 +134,7 @@ def side_bar(request):
 
 
 
-
-
+@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={400: 'Error Response'})
 @api_view(["POST"])
 def send_message(request):
     """
@@ -119,11 +156,18 @@ def send_message(request):
             if is_room_avalaible:
                 response = DB.write("dm_messages", data=serializer.data)
                 if response.get("status") == 200:
-                    print("data sent to zc core")
                     centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
                     if centrifugo_data["message"].get("error",None) == None:
-                        print(centrifugo_data)
-                        return Response(data=response, status=status.HTTP_201_CREATED)
+                        response_output = {
+                            "status":response["message"],
+                            "message_id":response["data"]["object_id"],
+                            "data":{
+                                "room_id":room_id,
+                                "sender_id":data["sender_id"],
+                                "message":data["message"]
+                            }
+                        }
+                        return Response(data=response_output, status=status.HTTP_201_CREATED)
                     
                 return Response(data="data not sent",status=status.HTTP_400_BAD_REQUEST)
             return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
@@ -131,14 +175,17 @@ def send_message(request):
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: 'Error Response'})
 @api_view(["POST"])
 def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
-         response = DB.write("dm_rooms", data=serializer.data)
-         data = dict(room_id=response.get("data").get("object_id"))
-         if response.get("status") == 200:
+        response = DB.write("dm_rooms", data=serializer.data)
+        data = dict(room_id=response.get("data").get("object_id"))
+        if response.get("status") == 200:
             return Response(data=data, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -163,6 +210,7 @@ def getUserRooms(request):
                 return Response(res)
         return Response(data="provide only the user_id", status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(["GET"])
