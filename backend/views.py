@@ -197,20 +197,22 @@ def getUserRooms(request):
     """
     This is used to retrieve all rooms a user is currently active in.
     It takes in a user_id as query param and returns the rooms for that user or a 204 status code 
-    if there is no room for the user_id or the user id is not valid.
-    If the user_id is not provided, a 204 status code is returned.
+    if there is no room for the user_id or an invalid user_id.
+    If the user_id is not provided, a 202 status code is returned.
     """
     if request.method == "GET":
         res = get_rooms(request.GET.get("user_id", None))
         param = len(request.GET.dict())
         if param == 1:
             if request.GET.get("user_id") == None:
-                return Response(data="Not authorized, provide a user_id", status=status.HTTP_204_NO_CONTENT)
+                return Response(data="Provide a user_id as query param", status=status.HTTP_202_ACCEPTED)
             else:
                 if len(res) == 0:
                     return Response(data="No rooms available", status=status.HTTP_204_NO_CONTENT)
-                return Response(res)
-        return Response(data="provide only the user_id", status=status.HTTP_200_OK)
+                return Response(res, status=status.HTTP_200_OK)
+        elif param == 0:
+            return Response(data="Provide a user_id as query param", status=status.HTTP_202_ACCEPTED)
+        return Response(data="Provide only the user_id", status=status.HTTP_202_ACCEPTED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -227,33 +229,38 @@ def getRoomMessages(request):
     """
     This is used to retrieve messages in a room. It takes a room_id or a date as query params.
     If only the room_id is provided, it returns a list of all the messages if available,
-    or a 204 status code if there is no message in the room or perhaps the room_id is not valid.
-    If only the date param is provided, it returns a 203 status code, non_authoritative information. 
+    or a 204 status code if there is no message in the room or invalid room_id.
+    If only the date param is provided, it returns a 202 status code. 
     If both room_id and date are provided, it returns all the messages in that room for that
     particular date.
-    If there is no query parameter, it returns a 204 status code.
+    If there is no query parameter, it returns a 202 status code.
     """
     if request.method == "GET":
         room = request.GET.get("room_id", None)
         date = request.GET.get("date", None)
         params = request.GET.dict()
-        param_length = len(params)
+        print(params)
+        allow = False
+        if len(params) == 0 or len(params) > 2:
+            allow = False
+        elif len(params) == 1 and "room_id" in params:
+            allow = True
+        elif len(params) == 2 and "room_id" in params and "date" in params:
+            allow = True
+        else:
+            allow = False
         res = get_room_messages(room)
-        if param_length == 2:
+        if allow:
             if room != None and date != None:
                 response_data = get_messages(res, date)
                 if len(response_data) == 0:
                     return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
                 return Response(response_data, status=status.HTTP_200_OK)
-            elif room != None and date == None:
+            else:
                 if len(res) == 0:
                     return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
                 return Response(res, status=status.HTTP_200_OK)
-            elif room == None and date != None:
-                return Response(data="Not authorized", status=status.HTTP_203_NON_AUTHORITATIVE_INFORMATION)
-            else:
-                return Response(data="No room_id provided", status=status.HTTP_204_NO_CONTENT)
-        return Response(data="provide the room_id or/and date only as params", status=status.HTTP_200_OK)
+        return Response(data="Provide the room_id or/and date only as params", status=status.HTTP_202_ACCEPTED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
