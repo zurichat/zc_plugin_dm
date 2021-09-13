@@ -9,7 +9,7 @@ import requests
 from rest_framework.serializers import Serializer
 from .db import *
 # Import Read Write function to Zuri Core
-from .serializers import MessageSerializer
+from .responses import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -97,7 +97,7 @@ def side_bar(request):
 
 
 
-@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={400: 'Error Response'})
+@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
 @api_view(["POST"])
 def send_message(request):
     """
@@ -140,7 +140,7 @@ def send_message(request):
 
 
 
-@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: 'Error Response'})
+@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: "Error: Bad Request"})
 @api_view(["POST"])
 def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
@@ -153,6 +153,8 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+test_param = openapi.Parameter('user_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
+@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={400: "Error: Bad Request"})
 @api_view(["GET"])
 def getUserRooms(request):
     """
@@ -177,7 +179,14 @@ def getUserRooms(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
+@swagger_auto_schema(
+    method='get', 
+    manual_parameters=[
+        openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING), 
+        openapi.Parameter('date', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
+    ],
+    responses={400: "Error: Bad Request"}
+    )
 @api_view(["GET"])
 def getRoomMessages(request):
     """
@@ -218,7 +227,8 @@ def getRoomMessages(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
+test_param = openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
+@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={201: RoomInfoResponse, 400: "Error: Bad Request"})
 @api_view(["GET"])
 def room_info(request):
     """
