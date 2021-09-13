@@ -156,11 +156,18 @@ def send_message(request):
             if is_room_avalaible:
                 response = DB.write("dm_messages", data=serializer.data)
                 if response.get("status") == 200:
-                    print("data sent to zc core")
                     centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
                     if centrifugo_data["message"].get("error",None) == None:
-                        print(centrifugo_data)
-                        return Response(data=response, status=status.HTTP_201_CREATED)
+                        response_output = {
+                            "status":response["message"],
+                            "message_id":response["data"]["object_id"],
+                            "data":{
+                                "room_id":room_id,
+                                "sender_id":data["sender_id"],
+                                "message":data["message"]
+                            }
+                        }
+                        return Response(data=response_output, status=status.HTTP_201_CREATED)
                     
                 return Response(data="data not sent",status=status.HTTP_400_BAD_REQUEST)
             return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
