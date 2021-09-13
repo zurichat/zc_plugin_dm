@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework import status
 import requests
 from rest_framework.serializers import Serializer
-from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
+from .db import *
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
@@ -119,11 +119,18 @@ def send_message(request):
             if is_room_avalaible:
                 response = DB.write("dm_messages", data=serializer.data)
                 if response.get("status") == 200:
-                    print("data sent to zc core")
                     centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
                     if centrifugo_data["message"].get("error",None) == None:
-                        print(centrifugo_data)
-                        return Response(data=response, status=status.HTTP_201_CREATED)
+                        response_output = {
+                            "status":response["message"],
+                            "message_id":response["data"]["object_id"],
+                            "data":{
+                                "room_id":room_id,
+                                "sender_id":data["sender_id"],
+                                "message":data["message"]
+                            }
+                        }
+                        return Response(data=response_output, status=status.HTTP_201_CREATED)
                     
                 return Response(data="data not sent",status=status.HTTP_400_BAD_REQUEST)
             return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
@@ -146,21 +153,68 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
-def get_all_rooms():
-    response = DB.read("dm_rooms")
-    return response
-
 @api_view(["GET"])
 def getUserRooms(request):
+    """
+    This is used to retrieve all rooms a user is currently active in.
+    It takes in a user_id as query param and returns the rooms for that user or a 204 status code 
+    if there is no room for the user_id or an invalid user_id.
+    If the user_id is not provided, a 202 status code is returned.
+    """
     if request.method == "GET":
         res = get_rooms(request.GET.get("user_id", None))
-        if request.GET.get("user_id") == None:
-            return Response(get_all_rooms())
+        param = len(request.GET.dict())
+        if param == 1:
+            if request.GET.get("user_id") == None:
+                return Response(data="Provide a user_id as query param", status=status.HTTP_202_ACCEPTED)
+            else:
+                if len(res) == 0:
+                    return Response(data="No rooms available", status=status.HTTP_204_NO_CONTENT)
+                return Response(res, status=status.HTTP_200_OK)
+        elif param == 0:
+            return Response(data="Provide a user_id as query param", status=status.HTTP_202_ACCEPTED)
+        return Response(data="Provide only the user_id", status=status.HTTP_202_ACCEPTED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(["GET"])
+def getRoomMessages(request):
+    """
+    This is used to retrieve messages in a room. It takes a room_id or a date as query params.
+    If only the room_id is provided, it returns a list of all the messages if available,
+    or a 204 status code if there is no message in the room or invalid room_id.
+    If only the date param is provided, it returns a 202 status code. 
+    If both room_id and date are provided, it returns all the messages in that room for that
+    particular date.
+    If there is no query parameter, it returns a 202 status code.
+    """
+    if request.method == "GET":
+        room = request.GET.get("room_id", None)
+        date = request.GET.get("date", None)
+        params = request.GET.dict()
+        print(params)
+        allow = False
+        if len(params) == 0 or len(params) > 2:
+            allow = False
+        elif len(params) == 1 and "room_id" in params:
+            allow = True
+        elif len(params) == 2 and "room_id" in params and "date" in params:
+            allow = True
         else:
-            if len(res) == 0:
-                return Response(data="no such user", status=status.HTTP_204_NO_CONTENT)
-            return Response(res)
+            allow = False
+        res = get_room_messages(room)
+        if allow:
+            if room != None and date != None:
+                response_data = get_messages(res, date)
+                if len(response_data) == 0:
+                    return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
+                return Response(response_data, status=status.HTTP_200_OK)
+            else:
+                if len(res) == 0:
+                    return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
+                return Response(res, status=status.HTTP_200_OK)
+        return Response(data="Provide the room_id or/and date only as params", status=status.HTTP_202_ACCEPTED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -33,7 +33,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://zuri.chat",
     "http://zuri.chat",
     "http://127.0.0.1",
-    "http://localhost",
+    "http://localhost:8000",
 ]
 
 # rest_framework global configs
