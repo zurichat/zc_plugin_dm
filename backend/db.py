@@ -92,7 +92,6 @@ def send_centrifugo_data(room, data):
 
 DB = DataStorage()
 
-
 # Gets the rooms that a user is in
 def get_user_rooms(collection_name, org_id, user):
     room_list = list()
@@ -109,15 +108,49 @@ def get_user_rooms(collection_name, org_id, user):
         return room_list
 
 
+#get rooms for a particular user
 def get_rooms(user_id):
     response = DB.read("dm_rooms")
-    data = {"data": []}
+    data =  []
+    if "status_code" in response:
+        return response
     for room in response:
         try:
             users_room_list = room['room_user_ids']
             if user_id in users_room_list:
-                data['data'].append(room)
+                data.append(room)
         except Exception:
             pass
     
-    return data['data']
+    return data
+
+
+#get all the messages in a particular room
+def get_room_messages(room_id):
+    response = DB.read("dm_messages")
+    result = []
+    if "status_code" in response:
+        return response
+    for message in response:
+        try:
+            if message['room_id'] == room_id:
+                result.append(message)
+        except Exception:
+            pass
+    result.reverse()
+    return result
+
+
+#get all the messages in a particular room filtered by date
+def get_messages(response, date):
+    res = []
+    if "status_code" in response:
+        return response
+    for message in response:
+        try:
+            query_date = message['created_at'].split("T")[0]
+            if query_date == date:
+                res.append(message)
+        except Exception:
+            pass
+    return res
