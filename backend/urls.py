@@ -7,7 +7,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/v1/info', views.info, name='plugin_info'),
     path('api/v1/sidebar', views.side_bar, name='sidebar'),
-    path('api/v1/ping', views.dm_PING, name = 'PING'),
     path('api/v1/sendmessage', views.send_message, name="send_message"),
     path('api/v1/sendthreadmessage', views.send_thread_message, name="send_thread_message"),
     path('api/v1/createroom', views.create_room, name='createroom'),
