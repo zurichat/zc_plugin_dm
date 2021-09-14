@@ -5,11 +5,11 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.parsers import JSONParser
 import requests
 from rest_framework.serializers import Serializer
 from .db import DB,send_centrifugo_data, get_user_rooms 
 # Import Read Write function to Zuri Core
-from .serializers import MessageSerializer
 from .serializers import *
 
 
@@ -183,3 +183,25 @@ def room_info(request):
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+# /code for updating room
+
+@api_view(['GET', 'PUT'])
+def edit_room(request, pk):
+    try: 
+        message= DB.read("dm_messages",{"id":pk})
+    except: 
+        return JsonResponse({'message': 'The room does not exist'}, status=status.HTTP_404_NOT_FOUND) 
+ 
+    if request.method == 'GET':
+        singleRoom = DB.read("dm_messages",{"id": pk})
+        return JsonResponse(singleRoom) 
+ 
+    elif request.method == 'PUT': 
+        room_serializer = MessageSerializer(message, data=request.data,partial = True) 
+        if room_serializer.is_valid():
+            room_serializer.save()
+            data=room_serializer.data
+            print(data)
+            response = DB.write("dm_messages", data)
+            return Response(room_serializer.data)
+        return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
