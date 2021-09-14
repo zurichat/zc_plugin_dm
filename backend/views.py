@@ -371,7 +371,7 @@ def copy_message_link(request, message_id):
         message_info = {
                 "room_id": room_id,
                 "message_id": message_id,
-                "link": f"http://127.0.0.1:8000/getmessage/{room_id}/{message_id}"
+                "link": f"https://dm.zuri.chat/getmessage/{room_id}/{message_id}"
             }
         return Response(data=message_info, status=status.HTTP_200_OK)
     else:
