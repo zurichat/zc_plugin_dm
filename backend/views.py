@@ -9,6 +9,7 @@ import requests
 from rest_framework.serializers import Serializer
 from .db import *
 # Import Read Write function to Zuri Core
+from .responses import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -87,53 +88,16 @@ def side_bar(request):
         "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "joined_rooms":[],
-        "public_rooms": [
-        {
-            "id": "6139b26959842c7444fb01f5",
-            "title": "Announcement",
-            "members": 1250,
-            "unread": 2,
-            "action": "open"
-        },
-        {
-            "id": "6139b29259842c7444fb01f6",
-            "title": "Dorime",
-            "members": 12,
-            "unread": 0,
-            "action": "open"
-        },
-        {
-            "id": "6139b35259842c7444fb01f7",
-            "title": "Ameno",
-            "members": 20,
-            "unread": 10,
-            "action": "open"
-        },
-        {
-            "id": "6139b74e59842c7444fb01fa",
-            "title": "games",
-            "members": 1250,
-            "unread": 16,
-            "action": "open"
-        },
-        {
-            "id": "6139b88359842c7444fb01fc",
-            "title": "business-ideas",
-            "members": 500,
-            "unread": 25,
-            "action": "open"
-        }
-        ],
+        "public_rooms":[],
+        "joined_rooms":rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
-        # This is what will be displayed by Zuri Main on the sidebar
-        "DMs":rooms,
+        # This is what will be displayed by Zuri Main 
     }
     return JsonResponse(side_bar, safe=False)
 
 
 
-@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={400: 'Error Response'})
+@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
 @api_view(["POST"])
 def send_message(request):
     """
@@ -234,7 +198,7 @@ def send_thread_message(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: 'Error Response'})
+@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: "Error: Bad Request"})
 @api_view(["POST"])
 def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
@@ -247,6 +211,8 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+test_param = openapi.Parameter('user_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
+@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={400: "Error: Bad Request"})
 @api_view(["GET"])
 def getUserRooms(request):
     """
@@ -271,7 +237,14 @@ def getUserRooms(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
+@swagger_auto_schema(
+    method='get', 
+    manual_parameters=[
+        openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING), 
+        openapi.Parameter('date', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
+    ],
+    responses={400: "Error: Bad Request"}
+    )
 @api_view(["GET"])
 def getRoomMessages(request):
     """
@@ -312,7 +285,8 @@ def getRoomMessages(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
+test_param = openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
+@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={201: RoomInfoResponse, 400: "Error: Bad Request"})
 @api_view(["GET"])
 def room_info(request):
     """
