@@ -5,6 +5,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, action
 from rest_framework import status
+from rest_framework.parsers import JSONParser
 import requests
 from rest_framework.serializers import Serializer
 from .db import *
@@ -39,6 +40,7 @@ def info(request):
     }
 
     return JsonResponse(info, safe=False)
+
 
 
 def verify_user_auth(token):
@@ -94,7 +96,6 @@ def side_bar(request):
         # This is what will be displayed by Zuri Main 
     }
     return JsonResponse(side_bar, safe=False)
-
 
 
 @swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
@@ -321,5 +322,27 @@ def room_info(request):
                 }
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+# /code for updating room
+
+@api_view(['GET',"POST"])
+def edit_room(request, pk):
+    try: 
+        message= DB.read("dm_messages",{"id":pk})
+    except: 
+        return JsonResponse({'message': 'The room does not exist'}, status=status.HTTP_404_NOT_FOUND) 
+ 
+    if request.method == 'GET':
+        singleRoom = DB.read("dm_messages",{"id": pk})
+        return JsonResponse(singleRoom) 
+    else:
+        room_serializer = MessageSerializer(message, data=request.data,partial = True) 
+        if room_serializer.is_valid():
+            room_serializer.save()
+            data=room_serializer.data
+            # print(data)
+            response = DB.update("dm_messages",pk,data)
+            return Response(room_serializer.data)
+        return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
     
