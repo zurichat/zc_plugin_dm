@@ -112,13 +112,6 @@ def send_centrifugo_data(room, data):
     
 
 DB = DataStorage()
-data = {"threads":[
-    {
-        'message':'tested',
-        'sender_id':'001',
-        'messaged_id':'613f868d6173056af01b4af9'
-        }
-]}
 
 
 
