@@ -41,10 +41,7 @@ def info(request):
     return JsonResponse(info, safe=False)
 
 
-<<<<<<< HEAD
-def verify_user_auth(ID, token):
-	url = f"https://api.zuri.chat/users/{ID}"
-=======
+
 def verify_user_auth(token):
 	"""
 	Call Endpoint for verification of JWT Token
@@ -52,17 +49,10 @@ def verify_user_auth(token):
 	"""
 	url = "https://api.zuri.chat/auth/verify-token"
 	
->>>>>>> 97a7a3f37d8465882768acf56bfd6f09eee97374
 	headers = {
 		'Authorization': f'Bearer {token}',
 		'Content-Type': 'application/json'
 	}
-<<<<<<< HEAD
-	response = requests.request("GET", url, headers=headers)
-
-	return response.status == "200"
-=======
->>>>>>> 97a7a3f37d8465882768acf56bfd6f09eee97374
 
 	api_response = requests.request("GET", url, headers=headers)
 	
@@ -107,71 +97,6 @@ def side_bar(request):
     return JsonResponse(side_bar, safe=False)
 
 
-
-<<<<<<< HEAD
-
-
-def organization(request):
-    return render(request, "index.html")
-
-def organizations(request):
-    return render(request, "index.html")
-
-
-def user(request):
-    return render(request, "index.html")
-
-def users(request):
-    return render(request, "index.html")
-
-
-def rooms(request):
-    return render(request, "index.html")
-
-
-def room(request):
-    # return render(request, "index.html")
-    return HttpResponse("<h1>Work in Progress</h1>")
-
-
-def room_users(request):
-    return render(request, "index.html")
-
-
-def room_messages(request):
-    return render(request, "index.html")
-
-
-def room_message(request):
-    return render(request, "index.html")
-
-
-def room_medias(request):
-    return render(request, "index.html")
-
-
-def room_media(request):
-    return render(request, "index.html")
-
-
-def room_files(request):
-    return render(request, "index.html")
-
-
-def room_file(request):
-    return render(request, "index.html")
-
-def dm_PING(request):
-    url = "https://api.zuri.chat"
-    try:
-        response = requests.get(url, headers={ "Content-Type" : "application/json"})
-        print(response)
-        server = {"server":"UP"}
-        return JsonResponse(server, safe = False)
-    except:
-        server = {"server":"down"}
-        return JsonResponse(server, safe = False)
-=======
 @swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
 @api_view(["POST"])
 def send_message(request):
@@ -398,4 +323,3 @@ def room_info(request):
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
     
->>>>>>> 97a7a3f37d8465882768acf56bfd6f09eee97374
