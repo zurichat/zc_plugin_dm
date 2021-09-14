@@ -10,10 +10,7 @@ import requests
 from rest_framework.serializers import Serializer
 from .db import *
 # Import Read Write function to Zuri Core
-<<<<<<< HEAD
-=======
 from .responses import *
->>>>>>> 1a803405251dfe170db3b58267506f8bef8bba7d
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
