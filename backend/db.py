@@ -1,7 +1,7 @@
 
 from urllib.parse import urlencode
 
-import requests, json, uuid
+import requests, json
 
 
 
