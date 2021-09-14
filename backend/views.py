@@ -316,7 +316,7 @@ def room_info(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 # /code for updating room
 
-@api_view(['GET', 'PUT'])
+@api_view(['GET',"POST"])
 def edit_room(request, pk):
     try: 
         message= DB.read("dm_messages",{"id":pk})
@@ -326,14 +326,13 @@ def edit_room(request, pk):
     if request.method == 'GET':
         singleRoom = DB.read("dm_messages",{"id": pk})
         return JsonResponse(singleRoom) 
- 
-    elif request.method == 'PUT': 
+    else:
         room_serializer = MessageSerializer(message, data=request.data,partial = True) 
         if room_serializer.is_valid():
             room_serializer.save()
             data=room_serializer.data
-            print(data)
-            response = DB.write("dm_messages", data)
+            # print(data)
+            response = DB.update("dm_messages",pk,data)
             return Response(room_serializer.data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
