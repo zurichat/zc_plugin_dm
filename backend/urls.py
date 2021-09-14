@@ -7,7 +7,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/v1/info', views.info, name='plugin_info'),
     path('api/v1/sidebar', views.side_bar, name='sidebar'),
-<<<<<<< HEAD
     path('api/v1/ping', views.dm_PING, name = 'PING'),
     path('api/organizations', views.organizations, name='organizations'),
     path('api/organizations/id', views.organization, name='organization'),
@@ -22,8 +21,6 @@ urlpatterns = [
     path('api/organizations/id/rooms/id/media/id', views.room_media, name='room_media'),
     path('api/organizations/id/rooms/id/files', views.room_files, name='room_files'),
     path('api/organizations/id/rooms/id/files/id', views.room_file, name='room_file'),
-    ]
-=======
     path('api/v1/sendmessage', views.send_message, name="send_message"),
     path('api/v1/sendthreadmessage', views.send_thread_message, name="send_thread_message"),
     path('api/v1/createroom', views.create_room, name='createroom'),
@@ -31,4 +28,3 @@ urlpatterns = [
     path('api/v1/room-info', views.room_info, name='roominfo'),
     path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
 ]
->>>>>>> 97a7a3f37d8465882768acf56bfd6f09eee97374
