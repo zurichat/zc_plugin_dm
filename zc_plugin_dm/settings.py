@@ -30,9 +30,18 @@ DEBUG = True #str(os.getenv('DEBUG'))
 ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://dm.zuri.chat",
-    "http://dm.zuri.chat"
+    "https://zuri.chat",
+    "http://zuri.chat",
+    "http://127.0.0.1",
+    "http://localhost:8000",
 ]
+
+# rest_framework global configs
+REST_FRAMEWORK = {
+    "DEFAULT_PARSER_CLASSES": [
+        'rest_framework.parsers.JSONParser',
+    ]
+}
 
 # Application definition
 
@@ -47,6 +56,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'webpack_loader',
     'backend',
+    'drf_yasg',
 
 ]
 
