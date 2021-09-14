@@ -128,7 +128,7 @@ def send_message(request):
                                 "room_id":room_id,
                                 "sender_id":data["sender_id"],
                                 "message":data["message"],
-                                "date_time":data['created_at']
+                                "created_at":data['created_at']
                             }
                         }
                     
@@ -179,12 +179,13 @@ def send_thread_message(request):
                     response_output = {
                             "status":response["message"],
                             "message_id":message['_id'],
+                            "thread_id":data['_id'],
                             "thread":True,
                             "data":{
                                 "room_id":message['room_id'],
                                 "sender_id":data["sender_id"],
                                 "message":data["message"],
-                                "date_time":data['created_at']
+                                "created_at":data['created_at']
                             }
                         }
                     
