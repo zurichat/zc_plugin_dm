@@ -1,4 +1,4 @@
-import json
+import json, uuid
 from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
@@ -101,7 +101,7 @@ def side_bar(request):
 @api_view(["POST"])
 def send_message(request):
     """
-    This is used to send message to user in rooms.
+    This endpoint is used to send message to user in rooms.
     It checks if room already exist before sending data.
     It makes a publish event to centrifugo after data 
     is persisted
@@ -118,26 +118,85 @@ def send_message(request):
         
             if is_room_avalaible:
                 response = DB.write("dm_messages", data=serializer.data)
-                if response.get("status") == 200:
-                    centrifugo_data = send_centrifugo_data(room=room_id,data=data) #publish data to centrifugo
-                    if centrifugo_data["message"].get("error",None) == None:
-                        response_output = {
+                if response.get("status",None) == 200:
+                    
+                    response_output = {
                             "status":response["message"],
                             "message_id":response["data"]["object_id"],
+                            "thread":False,
                             "data":{
                                 "room_id":room_id,
                                 "sender_id":data["sender_id"],
-                                "message":data["message"]
+                                "message":data["message"],
+                                "created_at":data['created_at']
                             }
                         }
+                    
+                    centrifugo_data = send_centrifugo_data(room=room_id,data=response_output) #publish data to centrifugo
+                    if centrifugo_data["message"].get("error",None) == None:
+                        
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                     
-                return Response(data="data not sent",status=status.HTTP_400_BAD_REQUEST)
+                return Response(data="data not sent",status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
         return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
     
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+@swagger_auto_schema(methods=['post'], request_body=ThreadSerializer, responses={400: 'Error Response'})
+@api_view(["POST"])
+def send_thread_message(request):
+    """
+    This endpoint is used send messages as a thread
+    under a message. It takes a message ID and 
+    validates if the message exists, then sends 
+    a publish event to centrifugo after 
+    thread message is persisted.
+    """
+    
+    serializer = ThreadSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        data = serializer.data
+        message_id = data['message_id']
+        messages = DB.read('dm_messages') #fetch messages from zc core
+        if type(messages) == list:
+            message_list = [msg for msg in messages if msg['_id'] == message_id]
+            
+            if len(message_list) != 0:
+                message = message_list[0] #get messsage itself
+                threads = message.get('threads',[]) #get threads
+                
+                del data['message_id'] #remove message id from request to zc core
+                data['_id'] = str(uuid.uuid1()) # assigns an id to each message in thread
+                threads.append(data) # append new message to list of thread
+                
+                response = DB.update("dm_messages",message['_id'],{"threads":threads}) # update threads in db
+
+                if response.get("status",None) == 200:
+                    
+                    response_output = {
+                            "status":response["message"],
+                            "message_id":message['_id'],
+                            "thread_id":data['_id'],
+                            "thread":True,
+                            "data":{
+                                "room_id":message['room_id'],
+                                "sender_id":data["sender_id"],
+                                "message":data["message"],
+                                "created_at":data['created_at']
+                            }
+                        }
+                    
+                    centrifugo_data = send_centrifugo_data(room=message['room_id'],data=response_output) #publish data to centrifugo
+                    if centrifugo_data["message"].get("error",None) == None:
+                        print("message is published to centrifugo")
+                        return Response(data=response_output, status=status.HTTP_201_CREATED)
+                return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+            return Response("No such message",status=status.HTTP_400_BAD_REQUEST)
+        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY) 
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: "Error: Bad Request"})
