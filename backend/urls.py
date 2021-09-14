@@ -12,5 +12,5 @@ urlpatterns = [
 	
 	
     # test endpoint
-    path('test/verify_user_auth', views.test_verify_user_auth, name="test_verify_user_auth"),
+    path('test/verify_user_authToken', views.test_verify_user_authToken, name="test_verify_user_authToken"),
 ]

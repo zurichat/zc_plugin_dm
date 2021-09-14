@@ -38,42 +38,49 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
-def verify_user_auth(token):
-	"""
-	Call Endpoint for verification of JWT Token
-	Returns: py dict -> is_authenticated: boolean, & data: more info
-	"""
-	url = "https://api.zuri.chat/auth/verify-token"
-	
-	headers = {
-		'Authorization': f'Bearer {token}',
-		'Content-Type': 'application/json'
-	}
+def verify_user_authToken(token):
+    """
+    Call Endpoint for verification of JWT Token
+    :params: JWT token
+    :returns: py dict -> is_authenticated: boolean, & data: more info on verification
+    """
+    url = "https://api.zuri.chat/auth/verify-token"
+    
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
 
-	api_response = requests.request("GET", url, headers=headers)
-	
-	json_response = api_response.json()
-	
-	response = {
-		'is_authenticated': False,
-		'data': json_response['message']
-	}
-	
-	if json_response['status'] == "200":
-		response['is_authenticated'] = json_response['data']['is_verified']
-		response['data'] = json_response['data']['user']
-	
-	return response
+    api_response = requests.request("GET", url, headers=headers)
+    
+    json_response = api_response.json()
+    
+    response = {
+        'is_authenticated': False,
+        'data': json_response['message']
+    }
+    
+    if json_response['status'] == "200":
+        response['is_authenticated'] = json_response['data']['is_verified']
+        response['data'] = json_response['data']['user']
+    
+    return response
 
 @api_view(['POST'])
-def test_verify_user_auth(request):
-	token_serializer = TokenSerializer(data = request.data)
-	
-	if token_serializer.is_valid():
-		response = verify_user_auth(token_serializer.data['token'])
+def test_verify_user_authToken(request):
+    """
+    Test for token verification endpoint: Makes a post request to verify token function
+    :verb: post
+    :payload: JWT token as json -> {e.g "token": "aaa.bbb.ccc"}
+    :returns: json response -> is_authenticated: boolean and data: more info
+    """
+    token_serializer = TokenSerializer(data = request.data)
+    
+    if token_serializer.is_valid():
+        response = verify_user_authToken(token_serializer.data['token'])
 		
-		return Response(response, status = status.HTTP_200_OK)
-	return Response(token_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+        return Response(response, status = status.HTTP_200_OK)
+    return Response(token_serializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
