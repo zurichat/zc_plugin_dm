@@ -1,7 +1,7 @@
 
 from urllib.parse import urlencode
 
-import requests, json
+import requests, json, uuid
 
 
 
@@ -34,6 +34,27 @@ class DataStorage:
             print(e)
             return None
         if response.status_code == 201:
+            return response.json()
+        else:
+            return {
+                "status_code": response.status_code,
+                "message": response.reason
+            }
+            
+    def update(self, collection_name, document_id, data):
+        body = dict(
+            plugin_id=self.plugin_id,
+            organization_id=self.organization_id,
+            collection_name=collection_name,
+            object_id=document_id,
+            payload=data
+        )
+        try:
+            response = requests.put(url=self.write_api, json=body)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
             return response.json()
         else:
             return {
@@ -91,6 +112,15 @@ def send_centrifugo_data(room, data):
     
 
 DB = DataStorage()
+data = {"threads":[
+    {
+        'message':'tested',
+        'sender_id':'001',
+        'messaged_id':'613f868d6173056af01b4af9'
+        }
+]}
+
+
 
 # Gets the rooms that a user is in
 def get_user_rooms(collection_name, org_id, user):
