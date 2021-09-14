@@ -36,7 +36,7 @@ def info(request):
 
     return JsonResponse(info, safe=False)
 
- 
+
 def verify_user_auth(ID, token):
 	url = f"https://api.zuri.chat/users/{ID}"
 	headers = {
@@ -44,7 +44,7 @@ def verify_user_auth(ID, token):
 		'Content-Type': 'application/json'
 	}
 	response = requests.request("GET", url, headers=headers)
-	
+
 	return response.status == "200"
 
 
@@ -177,3 +177,14 @@ def room_files(request):
 
 def room_file(request):
     return render(request, "index.html")
+
+def dm_PING(request):
+    url = "https://api.zuri.chat"
+    try:
+        response = requests.get(url, headers={ "Content-Type" : "application/json"})
+        print(response)
+        server = {"server":"UP"}
+        return JsonResponse(server, safe = False)
+    except:
+        server = {"server":"down"}
+        return JsonResponse(server, safe = False)

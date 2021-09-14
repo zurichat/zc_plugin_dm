@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/info', views.info, name='plugin_info'),
     path('api/v1/sidebar', views.side_bar, name='sidebar'),
+    path('api/v1/ping', views.dm_PING, name = 'PING'),
     path('api/organizations', views.organizations, name='organizations'),
     path('api/organizations/id', views.organization, name='organization'),
     path('api/organizations/id/users', views.users, name='users'),
