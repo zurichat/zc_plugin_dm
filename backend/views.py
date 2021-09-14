@@ -41,6 +41,7 @@ def info(request):
     return JsonResponse(info, safe=False)
 
 
+
 def verify_user_auth(token):
 	"""
 	Call Endpoint for verification of JWT Token
@@ -94,7 +95,6 @@ def side_bar(request):
         # This is what will be displayed by Zuri Main 
     }
     return JsonResponse(side_bar, safe=False)
-
 
 
 @swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
