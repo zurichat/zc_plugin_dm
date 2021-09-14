@@ -25,12 +25,23 @@ export default {
     font-family: 'Lato', sans-serif;
 }
 
+:root {
+    --bg-color-header: #00b87c;
+    --bg-color-footer: #e1fdf4;
+    --color-btn-bookmark: #bcf9e6;
+    --color-hover-send: #1264a3;
+}
+
 li {
     list-style: none;
 }
 
 a {
     text-decoration: none;
+}
+
+p {
+    font-size: 15px;
 }
 
 div,
