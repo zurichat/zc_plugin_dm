@@ -145,7 +145,7 @@ def send_message(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=ThreadSerializer, responses={400: 'Error Response'})
+@swagger_auto_schema(methods=['post'], request_body=ThreadSerializer, responses={201: ThreadResponse, 400: 'Error Response'})
 @api_view(["POST"])
 def send_thread_message(request):
     """
@@ -213,8 +213,7 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-test_param = openapi.Parameter('user_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
-@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={400: "Error: Bad Request"})
+@swagger_auto_schema(methods=['get'], query_serializer=UserRoomsSerializer, responses={400: "Error: Bad Request"})
 @api_view(["GET"])
 def getUserRooms(request):
     """
@@ -239,14 +238,7 @@ def getUserRooms(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(
-    method='get', 
-    manual_parameters=[
-        openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING), 
-        openapi.Parameter('date', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
-    ],
-    responses={400: "Error: Bad Request"}
-    )
+@swagger_auto_schema(methods=['get'], query_serializer=GetMessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
 @api_view(["GET"])
 def getRoomMessages(request):
     """
@@ -287,8 +279,7 @@ def getRoomMessages(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-test_param = openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
-@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={201: RoomInfoResponse, 400: "Error: Bad Request"})
+@swagger_auto_schema(methods=['get'], query_serializer=RoomInfoSerializer, responses={201: RoomInfoResponse, 400: "Error: Bad Request"})
 @api_view(["GET"])
 def room_info(request):
     """

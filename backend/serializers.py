@@ -55,3 +55,15 @@ class RoomSerializer(serializers.Serializer):
     def __str__(self):
         return str()
 
+
+class RoomInfoSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+
+
+class GetMessageSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+    date = serializers.DateField(input_formats="yy-mm-dd", required=False)
+
+
+class UserRoomsSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
