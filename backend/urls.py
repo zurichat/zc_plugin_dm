@@ -15,4 +15,6 @@ urlpatterns = [
     path('api/v1/getuserrooms', views.getUserRooms, name="get_user_rooms"),
     path('api/v1/room-info', views.room_info, name='roominfo'),
     path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
+    path('api/v1/copymessagelink/<str:message_id>', views.copy_message_link, name="copy_message_link"),
+    path('getmessage/<str:room_id>/<str:message_id>', views.read_message_link, name="read_message_link"),
 ]
