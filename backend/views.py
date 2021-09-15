@@ -203,13 +203,21 @@ def send_thread_message(request):
 @swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={201: CreateRoomResponse, 400: "Error: Bad Request"})
 @api_view(["POST"])
 def create_room(requests):
+    """
+    This function is used to create a room between 2 users.
+    It takes the id of the users involved, sends a write request to the database .
+    Then returns the room id when a room is successfully created
+    """
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
         response = DB.write("dm_rooms", data=serializer.data)
-        data = dict(room_id=response.get("data").get("object_id"))
+        data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_201_CREATED)
+            response_output = {
+                "room_id": data
+                }
+            return Response(data=response_output, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
