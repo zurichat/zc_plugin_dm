@@ -123,10 +123,10 @@ def send_message(request):
                     
                     response_output = {
                             "status":response["message"],
-                            "message_id":response["data"]["object_id"],
+                            "id":response["data"]["object_id"],
+                            "room_id":room_id,
                             "thread":False,
                             "data":{
-                                "room_id":room_id,
                                 "sender_id":data["sender_id"],
                                 "message":data["message"],
                                 "created_at":data['created_at']
@@ -179,11 +179,11 @@ def send_thread_message(request):
                     
                     response_output = {
                             "status":response["message"],
+                            "id":data['_id'],
+                            "room_id":message['room_id'],
                             "message_id":message['_id'],
-                            "thread_id":data['_id'],
                             "thread":True,
                             "data":{
-                                "room_id":message['room_id'],
                                 "sender_id":data["sender_id"],
                                 "message":data["message"],
                                 "created_at":data['created_at']
@@ -289,6 +289,7 @@ def room_info(request):
     # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
+    print(rooms)
     if rooms is not None:
         for current_room in rooms:
             if current_room['_id'] == room_id:
@@ -336,4 +337,41 @@ def edit_room(request, pk):
             return Response(room_serializer.data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def copy_message_link(request, message_id):
+    """
+        This is used to retrieve a single message. It takes a message_id as query params.
+        If message_id is provided, it returns a dictionary with information about the message,
+        or a 204 status code if there is no message with the same message id.
+        I will use the message information returned to generate a link which contains a room_id and a message_id
+    """
+    if request.method == 'GET':
+        message = DB.read("dm_messages", {"id": message_id})
+        room_id = message['room_id']
+        message_info = {
+                "room_id": room_id,
+                "message_id": message_id,
+                "link": f"https://dm.zuri.chat/getmessage/{room_id}/{message_id}"
+            }
+        return Response(data=message_info, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def read_message_link(request, room_id, message_id):
+    """
+        This is used to retrieve a single message. It takes a message_id as query params.
+        If message_id is provided, it returns a dictionary with information about the message,
+        or a 204 status code if there is no message with the same message id.
+        I will use the message information returned to generate a link which contains a room_id and a message_id
+    """
+
+    if request.method == 'GET':
+        message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+        return Response(data=message, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
