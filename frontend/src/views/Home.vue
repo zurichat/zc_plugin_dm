@@ -1,92 +1,68 @@
 <template>
-    <div class="home">
-        <b-row class="all-contents">
-            <b-col cols="3" class="zurichat-sidebar">
-                <div class="hedaer-contents">
-                    <p>
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit. Obcaecati officia iure corrupti, perferendis a
-                        laudantium earum neque tempora facere ipsum dolore
-                        commodi laboriosam temporibus. Repellat omnis vitae
-                        inventore. Qui, itaque!
-                    </p>
-                    <p>
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Ipsam tempora id iusto necessitatibus reiciendis enim
-                        repudiandae numquam porro quam ut. Exercitationem labore
-                        totam nihil eius, corporis quam eligendi a! Veritatis!
-                    </p>
+    <div class="home position-relative d-flex flex-column">
+        <div
+            class="direct-message-contents d-flex flex-column position-relative"
+        >
+            <div class="direct-message-header">
+                <DmProfileHeader />
+            </div>
+            <div
+                class="direct-message-body-contents d-flex flex-column position-relative"
+            >
+                <div class="direct-message-allmessages-body position-relative">
+                    <DmSingleMessageBox />
                 </div>
-            </b-col>
-            <b-col cols="9" class="zurichat-contents-plugin main px-4">
-                <header>
-                    <div class="searchform-settings-profile py-3">
-                        <SearchBar />
-                    </div>
-                </header>
-                <div class="user-profile-header">
-                    <DmProfileHeader />
+                <div class="direct-message-input-footer">
+                    <DmInputxtf />
                 </div>
-
-                <div class="dm-plugin-contents">
-                    <DmPluginContents />
-                </div>
-            </b-col>
-        </b-row>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import SearchBar from '@/components/searchBar.vue';
 import DmProfileHeader from '@/components/dmProfileHeader.vue';
-import DmPluginContents from '@/components/dmPluginContents.vue';
+import Bookmark from '@/components/bookmarks.vue';
+import DmInputxtf from '@/components/dmInputTextField.vue';
+import DmSingleMessageBox from '@/components/dmSingleMessageBox.vue';
 
 export default {
     name: 'Home',
     components: {
-        SearchBar,
         DmProfileHeader,
-        DmPluginContents,
+        Bookmark,
+        DmInputxtf,
+        DmSingleMessageBox,
     },
 };
 </script>
 
 <style scoped>
-.hone .all-contents {
-    position: relative;
+div.home {
     width: 100%;
+    background-color: #f9f9f9;
 }
 
-.zurichat-sidebar {
-    background: #fff;
-    overflow-x: hidden;
+div.home .direct-message-contents {
+    min-width: 0;
+    min-height: 0;
+    background-color: #f9f9f9;
 }
 
-.zurichat-contents-plugin {
-    position: relative;
-    background: #f6f6f6;
+.direct-message-body-contents {
+    flex: 1;
+    min-height: 0;
 }
 
-.user-profile-header {
-    margin: 16px 0 26px;
+.direct-message-allmessages-body {
+    flex: 1;
+    min-height: 0;
 }
 
-dm-plugin-contents {
-    position: relative;
-}
-
-@media screen and (min-width: 100px) and (max-width: 767px) {
-    .all-contents .zurichat-sidebar {
-        position: sticky;
-        top: 0;
-        left: 0;
-        width: 100%;
-        overflow: auto;
-    }
-
-    .all-contents .zurichat-contents-plugin {
-        width: 100%;
-    }
+.direct-message-input-footer {
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-end;
 }
 </style>
