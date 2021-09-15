@@ -10,7 +10,7 @@ import requests
 from rest_framework.serializers import Serializer
 from .db import *
 # Import Read Write function to Zuri Core
-from .responses import *
+from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -200,7 +200,7 @@ def send_thread_message(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: "Error: Bad Request"})
+@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={201: CreateRoomResponse, 400: "Error: Bad Request"})
 @api_view(["POST"])
 def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
@@ -317,6 +317,7 @@ def room_info(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 # /code for updating room
 
+
 @api_view(['GET',"POST"])
 def edit_room(request, pk):
     try: 
@@ -339,6 +340,7 @@ def edit_room(request, pk):
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(methods=['get'], responses={201: MessageLinkResponse, 400: "Error: Bad Request"})
 @api_view(['GET'])
 def copy_message_link(request, message_id):
     """

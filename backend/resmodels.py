@@ -26,8 +26,12 @@ class ThreadResponse(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
 
 class CreateRoomResponse(serializers.Serializer):
-    pass
+    room_id = serializers.ReadOnlyField()
 
+class MessageLinkResponse(serializers.Serializer):
+    room_id = serializers.ReadOnlyField()
+    message_id = serializers.ReadOnlyField()
+    link = serializers.URLField(read_only=True)
 
 class UserRoomsResponse(serializers.Serializer):
     pass
