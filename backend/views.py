@@ -123,10 +123,10 @@ def send_message(request):
                     
                     response_output = {
                             "status":response["message"],
-                            "message_id":response["data"]["object_id"],
+                            "id":response["data"]["object_id"],
+                            "room_id":room_id,
                             "thread":False,
                             "data":{
-                                "room_id":room_id,
                                 "sender_id":data["sender_id"],
                                 "message":data["message"],
                                 "created_at":data['created_at']
@@ -179,11 +179,11 @@ def send_thread_message(request):
                     
                     response_output = {
                             "status":response["message"],
+                            "id":data['_id'],
+                            "room_id":message['room_id'],
                             "message_id":message['_id'],
-                            "thread_id":data['_id'],
                             "thread":True,
                             "data":{
-                                "room_id":message['room_id'],
                                 "sender_id":data["sender_id"],
                                 "message":data["message"],
                                 "created_at":data['created_at']
