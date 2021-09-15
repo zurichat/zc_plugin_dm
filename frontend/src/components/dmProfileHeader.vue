@@ -54,16 +54,8 @@
                         </div>
                         <div class="mute_start_a_call mt-4 d-flex">
                             <b-button class="btn_mute me-2">
-                                <b-icon
-                                    icon="mic-mute"
-                                    scale="1"
-                                    class="close"
-                                ></b-icon>
+                                <b-icon class="close bi bi-bell-slash"></b-icon>
                                 Mute
-                            </b-button>
-                            <b-button class="btn_mute">
-                                <b-icon icon="telephone" scale="1"></b-icon>
-                                start a call
                             </b-button>
                         </div>
 
