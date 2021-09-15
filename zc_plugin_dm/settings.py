@@ -151,3 +151,10 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+# CENTRIFUGO settings
+
+CENTRIFUGO_HOST = 'https://realtime.zuri.chat/api'
+CENTRIFUGO_API_TOKEN = '58c2400b-831d-411d-8fe8-31b6e337738b'
+
