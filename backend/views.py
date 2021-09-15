@@ -1,4 +1,4 @@
-import json, uuid
+import json, uuid, re
 from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
@@ -14,7 +14,6 @@ from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
 
 
 def index(request):
@@ -385,3 +384,27 @@ def read_message_link(request, room_id, message_id):
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
+
+@api_view(["GET"])
+def get_links(request, room_id):
+    """
+    Search messages in a room and return all links found
+    """
+    url_pattern =  r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+    regex = re.compile(url_pattern)
+    matches = []
+    messages = DB.read(
+        "dm_messages", filter={"room_id": room_id})
+    if messages is not None:
+        for message in messages:
+            for word in message.get("message").split(" "):
+                match = regex.match(word)
+                if match:
+                    matches.append(
+                        {"link": str(word), "timestamp": message.get("created_at")})
+        data = {
+            "links": matches,
+            "room_id": room_id
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)

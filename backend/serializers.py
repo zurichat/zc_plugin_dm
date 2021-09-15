@@ -1,6 +1,6 @@
 from django.utils import timezone
-from datetime import datetime
 from rest_framework import serializers
+
 
 class ThreadSerializer(serializers.Serializer):
     """
