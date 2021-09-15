@@ -7,10 +7,11 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
 from rest_framework.serializers import Serializer
-from .db import DB,send_centrifugo_data, get_user_rooms 
+from .db import DB,send_centrifugo_data, get_user_rooms, get_rooms
 # Import Read Write function to Zuri Core
 from .serializers import MessageSerializer
 from .serializers import *
+
 
 
 
@@ -81,13 +82,49 @@ def side_bar(request):
     side_bar = {
         "name" : "DM Plugin",
         "description" : "Sends messages between users",
-        "plugin_id" : "dm-plugin-id",
-        "organisation_id" : "HNGi8",
-        "user_id" : "232",
+        "plugin_id" : "6135f65de2358b02686503a7",
+        "organisation_id" : f"{org_id}",
+        "user_id" : f"{user}",
         "group_name" : "DM",
         "show_group" : False,
-        "Public rooms":[],
-        "Joined rooms":[],
+        "joined_rooms":[],
+        "public_rooms": [
+        {
+            "id": "6139b26959842c7444fb01f5",
+            "title": "Announcement",
+            "members": 1250,
+            "unread": 2,
+            "action": "open"
+        },
+        {
+            "id": "6139b29259842c7444fb01f6",
+            "title": "Dorime",
+            "members": 12,
+            "unread": 0,
+            "action": "open"
+        },
+        {
+            "id": "6139b35259842c7444fb01f7",
+            "title": "Ameno",
+            "members": 20,
+            "unread": 10,
+            "action": "open"
+        },
+        {
+            "id": "6139b74e59842c7444fb01fa",
+            "title": "games",
+            "members": 1250,
+            "unread": 16,
+            "action": "open"
+        },
+        {
+            "id": "6139b88359842c7444fb01fc",
+            "title": "business-ideas",
+            "members": 500,
+            "unread": 25,
+            "action": "open"
+        }
+        ],
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main on the sidebar
         "DMs":rooms,
@@ -101,10 +138,10 @@ def side_bar(request):
 @api_view(["POST"])
 def send_message(request):
     """
-    this is used to send message to user in rooms
-    It checks if room already exist before sending data
-    Ir makes a publish event to centrifugo after data 
-    is persiste
+    This is used to send message to user in rooms.
+    It checks if room already exist before sending data.
+    It makes a publish event to centrifugo after data 
+    is persisted
     """
     serializer = MessageSerializer(data=request.data)
     
@@ -143,21 +180,33 @@ def create_room(requests):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
+def get_all_rooms():
+    response = DB.read("dm_rooms")
+    return response
+
+@api_view(["GET"])
+def getUserRooms(request):
+    if request.method == "GET":
+        res = get_rooms(request.GET.get("user_id", None))
+        if request.GET.get("user_id") == None:
+            return Response(get_all_rooms())
+        else:
+            if len(res) == 0:
+                return Response(data="no such user", status=status.HTTP_204_NO_CONTENT)
+            return Response(res)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
 def room_info(request):
-    serializer = RoomInfoSerializer(data=request.data)
+    """
+    This is used to retrieve information about a room.
+    """
+    room_id = request.GET.get("room_id", None)
+    # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
-    message_collection = "dm_messages"
-    messages  = DB.read(message_collection)
-    room_messages=[]
-    
-    if serializer.is_valid():
-        data = serializer.data
-        room_id = data['room_id']
-        for message in messages:
-            if 'room_id' in message and message['room_id'] == room_id:
-                room_messages.append(message)
+    if rooms is not None:
         for current_room in rooms:
             if current_room['_id'] == room_id:
                 if 'room_user_ids' in current_room:
@@ -171,15 +220,41 @@ def room_info(request):
                 if 'org_id' in current_room:
                     org_id = current_room['org_id']
                 else:
-                    org_id =""
-
+                    org_id ="6133c5a68006324323416896"
                 room_data = {
                     "room_id": room_id,
                     "org_id": org_id,
                     "room_user_ids": room_user_ids,
                     "created_at": created_at,
-                    "messages": room_messages
+                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}"
                 }
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(["POST", "GET"])
+def reminder(request):
+    """
+        This is used to remind a user about a bookmarked message
+        and scheduled message
+    """
+    #collect the user info(the rooms the user is in) , the message info (time of creation),
+    # collect the scheduled message(time created, time set for the remineder)
+    # set a default timer to count  of 24hours for bookmarked messages,
+    #
+    #return {message with 15 words, snooze ,dismiss }
+    # so what can I implement
+    #create a room for the current user to display reminders
+    if request.method == "POST":
+        data = json.loads(request.body)
+        user_id = data['user_id']
+        room_id = data['room_id']
+        recipient = data['recipient_id']
+        time = data['time']
+        
+
+    # serializers = ReminderSerializer
+    # room_collection = "dm_rooms"
+    # rooms = DB.read(room_collection)
+    # get_user_rooms(collection_name, org_id, user)
+

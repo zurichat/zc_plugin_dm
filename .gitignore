@@ -13,12 +13,12 @@ static
 *__pycache__
 
 *.idea
-=======
-.idea
+
 
 # *media
 *.DS_Store
 /.vscode
 /__pycache__
+.yarn
 
 
