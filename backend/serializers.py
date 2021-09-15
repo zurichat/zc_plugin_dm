@@ -50,6 +50,10 @@ class RoomSerializer(serializers.Serializer):
     org_id = serializers.CharField(max_length=128, required=True)
     room_user_ids = serializers.ListField(child=serializers.CharField(max_length=128),
                                            allow_empty=False, required=True)
+    bookmarks = serializers.ListField(child=serializers.CharField(max_length=128),
+                                            allow_empty=True)
+    pinned = serializers.ListField(child=serializers.CharField(max_length=128),
+                                        allow_empty=True)
     created_at = serializers.DateTimeField(default=timezone.now, read_only=True)
 
     def __str__(self):
