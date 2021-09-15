@@ -158,7 +158,7 @@ def send_thread_message(request):
     if serializer.is_valid():
         data = serializer.data
         message_id = data['message_id']
-        messages = DB.read('dm_messages') #fetch messages from response = DB.read("dm_rooms")zc core
+        messages = DB.read('dm_messages') #fetch messages from zc core
         if type(messages) == list:
             message_list = [msg for msg in messages if msg['_id'] == message_id]
             
