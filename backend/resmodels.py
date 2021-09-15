@@ -12,13 +12,26 @@ class RoomInfoResponse(serializers.Serializer):
 class MessageResponse(serializers.Serializer):
     status = serializers.CharField(read_only=True)
     message_id = serializers.ReadOnlyField()
+    thread = serializers.BooleanField()
     data = serializers.DictField(child=serializers.CharField(), read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
 
 
-class CreateRoomResponse(serializers.Serializer):
-    pass
+class ThreadResponse(serializers.Serializer):
+    status = serializers.CharField(read_only=True)
+    message_id = serializers.ReadOnlyField()
+    thread_id = serializers.ReadOnlyField()
+    thread = serializers.BooleanField()
+    data = serializers.DictField(child=serializers.CharField(), read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
 
+class CreateRoomResponse(serializers.Serializer):
+    room_id = serializers.ReadOnlyField()
+
+class MessageLinkResponse(serializers.Serializer):
+    room_id = serializers.ReadOnlyField()
+    message_id = serializers.ReadOnlyField()
+    link = serializers.URLField(read_only=True)
 
 class UserRoomsResponse(serializers.Serializer):
     pass
