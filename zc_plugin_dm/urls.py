@@ -30,6 +30,7 @@ schema_view = get_schema_view(
       contact=openapi.Contact(email="dm_plugin@zuri.chat"),
       license=openapi.License(name="BSD License"),
    ),
+   url="https://dm.zuri.chat",
    public=True,
    permission_classes=(permissions.AllowAny,),
    #validators=["ssv"],

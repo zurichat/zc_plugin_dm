@@ -10,7 +10,7 @@ import requests
 from rest_framework.serializers import Serializer
 from .db import *
 # Import Read Write function to Zuri Core
-from .responses import *
+from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -145,7 +145,7 @@ def send_message(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=ThreadSerializer, responses={400: 'Error Response'})
+@swagger_auto_schema(methods=['post'], request_body=ThreadSerializer, responses={201: ThreadResponse, 400: 'Error Response'})
 @api_view(["POST"])
 def send_thread_message(request):
     """
@@ -200,21 +200,28 @@ def send_thread_message(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: "Error: Bad Request"})
+@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={201: CreateRoomResponse, 400: "Error: Bad Request"})
 @api_view(["POST"])
 def create_room(requests):
+    """
+    This function is used to create a room between 2 users.
+    It takes the id of the users involved, sends a write request to the database .
+    Then returns the room id when a room is successfully created
+    """
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
         response = DB.write("dm_rooms", data=serializer.data)
-        data = dict(room_id=response.get("data").get("object_id"))
+        data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_201_CREATED)
+            response_output = {
+                "room_id": data
+                }
+            return Response(data=response_output, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-test_param = openapi.Parameter('user_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
-@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={400: "Error: Bad Request"})
+@swagger_auto_schema(methods=['get'], query_serializer=UserRoomsSerializer, responses={400: "Error: Bad Request"})
 @api_view(["GET"])
 def getUserRooms(request):
     """
@@ -239,14 +246,7 @@ def getUserRooms(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(
-    method='get', 
-    manual_parameters=[
-        openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING), 
-        openapi.Parameter('date', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
-    ],
-    responses={400: "Error: Bad Request"}
-    )
+@swagger_auto_schema(methods=['get'], query_serializer=GetMessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
 @api_view(["GET"])
 def getRoomMessages(request):
     """
@@ -287,8 +287,7 @@ def getRoomMessages(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-test_param = openapi.Parameter('room_id', openapi.IN_QUERY, description="", type=openapi.TYPE_STRING)
-@swagger_auto_schema(method='get', manual_parameters=[test_param], responses={201: RoomInfoResponse, 400: "Error: Bad Request"})
+@swagger_auto_schema(methods=['get'], query_serializer=RoomInfoSerializer, responses={201: RoomInfoResponse, 400: "Error: Bad Request"})
 @api_view(["GET"])
 def room_info(request):
     """
@@ -326,6 +325,7 @@ def room_info(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 # /code for updating room
 
+
 @api_view(['GET',"POST"])
 def edit_room(request, pk):
     try: 
@@ -348,6 +348,7 @@ def edit_room(request, pk):
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(methods=['get'], responses={201: MessageLinkResponse, 400: "Error: Bad Request"})
 @api_view(['GET'])
 def copy_message_link(request, message_id):
     """
