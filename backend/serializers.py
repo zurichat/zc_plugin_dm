@@ -21,6 +21,8 @@ class ThreadSerializer(serializers.Serializer):
 class MessageSerializer(serializers.Serializer):
     sender_id = serializers.CharField(max_length=128)
     room_id = serializers.CharField(max_length=128)
+    message = serializers.CharField(max_length=128)
+    media = serializers.ListField(child=serializers.URLField(), allow_empty=True)
     message = serializers.CharField()
     media = serializers.ListField(child=serializers.URLField(), allow_empty=True, required=False, default=[])
     read = serializers.BooleanField(default=False, required=False)
@@ -31,6 +33,17 @@ class MessageSerializer(serializers.Serializer):
 
     def __str__(self):
         return str(self.message)
+    
+    def update(self, instance, validated_data):
+        print(validated_data)
+        instance["sender_id"] = validated_data.get('sender_id', instance["sender_id"])
+        instance["room_id"] = validated_data.get('room_id', instance["room_id"])
+        instance["message"] = validated_data.get('message', instance["message"])
+        
+        # instance["created_at"] = validated_data.get('created_at', instance["created_at"] ) read only
+        
+        return instance
+    
 
 
 class RoomSerializer(serializers.Serializer):
@@ -42,3 +55,15 @@ class RoomSerializer(serializers.Serializer):
     def __str__(self):
         return str()
 
+
+class RoomInfoSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+
+
+class GetMessageSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+    date = serializers.DateField(input_formats="yy-mm-dd", required=False)
+
+
+class UserRoomsSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
