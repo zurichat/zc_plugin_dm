@@ -385,3 +385,18 @@ def read_message_link(request, room_id, message_id):
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
+
+@api_view(['GET'])
+def organization_members(request):
+    """
+    This endpoint returns a list of members for an organization.
+    :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
+    """
+    url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
+
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        response = response.json()['data']
+        return Response(response, status = status.HTTP_200_OK)
+    return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
