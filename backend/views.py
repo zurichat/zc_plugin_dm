@@ -1,13 +1,10 @@
-import json, uuid
-from django.http import response
+import uuid
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view
 from rest_framework import status
-from rest_framework.parsers import JSONParser
 import requests
-from rest_framework.serializers import Serializer
 from .db import *
 # Import Read Write function to Zuri Core
 from .resmodels import *
