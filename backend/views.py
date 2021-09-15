@@ -180,6 +180,11 @@ def send_message(request):
 @swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={400: 'Error Response'})
 @api_view(["POST"])
 def create_room(requests):
+    """
+    This function is used to create a room between 2 users.
+    It takes the id of the users involved sends a write request to the database .
+    It returns the room id when a room is successfully created
+    """
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
