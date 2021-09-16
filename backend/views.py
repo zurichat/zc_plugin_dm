@@ -9,6 +9,7 @@ from rest_framework.parsers import JSONParser
 import requests
 from rest_framework.serializers import Serializer
 from .db import *
+
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
@@ -16,10 +17,9 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 
-
 def index(request):
     context = {}
-    return render(request, 'index.html', context)
+    return render(request, "index.html", context)
 
 
 # Shows basic information about the DM plugin
@@ -34,47 +34,43 @@ def info(request):
             "scaffold_structure": "Monolith",
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
-            "homepage_url": "https://dm.zuri.chat/"
+            "homepage_url": "https://dm.zuri.chat/",
         },
-        "success": "true"
+        "success": "true",
     }
 
     return JsonResponse(info, safe=False)
 
 
-
 def verify_user_auth(token):
-	"""
-	Call Endpoint for verification of JWT Token
-	Returns: py dict -> is_authenticated: boolean, & data: more info
-	"""
-	url = "https://api.zuri.chat/auth/verify-token"
-	
-	headers = {
-		'Authorization': f'Bearer {token}',
-		'Content-Type': 'application/json'
-	}
+    """
+    Call Endpoint for verification of JWT Token
+    Returns: py dict -> is_authenticated: boolean, & data: more info
+    """
+    url = "https://api.zuri.chat/auth/verify-token"
 
-	api_response = requests.request("GET", url, headers=headers)
-	
-	json_response = api_response.json()
-	
-	response = {}
-	if json_response['status'] == "200":
-		response['is_authenticated'] = json_response['data']['is_verified']
-		response['data'] = json_response['data']['user']
-	else:
-		response['is_authenticated'] = False
-		response['data'] = json_response['message']
-	
-	return response
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    api_response = requests.request("GET", url, headers=headers)
+
+    json_response = api_response.json()
+
+    response = {}
+    if json_response["status"] == "200":
+        response["is_authenticated"] = json_response["data"]["is_verified"]
+        response["data"] = json_response["data"]["user"]
+    else:
+        response["is_authenticated"] = False
+        response["data"] = json_response["message"]
+
+    return response
+
 
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-    
 
 def side_bar(request):
     collections = "dm_rooms"
@@ -83,124 +79,132 @@ def side_bar(request):
     rooms = get_user_rooms(collections, org_id, user)
 
     side_bar = {
-        "name" : "DM Plugin",
-        "description" : "Sends messages between users",
-        "plugin_id" : "6135f65de2358b02686503a7",
-        "organisation_id" : f"{org_id}",
-        "user_id" : f"{user}",
-        "group_name" : "DM",
-        "show_group" : False,
-        "public_rooms":[],
-        "joined_rooms":rooms,
+        "name": "DM Plugin",
+        "description": "Sends messages between users",
+        "plugin_id": "6135f65de2358b02686503a7",
+        "organisation_id": f"{org_id}",
+        "user_id": f"{user}",
+        "group_name": "DM",
+        "show_group": False,
+        "public_rooms": [],
+        "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
-        # This is what will be displayed by Zuri Main 
+        # This is what will be displayed by Zuri Main
     }
     return JsonResponse(side_bar, safe=False)
 
 
-@swagger_auto_schema(methods=['post'], request_body=MessageSerializer, responses={201: MessageResponse, 400: "Error: Bad Request"})
+@swagger_auto_schema(
+    methods=["post"],
+    request_body=MessageSerializer,
+    responses={201: MessageResponse, 400: "Error: Bad Request"},
+)
 @api_view(["POST"])
 def send_message(request):
     """
     This endpoint is used to send message to user in rooms.
     It checks if room already exist before sending data.
-    It makes a publish event to centrifugo after data 
+    It makes a publish event to centrifugo after data
     is persisted
     """
     serializer = MessageSerializer(data=request.data)
-    
+
     if serializer.is_valid():
         data = serializer.data
-        room_id = data['room_id'] #room id gotten from client request
-        
-        rooms = DB.read("dm_rooms")
-        if type(rooms) == list:
-            is_room_avalaible = len([room for room in rooms if room.get('_id', None) == room_id]) != 0
-        
-            if is_room_avalaible:
+        room_id = data["room_id"]  # room id gotten from client request
+
+        room = DB.read("dm_rooms", {"_id": room_id})
+        if room:
+            if data["sender_id"] in room.get("room_user_ids", []):
+
                 response = DB.write("dm_messages", data=serializer.data)
-                if response.get("status",None) == 200:
-                    
+                if response.get("status", None) == 200:
+
                     response_output = {
-                            "status":response["message"],
-                            "id":response["data"]["object_id"],
-                            "room_id":room_id,
-                            "thread":False,
-                            "data":{
-                                "sender_id":data["sender_id"],
-                                "message":data["message"],
-                                "created_at":data['created_at']
-                            }
-                        }
-                    
-                    centrifugo_data = send_centrifugo_data(room=room_id,data=response_output) #publish data to centrifugo
-                    if centrifugo_data["message"].get("error",None) == None:
-                        
+                        "status": response["message"],
+                        "event": "message_create",
+                        "id": response["data"]["object_id"],
+                        "room_id": room_id,
+                        "thread": False,
+                        "data": {
+                            "sender_id": data["sender_id"],
+                            "message": data["message"],
+                            "created_at": data["created_at"],
+                        },
+                    }
+
+                    centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
+                    if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
-                    
-                return Response(data="data not sent",status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
-        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
-    
+                return Response(data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+            return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
+        return Response("No such room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=ThreadSerializer, responses={201: ThreadResponse, 400: 'Error Response'})
+@swagger_auto_schema(
+    methods=["post"],
+    request_body=ThreadSerializer,
+    responses={201: ThreadResponse, 400: "Error Response"},
+)
 @api_view(["POST"])
 def send_thread_message(request):
     """
     This endpoint is used send messages as a thread
-    under a message. It takes a message ID and 
-    validates if the message exists, then sends 
-    a publish event to centrifugo after 
+    under a message. It takes a message ID and
+    validates if the message exists, then sends
+    a publish event to centrifugo after
     thread message is persisted.
     """
-    
+
     serializer = ThreadSerializer(data=request.data)
-    
+
     if serializer.is_valid():
         data = serializer.data
-        message_id = data['message_id']
-        messages = DB.read('dm_messages') #fetch messages from zc core
-        if type(messages) == list:
-            message_list = [msg for msg in messages if msg['_id'] == message_id]
-            
-            if len(message_list) != 0:
-                message = message_list[0] #get messsage itself
-                threads = message.get('threads',[]) #get threads
-                
-                del data['message_id'] #remove message id from request to zc core
-                data['_id'] = str(uuid.uuid1()) # assigns an id to each message in thread
-                threads.append(data) # append new message to list of thread
-                
-                response = DB.update("dm_messages",message['_id'],{"threads":threads}) # update threads in db
+        message_id = data["message_id"]
+        sender_id = data["sender_id"]
 
-                if response.get("status",None) == 200:
-                    
+        message = DB.read("dm_messages", {"_id": message_id})  # fetch message from zc core
+        if message:
+            threads = message.get("threads", [])  # get threads
+            del data["message_id"]  # remove message id from request to zc core
+            data["_id"] = str(uuid.uuid1())  # assigns an id to each message in thread
+            threads.append(data)  # append new message to list of thread
+            
+
+            if message['room_id'] in get_rooms[sender_id]:
+
+                response = DB.update("dm_messages", message["_id"], {"threads": threads} )  # update threads in db
+                if response.get("status", None) == 200:
+
                     response_output = {
-                            "status":response["message"],
-                            "id":data['_id'],
-                            "room_id":message['room_id'],
-                            "message_id":message['_id'],
-                            "thread":True,
-                            "data":{
-                                "sender_id":data["sender_id"],
-                                "message":data["message"],
-                                "created_at":data['created_at']
-                            }
-                        }
-                    
-                    centrifugo_data = send_centrifugo_data(room=message['room_id'],data=response_output) #publish data to centrifugo
-                    if centrifugo_data["message"].get("error",None) == None:
-                        print("message is published to centrifugo")
+                        "status": response["message"],
+                        "event": "thread_message_create",
+                        "id": data["_id"],
+                        "room_id": message["room_id"],
+                        "message_id": message["_id"],
+                        "thread": True,
+                        "data": {
+                            "sender_id": data["sender_id"],
+                            "message": data["message"],
+                            "created_at": data["created_at"],
+                        },
+                    }
+
+                    centrifugo_data = send_centrifugo_data(room=message["room_id"], data=response_output)  # publish data to centrifugo
+                    if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("No such message",status=status.HTTP_400_BAD_REQUEST)
-        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY) 
+            return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
+        return Response("No such message", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['post'], request_body=RoomSerializer, responses={201: CreateRoomResponse, 400: "Error: Bad Request"})
+@swagger_auto_schema(
+    methods=["post"],
+    request_body=RoomSerializer,
+    responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
+)
 @api_view(["POST"])
 def create_room(requests):
     """
@@ -214,19 +218,21 @@ def create_room(requests):
         response = DB.write("dm_rooms", data=serializer.data)
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            response_output = {
-                "room_id": data
-                }
+            response_output = {"room_id": data}
             return Response(data=response_output, status=status.HTTP_201_CREATED)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['get'], query_serializer=UserRoomsSerializer, responses={400: "Error: Bad Request"})
+@swagger_auto_schema(
+    methods=["get"],
+    query_serializer=UserRoomsSerializer,
+    responses={400: "Error: Bad Request"},
+)
 @api_view(["GET"])
 def getUserRooms(request):
     """
     This is used to retrieve all rooms a user is currently active in.
-    It takes in a user_id as query param and returns the rooms for that user or a 204 status code 
+    It takes in a user_id as query param and returns the rooms for that user or a 204 status code
     if there is no room for the user_id or an invalid user_id.
     If the user_id is not provided, a 202 status code is returned.
     """
@@ -323,65 +329,72 @@ def room_info(request):
                 return Response(data=room_data, status=status.HTTP_200_OK)
         return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 # /code for updating room
 
 
-@api_view(['GET',"POST"])
+@api_view(["GET", "POST"])
 def edit_room(request, pk):
-    try: 
-        message= DB.read("dm_messages",{"id":pk})
-    except: 
-        return JsonResponse({'message': 'The room does not exist'}, status=status.HTTP_404_NOT_FOUND) 
- 
-    if request.method == 'GET':
-        singleRoom = DB.read("dm_messages",{"id": pk})
-        return JsonResponse(singleRoom) 
+    try:
+        message = DB.read("dm_messages", {"id": pk})
+    except:
+        return JsonResponse(
+            {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
+        )
+
+    if request.method == "GET":
+        singleRoom = DB.read("dm_messages", {"id": pk})
+        return JsonResponse(singleRoom)
     else:
-        room_serializer = MessageSerializer(message, data=request.data,partial = True) 
+        room_serializer = MessageSerializer(message, data=request.data, partial=True)
         if room_serializer.is_valid():
             room_serializer.save()
-            data=room_serializer.data
+            data = room_serializer.data
             # print(data)
-            response = DB.update("dm_messages",pk,data)
+            response = DB.update("dm_messages", pk, data)
             return Response(room_serializer.data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(methods=['get'], responses={201: MessageLinkResponse, 400: "Error: Bad Request"})
-@api_view(['GET'])
+@swagger_auto_schema(
+    methods=["get"], responses={201: MessageLinkResponse, 400: "Error: Bad Request"}
+)
+@api_view(["GET"])
 def copy_message_link(request, message_id):
     """
-        This is used to retrieve a single message. It takes a message_id as query params.
-        If message_id is provided, it returns a dictionary with information about the message,
-        or a 204 status code if there is no message with the same message id.
-        I will use the message information returned to generate a link which contains a room_id and a message_id
+    This is used to retrieve a single message. It takes a message_id as query params.
+    If message_id is provided, it returns a dictionary with information about the message,
+    or a 204 status code if there is no message with the same message id.
+    I will use the message information returned to generate a link which contains a room_id and a message_id
     """
-    if request.method == 'GET':
+    if request.method == "GET":
         message = DB.read("dm_messages", {"id": message_id})
-        room_id = message['room_id']
+        room_id = message["room_id"]
         message_info = {
-                "room_id": room_id,
-                "message_id": message_id,
-                "link": f"https://dm.zuri.chat/getmessage/{room_id}/{message_id}"
-            }
+            "room_id": room_id,
+            "message_id": message_id,
+            "link": f"https://dm.zuri.chat/getmessage/{room_id}/{message_id}",
+        }
         return Response(data=message_info, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
+        return JsonResponse(
+            {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
+        )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 def read_message_link(request, room_id, message_id):
     """
-        This is used to retrieve a single message. It takes a message_id as query params.
-        If message_id is provided, it returns a dictionary with information about the message,
-        or a 204 status code if there is no message with the same message id.
-        I will use the message information returned to generate a link which contains a room_id and a message_id
+    This is used to retrieve a single message. It takes a message_id as query params.
+    If message_id is provided, it returns a dictionary with information about the message,
+    or a 204 status code if there is no message with the same message id.
+    I will use the message information returned to generate a link which contains a room_id and a message_id
     """
 
-    if request.method == 'GET':
+    if request.method == "GET":
         message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
         return Response(data=message, status=status.HTTP_200_OK)
     else:
-        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    
+        return JsonResponse({"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND)
