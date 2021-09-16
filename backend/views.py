@@ -452,3 +452,22 @@ def retrieve_bookmarks(request, room_id):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET"])
+def message_filter(request, room_id):
+    """
+    Fetches all the messages in a room, and sort it out according to time_stamp.
+    """
+    if request.method == "GET":
+        room = DB.read("dm_rooms", {"id": room_id})
+        # room = "613b2db387708d9551acee3b"
+
+        if room is not None :
+            all_messages = DB.read("dm_messages", filter={"room_id":room_id})
+            if all_messages is not None:
+                message_timestamp_filter = sorted(all_messages, key=lambda k: k['created_at']) 
+                return Response(message_timestamp_filter, status=status.HTTP_200_OK)
+            return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
+        return Response(data="No Room or Invalid Room", status=status.HTTP_400_BAD_REQUEST)
+
