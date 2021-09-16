@@ -18,4 +18,5 @@ urlpatterns = [
     path('api/v1/copymessagelink/<str:message_id>', views.copy_message_link, name="copy_message_link"),
     path('getmessage/<str:room_id>/<str:message_id>', views.read_message_link, name="read_message_link"),
     path('api/v1/<str:room_id>/links', views.get_links, name="get_links"),
+    path('api/v1/<str:room_id>/bookmark/new', views.save_bookmark, name="create_bookmark"),
 ]

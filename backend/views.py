@@ -408,3 +408,24 @@ def get_links(request, room_id):
         }
         return Response(data=data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["POST"])
+def save_bookmark(request, room_id):
+    """
+    save a link as bookmark in a room
+    """
+    try:
+        serializer = BookmarkSerializer(data=request.data)
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if serializer.is_valid() and bookmarks is not None:
+        bookmarks.append(serializer.data)
+        data = {"bookmarks": bookmarks}
+        response = DB.update("dm_rooms", room_id, data=data)
+        if response.get("status") == 200:
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
