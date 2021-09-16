@@ -6,10 +6,9 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
 from .db import *
-# Import Read Write function from Zuri Core
+# Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
-#import tools for documentation
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
