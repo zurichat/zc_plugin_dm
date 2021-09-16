@@ -1,3 +1,4 @@
+from requests.api import delete
 from . import views
 from django.urls import path
 
@@ -22,4 +23,6 @@ urlpatterns = [
     path('api/v1/get_organization_members', views.organization_members, name="organization_members"),
     path('api/v1/<str:room_id>/bookmark/all', views.retrieve_bookmarks, name="get_bookmarks"),
     path('api/v1/<str:room_id>/filter_messages', views.message_filter, name="message_filter"),
+    path('api/v1/delete-message', views.delete_message, name="delete_message")
+
 ]
