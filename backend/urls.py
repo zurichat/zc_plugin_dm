@@ -20,4 +20,5 @@ urlpatterns = [
     path('api/v1/<str:room_id>/links', views.get_links, name="get_links"),
     path('api/v1/<str:room_id>/bookmark/new', views.save_bookmark, name="create_bookmark"),
     path('api/v1/get_organization_members', views.organization_members, name="organization_members"),
+    path('api/v1/<str:room_id>/bookmark/all', views.retrieve_bookmarks, name="get_bookmarks"),
 ]

@@ -433,3 +433,22 @@ def organization_members(request):
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)
     return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["GET"])
+def retrieve_bookmarks(request, room_id):
+    """
+    Retrieves all saved bookmarks in the room
+    """
+    try:
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if bookmarks is not None:
+        serializer = BookmarkSerializer(data=bookmarks, many=True)
+        if serializer.is_valid():
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_404_NOT_FOUND)
