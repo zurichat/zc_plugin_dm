@@ -132,6 +132,7 @@ def send_centrifugo_data(room, data):
     except Exception as e:
         print(e)
 
+
 DB = DataStorage()
 
 def get_user_rooms(collection_name, org_id, user):
