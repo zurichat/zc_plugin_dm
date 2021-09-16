@@ -386,16 +386,32 @@ def read_message_link(request, room_id, message_id):
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def organization_members(request):
     """
     This endpoint returns a list of members for an organization.
     :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
+    
+    GET: simulates production - if request is get, cookie exist in browser and will be sent with the request,
+    and authorization should take places automatically
+    
+    POST: simulates testing - if request is post, send the cookies through the post request, it would be added
+    manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
-
-    response = requests.get(url)
     
+    if request.method == "GET":
+        response = requests.get(url)
+		
+    elif request.method == "POST":
+        cookie_serializer = CookieSerializer(data=request.data)
+    
+        if cookie_serializer.is_valid():
+            cookie = cookie_serializer.data['cookie']
+            response = requests.get(url, headers={'Cookie': cookie})
+        else:
+            return Response(cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		
     if response.status_code == 200:
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)

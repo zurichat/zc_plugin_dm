@@ -71,3 +71,7 @@ class GetMessageSerializer(serializers.Serializer):
 
 class UserRoomsSerializer(serializers.Serializer):
     room_id = serializers.CharField(max_length=128)
+
+
+class CookieSerializer(serializers.Serializer):
+    cookie = serializers.CharField(max_length=150)
