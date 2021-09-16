@@ -68,11 +68,12 @@ class RoomInfoSerializer(serializers.Serializer):
 
 class GetMessageSerializer(serializers.Serializer):
     room_id = serializers.CharField(max_length=128)
-    date = serializers.DateField(input_formats="yy-mm-dd", required=False)
+    date = serializers.DateField(format="%d-%m-%Y", input_formats=['%d-%m-%Y', 'iso-8601'], required=False)
 
 
 class UserRoomsSerializer(serializers.Serializer):
     room_id = serializers.CharField(max_length=128)
+    user_id = serializers.CharField(max_length=128)
 
 
 class BookmarkSerializer(serializers.Serializer):
