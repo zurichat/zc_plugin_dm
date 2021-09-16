@@ -388,8 +388,11 @@ def organization_members(request):
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
     
     if request.method == "GET":
-        response = requests.get(url)
-		
+        headers={}
+        if 'Cookie' in request.COOKIES:
+            headers['Cookie'] = request.COOKIES.get('Cookie')
+        response = requests.get(url, headers=headers)
+    
     elif request.method == "POST":
         cookie_serializer = CookieSerializer(data=request.data)
     
