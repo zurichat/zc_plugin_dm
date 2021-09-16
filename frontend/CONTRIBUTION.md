@@ -18,14 +18,38 @@ When contributing to the project, please follow these guidelines:
 
 ## Pull Requests Process
 
-1.  Create a new branch for your changes. `git checkout -b <branch_name>`
-2.  Make your changes in the branch. `git add .`
-3.  Commit your changes. `git commit -m "message"`
-4.  Push your changes to the remote repository. `git push origin <branch_name>`
-5.  Create a pull request on GitHub and screenshot the localhost screen of your work.
-6.  When creating a pull request on GitHub make sure you're push to **_Develop_** branch and not **_Main_** branch.
-7.  Once the pull request is merged, you can merge the branch into the develop branch.
+FRONTEND DEVELOPERS
+$ ```git clone https://github.com/username/zc_plugin_dm```
+  ##### Cloning into your machine
 
+$ ```cd frontend```
+  ##### Change directory frontend
+
+$ ```yarn```
+  ##### Install Package managers
+ 
+$ ```yarn serve```
+  ##### Display what you're working on
+  
+$ ```git add .```
+
+$ ```git commit -m "your-message"```
+  ##### the component you worked on
+  
+$ ```git remote -v```
+  ##### check your remote branches
+
+$ ```git remote add upstream git@github:zurichat/zc_plugin_dm.git```
+  ##### Add upstream to repo directory to the upstream forked repository
+  
+$ ```git fetch upstream```
+  ##### Fetch from the upstream branch if there's an update
+
+$ ```git checkout -b <your_branch_name>```
+  ##### Checkout your branch name here
+
+$ ```git push upstream```
+  ##### Push the code to the upstream branch and make a pull-request to the frontend-develop branch
 <hr>
 
 **_THANK YOU FOR READING THIS DOCUMENTATION._**
