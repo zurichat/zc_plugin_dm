@@ -6,9 +6,10 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 import requests
 from .db import *
-# Import Read Write function to Zuri Core
+# Import Read Write function from Zuri Core
 from .resmodels import *
 from .serializers import *
+#import tools for documentation
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
@@ -208,6 +209,16 @@ def create_room(requests):
     serializer = RoomSerializer(data=requests.data)
 
     if serializer.is_valid():
+        user_ids = serializer.data["room_user_ids"]
+        user_rooms = get_rooms(user_ids[0]) + get_rooms(user_ids[1])
+        for room in user_rooms:
+            room_users = room['room_user_ids']
+            if set(room_users) == set(user_ids):
+                response_output = {
+                    "room_id": room["_id"]
+                }
+                return Response(data=response_output, status=status.HTTP_200_OK)
+
         response = DB.write("dm_rooms", data=serializer.data)
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
@@ -378,6 +389,7 @@ def organization_members(request):
     """
     This endpoint returns a list of members for an organization.
     :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
+
     """
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
 
