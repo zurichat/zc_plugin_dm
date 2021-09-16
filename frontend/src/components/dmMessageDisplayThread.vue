@@ -6,7 +6,7 @@
             class="msgBody position-relative"
         >
             <div class="conversation-threads d-flex flex-row">
-                <div class="userProfile-avatar">
+                <div class="userProfile-avatar" id="userProfile-avatar" @click="show_popup_profile(p_state = !p_state)">
                     <img src="https://picsum.photos/200/300" alt="{}" />
                 </div>
                 <div class="usertext-messages">
@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import { bus } from '@/main.js';
+
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
 import EmojiComp from '../components/common/dmEmojis.vue';
@@ -60,6 +62,7 @@ export default {
     data() {
         return {
             hover: false,
+            p_state:false
         };
     },
     methods: {
@@ -72,6 +75,9 @@ export default {
         postSelect(name) {
             this.setEmojis(name);
         },
+        show_popup_profile(p_state){
+            bus.$emit('togleProfilePopUp', p_state)
+        }
     },
     computed: {
         ...mapGetters(['emojis', 'emojiSet']),
@@ -92,6 +98,7 @@ export default {
 }
 
 .userProfile-avatar {
+    cursor:pointer;
     padding-right: 16px;
 }
 

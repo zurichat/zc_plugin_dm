@@ -2,7 +2,10 @@
     <div class="home position-relative d-flex ">
         <div
             class="direct-message-contents d-flex flex-column position-relative"
-        >
+        >   
+            <div class="profile-pop-up" v-if="toggleProfilePopUp">
+                    <PopupProfile/>
+            </div>
             <div class="direct-message-header">
                 <DmProfileHeader />
             </div>
@@ -19,12 +22,13 @@
            
         </div>
          <div class="profileContainer">
-                <ProfileContainer />
+                <!-- <ProfileContainer /> -->
             </div>
     </div>
 </template>
 
 <script>
+import { bus } from '../main.js';
 // @ is an alias to /src
 import DmProfileHeader from '@/components/dmProfileHeader.vue';
 import Bookmark from '@/components/bookmarks.vue';
@@ -39,8 +43,18 @@ export default {
         Bookmark,
         DmInputxtf,
         DmSingleMessageBox,
-        ProfileContainer
+        ProfileContainer,
     },
+    data(){
+        return{
+            toggleProfilePopUp:false
+        }
+    },
+    created(){
+        bus.$on('togleProfilePopUp', p_state =>{
+            this.toggleProfilePopUp = p_state;
+        })
+    }
 };
 </script>
 
