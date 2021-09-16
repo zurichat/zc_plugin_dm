@@ -300,15 +300,22 @@ def room_info(request):
                     org_id = current_room['org_id']
                 else:
                     org_id ="6133c5a68006324323416896"
+                if len(room_user_ids)>3:
+                    text = f" and {len(room_user_ids)-2} others"
+                elif len(room_user_ids) == 3:
+                    text = "and 1 other"
+                else:
+                    text = " only"
                 room_data = {
                     "room_id": room_id,
                     "org_id": org_id,
                     "room_user_ids": room_user_ids,
                     "created_at": created_at,
-                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}"
+                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}{text}",
+                    "Number of users": f"{len(room_user_ids)}"
                 }
                 return Response(data=room_data, status=status.HTTP_200_OK)
-        return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+        return Response(data="No such Room", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 # /code for updating room
 
@@ -452,3 +459,21 @@ def retrieve_bookmarks(request, room_id):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["DELETE"])
+def delete_message(request):
+    """
+    Deletes a message after taking the message id
+    """
+
+    if request.method == "DELETE":
+        message_id=request.GET.get('message_id')
+        message = DB.read('dm_messages', {'_id':message_id})
+        if message:
+            response=DB.delete('dm_messages', message_id)
+            return Response(response, status.HTTP_200_OK)
+        else:
+            return Response("No such message", status.HTTP_404_NOT_FOUND)
+    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+    
