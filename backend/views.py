@@ -1,4 +1,5 @@
-import uuid
+import json, uuid, re
+from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -11,7 +12,6 @@ from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
 
 
 def index(request):
@@ -373,6 +373,52 @@ def read_message_link(request, room_id, message_id):
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
 
+@api_view(["GET"])
+def get_links(request, room_id):
+    """
+    Search messages in a room and return all links found
+    """
+    url_pattern =  r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+    regex = re.compile(url_pattern)
+    matches = []
+    messages = DB.read(
+        "dm_messages", filter={"room_id": room_id})
+    if messages is not None:
+        for message in messages:
+            for word in message.get("message").split(" "):
+                match = regex.match(word)
+                if match:
+                    matches.append(
+                        {"link": str(word), "timestamp": message.get("created_at")})
+        data = {
+            "links": matches,
+            "room_id": room_id
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["POST"])
+def save_bookmark(request, room_id):
+    """
+    save a link as bookmark in a room
+    """
+    try:
+        serializer = BookmarkSerializer(data=request.data)
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if serializer.is_valid() and bookmarks is not None:
+        bookmarks.append(serializer.data)
+        data = {"bookmarks": bookmarks}
+        response = DB.update("dm_rooms", room_id, data=data)
+        if response.get("status") == 200:
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET', 'POST'])
 def organization_members(request):
     """
@@ -406,3 +452,22 @@ def organization_members(request):
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)
     return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["GET"])
+def retrieve_bookmarks(request, room_id):
+    """
+    Retrieves all saved bookmarks in the room
+    """
+    try:
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if bookmarks is not None:
+        serializer = BookmarkSerializer(data=bookmarks, many=True)
+        if serializer.is_valid():
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_404_NOT_FOUND)

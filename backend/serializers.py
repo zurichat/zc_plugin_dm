@@ -1,6 +1,8 @@
+import re
+
 from django.utils import timezone
-from datetime import datetime
 from rest_framework import serializers
+
 
 class ThreadSerializer(serializers.Serializer):
     """
@@ -70,9 +72,21 @@ class GetMessageSerializer(serializers.Serializer):
 
 
 class UserRoomsSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
     user_id = serializers.CharField(max_length=128)
+
+
+class BookmarkSerializer(serializers.Serializer):
+    link = serializers.URLField()
+    name = serializers.CharField()
+    created_at = serializers.DateTimeField(default=timezone.now)
+
+    def validate_link(self, value):
+        pattern = r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+        if not re.match(pattern, value):
+            raise serializers.ValidationError("Invalid link for bookmark")
+        return value
 
 
 class CookieSerializer(serializers.Serializer):
     cookie = serializers.CharField(max_length=150)
-
