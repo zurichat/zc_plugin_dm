@@ -6,12 +6,12 @@
             class="msgBody position-relative"
         >
             <div class="conversation-threads d-flex flex-row">
-                <div class="userProfile-avatar" id="userProfile-avatar" @click="show_popup_profile(p_state = !p_state)">
+                <div class="userProfile-avatar" @click="show_popup_profile(p_state = !p_state)">
                     <img src="https://picsum.photos/200/300" alt="{}" />
                 </div>
                 <div class="usertext-messages">
                     <h5 class="pb-2">
-                        <span class="userName">MamaGee</span>
+                        <span class="userName" @click="show_popup_profile(p_state = !p_state)">MamaGee</span>
                         <span class="msgTime">5.55pm</span>
                     </h5>
                     <div class="text-container">
@@ -130,7 +130,9 @@ export default {
 .usertext-messages p {
     margin-bottom: 0;
 }
-
+.usertext-messages .userName{
+    cursor:pointer
+}
 .text-container {
     position: relative;
 }

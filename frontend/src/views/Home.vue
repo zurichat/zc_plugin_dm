@@ -34,7 +34,7 @@ import DmProfileHeader from '@/components/dmProfileHeader.vue';
 import Bookmark from '@/components/bookmarks.vue';
 import DmInputxtf from '@/components/dmInputTextField.vue';
 import DmSingleMessageBox from '@/components/dmSingleMessageBox.vue';
-import ProfileContainer from '@/components/common/profileContainer.vue';
+import PopupProfile from '@/components/common/popupProfile';
 
 export default {
     name: 'Home',
@@ -43,7 +43,7 @@ export default {
         Bookmark,
         DmInputxtf,
         DmSingleMessageBox,
-        ProfileContainer,
+        PopupProfile,
     },
     data(){
         return{
