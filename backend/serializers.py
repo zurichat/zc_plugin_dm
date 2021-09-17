@@ -89,3 +89,6 @@ class BookmarkSerializer(serializers.Serializer):
 
 class ReadSerializer(serializers.Serializer):
     message_id = serializers.CharField(max_length=128)
+
+class CookieSerializer(serializers.Serializer):
+    cookie = serializers.CharField(max_length=150)
