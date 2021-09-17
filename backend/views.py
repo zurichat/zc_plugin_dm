@@ -1,4 +1,5 @@
-import uuid
+import json, uuid, re
+from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -11,7 +12,6 @@ from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
 
 
 def index(request):
@@ -300,15 +300,22 @@ def room_info(request):
                     org_id = current_room['org_id']
                 else:
                     org_id ="6133c5a68006324323416896"
+                if len(room_user_ids)>3:
+                    text = f" and {len(room_user_ids)-2} others"
+                elif len(room_user_ids) == 3:
+                    text = "and 1 other"
+                else:
+                    text = " only"
                 room_data = {
                     "room_id": room_id,
                     "org_id": org_id,
                     "room_user_ids": room_user_ids,
                     "created_at": created_at,
-                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}"
+                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}{text}",
+                    "Number of users": f"{len(room_user_ids)}"
                 }
                 return Response(data=room_data, status=status.HTTP_200_OK)
-        return Response(data="No such Room", status=status.HTTP_400_BAD_REQUEST)
+        return Response(data="No such Room", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 # /code for updating room
 
@@ -373,6 +380,52 @@ def read_message_link(request, room_id, message_id):
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
     
 
+@api_view(["GET"])
+def get_links(request, room_id):
+    """
+    Search messages in a room and return all links found
+    """
+    url_pattern =  r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+    regex = re.compile(url_pattern)
+    matches = []
+    messages = DB.read(
+        "dm_messages", filter={"room_id": room_id})
+    if messages is not None:
+        for message in messages:
+            for word in message.get("message").split(" "):
+                match = regex.match(word)
+                if match:
+                    matches.append(
+                        {"link": str(word), "timestamp": message.get("created_at")})
+        data = {
+            "links": matches,
+            "room_id": room_id
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["POST"])
+def save_bookmark(request, room_id):
+    """
+    save a link as bookmark in a room
+    """
+    try:
+        serializer = BookmarkSerializer(data=request.data)
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if serializer.is_valid() and bookmarks is not None:
+        bookmarks.append(serializer.data)
+        data = {"bookmarks": bookmarks}
+        response = DB.update("dm_rooms", room_id, data=data)
+        if response.get("status") == 200:
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['GET'])
 def organization_members(request):
     """
@@ -387,3 +440,58 @@ def organization_members(request):
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)
     return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(["GET"])
+def retrieve_bookmarks(request, room_id):
+    """
+    Retrieves all saved bookmarks in the room
+    """
+    try:
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if bookmarks is not None:
+        serializer = BookmarkSerializer(data=bookmarks, many=True)
+        if serializer.is_valid():
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["GET"])
+def message_filter(request, room_id):
+    """
+    Fetches all the messages in a room, and sort it out according to time_stamp.
+    """
+    if request.method == "GET":
+        room = DB.read("dm_rooms", {"id": room_id})
+        # room = "613b2db387708d9551acee3b"
+
+        if room is not None :
+            all_messages = DB.read("dm_messages", filter={"room_id":room_id})
+            if all_messages is not None:
+                message_timestamp_filter = sorted(all_messages, key=lambda k: k['created_at']) 
+                return Response(message_timestamp_filter, status=status.HTTP_200_OK)
+            return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
+        return Response(data="No Room or Invalid Room", status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["DELETE"])
+def delete_message(request):
+    """
+    Deletes a message after taking the message id
+    """
+
+    if request.method == "DELETE":
+        message_id=request.GET.get('message_id')
+        message = DB.read('dm_messages', {'_id':message_id})
+        if message:
+            response=DB.delete('dm_messages', message_id)
+            return Response(response, status.HTTP_200_OK)
+        else:
+            return Response("No such message", status.HTTP_404_NOT_FOUND)
+    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+    
