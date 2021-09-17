@@ -79,7 +79,7 @@ export default {
         profession: "Frontend Design Mentor",
         gender: "She/Her",
         localTime: "3:15PM",
-        phoneNumber: "021345789",
+        phoneNumber: "0211345789",
         profileImage: "https://picsum.photos/200/300",
       },
     };
