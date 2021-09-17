@@ -40,31 +40,24 @@ def info(request):
 
 
 
-def verify_user_auth(token):
-	"""
-	Call Endpoint for verification of JWT Token
-	Returns: py dict -> is_authenticated: boolean, & data: more info
-	"""
-	url = "https://api.zuri.chat/auth/verify-token"
-	
-	headers = {
-		'Authorization': f'Bearer {token}',
-		'Content-Type': 'application/json'
-	}
+def verify_user(token):
+    """
+    Call Endpoint for verification of user (sender)
+    It takes in either token or cookies and returns a python dictionary of 
+    user info if 200 successful or 401 unathorized if not
+    """
+    url = "https://api.zuri.chat/auth/verify-token"
+    
+    headers={}
+    if '.' in token:
+        headers['Authorization'] = f'Bearer {token}'
+    else:
+        headers['Cookie'] = token
+        
+    response = requests.get(url, headers=headers)
+    response = response.json()
 
-	api_response = requests.request("GET", url, headers=headers)
-	
-	json_response = api_response.json()
-	
-	response = {}
-	if json_response['status'] == "200":
-		response['is_authenticated'] = json_response['data']['is_verified']
-		response['data'] = json_response['data']['user']
-	else:
-		response['is_authenticated'] = False
-		response['data'] = json_response['message']
-	
-	return response
+    return response
 
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
