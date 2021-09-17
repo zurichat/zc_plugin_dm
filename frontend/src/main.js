@@ -6,7 +6,8 @@ import { BootstrapVueIcons, BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 import 'bootstrap-vue/dist/bootstrap-vue';
-import axios from 'axios';
+/*importing centrifuge server:deveeb*/ 
+import centrifuge_msg from './services/centrifuge_msg.js'
 
 // font awsome
 import '@fortawesome/fontawesome-free/css/all.css';
@@ -21,5 +22,6 @@ Vue.config.productionTip = false;
 new Vue({
     router,
     store,
+    centrifuge_msg,
     render: (h) => h(App),
 }).$mount('#app');

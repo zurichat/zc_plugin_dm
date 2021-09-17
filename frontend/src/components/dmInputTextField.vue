@@ -52,7 +52,10 @@
                                     : 'notSendDivider'
                             "
                         ></span>
-                        <span class="btnf input-send-reminder">
+                        <!--added a click event to make request:deveeb-->
+                        <span
+                         class="btnf input-send-reminder"
+                         @click="makeRequest">
                             <b-icon-chevron-down></b-icon-chevron-down>
                         </span>
                     </span>
@@ -63,6 +66,9 @@
 </template>
 
 <script>
+// importing makeRequest action from vuex store:deveeb
+import {mapActions} from 'vuex'
+
 export default {
     name: 'inputContainer',
     data() {
@@ -71,6 +77,10 @@ export default {
             sendMsg: '',
         };
     },
+    methods:{
+        //calling makeRequest:deveeb
+    ...mapActions(['makeRequest'])
+  }
 };
 </script>
 
