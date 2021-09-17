@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import apiServices from '../services/apiServices.js';
 
 Vue.use(Vuex);
-
-export default new Vuex.Store({
+const store = {
     state: {
         pickEmoji: false,
         showReply: false,
@@ -33,10 +33,20 @@ export default new Vuex.Store({
                     ...prev,
                     [next]: (prev[next] || 0) + 1,
                 }),
-                {}
             );
             commit('setEmojiSet', map);
         },
+        //making API call to the backend:deveeb
+        async makeRequest(){
+            try {
+              await apiServices.getClient()
+              .then(result => {
+                console.log(result.data)
+              })
+            } catch (error) {
+              alert(error)
+            }
+        }
     },
     getters: {
         pickEmoji(state) {
@@ -53,4 +63,6 @@ export default new Vuex.Store({
         },
     },
     modules: {},
-});
+
+}
+export default new Vuex.Store(store);
