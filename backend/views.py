@@ -130,7 +130,7 @@ def send_message(request, room_id ):
                     }
 
                     centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
-                    print(centrifugo_data)
+                    # print(centrifugo_data)
                     if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response(data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
