@@ -39,7 +39,6 @@ def info(request):
     return JsonResponse(info, safe=False)
 
 
-
 def verify_user(token):
     """
     Call Endpoint for verification of user (sender)
@@ -59,12 +58,13 @@ def verify_user(token):
 
     return response
 
+	
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-    
+
 
 def side_bar(request):
     collections = "dm_rooms"
@@ -83,7 +83,7 @@ def side_bar(request):
         "public_rooms":[],
         "joined_rooms":rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
-        # This is what will be displayed by Zuri Main 
+        # This is what will be displayed by Zuri Main
     }
     return JsonResponse(side_bar, safe=False)
 
@@ -94,23 +94,23 @@ def send_message(request):
     """
     This endpoint is used to send message to user in rooms.
     It checks if room already exist before sending data.
-    It makes a publish event to centrifugo after data 
+    It makes a publish event to centrifugo after data
     is persisted
     """
     serializer = MessageSerializer(data=request.data)
-    
+
     if serializer.is_valid():
         data = serializer.data
         room_id = data['room_id'] #room id gotten from client request
-        
+
         rooms = DB.read("dm_rooms")
         if type(rooms) == list:
             is_room_avalaible = len([room for room in rooms if room.get('_id', None) == room_id]) != 0
-        
+
             if is_room_avalaible:
                 response = DB.write("dm_messages", data=serializer.data)
                 if response.get("status",None) == 200:
-                    
+
                     response_output = {
                             "status":response["message"],
                             "id":response["data"]["object_id"],
@@ -122,16 +122,16 @@ def send_message(request):
                                 "created_at":data['created_at']
                             }
                         }
-                    
+
                     centrifugo_data = send_centrifugo_data(room=room_id,data=response_output) #publish data to centrifugo
                     if centrifugo_data["message"].get("error",None) == None:
-                        
+
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
-                    
+
                 return Response(data="data not sent",status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("No such room",status=status.HTTP_400_BAD_REQUEST)    
+            return Response("No such room",status=status.HTTP_400_BAD_REQUEST)
         return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
-    
+
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -140,33 +140,33 @@ def send_message(request):
 def send_thread_message(request):
     """
     This endpoint is used send messages as a thread
-    under a message. It takes a message ID and 
-    validates if the message exists, then sends 
-    a publish event to centrifugo after 
+    under a message. It takes a message ID and
+    validates if the message exists, then sends
+    a publish event to centrifugo after
     thread message is persisted.
     """
-    
+
     serializer = ThreadSerializer(data=request.data)
-    
+
     if serializer.is_valid():
         data = serializer.data
         message_id = data['message_id']
         messages = DB.read('dm_messages') #fetch messages from zc core
         if type(messages) == list:
             message_list = [msg for msg in messages if msg['_id'] == message_id]
-            
+
             if len(message_list) != 0:
                 message = message_list[0] #get messsage itself
                 threads = message.get('threads',[]) #get threads
-                
+
                 del data['message_id'] #remove message id from request to zc core
                 data['_id'] = str(uuid.uuid1()) # assigns an id to each message in thread
                 threads.append(data) # append new message to list of thread
-                
+
                 response = DB.update("dm_messages",message['_id'],{"threads":threads}) # update threads in db
 
                 if response.get("status",None) == 200:
-                    
+
                     response_output = {
                             "status":response["message"],
                             "id":data['_id'],
@@ -179,14 +179,14 @@ def send_thread_message(request):
                                 "created_at":data['created_at']
                             }
                         }
-                    
+
                     centrifugo_data = send_centrifugo_data(room=message['room_id'],data=response_output) #publish data to centrifugo
                     if centrifugo_data["message"].get("error",None) == None:
                         print("message is published to centrifugo")
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response("No such message",status=status.HTTP_400_BAD_REQUEST)
-        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY) 
+        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -216,7 +216,7 @@ def create_room(requests):
 def getUserRooms(request):
     """
     This is used to retrieve all rooms a user is currently active in.
-    It takes in a user_id as query param and returns the rooms for that user or a 204 status code 
+    It takes in a user_id as query param and returns the rooms for that user or a 204 status code
     if there is no room for the user_id or an invalid user_id.
     If the user_id is not provided, a 400 status code is returned.
     """
@@ -237,7 +237,7 @@ def getRoomMessages(request):
     """
     This is used to retrieve messages in a room. It takes a room_id and/or a date as query params.
     If only the room_id is provided, it returns a list of all the messages if available,
-    or a 204 status code if there is no message in the room. 
+    or a 204 status code if there is no message in the room.
     If both room_id and date are provided, it returns all the messages in that room for that
     particular date.
     If there is no room_id in the query params, it returns a 404 status code.
@@ -247,7 +247,7 @@ def getRoomMessages(request):
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         all_rooms = DB.read("dm_rooms")
-        
+
         if params_serializer.is_valid():
             is_room_avalaible = len([room for room in all_rooms if room.get('_id', None) == room_id]) != 0
             if is_room_avalaible:
@@ -315,16 +315,16 @@ def room_info(request):
 
 @api_view(['GET',"POST"])
 def edit_room(request, pk):
-    try: 
+    try:
         message= DB.read("dm_messages",{"id":pk})
-    except: 
-        return JsonResponse({'message': 'The room does not exist'}, status=status.HTTP_404_NOT_FOUND) 
- 
+    except:
+        return JsonResponse({'message': 'The room does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
     if request.method == 'GET':
         singleRoom = DB.read("dm_messages",{"id": pk})
-        return JsonResponse(singleRoom) 
+        return JsonResponse(singleRoom)
     else:
-        room_serializer = MessageSerializer(message, data=request.data,partial = True) 
+        room_serializer = MessageSerializer(message, data=request.data,partial = True)
         if room_serializer.is_valid():
             room_serializer.save()
             data=room_serializer.data
@@ -333,6 +333,8 @@ def edit_room(request, pk):
             return Response(room_serializer.data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 @swagger_auto_schema(methods=['get'], responses={201: MessageLinkResponse, 400: "Error: Bad Request"})
@@ -357,6 +359,8 @@ def copy_message_link(request, message_id):
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+
 @api_view(['GET'])
 def read_message_link(request, room_id, message_id):
     """
@@ -371,7 +375,9 @@ def read_message_link(request, room_id, message_id):
         return Response(data=message, status=status.HTTP_200_OK)
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
-    
+
+
+
 
 @api_view(["GET"])
 def get_links(request, room_id):
@@ -396,6 +402,8 @@ def get_links(request, room_id):
         }
         return Response(data=data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 @api_view(["POST"])
@@ -458,6 +466,8 @@ def organization_members(request):
     return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
 
 
+
+
 @api_view(["GET"])
 def retrieve_bookmarks(request, room_id):
     """
@@ -477,6 +487,66 @@ def retrieve_bookmarks(request, room_id):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+
+@api_view(["PUT"])
+def pinned_message(request, message_id):
+    """
+    This is used to pin a message.
+    The message_id is passed to it which
+    reads through the database, gets the room id,
+    generates a link and then add it to the pinned key value.
+
+    If the link already exist, it would greet you with a nice response from the developer that wrote it.
+    """
+    try:
+        message = DB.read("dm_messages", {"id": message_id})
+        room_id = message["room_id"]
+        room = DB.read("dm_rooms", {"id": room_id})
+        pin = room["pinned"] or []
+        link = f"https://dm.zuri.chat/"+ f"{room_id}"+"/"+f"{message_id}"+"/pinnedmessage"
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if link not in pin:
+        pin.append(link)
+        data = {"pinned": pin}
+        response = DB.update("dm_rooms", room_id, data)
+        room = DB.read("dm_rooms", {"id": room_id})
+        if response.get("status") == 200:
+            return Response(data=data, status=status.HTTP_200_OK)
+    return Response(data = "Already exist! why do you want to break my code?", status=status.HTTP_409_CONFLICT)
+
+
+
+
+@api_view(["DELETE"])
+def delete_pinned_message(request, message_id):
+    """
+    This is used to delete a pinned message.
+    It takes in the message id, gets the room id, generates a link and then check
+    if that link exists. If it exists, it deletes it
+    if not,...
+    """
+    try:
+        message = DB.read("dm_messages", {"id": message_id})
+        room_id = message["room_id"]
+        room = DB.read("dm_rooms", {"id": room_id})
+        pin = room["pinned"] or []
+        link = f"https://dm.zuri.chat/"+ f"{room_id}"+"/"+f"{message_id}"+"/pinnedmessage"
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if link in pin:
+        print("YES")
+        pin.remove(link)
+        data = {"pinned": pin}
+        response = DB.update("dm_rooms", room_id, data)
+        room = DB.read("dm_rooms", {"id": room_id})
+        if response.get("status") == 200:
+            return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["GET"])
 def message_filter(request, room_id):
     """
@@ -489,7 +559,7 @@ def message_filter(request, room_id):
         if room is not None :
             all_messages = DB.read("dm_messages", filter={"room_id":room_id})
             if all_messages is not None:
-                message_timestamp_filter = sorted(all_messages, key=lambda k: k['created_at']) 
+                message_timestamp_filter = sorted(all_messages, key=lambda k: k['created_at'])
                 return Response(message_timestamp_filter, status=status.HTTP_200_OK)
             return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
         return Response(data="No Room or Invalid Room", status=status.HTTP_400_BAD_REQUEST)
@@ -510,4 +580,3 @@ def delete_message(request):
         else:
             return Response("No such message", status.HTTP_404_NOT_FOUND)
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
-    
