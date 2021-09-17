@@ -39,33 +39,26 @@ def info(request):
     return JsonResponse(info, safe=False)
 
 
+def verify_user(token):
+    """
+    Call Endpoint for verification of user (sender)
+    It takes in either token or cookies and returns a python dictionary of 
+    user info if 200 successful or 401 unathorized if not
+    """
+    url = "https://api.zuri.chat/auth/verify-token"
+    
+    headers={}
+    if '.' in token:
+        headers['Authorization'] = f'Bearer {token}'
+    else:
+        headers['Cookie'] = token
+        
+    response = requests.get(url, headers=headers)
+    response = response.json()
 
-def verify_user_auth(token):
-	"""
-	Call Endpoint for verification of JWT Token
-	Returns: py dict -> is_authenticated: boolean, & data: more info
-	"""
-	url = "https://api.zuri.chat/auth/verify-token"
+    return response
 
-	headers = {
-		'Authorization': f'Bearer {token}',
-		'Content-Type': 'application/json'
-	}
-
-	api_response = requests.request("GET", url, headers=headers)
-
-	json_response = api_response.json()
-
-	response = {}
-	if json_response['status'] == "200":
-		response['is_authenticated'] = json_response['data']['is_verified']
-		response['data'] = json_response['data']['user']
-	else:
-		response['is_authenticated'] = False
-		response['data'] = json_response['message']
-
-	return response
-
+	
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
 # user_id will be gotten from the logged in user
@@ -434,18 +427,39 @@ def save_bookmark(request, room_id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def organization_members(request):
     """
     This endpoint returns a list of members for an organization.
     :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
+    
+    GET: simulates production - if request is get, either token or cookie gotten from FE will be used,
+    and authorization should take places automatically.
+    
+    POST: simulates testing - if request is post, send the cookies through the post request, it would be added
+    manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
-
-    response = requests.get(url)
-
+    
+    if request.method == "GET":
+        headers={}
+        
+        if 'Authorization' in request.headers:
+            headers['Authorization'] = request.headers['Authorization']
+        else:
+            headers['Cookie'] = request.headers['Cookie']
+        
+        response = requests.get(url, headers=headers)
+    
+    elif request.method == "POST":
+        cookie_serializer = CookieSerializer(data=request.data)
+    
+        if cookie_serializer.is_valid():
+            cookie = cookie_serializer.data['cookie']
+            response = requests.get(url, headers={'Cookie': cookie})
+        else:
+            return Response(cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		
     if response.status_code == 200:
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)
