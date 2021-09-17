@@ -425,8 +425,8 @@ def organization_members(request):
     This endpoint returns a list of members for an organization.
     :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
     
-    GET: simulates production - if request is get, cookie exist in browser and will be sent with the request,
-    and authorization should take places automatically
+    GET: simulates production - if request is get, either token or cookie gotten from FE will be used,
+    and authorization should take places automatically.
     
     POST: simulates testing - if request is post, send the cookies through the post request, it would be added
     manually to grant access, PS: please note cookies expire after a set time of inactivity.
@@ -435,8 +435,12 @@ def organization_members(request):
     
     if request.method == "GET":
         headers={}
-        if 'Cookie' in request.COOKIES:
-            headers['Cookie'] = request.COOKIES.get('Cookie')
+        
+        if 'Authorization' in request.headers:
+            headers['Authorization'] = request.headers['Authorization']
+        else:
+            headers['Cookie'] = request.headers['Cookie']
+        
         response = requests.get(url, headers=headers)
     
     elif request.method == "POST":
