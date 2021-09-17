@@ -47,11 +47,27 @@ class MessageSerializer(serializers.Serializer):
 
 
 class RoomSerializer(serializers.Serializer):
-    org_id = serializers.CharField(max_length=128)
+    org_id = serializers.CharField(max_length=128, required=True)
     room_user_ids = serializers.ListField(child=serializers.CharField(max_length=128),
-                                           allow_empty=False)
-    created_at = serializers.DateTimeField(default=timezone.now)
+                                           allow_empty=False, required=True)
+    bookmarks = serializers.ListField(child=serializers.CharField(max_length=128),
+                                            allow_empty=True)
+    pinned = serializers.ListField(child=serializers.CharField(max_length=128),
+                                        allow_empty=True)
+    created_at = serializers.DateTimeField(default=timezone.now, read_only=True)
 
     def __str__(self):
         return str()
 
+
+class RoomInfoSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+
+
+class GetMessageSerializer(serializers.Serializer):
+    room_id = serializers.CharField(max_length=128)
+    date = serializers.DateField(format="%d-%m-%Y", input_formats=['%d-%m-%Y', 'iso-8601'], required=False)
+
+
+class UserRoomsSerializer(serializers.Serializer):
+    user_id = serializers.CharField(max_length=128)

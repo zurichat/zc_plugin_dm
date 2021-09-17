@@ -26,7 +26,7 @@
                             tincidunt magnis.
                         </p>
                     </div>
-                    <div v-if="emojis" class="reactions d-flex">
+                    <div v-if="emojis.length > 0" class="reactions d-flex">
                         <div
                             v-for="(value, name, index) in emojiSet"
                             :key="index"
@@ -38,6 +38,9 @@
                                 {{ name }}
                                 <div class="reaction-count">{{ value }}</div>
                             </div>
+                        </div>
+                        <div class="add-reactions" @click="addEmoji">
+                            <img src="@/assets/add-emoji.svg" alt="add-emoji" />
                         </div>
                     </div>
                     <EmojiComp :onSelectEmoji="onSelectEmoji" />
@@ -77,7 +80,10 @@ export default {
         },
         show_popup_profile(p_state){
             bus.$emit('togleProfilePopUp', p_state)
-        }
+        },
+        addEmoji() {
+            this.setPickEmoji(true);
+        },
     },
     computed: {
         ...mapGetters(['emojis', 'emojiSet']),
@@ -141,20 +147,33 @@ export default {
     background: var(--bg-color-footer);
 }
 
-.thread-reactions {
-    border: 1px solid #00b87b !important;
+.thread-reactions,
+.add-reactions {
+    background: rgba(29, 28, 29, 0.06);
     border-radius: 25px;
-    padding: 1px 8px;
+    padding: 1px 10px;
     position: relative;
-    display: inline-block;
-    margin-right: 5px;
     cursor: pointer;
 }
+
+.add-reactions {
+    margin-left: 5px;
+}
+
+.add-reactions img {
+    width: 20px;
+    height: 20px;
+}
+
+.thread-reactions {
+    display: inline-flex;
+    justify-content: space-evenly;
+    margin-right: 5px;
+}
+
 .reaction-count {
-    position: absolute;
-    bottom: 0;
-    right: 4px;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 12px;
+    margin-top: 2px;
+    padding-left: 2px;
 }
 </style>
