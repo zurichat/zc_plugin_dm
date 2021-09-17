@@ -1,5 +1,5 @@
 import requests
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from requests.exceptions import RequestException
 
 # CENTRIFUGO settings
@@ -59,7 +59,29 @@ class CentrifugoHandler:
             Dict[int, Any]: The response from Centrifugo after executing the command sent
         """
 
-        command = {"method": "publish", "params": {"channel": room, "data": data}}
+        command = {
+            "method": "publish",
+            "params": {"channel": room, "data": data, "skip_history": skip_history},
+        }
+
+        return self._send_command(command)
+
+    def unsubscribe(self, user: str, room: str, client: Optional[str] = None) -> None:
+        """Unsubscribe a user from a room
+
+        Args:
+            user (str): The id of a user inside the current room
+            room (str): The name of the room where to unsubscribe the user
+            client (Optional[str], optional): Specific client ID to unsubscribe (user still required to be set). Defaults to None.
+
+        Returns:
+            [type]: The response from Centrifugo after executing the command sent
+        """
+
+        command = {
+            "method": "unsubscribe",
+            "params": {"channel": room, "user": user, "client": client},
+        }
 
         return self._send_command(command)
 
