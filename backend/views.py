@@ -98,13 +98,15 @@ def side_bar(request):
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-def send_message(request):
+def send_message(request, room_id ):
     """
     This endpoint is used to send message to user in rooms.
     It checks if room already exist before sending data.
     It makes a publish event to centrifugo after data
     is persisted
     """
+    request.data['room_id'] = room_id
+    print(request)
     serializer = MessageSerializer(data=request.data)
 
     if serializer.is_valid():
@@ -146,7 +148,7 @@ def send_message(request):
     responses={201: ThreadResponse, 400: "Error Response"},
 )
 @api_view(["POST"])
-def send_thread_message(request):
+def send_thread_message(request,room_id, message_id):
     """
     This endpoint is used send messages as a thread
     under a message. It takes a message ID and
@@ -154,7 +156,7 @@ def send_thread_message(request):
     a publish event to centrifugo after
     thread message is persisted.
     """
-
+    request.data['message_id'] = message_id
     serializer = ThreadSerializer(data=request.data)
 
     if serializer.is_valid():
@@ -162,7 +164,7 @@ def send_thread_message(request):
         message_id = data["message_id"]
         sender_id = data["sender_id"]
 
-        message = DB.read("dm_messages", {"_id": message_id})  # fetch message from zc 
+        message = DB.read("dm_messages", {"_id": message_id, "room_id":room_id})  # fetch message from zc 
 
         if message:
             threads = message.get("threads", [])  # get threads
@@ -195,7 +197,7 @@ def send_thread_message(request):
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
-        return Response("No such message", status=status.HTTP_400_BAD_REQUEST)
+        return Response("No such message or room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -7,8 +7,8 @@ import requests, json
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
 ORG_ID = "6133c5a68006324323416896"
-CENTRIFUGO_TOKEN = '58c2400b-831d-411d-8fe8-31b6e337738b'
-# CENTRIFUGO_TOKEN = 'my_api_key'
+# CENTRIFUGO_TOKEN = '58c2400b-831d-411d-8fe8-31b6e337738b'
+CENTRIFUGO_TOKEN = 'my_api_key'
 
 class DataStorage:
     def __init__(self, request=None):
@@ -113,8 +113,8 @@ class DataStorage:
 
 
 def send_centrifugo_data(room, data):
-    url = "https://realtime.zuri.chat/api"
-    # url = "http://localhost:8000/api"
+    # url = "https://realtime.zuri.chat/api"
+    url = "http://localhost:8000/api"
     headers = {'Content-type': 'application/json', 'Authorization': 'apikey ' + CENTRIFUGO_TOKEN}
     command = {
         "method": "publish",    
