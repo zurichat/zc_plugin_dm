@@ -487,6 +487,24 @@ def retrieve_bookmarks(request, room_id):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(["PUT"])
+def mark_read(request, message_id):
+    """
+    mark a message as read and unread
+    """
+    try:
+        message = DB.read("dm_messages", {"id": message_id})
+        read = message["read"]
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
+    data = {"read": not read}
+    response = DB.update("dm_messages", message_id, data=data)
+    message = DB.read("dm_messages", {"id": message_id})
+    
+    if response.get("status") == 200:
+       return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["PUT"])
 def pinned_message(request, message_id):
