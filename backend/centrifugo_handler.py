@@ -8,13 +8,12 @@ CENTRIFUGO_API_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
 
 
 class CentrifugoHandler:
-    """
-    Class to establish communication with Centrifugo server
-    """
+    """A helper class to handle communication with the Centrifugo server."""
 
     def __init__(
         self,
     ) -> None:
+        """Initialize CentrifugoHandler with `address` and `api_key` values."""
         self.address = CENTRIFUGO_HOST
         self.api_key = CENTRIFUGO_API_TOKEN
 
@@ -23,41 +22,48 @@ class CentrifugoHandler:
             "Authorization": "apikey " + self.api_key,
         }
 
-    def _send_command(self, data: Dict[int, Any]) -> Dict[int, Any]:
-        """[summary]
+    def _send_command(self, command: Dict[int, Any]) -> Dict[int, Any]:
+        """Connects to the Centrifugo server and sends command to execute via Centrifugo Server API.
 
-        Args:
-            data (Dict[int, Any]): [description]
+            Args:
+                command (Dict[int, Any]): The command to be sent to Centrifugo
 
-        Raises:
-            RequestException: [description]
+            Raises:
+                RequestException: There was an ambiguous exception that occurred while handling the
+        request
 
-        Returns:
-            Dict[int, Any]: [description]
+            Returns:
+                Dict[int, Any]: The response from Centrifugo after executing the command sent
         """
-       
+
         try:
-            response = requests.post(url=self.address, headers=self.headers, json=data)
+            response = requests.post(
+                url=self.address, headers=self.headers, json=command
+            )
         except requests.RequestException as error:
             raise RequestException(error)
-        stat = {"status_code": response.status_code, "message": response.json()}
 
         return {"status_code": response.status_code, "message": response.json()}
 
-    def publish(self, room: str, data: Dict[str, str], skip_history=False):
-        """Publish a message to a Centrifugo channel
+    def publish(
+        self, room: str, data: Dict[str, str], skip_history=False
+    ) -> Dict[int, Any]:
+        """Publish data into a room.
 
         Args:
-            room (str): [description]
-            data (Dict[str, str]): [description]
-            skip_history (bool, optional): [description]. Defaults to False.
+            room (str): The name of the room where to publish the data
+            data (Dict[str, str]): Custom JSON data to publish into the room
+            skip_history (bool, optional): Skip adding publication for this request. Defaults to False.
 
         Returns:
-            [type]: [description]
+            Dict[int, Any]: The response from Centrifugo after executing the command sent
         """
+
         command = {"method": "publish", "params": {"channel": room, "data": data}}
 
         return self._send_command(command)
 
 
+# An instance of CentrifugoHandler
+# This will be used when importing the class
 centrifugo_client = CentrifugoHandler()
