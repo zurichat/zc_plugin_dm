@@ -8,9 +8,9 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path("api/v1/sendmessage", views.send_message, name="send_message"),
+    path("api/v1/rooms/<str:room_id>/message", views.send_message, name="send_message"),
     path(
-        "api/v1/sendthreadmessage",
+        "api/v1/rooms/<str:room_id>/messages/<str:message_id>/thread",
         views.send_thread_message,
         name="send_thread_message",
     ),

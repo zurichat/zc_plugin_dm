@@ -23,7 +23,6 @@ class ThreadSerializer(serializers.Serializer):
 class MessageSerializer(serializers.Serializer):
     sender_id = serializers.CharField(max_length=128)
     room_id = serializers.CharField(max_length=128)
-    media = serializers.ListField(child=serializers.URLField(), allow_empty=True)
     message = serializers.CharField()
     media = serializers.ListField(child=serializers.URLField(), allow_empty=True, required=False, default=[])
     read = serializers.BooleanField(default=False, required=False)

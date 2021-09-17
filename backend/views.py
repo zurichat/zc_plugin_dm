@@ -98,48 +98,48 @@ def side_bar(request):
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-def send_message(request):
+def send_message(request, room_id ):
     """
     This endpoint is used to send message to user in rooms.
     It checks if room already exist before sending data.
     It makes a publish event to centrifugo after data
     is persisted
     """
+    request.data['room_id'] = room_id
+    print(request)
     serializer = MessageSerializer(data=request.data)
 
     if serializer.is_valid():
         data = serializer.data
-        room_id = data['room_id'] #room id gotten from client request
+        room_id = data["room_id"]  # room id gotten from client request
 
-        rooms = DB.read("dm_rooms")
-        if type(rooms) == list:
-            is_room_avalaible = len([room for room in rooms if room.get('_id', None) == room_id]) != 0
+        room = DB.read("dm_rooms", {"_id": room_id})
+        if room:
+            if data["sender_id"] in room.get("room_user_ids", []):
 
-            if is_room_avalaible:
                 response = DB.write("dm_messages", data=serializer.data)
-                if response.get("status",None) == 200:
+                if response.get("status", None) == 200:
 
                     response_output = {
-                            "status":response["message"],
-                            "id":response["data"]["object_id"],
-                            "room_id":room_id,
-                            "thread":False,
-                            "data":{
-                                "sender_id":data["sender_id"],
-                                "message":data["message"],
-                                "created_at":data['created_at']
-                            }
-                        }
+                        "status": response["message"],
+                        "event": "message_create",
+                        "message_id": response["data"]["object_id"],
+                        "room_id": room_id,
+                        "thread": False,
+                        "data": {
+                            "sender_id": data["sender_id"],
+                            "message": data["message"],
+                            "created_at": data["created_at"],
+                        },
+                    }
 
-                    centrifugo_data = send_centrifugo_data(room=room_id,data=response_output) #publish data to centrifugo
-                    if centrifugo_data["message"].get("error",None) == None:
-
+                    centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
+                    # print(centrifugo_data)
+                    if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
-
-                return Response(data="data not sent",status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("No such room",status=status.HTTP_400_BAD_REQUEST)
-        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
-
+                return Response(data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+            return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
+        return Response("room not found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -149,7 +149,7 @@ def send_message(request):
     responses={201: ThreadResponse, 400: "Error Response"},
 )
 @api_view(["POST"])
-def send_thread_message(request):
+def send_thread_message(request,room_id, message_id):
     """
     This endpoint is used send messages as a thread
     under a message. It takes a message ID and
@@ -157,48 +157,48 @@ def send_thread_message(request):
     a publish event to centrifugo after
     thread message is persisted.
     """
-
+    request.data['message_id'] = message_id
     serializer = ThreadSerializer(data=request.data)
 
     if serializer.is_valid():
         data = serializer.data
         message_id = data["message_id"]
-        messages = DB.read("dm_messages")  # fetch messages from zc core
-        if type(messages) == list:
-            message_list = [msg for msg in messages if msg['_id'] == message_id]
+        sender_id = data["sender_id"]
 
-            if len(message_list) != 0:
-                message = message_list[0] #get messsage itself
-                threads = message.get('threads',[]) #get threads
+        message = DB.read("dm_messages", {"_id": message_id, "room_id":room_id})  # fetch message from zc 
 
-                del data['message_id'] #remove message id from request to zc core
-                data['_id'] = str(uuid.uuid1()) # assigns an id to each message in thread
-                threads.append(data) # append new message to list of thread
+        if message:
+            threads = message.get("threads", [])  # get threads
+            del data["message_id"]  # remove message id from request to zc core
+            data["_id"] = str(uuid.uuid1())  # assigns an id to each message in thread
+            threads.append(data)  # append new message to list of thread
+            
+            room = DB.read("dm_rooms",{"_id":message["room_id"]})
+            if sender_id in room.get("room_user_ids", []):
 
-                response = DB.update("dm_messages",message['_id'],{"threads":threads}) # update threads in db
-
-                if response.get("status",None) == 200:
+                response = DB.update("dm_messages", message["_id"], {"threads": threads} )  # update threads in db
+                if response.get("status", None) == 200:
 
                     response_output = {
-                            "status":response["message"],
-                            "id":data['_id'],
-                            "room_id":message['room_id'],
-                            "message_id":message['_id'],
-                            "thread":True,
-                            "data":{
-                                "sender_id":data["sender_id"],
-                                "message":data["message"],
-                                "created_at":data['created_at']
-                            }
-                        }
+                        "status": response["message"],
+                        "event": "thread_message_create",
+                        "thread_id": data["_id"],
+                        "room_id": message["room_id"],
+                        "message_id": message["_id"],
+                        "thread": True,
+                        "data": {
+                            "sender_id": data["sender_id"],
+                            "message": data["message"],
+                            "created_at": data["created_at"],
+                        },
+                    }
 
-                    centrifugo_data = send_centrifugo_data(room=message['room_id'],data=response_output) #publish data to centrifugo
-                    if centrifugo_data["message"].get("error",None) == None:
-                        print("message is published to centrifugo")
+                    centrifugo_data = send_centrifugo_data(room=message["room_id"], data=response_output)  # publish data to centrifugo
+                    if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("No such message",status=status.HTTP_400_BAD_REQUEST)
-        return Response("core server not avaliable",status=status.HTTP_424_FAILED_DEPENDENCY)
+            return Response("sender not in room", status=status.HTTP_404_NOT_FOUND)
+        return Response("message or room not found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -402,13 +402,9 @@ def copy_message_link(request, message_id):
         )
 
 
-
-
-@api_view(['GET'])
 def read_message_link(request, room_id, message_id):
     """
     This is used to retrieve a single message. It takes a message_id as query params.
-    If message_id is provided, it returns a dictionary with information about the message,
     or a 204 status code if there is no message with the same message id.
     I will use the message information returned to generate a link which contains a room_id and a message_id
     """
