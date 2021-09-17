@@ -123,7 +123,7 @@ def send_message(request, room_id ):
                     response_output = {
                         "status": response["message"],
                         "event": "message_create",
-                        "id": response["data"]["object_id"],
+                        "message_id": response["data"]["object_id"],
                         "room_id": room_id,
                         "thread": False,
                         "data": {
@@ -134,11 +134,12 @@ def send_message(request, room_id ):
                     }
 
                     centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
+                    print(centrifugo_data)
                     if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response(data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
-        return Response("No such room", status=status.HTTP_400_BAD_REQUEST)
+        return Response("room not found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -181,7 +182,7 @@ def send_thread_message(request,room_id, message_id):
                     response_output = {
                         "status": response["message"],
                         "event": "thread_message_create",
-                        "id": data["_id"],
+                        "thread_id": data["_id"],
                         "room_id": message["room_id"],
                         "message_id": message["_id"],
                         "thread": True,
@@ -196,8 +197,8 @@ def send_thread_message(request,room_id, message_id):
                     if centrifugo_data["message"].get("error", None) == None:
                         return Response(data=response_output, status=status.HTTP_201_CREATED)
                 return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
-        return Response("No such message or room", status=status.HTTP_400_BAD_REQUEST)
+            return Response("sender not in room", status=status.HTTP_404_NOT_FOUND)
+        return Response("message or room not found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
