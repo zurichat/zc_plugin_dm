@@ -86,3 +86,7 @@ class BookmarkSerializer(serializers.Serializer):
         if not re.match(pattern, value):
             raise serializers.ValidationError("Invalid link for bookmark")
         return value
+
+
+class CookieSerializer(serializers.Serializer):
+    cookie = serializers.CharField(max_length=150)
