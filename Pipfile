@@ -21,6 +21,10 @@ urllib3 = "==1.26.6"
 drf-yasg = "==1.20.0"
 
 [dev-packages]
+black = "*"
 
 [requires]
 python_version = "3.9"
+
+[pipenv]
+allow_prereleases = true
