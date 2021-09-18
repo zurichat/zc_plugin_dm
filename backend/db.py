@@ -8,12 +8,14 @@ import requests, json
 PLUGIN_ID = "6135f65de2358b02686503a7"
 ORG_ID = "6133c5a68006324323416896"
 CENTRIFUGO_TOKEN = '58c2400b-831d-411d-8fe8-31b6e337738b'
-
+# CENTRIFUGO_TOKEN = 'my_api_key'
 
 class DataStorage:
     def __init__(self, request=None):
         self.read_api = "https://api.zuri.chat/data/read/{pgn_id}/{collec_name}/{org_id}?{query}"
         self.write_api = "https://api.zuri.chat/data/write"
+        self.delete_api = "https://api.zuri.chat/data/delete"
+        
         if request is None:
             self.plugin_id = PLUGIN_ID
             self.organization_id = ORG_ID
@@ -88,10 +90,31 @@ class DataStorage:
                 "status_code": response.status_code,
                 "message": response.reason
             }
+    
+    def delete(self, collection_name, document_id):
+        body = dict(
+            plugin_id=self.plugin_id,
+            organization_id=self.organization_id,
+            collection_name=collection_name,
+            object_id=document_id
+        )
+        try:
+            response = requests.post(url=self.delete_api, json=body)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {
+                "status_code": response.status_code,
+                "message": response.reason
+            }
 
 
 def send_centrifugo_data(room, data):
     url = "https://realtime.zuri.chat/api"
+    # url = "http://localhost:8000/api"
     headers = {'Content-type': 'application/json', 'Authorization': 'apikey ' + CENTRIFUGO_TOKEN}
     command = {
         "method": "publish",    
@@ -108,14 +131,11 @@ def send_centrifugo_data(room, data):
             }
     except Exception as e:
         print(e)
-        
-    
+
 
 DB = DataStorage()
 
 
-
-# Gets the rooms that a user is in
 def get_user_rooms(collection_name, org_id, user):
     room_list = list()
     rooms = DB.read(collection_name,{"org_id":org_id})
