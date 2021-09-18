@@ -31,6 +31,7 @@ schema_view = get_schema_view(
       license=openapi.License(name="BSD License"),
    ),
    url="https://dm.zuri.chat",
+# url="http://127.0.0.1:8000",
    public=True,
    permission_classes=(permissions.AllowAny,),
    #validators=["ssv"],
