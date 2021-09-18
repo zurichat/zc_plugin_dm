@@ -27,6 +27,6 @@ urlpatterns = [
     path('api/v1/<str:message_id>/deletepinnedmessage/', views.delete_pinned_message, name="pinned_message"),
     path('api/v1/<str:room_id>/<str:message_id>/pinnedmessage/', views.read_message_link, name="pinned_message"),
     path('api/v1/<str:room_id>/filter_messages', views.message_filter, name="message_filter"),
-    path('api/v1/delete-message', views.delete_message, name="delete_message")
-
+    path('api/v1/delete-message', views.delete_message, name="delete_message"),
+    path('api/v1/<str:org_id>/users/<str:user_id>', views.user_profile, name="user_profile")
 ]
