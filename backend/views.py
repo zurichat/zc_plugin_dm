@@ -401,7 +401,7 @@ def copy_message_link(request, message_id):
             {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
         )
 
-
+@api_view(['GET'])
 def read_message_link(request, room_id, message_id):
     """
     This is used to retrieve a single message. It takes a message_id as query params.
