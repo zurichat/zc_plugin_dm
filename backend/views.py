@@ -466,6 +466,7 @@ def save_bookmark(request, room_id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(methods=['post'], request_body=CookieSerializer, responses={400: "Error: Bad Request"})
 @api_view(['GET', 'POST'])
 def organization_members(request):
     """
@@ -574,8 +575,6 @@ def pinned_message(request, message_id):
     return Response(data = "Already exist! why do you want to break my code?", status=status.HTTP_409_CONFLICT)
 
 
-
-
 @api_view(["DELETE"])
 def delete_pinned_message(request, message_id):
     """
@@ -622,6 +621,7 @@ def message_filter(request, room_id):
         return Response(data="No Room or Invalid Room", status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(methods=['delete'], request_body=DeleteMessageSerializer, responses={400: "Error: Bad Request"})
 @api_view(["DELETE"])
 def delete_message(request):
     """
@@ -636,4 +636,34 @@ def delete_message(request):
             return Response(response, status.HTTP_200_OK)
         else:
             return Response("No such message", status.HTTP_404_NOT_FOUND)
+    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+@swagger_auto_schema(methods=['get'], responses={201: UserProfileResponse, 400: "Error: Bad Request"})
+@api_view(["GET"])
+def user_profile(request, org_id, user_id):
+    """
+    Retrieves the user details of a member in an organization using a unique user_id
+    If request is successful, a json output of select user details is returned
+    Elif login session is expired or wrong details were entered, a 401 response is returned
+    Else a 405 response returns if a wrong method was used
+    """
+    url = f"https://api.zuri.chat/organizations/{org_id}/members/{user_id}"
+    #url = f"https://dm.zuri.chat/api/v1/get_organization_members/{user_id}"
+
+    if request.method == "GET":
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()["data"]
+            output = {
+                "name": data["name"],
+                "display_name": data["display_name"],
+                "bio": data["bio"],
+                "pronouns": data["pronouns"],
+                "email": data["email"],
+                "phone": data["phone"],
+                "status": data["status"]
+            }
+            return Response(output, status = status.HTTP_200_OK)
+        return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)

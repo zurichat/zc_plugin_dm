@@ -10,7 +10,7 @@ When contributing to the project, please follow these guidelines:
 
 ## Contributing to the project
 
-1.  Fork the repository on [GitHub](https://github.com/Delight-Fela-Steve/zuri_dm_revamp/fork)
+1.  Fork the repository on [GitHub](https://github.com/zurichat/zc_plugin_dm/fork)
 2.  Clone the repository on your local machine `git clone https://github.com/Delight-Fela-Steve/zuri_dm_revamp/`
 3.  CD into the directory `$cd zuri_dm_revamp`
 4.  Run `$yarn add or $yarn` to install all the dependencies
