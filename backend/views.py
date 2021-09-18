@@ -47,23 +47,23 @@ def info(request):
 def verify_user(token):
     """
     Call Endpoint for verification of user (sender)
-    It takes in either token or cookies and returns a python dictionary of 
+    It takes in either token or cookies and returns a python dictionary of
     user info if 200 successful or 401 unathorized if not
     """
     url = "https://api.zuri.chat/auth/verify-token"
-    
+
     headers={}
     if '.' in token:
         headers['Authorization'] = f'Bearer {token}'
     else:
         headers['Cookie'] = token
-        
+
     response = requests.get(url, headers=headers)
     response = response.json()
 
     return response
 
-	
+
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
 # user_id will be gotten from the logged in user
@@ -401,7 +401,7 @@ def copy_message_link(request, message_id):
             {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
         )
 
-
+@api_view(['GET'])
 def read_message_link(request, room_id, message_id):
     """
     This is used to retrieve a single message. It takes a message_id as query params.
@@ -472,34 +472,34 @@ def organization_members(request):
     """
     This endpoint returns a list of members for an organization.
     :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
-    
+
     GET: simulates production - if request is get, either token or cookie gotten from FE will be used,
     and authorization should take places automatically.
-    
+
     POST: simulates testing - if request is post, send the cookies through the post request, it would be added
     manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
-    
+
     if request.method == "GET":
         headers={}
-        
+
         if 'Authorization' in request.headers:
             headers['Authorization'] = request.headers['Authorization']
         else:
             headers['Cookie'] = request.headers['Cookie']
-        
+
         response = requests.get(url, headers=headers)
-    
+
     elif request.method == "POST":
         cookie_serializer = CookieSerializer(data=request.data)
-    
+
         if cookie_serializer.is_valid():
             cookie = cookie_serializer.data['cookie']
             response = requests.get(url, headers={'Cookie': cookie})
         else:
             return Response(cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-		
+
     if response.status_code == 200:
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)
@@ -537,11 +537,11 @@ def mark_read(request, message_id):
         read = message["read"]
     except Exception as e:
         print(e)
-        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     data = {"read": not read}
     response = DB.update("dm_messages", message_id, data=data)
     message = DB.read("dm_messages", {"id": message_id})
-    
+
     if response.get("status") == 200:
        return Response(data=data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -558,10 +558,14 @@ def pinned_message(request, message_id):
     """
     try:
         message = DB.read("dm_messages", {"id": message_id})
+        print("message",message)
         room_id = message["room_id"]
+        print("room id", room_id)
         room = DB.read("dm_rooms", {"id": room_id})
+        print("room", room)
         pin = room["pinned"] or []
-        link = f"https://dm.zuri.chat/"+ f"{room_id}"+"/"+f"{message_id}"+"/pinnedmessage"
+        print("pin", pin)
+        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -571,7 +575,7 @@ def pinned_message(request, message_id):
         response = DB.update("dm_rooms", room_id, data)
         room = DB.read("dm_rooms", {"id": room_id})
         if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_200_OK)
+            return Response(data=room, status=status.HTTP_200_OK)
     return Response(data = "Already exist! why do you want to break my code?", status=status.HTTP_409_CONFLICT)
 
 
@@ -588,7 +592,7 @@ def delete_pinned_message(request, message_id):
         room_id = message["room_id"]
         room = DB.read("dm_rooms", {"id": room_id})
         pin = room["pinned"] or []
-        link = f"https://dm.zuri.chat/"+ f"{room_id}"+"/"+f"{message_id}"+"/pinnedmessage"
+        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
