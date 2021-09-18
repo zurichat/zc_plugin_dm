@@ -7,18 +7,14 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 import requests
 from .db import *
-<<<<<<< HEAD
-=======
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from django.core.files.storage import default_storage
->>>>>>> 5f988bb0b0cd333defb25f4210bc3cadc180af30
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-<<<<<<< HEAD
 from .utils import SendNotificationThread
 from datetime import datetime
 import datetime as datetimemodule
@@ -26,10 +22,8 @@ import datetime as datetimemodule
 
 
 
-=======
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
->>>>>>> 5f988bb0b0cd333defb25f4210bc3cadc180af30
 
 def index(request):
     context = {}
@@ -693,7 +687,6 @@ def user_profile(request, org_id, user_id):
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-<<<<<<< HEAD
 @swagger_auto_schema(methods=['post'], request_body=ReminderSerializer, responses={400: "Error: Bad Request"})
 @api_view(["POST"])
 def remind_message(request):
@@ -741,7 +734,6 @@ def remind_message(request):
         return Response(data=response_output, status=status.HTTP_201_CREATED)
     return Response(data="Bad Format - Follow the format{'message_id'}", status=status.HTTP_400_BAD_REQUEST)
 
-=======
 class Files(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
@@ -814,4 +806,3 @@ class SendFile(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         return Response("No file attached, Use send Message api to send only a message", status=status.HTTP_204_NO_CONTENT)
->>>>>>> 5f988bb0b0cd333defb25f4210bc3cadc180af30
