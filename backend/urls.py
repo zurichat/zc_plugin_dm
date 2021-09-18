@@ -1,7 +1,8 @@
 from requests.api import delete
 from . import views
 from django.urls import path
-
+from django.conf import settings
+from django.conf.urls.static import static
 app_name = "backend"
 
 urlpatterns = [
@@ -28,6 +29,12 @@ urlpatterns = [
     path('api/v1/<str:room_id>/<str:message_id>/pinnedmessage/', views.read_message_link, name="read_pinned_message"),
     path('api/v1/<str:room_id>/filter_messages', views.message_filter, name="message_filter"),
     path('api/v1/delete-message', views.delete_message, name="delete_message"),
-    path('api/v1/<str:org_id>/users/<str:user_id>', views.user_profile, name="user_profile")
+    path('api/v1/<str:org_id>/users/<str:user_id>', views.user_profile, name="user_profile"),
+    path('api/v1/files', views.Files.as_view(), name='upload-file'),
+    path('api/v1/rooms/<str:room_id>/messagemedia', views.SendFile.as_view(), name='view')
 
 ]
+
+
+if settings.DEBUG:
+	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -3,11 +3,13 @@ from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 import requests
 from .db import *
-
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
+from django.core.files.storage import default_storage
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
@@ -671,3 +673,77 @@ def user_profile(request, org_id, user_id):
             return Response(output, status = status.HTTP_200_OK)
         return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class Files(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        if request.method == "POST" and request.FILES['file']:
+            file = request.FILES['file']
+            filename = default_storage.save(file.name, file)
+            file_url = default_storage.url(filename)
+            return Response({
+                "file_url":file_url
+            })
+
+
+class SendFile(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, room_id):
+        print(request.FILES)
+        if request.FILES:
+            file_urls = []
+            for fil in request.FILES:
+                file= request.FILES[fil]
+                files = {
+                    'file':file
+                }
+
+                response = requests.post(f'http://{request.META["HTTP_HOST"]}/api/v1/files', files=files )
+                if response.status_code == 200:
+                    file_urls.append(response.json()['file_url'])
+                else:
+                    return Response({
+                        'status_code':response.status_code,
+                        "reason": response.reason
+                    })
+            
+            request.data['room_id'] = room_id
+            print(request)
+            serializer = MessageSerializer(data=request.data)
+
+            if serializer.is_valid():
+                data = serializer.data
+                room_id = data["room_id"]  # room id gotten from client request
+
+                room = DB.read("dm_rooms", {"_id": room_id})
+                if room:
+                    if data["sender_id"] in room.get("room_user_ids", []):
+                        data['media']=file_urls
+                        response = DB.write("dm_messages", data=data)
+                        if response.get("status", None) == 200:
+
+                            response_output = {
+                                "status": response["message"],
+                                "event": "message_create",
+                                "message_id": response["data"]["object_id"],
+                                "room_id": room_id,
+                                "thread": False,
+                                "data": {
+                                    "sender_id": data["sender_id"],
+                                    "message": data["message"],
+                                    "created_at": data["created_at"],
+                                    "media": data["media"]
+                                },
+                            }
+
+                            centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
+                            # print(centrifugo_data)
+                            if centrifugo_data["message"].get("error", None) == None:
+                                return Response(data=response_output, status=status.HTTP_201_CREATED)
+                        return Response(data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                    return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
+                return Response("room not found", status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response("No file attached, Use send Message api to send only a message", status=status.HTTP_204_NO_CONTENT)
