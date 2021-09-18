@@ -257,9 +257,7 @@ def create_room(request):
 def getUserRooms(request, user_id):
     """
     This is used to retrieve all rooms a user is currently active in.
-    It takes in a user_id as query param and returns the rooms for that user or a 204 status code
-    if there is no room for the user_id or an invalid user_id.
-    If the user_id is not provided, a 400 status code is returned.
+    if there is no room for the user_id it returns a 204 status.
     """
     if request.method == "GET":
         res = get_rooms(user_id)
