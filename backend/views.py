@@ -14,7 +14,32 @@ from .responses import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from .utils import SendNotificationThread
+from datetime import datetime
 
+@swagger_auto_schema(methods=['post'], request_body=ReminderSerializer, responses={400: "Error: Bad Request"})
+@api_view(["POST"])
+def remind_message(request):
+    """
+        This is used to remind a user about a  message
+    """
+    serializer = ReminderSerializer(data=request.data)
+    print(serializer.is_valid())
+    if serializer.is_valid():
+        serialized_data = serializer.data
+        message_id = serialized_data['message']
+        current_date = serialized_data['current_date']
+        scheduled_date = serialized_data['scheduled_date']
+        local_current_date = datetime.strptime(current_date,'%a, %d %b %Y %H:%M:%S %Z')
+        local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
+        # message = DB.read("dm_messages", {"id": message_id})
+        print(message)
+        response_output ={
+            # "message":message,
+            "scheduled_date": local_scheduled_date
+        }
+        return Response(data=response_output, status=status.HTTP_201_CREATED)
+    return Response(data={"bad":"verybad"}, status=status.HTTP_201_CREATED)
 
 
 
@@ -348,32 +373,6 @@ def edit_room(request, pk):
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(["POST", "GET"])
-def reminder(request):
-    """
-        This is used to remind a user about a bookmarked message
-        and scheduled message
-    """
-    #collect the user info(the rooms the user is in) , the message info (time of creation),
-    # collect the scheduled message(time created, time set for the remineder)
-    # set a default timer to count  of 24hours for bookmarked messages,
-    #
-    #return {message with 15 words, snooze ,dismiss }
-    # so what can I implement
-    #create a room for the current user to display reminders
-    if request.method == "POST":
-        data = json.loads(request.body)
-        user_id = data['user_id']
-        room_id = data['room_id']
-        recipient = data['recipient_id']
-        time = data['time']
-        
-
-    # serializers = ReminderSerializer
-    # room_collection = "dm_rooms"
-    # rooms = DB.read(room_collection)
-    # get_user_rooms(collection_name, org_id, user)
-
 
 
 @api_view(['GET'])

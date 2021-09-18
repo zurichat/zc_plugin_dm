@@ -1,7 +1,6 @@
 from . import views
 # from .views import EditMessage
 from django.urls import path
-from django.views.decorators import csrf_exempt
 
 app_name = 'backend'
 
@@ -16,7 +15,7 @@ urlpatterns = [
     path('api/v1/room-info', views.room_info, name='roominfo'),
     path('api/v1/getuserrooms', views.getUserRooms, name="get_user_rooms"),
     path('api/v1/room-info', views.room_info, name='roominfo'),
-    path('api/v1/reminder', csrf_exempt(views.reminder), name='reminder' ),
+    path('api/v1/reminder', views.remind_message, name='reminder' ),
     path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
     path('api/v1/copymessagelink/<str:message_id>', views.copy_message_link, name="copy_message_link"),
     path('getmessage/<str:room_id>/<str:message_id>', views.read_message_link, name="read_message_link"),
