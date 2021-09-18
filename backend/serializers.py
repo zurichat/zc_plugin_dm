@@ -70,7 +70,6 @@ class GetMessageSerializer(serializers.Serializer):
 
 
 class UserRoomsSerializer(serializers.Serializer):
-    room_id = serializers.CharField(max_length=128)
     user_id = serializers.CharField(max_length=128)
 
 
@@ -91,3 +90,6 @@ class ReadSerializer(serializers.Serializer):
 
 class CookieSerializer(serializers.Serializer):
     cookie = serializers.CharField(max_length=150)
+
+class DeleteMessageSerializer(serializers.Serializer):
+    message_id = serializers.CharField(max_length=128)
