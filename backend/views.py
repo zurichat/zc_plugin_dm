@@ -218,15 +218,16 @@ def create_room(request):
     Then returns the room id when a room is successfully created
     """
 
+            #validate request
     if 'Authorization' in request.headers:
         token = request.headers['Authorization']
     else:
         token = request.headers['Cookie']
 
     verify = verify_user(token)
-    if verify.get("status_code") == 200:
+    if verify.get("status") == 200:
 
-        serializer = RoomSerializer(data=requests.data)
+        serializer = RoomSerializer(data=request.data)
         if serializer.is_valid():
             user_ids = serializer.data["room_user_ids"]
             user_rooms = get_rooms(user_ids[0]) + get_rooms(user_ids[1])
