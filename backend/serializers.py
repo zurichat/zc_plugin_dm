@@ -65,12 +65,10 @@ class RoomInfoSerializer(serializers.Serializer):
 
 
 class GetMessageSerializer(serializers.Serializer):
-    room_id = serializers.CharField(max_length=128)
     date = serializers.DateField(format="%d-%m-%Y", input_formats=['%d-%m-%Y', 'iso-8601'], required=False)
 
 
 class UserRoomsSerializer(serializers.Serializer):
-    room_id = serializers.CharField(max_length=128)
     user_id = serializers.CharField(max_length=128)
 
 
@@ -91,3 +89,6 @@ class ReadSerializer(serializers.Serializer):
 
 class CookieSerializer(serializers.Serializer):
     cookie = serializers.CharField(max_length=150)
+
+class DeleteMessageSerializer(serializers.Serializer):
+    message_id = serializers.CharField(max_length=128)

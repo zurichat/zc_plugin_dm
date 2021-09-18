@@ -35,3 +35,12 @@ class MessageLinkResponse(serializers.Serializer):
 
 class UserRoomsResponse(serializers.Serializer):
     pass
+
+class UserProfileResponse(serializers.Serializer):
+    name = serializers.ReadOnlyField()
+    display_name = serializers.ReadOnlyField()
+    bio = serializers.ReadOnlyField()
+    pronouns = serializers.ReadOnlyField()
+    email = serializers.ReadOnlyField()
+    phone = serializers.ReadOnlyField()
+    status = serializers.ReadOnlyField()
