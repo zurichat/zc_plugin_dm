@@ -1,5 +1,7 @@
 from requests.api import delete
 from . import views
+
+# from .views import EditMessage
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
@@ -19,6 +21,9 @@ urlpatterns = [
     path("api/v1/createroom", views.create_room, name="createroom"),
     path("api/v1/updatemessage/<str:pk>", views.edit_room, name="updateroom"),
     path("api/v1/room-info", views.room_info, name="roominfo"),
+    path("api/v1/getuserrooms", views.getUserRooms, name="get_user_rooms"),
+    path("api/v1/reminder", views.remind_message, name="reminder"),
+    # path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
     path("api/v1/rooms/<str:user_id>", views.getUserRooms, name="get_user_rooms"),
     path("api/v1/messages/<str:room_id>", views.room_messages, name="room_messages"),
     path(

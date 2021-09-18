@@ -19,6 +19,13 @@ class EmojiSerializer(serializers.Serializer):
         return str(self.data)
 
 
+class ReminderSerializer(serializers.Serializer):
+    message_id = serializers.CharField(max_length=500)
+    current_date = serializers.CharField(max_length=500)
+    scheduled_date = serializers.CharField(max_length=500)
+    class Meta: 
+        fields = ['__all__']
+
 class ThreadSerializer(serializers.Serializer):
     """
     this will server as a serializer to hold threads
