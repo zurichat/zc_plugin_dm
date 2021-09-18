@@ -208,21 +208,43 @@ def send_thread_message(request,room_id, message_id):
     responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-def create_room(requests):
+def create_room(request):
     """
     This function is used to create a room between 2 users.
     It takes the id of the users involved, sends a write request to the database .
     Then returns the room id when a room is successfully created
     """
-    serializer = RoomSerializer(data=requests.data)
 
-    if serializer.is_valid():
-        response = DB.write("dm_rooms", data=serializer.data)
-        data = response.get("data").get("object_id")
-        if response.get("status") == 200:
-            response_output = {"room_id": data}
-            return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization']
+    else:
+        token = request.headers['Cookie']
+
+    verify = verify_user(token)
+    if verify.get("status_code") == 200:
+
+        serializer = RoomSerializer(data=requests.data)
+        if serializer.is_valid():
+            user_ids = serializer.data["room_user_ids"]
+            user_rooms = get_rooms(user_ids[0]) + get_rooms(user_ids[1])
+            for room in user_rooms:
+                room_users = room['room_user_ids']
+                if set(room_users) == set(user_ids):
+                    response_output = {
+                        "room_id": room["_id"]
+                    }
+                    return Response(data=response_output, status=status.HTTP_200_OK)
+
+            response = DB.write("dm_rooms", data=serializer.data)
+            data = response.get("data").get("object_id")
+            if response.get("status") == 200:
+                response_output = {
+                    "room_id": data
+                    }
+                return Response(data=response_output, status=status.HTTP_201_CREATED)
+
+        return Response ( status=status.HTTP_400_BAD_REQUEST )
+    return Response ( verify, status=status.HTTP_401_UNAUTHORIZED )
 
 
 @swagger_auto_schema(
