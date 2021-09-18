@@ -3,15 +3,22 @@ from django.http import response
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 import requests
 from .db import *
+<<<<<<< HEAD
+=======
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
+from django.core.files.storage import default_storage
+>>>>>>> 5f988bb0b0cd333defb25f4210bc3cadc180af30
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+<<<<<<< HEAD
 from .utils import SendNotificationThread
 from datetime import datetime
 import datetime as datetimemodule
@@ -19,6 +26,10 @@ import datetime as datetimemodule
 
 
 
+=======
+from .centrifugo_handler import centrifugo_client
+from rest_framework.pagination import PageNumberPagination
+>>>>>>> 5f988bb0b0cd333defb25f4210bc3cadc180af30
 
 def index(request):
     context = {}
@@ -52,23 +63,23 @@ def info(request):
 def verify_user(token):
     """
     Call Endpoint for verification of user (sender)
-    It takes in either token or cookies and returns a python dictionary of 
+    It takes in either token or cookies and returns a python dictionary of
     user info if 200 successful or 401 unathorized if not
     """
     url = "https://api.zuri.chat/auth/verify-token"
-    
+
     headers={}
     if '.' in token:
         headers['Authorization'] = f'Bearer {token}'
     else:
         headers['Cookie'] = token
-        
+
     response = requests.get(url, headers=headers)
     response = response.json()
 
     return response
 
-	
+
 # Returns the json data of the sidebar that will be consumed by the api
 # The sidebar info will be unique for each logged in user
 # user_id will be gotten from the logged in user
@@ -213,21 +224,44 @@ def send_thread_message(request,room_id, message_id):
     responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-def create_room(requests):
+def create_room(request):
     """
     This function is used to create a room between 2 users.
     It takes the id of the users involved, sends a write request to the database .
     Then returns the room id when a room is successfully created
     """
-    serializer = RoomSerializer(data=requests.data)
 
-    if serializer.is_valid():
-        response = DB.write("dm_rooms", data=serializer.data)
-        data = response.get("data").get("object_id")
-        if response.get("status") == 200:
-            response_output = {"room_id": data}
-            return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+            #validate request
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization']
+    else:
+        token = request.headers['Cookie']
+
+    verify = verify_user(token)
+    if verify.get("status") == 200:
+
+        serializer = RoomSerializer(data=request.data)
+        if serializer.is_valid():
+            user_ids = serializer.data["room_user_ids"]
+            user_rooms = get_rooms(user_ids[0]) + get_rooms(user_ids[1])
+            for room in user_rooms:
+                room_users = room['room_user_ids']
+                if set(room_users) == set(user_ids):
+                    response_output = {
+                        "room_id": room["_id"]
+                    }
+                    return Response(data=response_output, status=status.HTTP_200_OK)
+
+            response = DB.write("dm_rooms", data=serializer.data)
+            data = response.get("data").get("object_id")
+            if response.get("status") == 200:
+                response_output = {
+                    "room_id": data
+                    }
+                return Response(data=response_output, status=status.HTTP_201_CREATED)
+
+        return Response ( status=status.HTTP_400_BAD_REQUEST )
+    return Response ( verify, status=status.HTTP_401_UNAUTHORIZED )
 
 
 @swagger_auto_schema(
@@ -236,23 +270,16 @@ def create_room(requests):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["GET"])
-def getUserRooms(request):
+def getUserRooms(request, user_id):
     """
     This is used to retrieve all rooms a user is currently active in.
-    It takes in a user_id as query param and returns the rooms for that user or a 204 status code
-    if there is no room for the user_id or an invalid user_id.
-    If the user_id is not provided, a 400 status code is returned.
+    if there is no room for the user_id it returns a 204 status.
     """
     if request.method == "GET":
-        res = get_rooms(request.GET.get("user_id", None))
-        query_param_serializer = UserRoomsSerializer(data=request.GET.dict())
-        if query_param_serializer.is_valid():
-            if len(res) == 0:
-                return Response(
-                    data="No rooms available", status=status.HTTP_204_NO_CONTENT
-                )
-            return Response(res, status=status.HTTP_200_OK)
-        return Response(data="Provide a user_id", status=status.HTTP_400_BAD_REQUEST)
+        res = get_rooms(user_id)
+        if res == None:
+            return Response(data="No rooms available", status=status.HTTP_204_NO_CONTENT)
+        return Response(res, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -262,48 +289,35 @@ def getUserRooms(request):
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
 @api_view(["GET"])
-def getRoomMessages(request):
+def room_messages(request, room_id):
     """
-    This is used to retrieve messages in a room. It takes a room_id and/or a date as query params.
-    If only the room_id is provided, it returns a list of all the messages if available,
-    or a 204 status code if there is no message in the room.
-    If both room_id and date are provided, it returns all the messages in that room for that
-    particular date.
-    If there is no room_id in the query params, it returns a 404 status code.
+    This is used to retrieve messages in a room.
+    It returns a 204 status code if there is no message in the room. 
+    The messages can be filter by adding date in the query, 
+    it also returns a 204 status if there is no messages.
     """
     if request.method == "GET":
-        room_id = request.GET.get("room_id", None)
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
         date = request.GET.get("date", None)
-        params_serializer = GetMessageSerializer(data=request.GET.dict())
-        all_rooms = DB.read("dm_rooms")
-
+        params_serializer = GetMessageSerializer(data=request.GET.dict()) 
         if params_serializer.is_valid():
-            is_room_avalaible = (
-                len([room for room in all_rooms if room.get("_id", None) == room_id])
-                != 0
-            )
-            if is_room_avalaible:
+            room = DB.read("dm_rooms", {"_id": room_id})
+            if room:
                 messages = get_room_messages(room_id)
-                param_len = len(params_serializer.data)
-                if param_len == 2:
+                if date != None:
                     messages_by_date = get_messages(messages, date)
-                    if len(messages_by_date) == 0:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    return Response(messages_by_date, status=status.HTTP_200_OK)
+                    if messages_by_date == None or "message" in messages_by_date:
+                        return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
+                    messages_page = paginator.paginate_queryset(messages_by_date, request)
+                    return paginator.get_paginated_response(messages_page)
                 else:
-                    if len(messages) == 0:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    return Response(messages, status=status.HTTP_200_OK)
+                    if messages == None or "message" in messages:
+                        return Response(data="No messages available", status=status.HTTP_204_NO_CONTENT)
+                    result_page = paginator.paginate_queryset(messages, request)
+                    return paginator.get_paginated_response(result_page)
             return Response(data="No such room", status=status.HTTP_400_BAD_REQUEST)
-        return Response(
-            data="Provide the room_id or/and date", status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -407,7 +421,7 @@ def copy_message_link(request, message_id):
             {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
         )
 
-
+@api_view(['GET'])
 def read_message_link(request, room_id, message_id):
     """
     This is used to retrieve a single message. It takes a message_id as query params.
@@ -478,34 +492,34 @@ def organization_members(request):
     """
     This endpoint returns a list of members for an organization.
     :returns: json response -> a list of objects (members) or 401_Unauthorized messages.
-    
+
     GET: simulates production - if request is get, either token or cookie gotten from FE will be used,
     and authorization should take places automatically.
-    
+
     POST: simulates testing - if request is post, send the cookies through the post request, it would be added
     manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
-    
+
     if request.method == "GET":
         headers={}
-        
+
         if 'Authorization' in request.headers:
             headers['Authorization'] = request.headers['Authorization']
         else:
             headers['Cookie'] = request.headers['Cookie']
-        
+
         response = requests.get(url, headers=headers)
-    
+
     elif request.method == "POST":
         cookie_serializer = CookieSerializer(data=request.data)
-    
+
         if cookie_serializer.is_valid():
             cookie = cookie_serializer.data['cookie']
             response = requests.get(url, headers={'Cookie': cookie})
         else:
             return Response(cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-		
+
     if response.status_code == 200:
         response = response.json()['data']
         return Response(response, status = status.HTTP_200_OK)
@@ -543,11 +557,11 @@ def mark_read(request, message_id):
         read = message["read"]
     except Exception as e:
         print(e)
-        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     data = {"read": not read}
     response = DB.update("dm_messages", message_id, data=data)
     message = DB.read("dm_messages", {"id": message_id})
-    
+
     if response.get("status") == 200:
        return Response(data=data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -564,10 +578,14 @@ def pinned_message(request, message_id):
     """
     try:
         message = DB.read("dm_messages", {"id": message_id})
+        print("message",message)
         room_id = message["room_id"]
+        print("room id", room_id)
         room = DB.read("dm_rooms", {"id": room_id})
+        print("room", room)
         pin = room["pinned"] or []
-        link = f"https://dm.zuri.chat/"+ f"{room_id}"+"/"+f"{message_id}"+"/pinnedmessage"
+        print("pin", pin)
+        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -577,7 +595,7 @@ def pinned_message(request, message_id):
         response = DB.update("dm_rooms", room_id, data)
         room = DB.read("dm_rooms", {"id": room_id})
         if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_200_OK)
+            return Response(data=room, status=status.HTTP_200_OK)
     return Response(data = "Already exist! why do you want to break my code?", status=status.HTTP_409_CONFLICT)
 
 
@@ -594,7 +612,7 @@ def delete_pinned_message(request, message_id):
         room_id = message["room_id"]
         room = DB.read("dm_rooms", {"id": room_id})
         pin = room["pinned"] or []
-        link = f"https://dm.zuri.chat/"+ f"{room_id}"+"/"+f"{message_id}"+"/pinnedmessage"
+        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
@@ -675,6 +693,7 @@ def user_profile(request, org_id, user_id):
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
+<<<<<<< HEAD
 @swagger_auto_schema(methods=['post'], request_body=ReminderSerializer, responses={400: "Error: Bad Request"})
 @api_view(["POST"])
 def remind_message(request):
@@ -722,3 +741,77 @@ def remind_message(request):
         return Response(data=response_output, status=status.HTTP_201_CREATED)
     return Response(data="Bad Format - Follow the format{'message_id'}", status=status.HTTP_400_BAD_REQUEST)
 
+=======
+class Files(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        if request.method == "POST" and request.FILES['file']:
+            file = request.FILES['file']
+            filename = default_storage.save(file.name, file)
+            file_url = default_storage.url(filename)
+            return Response({
+                "file_url":file_url
+            })
+
+
+class SendFile(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, room_id):
+        print(request.FILES)
+        if request.FILES:
+            file_urls = []
+            for fil in request.FILES:
+                file= request.FILES[fil]
+                files = {
+                    'file':file
+                }
+
+                response = requests.post(f'http://{request.META["HTTP_HOST"]}/api/v1/files', files=files )
+                if response.status_code == 200:
+                    file_urls.append(response.json()['file_url'])
+                else:
+                    return Response({
+                        'status_code':response.status_code,
+                        "reason": response.reason
+                    })
+            
+            request.data['room_id'] = room_id
+            print(request)
+            serializer = MessageSerializer(data=request.data)
+
+            if serializer.is_valid():
+                data = serializer.data
+                room_id = data["room_id"]  # room id gotten from client request
+
+                room = DB.read("dm_rooms", {"_id": room_id})
+                if room:
+                    if data["sender_id"] in room.get("room_user_ids", []):
+                        data['media']=file_urls
+                        response = DB.write("dm_messages", data=data)
+                        if response.get("status", None) == 200:
+
+                            response_output = {
+                                "status": response["message"],
+                                "event": "message_create",
+                                "message_id": response["data"]["object_id"],
+                                "room_id": room_id,
+                                "thread": False,
+                                "data": {
+                                    "sender_id": data["sender_id"],
+                                    "message": data["message"],
+                                    "created_at": data["created_at"],
+                                    "media": data["media"]
+                                },
+                            }
+
+                            centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
+                            # print(centrifugo_data)
+                            if centrifugo_data["message"].get("error", None) == None:
+                                return Response(data=response_output, status=status.HTTP_201_CREATED)
+                        return Response(data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                    return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
+                return Response("room not found", status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response("No file attached, Use send Message api to send only a message", status=status.HTTP_204_NO_CONTENT)
+>>>>>>> 5f988bb0b0cd333defb25f4210bc3cadc180af30
