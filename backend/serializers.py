@@ -4,6 +4,14 @@ from django.utils import timezone
 from rest_framework import serializers
 
 
+
+class ReminderSerializer(serializers.Serializer):
+    message_id = serializers.CharField(max_length=500)
+    current_date = serializers.CharField(max_length=500)
+    scheduled_date = serializers.CharField(max_length=500)
+    class Meta: 
+        fields = ['__all__']
+
 class ThreadSerializer(serializers.Serializer):
     """
     this will server as a serializer to hold threads 
@@ -65,7 +73,6 @@ class RoomInfoSerializer(serializers.Serializer):
 
 
 class GetMessageSerializer(serializers.Serializer):
-    room_id = serializers.CharField(max_length=128)
     date = serializers.DateField(format="%d-%m-%Y", input_formats=['%d-%m-%Y', 'iso-8601'], required=False)
 
 
