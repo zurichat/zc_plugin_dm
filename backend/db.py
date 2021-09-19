@@ -156,7 +156,7 @@ def get_rooms(user_id):
             except Exception:
                 pass
         if len(data) == 0:
-            data = None
+            data = []
             return data
         return data
     
