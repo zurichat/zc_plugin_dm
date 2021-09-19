@@ -10,8 +10,9 @@ const store = {
         emojis: [],
         emojiSet: Object.create(null),
         sendMsg:'',
-        sender_id:'lkdl049052098509292',
-        room_id:"61423bbc9fd1f4f655d445e7",
+        recieveMsg:[],
+        sender_id:'6146ce37845b436ea04d102d',
+        room_id:"6146d126845b436ea04d102e",
         allSentMsg:[],
     },
     mutations: {
@@ -32,6 +33,9 @@ const store = {
         },
         setChat(state,newChat){
             state.sendMsg = newChat
+        },
+        setReceiveMsg(state,newMsg){
+            state.recieveMsg = newMsg
         }
     },
     actions: {
@@ -45,14 +49,29 @@ const store = {
             commit('setEmojiSet', map);
         },
         //making API call to the backend:deveeb
-        async makeRequest() {
+        async makeRequest({commit}){
             try {
-                await apiServices.getClient().then((result) => {
-                    console.log(result.data);
-                });
+                await apiServices.getClient(this.state.room_id,this.state.sender_id,this.state.sendMsg)
+                .then(result => {
+                    //console.log(result.data)
+                    commit('setSendMsg',result.data.data.message)
+                })
             } catch (error) {
-                alert(error);
+                alert(error)
             }
+            this.state.sendMsg = ''    
+        },
+        //getting messages in room
+        async getRequest({commit}){
+            try {
+                await apiServices.recieveClient(this.state.room_id)
+                .then(result => {
+                    console.log(result.data.results)
+                    commit('setReceiveMsg',result.data.results)
+                })
+            } catch (error) {
+                alert(error)
+            }   
         },
     },
     getters: {
@@ -70,6 +89,9 @@ const store = {
         },
         getSendMsg(state){
             return state.sendMsg;
+        },
+        getRecieveMsg(state){
+            return state.recieveMsg
         }
     },
     modules: {},

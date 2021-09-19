@@ -68,7 +68,7 @@
 
 <script>
 // importing makeRequest action from vuex store:deveeb
-import {mapActions,mapState} from 'vuex'
+import {mapActions} from 'vuex'
 
 export default {
     name: 'inputContainer',
@@ -78,6 +78,9 @@ export default {
             sendMsg: '',
         };
     },
+    mounted(){
+        
+    },
     computed: {
         sentMsg:{
             get(){
@@ -86,13 +89,12 @@ export default {
             set(newChat){
                 this.$store.commit('setChat',newChat)
             }
-        }
-           
-
+        },
+        
     },
     methods:{
         //calling makeRequest:deveeb
-    ...mapActions(['makeRequest'])
+    ...mapActions(['makeRequest','getRequest'])
   }
 };
 </script>
