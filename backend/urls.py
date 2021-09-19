@@ -81,7 +81,6 @@ urlpatterns = [
         views.user_profile,
         name="user_profile",
     ),
-    path("api/v1/files", views.Files.as_view(), name="upload-file"),
     path(
         "api/v1/rooms/<str:room_id>/messagemedia", views.SendFile.as_view(), name="view"
     ),

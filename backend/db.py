@@ -1,4 +1,6 @@
+import re
 from urllib.parse import urlencode
+from django.http import response
 import requests, json
 
 
@@ -15,6 +17,8 @@ class DataStorage:
         )
         self.write_api = "https://api.zuri.chat/data/write"
         self.delete_api = "https://api.zuri.chat/data/delete"
+        self.upload_api = "https://api.zuri.chat/upload/file/{pgn_id}"
+        self.delete_file_api ="https://api.zuri.chat/delete/file"
 
         if request is None:
             self.plugin_id = PLUGIN_ID
@@ -98,6 +102,22 @@ class DataStorage:
             return response.json()
         else:
             return {"status_code": response.status_code, "message": response.reason}
+    
+    def upload(self, file):
+        url = self.upload_api.format(
+            pgn_id = self.plugin_id
+        )
+        files = {"file":file}
+        try:
+            response = requests.post(url=url, files=files)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json()["data"]
+        else:
+            return {"status_code": response.status_code, "message": response.reason}  
+
 
 
 def send_centrifugo_data(room, data):

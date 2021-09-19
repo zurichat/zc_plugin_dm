@@ -784,10 +784,9 @@ class Files(APIView):
 
     def post(self, request, *args, **kwargs):
         if request.method == "POST" and request.FILES["file"]:
+            print(request)
             file = request.FILES["file"]
-            filename = default_storage.save(file.name, file)
-            file_url = default_storage.url(filename)
-            return Response({"file_url": file_url})
+            
 
 
 class SendFile(APIView):
@@ -797,19 +796,12 @@ class SendFile(APIView):
         print(request.FILES)
         if request.FILES:
             file_urls = []
-            for fil in request.FILES:
-                file = request.FILES[fil]
-                files = {"file": file}
-
-                response = requests.post(
-                    f'http://{request.META["HTTP_HOST"]}/api/v1/files', files=files
-                )
-                if response.status_code == 200:
-                    file_urls.append(response.json()["file_url"])
-                else:
-                    return Response(
-                        {"status_code": response.status_code, "reason": response.reason}
-                    )
+            if len(request.FILES.getlist('file')) == 1:
+                for file in request.FILES.getlist('file'):
+                    data = DB.upload(file)
+                    file_url=data['file_url']
+                    file_urls.append(file_url)
+                
 
             request.data["room_id"] = room_id
             print(request)
