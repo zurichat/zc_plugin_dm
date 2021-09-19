@@ -13,7 +13,15 @@ const store = {
         recieveMsg:[],
         sender_id:'6146ce37845b436ea04d102d',
         room_id:"6146d126845b436ea04d102e",
-        allSentMsg:[],
+        allSentMsg:[ ],
+        // For Reply Thread
+        replyThreadMsgs: {
+            username: '',
+            userImg: '',
+            clickedMsg: 'validates if the message exists, then sends a publish event to centrifugo after thread message is persisted validates if the message exists, then sends a publish event to centrifugo after thread message is persisted',
+            senderId: '6145fc9a285e4a18402074f4',
+            replyThreadNewMsg: [ ]
+        }
     },
     mutations: {
         setPickEmoji(state, payload) {
