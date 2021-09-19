@@ -879,17 +879,43 @@ class Emoji(APIView):
     List all Emoji reactions, or create a new Emoji reaction.
     """
 
-    def get(self, request, format=None):
-        snippets = EmojiSerializer.objects.all()
-        serializer = EmojiSerializer(snippets, many=True)
-        return Response(serializer.data)
+    @swagger_auto_schema(
+        responses={400: "Error: Bad Request"},
+    )
+    def get(self, request, room_id: str, message_id: str):
+        # fetch message related to that reaction
+        message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        if message:
+            print(message)
+            if response:
+                return Response(
+                    data={
+                        "status": message["message"],
+                        "event": "get_message_reactions",
+                        "room_id": message["room_id"],
+                        "message_id": message["_id"],
+                        "data": {
+                            "reactions": message["reactions"],
+                        },
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            return Response(
+                data="Data not retrieved", status=status.HTTP_424_FAILED_DEPENDENCY
+            )
+        return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
+    @swagger_auto_schema(
+        request_body=EmojiSerializer,
+        responses={400: "Error: Bad Request"},
+    )
     def post(self, request, room_id: str, message_id: str):
         request.data["message_id"] = message_id
         serializer = EmojiSerializer(data=request.data)
 
         if serializer.is_valid():
             data = serializer.data
+            data["count"] += 1
             message_id = data["message_id"]
             sender_id = data["sender_id"]
 
@@ -908,12 +934,12 @@ class Emoji(APIView):
                         response_output = {
                             "status": response["message"],
                             "event": "add_message_reaction",
-                            "reaction_id": data["_id"],
+                            "reaction_id": str(uuid.uuid1()),
                             "room_id": message["room_id"],
                             "message_id": message["_id"],
                             "data": {
                                 "sender_id": sender_id,
-                                "message": data["message"],
+                                "reaction": data["data"],
                                 "created_at": data["created_at"],
                             },
                         }
