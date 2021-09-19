@@ -84,8 +84,13 @@ def side_bar(request):
     collections = "dm_rooms"
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    rooms = get_user_rooms(collections, org_id, user)
-
+    user_rooms = get_rooms(user_id=user)
+    rooms=[]
+    for room in user_rooms:
+        if "org_id" in room:
+            if org_id == room["org_id"]:
+                rooms.append(room)
+    
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",

@@ -1,3 +1,3 @@
 import { setPublicPath } from 'systemjs-webpack-interop';
 
-setPublicPath('@zuri/dmplugins');
+setPublicPath('@zuri/zuri-plugin-dm');

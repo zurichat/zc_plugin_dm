@@ -23,14 +23,8 @@
                     </h5>
                     <div class="text-container">
                         <messageHoverShow v-if="hover" />
-                        <p class="text">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing
-                            elit. Eum mollitia aspernatur laboriosam cum
-                            officiis commodi deleniti odit rerum ratione
-                            consectetur. Lorem ipsum dolor sit amet, consectetur
-                            adipiscing elit. Tincidunt adipiscing et, tortor,
-                            fusce quis tellus, enim. A, posuere mi auctor odio
-                            tincidunt magnis.
+                        <p class="text" v-for="(message,index) in this.$store.state.allSentMsg" :key="index">
+                            {{message}}
                         </p>
                     </div>
                     <div v-if="emojis.length > 0" class="reactions d-flex">
