@@ -148,7 +148,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "frontend", "dist", "static")
+    # os.path.join(BASE_DIR, "frontend", "dist", "static")
+    os.path.join(BASE_DIR, "dmspa", "dist"),
+    os.path.join(BASE_DIR, "dmplugins", "dist")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
