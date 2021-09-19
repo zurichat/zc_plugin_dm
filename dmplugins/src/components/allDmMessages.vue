@@ -12,7 +12,7 @@
           <b-form-input class="form-input" v-model="userSearched" placeholder="@somebody or somebody@example.com" autofocus></b-form-input>
         </b-input-group>
 
-        <!-- Filtered Dropdrown List of Users -->
+        <!-- This produces the filtered dropdrown list of Users -->
         <div v-if="filteredUser.length > 0 && userSearched" class="user-dropdown">
           <ul>
             <li v-for="user in filteredUser" v-bind:key="user._iD"><img :src="user.image_url"> {{ user.user_name }} {{ user.first_name }} {{ user.last_name}}</li>
