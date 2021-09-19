@@ -17,6 +17,7 @@ const store = {
         room_id:"6146d126845b436ea04d102e",
         allSentMsg:[ ],
         // For Reply Thread
+        showReplyThread: false,
         replyThreadMsgs: {
             username: '',
             userImg: '',
