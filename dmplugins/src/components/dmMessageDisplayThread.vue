@@ -10,7 +10,7 @@
                     class="userProfile-avatar"
                     @click="show_popup_profile((p_state = !p_state))"
                 >
-                    // Added a ref to get the image
+                    <!-- Added a ref to get the image -->
                     <img ref="msgThreadUserImg" src="https://picsum.photos/200/300" alt="{}" />
                 </div>
                 <div class="usertext-messages">
@@ -26,7 +26,7 @@
                     </h5>
                     <div class="text-container">
                         <messageHoverShow v-if="hover" />
-                        // Added a ref to get all messagen clicked
+                        <!-- Added a ref to get all messagen clicked -->
                         <p ref="msgThreadUserMsg" class="text" v-for="(message,index) in this.$store.state.allSentMsg" :key="index">
                             {{message}}
                         </p>
