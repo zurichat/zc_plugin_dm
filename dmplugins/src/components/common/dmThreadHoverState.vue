@@ -78,6 +78,8 @@ export default {
         },
         showReply() {
             this.setShowReply(true);
+            // show ReplyThread by Ozovehe
+            this.$store.state.showReplyThread = !this.$store.state.showReplyThread
         },
     },
 };
