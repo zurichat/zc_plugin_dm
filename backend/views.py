@@ -814,15 +814,6 @@ def remind_message(request):
         return Response(data="Your current date is ahead of the scheduled time. Are you plannig to go back in time?", status=status.HTTP_400_BAD_REQUEST)
     return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
 
-class Files(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
-    def post(self, request, *args, **kwargs):
-        if request.method == "POST" and request.FILES["file"]:
-            file = request.FILES["file"]
-            filename = default_storage.save(file.name, file)
-            file_url = default_storage.url(filename)
-            return Response({"file_url": file_url})
 
 
 class SendFile(APIView):
