@@ -778,14 +778,6 @@ def remind_message(request):
         status=status.HTTP_400_BAD_REQUEST,
     )
 
-
-class Files(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
-    def post(self, request, *args, **kwargs):
-        if request.method == "POST" and request.FILES["file"]:
-            print(request)
-            file = request.FILES["file"]
             
 
 
@@ -796,11 +788,16 @@ class SendFile(APIView):
         print(request.FILES)
         if request.FILES:
             file_urls = []
-            if len(request.FILES.getlist('file')) == 1:
+            files = request.FILES.getlist('file')
+            if len(files) == 1:
                 for file in request.FILES.getlist('file'):
-                    data = DB.upload(file)
-                    file_url=data['file_url']
+                    file_data = DB.upload(file)
+                    file_url = file_data['file_url']
                     file_urls.append(file_url)
+            elif len(files) > 1:
+                file_data = DB.upload_more(files)
+                for datum in file_data['files_info']:
+                    file_urls.append(datum['file_url'])
                 
 
             request.data["room_id"] = room_id
