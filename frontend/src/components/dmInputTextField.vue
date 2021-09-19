@@ -6,7 +6,7 @@
                 placeholder="Send message to "
                 rows="1"
                 class="px-3 py-2"
-                v-model="sendMsg"
+                v-model="sentMsg"
                 style="border: none; overflow-y: hidden; height: calc(0.5em + 0.25em + 1px);"
                 no-resize
             ></b-form-textarea>
@@ -39,10 +39,11 @@
                     <span class="btnf input-emoji-icons">
                         <b-icon-paperclip rotate="45"></b-icon-paperclip>
                     </span>
-                    <span :class="this.sendMsg.length > 0 ? 'send' : 'notSend'">
+                    <span :class="this.sentMsg.length > 0 ? 'send' : 'notSend'">
                         <span class="btnf input-send">
                             <b-icon-cursor-fill
                                 rotate="45"
+                                @click="makeRequest"
                             ></b-icon-cursor-fill>
                         </span>
                         <span
@@ -55,8 +56,8 @@
                         <!--added a click event to make request:deveeb-->
                         <span
                          class="btnf input-send-reminder"
-                         @click="makeRequest">
-                            <b-icon-chevron-down></b-icon-chevron-down>
+                         >
+                            <b-icon-chevron-down ></b-icon-chevron-down>
                         </span>
                     </span>
                 </div>
@@ -67,7 +68,7 @@
 
 <script>
 // importing makeRequest action from vuex store:deveeb
-import {mapActions} from 'vuex'
+import {mapActions,mapState} from 'vuex'
 
 export default {
     name: 'inputContainer',
@@ -76,6 +77,18 @@ export default {
             message: 'Hello',
             sendMsg: '',
         };
+    },
+    computed: {
+        sentMsg:{
+            get(){
+                return this.$store.state.sendMsg
+            },
+            set(newChat){
+                this.$store.commit('setChat',newChat)
+            }
+        }
+           
+
     },
     methods:{
         //calling makeRequest:deveeb

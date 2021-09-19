@@ -9,6 +9,10 @@ const store = {
         showReply: false,
         emojis: [],
         emojiSet: Object.create(null),
+        sendMsg:'',
+        sender_id:'lkdl049052098509292',
+        room_id:"61423bbc9fd1f4f655d445e7",
+        allSentMsg:[],
     },
     mutations: {
         setPickEmoji(state, payload) {
@@ -23,6 +27,12 @@ const store = {
         setEmojiSet(state, payload) {
             state.emojiSet = payload;
         },
+        setSendMsg(state,payload){
+            state.allSentMsg.push(payload)
+        },
+        setChat(state,newChat){
+            state.sendMsg = newChat
+        }
     },
     actions: {
         setEmojis({ commit, state }, payload) {
@@ -37,15 +47,17 @@ const store = {
             commit('setEmojiSet', map);
         },
         //making API call to the backend:deveeb
-        async makeRequest(){
+        async makeRequest({commit}){
             try {
-              await apiServices.getClient()
-              .then(result => {
-                console.log(result.data)
-              })
+                await apiServices.getClient(this.state.room_id,this.state.sender_id,this.state.sendMsg)
+                .then(result => {
+                    console.log(result.data)
+                    commit('setSendMsg',result.data.data.message)
+                })
             } catch (error) {
-              alert(error)
+                alert(error)
             }
+            this.state.sendMsg = ''    
         }
     },
     getters: {
@@ -61,6 +73,9 @@ const store = {
         emojiSet(state) {
             return state.emojiSet;
         },
+        getSendMsg(state){
+            return state.sendMsg;
+        }
     },
     modules: {},
 
