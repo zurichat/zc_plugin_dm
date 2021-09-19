@@ -124,7 +124,7 @@ def send_message(request, room_id):
         room_id = data["room_id"]  # room id gotten from client request
 
         room = DB.read("dm_rooms", {"_id": room_id})
-        if room:
+        if room and room.get('status_code',None) == None:
             if data["sender_id"] in room.get("room_user_ids", []):
 
                 response = DB.write("dm_messages", data=serializer.data)
@@ -140,35 +140,30 @@ def send_message(request, room_id):
                             "sender_id": data["sender_id"],
                             "message": data["message"],
                             "created_at": data["created_at"],
-                        },
+                        }
                     }
-
-                    centrifugo_data = send_centrifugo_data(
-                        room=room_id, data=response_output
-                    )  # publish data to centrifugo
-                    # print(centrifugo_data)
-                    if centrifugo_data["message"].get("error", None) == None:
-                        return Response(
-                            data=response_output, status=status.HTTP_201_CREATED
-                        )
-                return Response(
-                    data="data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
-                )
+                    try:
+                        centrifugo_data = centrifugo_client.publish(room=room_id, data=response_output)  # publish data to centrifugo
+                        if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                            return Response(data=response_output, status=status.HTTP_201_CREATED)
+                        else:
+                            return Response(data="message not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                    except:
+                        return Response(data="centrifugo server not available",status=status.HTTP_424_FAILED_DEPENDENCY)        
+                return Response(data="message not saved and not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
-        return Response("room not found", status=status.HTTP_404_NOT_FOUND)
+        return Response("room not found",status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
+        
+        
 @swagger_auto_schema(
     methods=["post"],
     request_body=ThreadSerializer,
-    responses={201: ThreadResponse, 400: "Error Response"},
+    responses={201: ThreadResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
 def send_thread_message(request, room_id, message_id):
     """
-    This endpoint is used send messages as a thread
-    under a message. It takes a message ID and
     validates if the message exists, then sends
     a publish event to centrifugo after
     thread message is persisted.
@@ -185,7 +180,7 @@ def send_thread_message(request, room_id, message_id):
             "dm_messages", {"_id": message_id, "room_id": room_id}
         )  # fetch message from zc
 
-        if message:
+        if message and message.get('status_code',None) == None:
             threads = message.get("threads", [])  # get threads
             del data["message_id"]  # remove message id from request to zc core
             data["_id"] = str(uuid.uuid1())  # assigns an id to each message in thread
@@ -194,10 +189,8 @@ def send_thread_message(request, room_id, message_id):
             room = DB.read("dm_rooms", {"_id": message["room_id"]})
             if sender_id in room.get("room_user_ids", []):
 
-                response = DB.update(
-                    "dm_messages", message["_id"], {"threads": threads}
-                )  # update threads in db
-                if response.get("status", None) == 200:
+                response = DB.update("dm_messages", message["_id"], {"threads": threads} )  # update threads in db
+                if response and response.get("status", None) == 200:
 
                     response_output = {
                         "status": response["message"],
@@ -210,19 +203,18 @@ def send_thread_message(request, room_id, message_id):
                             "sender_id": data["sender_id"],
                             "message": data["message"],
                             "created_at": data["created_at"],
-                        },
+                        }
                     }
-
-                    centrifugo_data = send_centrifugo_data(
-                        room=message["room_id"], data=response_output
-                    )  # publish data to centrifugo
-                    if centrifugo_data["message"].get("error", None) == None:
-                        return Response(
-                            data=response_output, status=status.HTTP_201_CREATED
-                        )
-                return Response(
-                    "data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
-                )
+                    
+                    try:
+                        centrifugo_data = centrifugo_client.publish(room=room_id, data=response_output)  # publish data to centrifugo
+                        if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                            return Response(data=response_output, status=status.HTTP_201_CREATED)
+                        else:
+                            return Response(data="message not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                    except:
+                        return Response(data="centrifugo server not available",status=status.HTTP_424_FAILED_DEPENDENCY)
+                return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response("sender not in room", status=status.HTTP_404_NOT_FOUND)
         return Response("message or room not found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -231,7 +223,7 @@ def send_thread_message(request, room_id, message_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=RoomSerializer,
-    responses={200: "success", 201: CreateRoomResponse, 400: "Error: Bad Request"},
+    responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
 def create_room(request):
@@ -385,7 +377,6 @@ def room_info(request):
 
 # /code for updating room
 
-
 @api_view(["GET", "POST"])
 def edit_room(request, pk):
     try:
@@ -408,7 +399,6 @@ def edit_room(request, pk):
             return Response(room_serializer.data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
-
 
 @swagger_auto_schema(
     methods=["get"], responses={201: MessageLinkResponse, 400: "Error: Bad Request"}
@@ -448,9 +438,7 @@ def read_message_link(request, room_id, message_id):
         message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
         return Response(data=message, status=status.HTTP_200_OK)
     else:
-        return JsonResponse(
-            {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])
