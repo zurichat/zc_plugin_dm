@@ -685,35 +685,59 @@ def delete_message(request):
 
 
 @swagger_auto_schema(
-    methods=["get"], responses={201: UserProfileResponse, 400: "Error: Bad Request"}
+    methods=["post"],
+    request_body=CookieSerializer,
+    responses={
+        201: UserProfileResponse,
+        400: "Error: Bad Request"
+        }
 )
-@api_view(["GET"])
-def user_profile(request, org_id, user_id):
+@api_view(["GET", "POST"])
+def user_profile(request, org_id, member_id):
     """
     Retrieves the user details of a member in an organization using a unique user_id
     If request is successful, a json output of select user details is returned
     Elif login session is expired or wrong details were entered, a 401 response is returned
     Else a 405 response returns if a wrong method was used
     """
-    url = f"https://api.zuri.chat/organizations/{org_id}/members/{user_id}"
-    # url = f"https://dm.zuri.chat/api/v1/get_organization_members/{user_id}"
+    url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
+    #url = f"https://dm.zuri.chat/api/v1/get_organization_members"
 
     if request.method == "GET":
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()["data"]
-            output = {
-                "name": data["name"],
-                "display_name": data["display_name"],
-                "bio": data["bio"],
-                "pronouns": data["pronouns"],
-                "email": data["email"],
-                "phone": data["phone"],
-                "status": data["status"],
-            }
-            return Response(output, status=status.HTTP_200_OK)
-        return Response(response.json(), status=status.HTTP_401_UNAUTHORIZED)
-    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+        headers = {}
+
+        if "Authorization" in request.headers:
+            headers["Authorization"] = request.headers["Authorization"]
+        else:
+            headers["Cookie"] = request.headers["Cookie"]
+
+        response = requests.get(url, headers=headers)
+
+    elif request.method == "POST":
+        cookie_serializer = CookieSerializer(data=request.data)
+
+        if cookie_serializer.is_valid():
+            cookie = cookie_serializer.data["cookie"]
+            response = requests.get(url, headers={"Cookie": cookie})
+        else:
+            return Response(
+                cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    if response.status_code == 200:
+        data = response.json()["data"]
+        output = {
+            "first_name": data["first_name"],
+            "last_name": data["last_name"],
+            "display_name": data["display_name"],
+            "bio": data["bio"],
+            "pronouns": data["pronouns"],
+            "email": data["email"],
+            "phone": data["phone"],
+            "status": data["status"],
+        }
+        return Response(output, status=status.HTTP_200_OK)
+    return Response(response.json(), status=status.HTTP_401_UNAUTHORIZED)
 
 
 @swagger_auto_schema(
@@ -735,50 +759,70 @@ def remind_message(request):
     serializer = ReminderSerializer(data=request.data)
     if serializer.is_valid():
         serialized_data = serializer.data
-        message_id = serialized_data["message_id"]
-        current_date = serialized_data["current_date"]
-        scheduled_date = serialized_data["scheduled_date"]
-
+        message_id = serialized_data['message_id']
+        current_date = serialized_data['current_date']
+        scheduled_date = serialized_data['scheduled_date']
+        notes_data = serialized_data['notes']
         ##calculate duration and send notification
-        local_scheduled_date = datetime.strptime(
-            scheduled_date, "%a, %d %b %Y %H:%M:%S %Z"
-        )
-        local_current_date = datetime.strptime(current_date, "%a, %d %b %Y %H:%M:%S %Z")
-        duration = (
-            (local_scheduled_date - local_current_date)
-            .replace(tzinfo=timezone.utc, microsecond=0)
-            .total_seconds()
-        )
+        local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
+        utc_scheduled_date = local_scheduled_date.replace(tzinfo=timezone.utc)
 
+        local_current_date = datetime.strptime(current_date,'%a, %d %b %Y %H:%M:%S %Z')
+        utc_current_date = local_current_date.replace(tzinfo=timezone.utc)
+        duration = local_scheduled_date - local_current_date
+        duration_sec = duration.total_seconds()
+        if duration_sec > 0:
         ## get message infos , sender info and recpient info
-        message = DB.read("dm_messages", {"id": message_id})
-        room_id = message["room_id"]
-        room = DB.read("dm_rooms", {"_id": room_id})
-        users_in_a_room = room.get("room_user_ids", []).copy()
-        message_content = message["message"]
-        sender_id = message["sender_id"]
-        recipient_id = ""
-        if sender_id in users_in_a_room:
-            users_in_a_room.remove(sender_id)
-            recipient_id = users_in_a_room[0]
+            message = DB.read("dm_messages", {"id": message_id})
+            if message:
+                room_id = message['room_id']
+                try:
+                    room = DB.read("dm_rooms", {"_id": room_id})
+                    
+                except Exception as e:
+                    print(e)
+                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
 
-        response_output = {
-            # "message":message,
-            "recipient_id": recipient_id,
-            "sender_id": sender_id,
-            "message": message_content,
-            "scheduled_date": scheduled_date,
-        }
-        SendNotificationThread(
-            duration, room_id, response_output, local_scheduled_date
-        ).start()
-        return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(
-        data="Bad Format - Follow the format{'message_id'}",
-        status=status.HTTP_400_BAD_REQUEST,
-    )
+                users_in_a_room = room.get("room_user_ids",[]).copy()
+                message_content = message['message']
+                sender_id = message['sender_id']
+                recipient_id = ''
+                if sender_id in users_in_a_room:
+                    users_in_a_room.remove(sender_id)
+                    recipient_id = users_in_a_room[0]
+                response_output ={
+                    "recipient_id": recipient_id,
+                    "sender_id": sender_id,
+                    "message":message_content,
+                    "scheduled_date": scheduled_date
+                }
+                if notes_data is not None:
+                    try:
+                        notes = message["notes"] or []
+                        notes.append(notes_data)
+                        response = DB.update("dm_messages",message_id, {"notes": notes})
+                    except Exception as e:
+                        notes = []
+                        notes.append(notes_data)
+                        response = DB.update("dm_messages", message_id, {"notes":notes})
+                    if response.get("status") == 200:
+                        response_output["notes"] = notes
+                        return Response(data = response_output,status=status.HTTP_201_CREATED)
+                SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date,).start()
+                return Response(data=response_output, status=status.HTTP_201_CREATED)
+            return Response(data="No such message", status=status.HTTP_400_BAD_REQUEST)
+        return Response(data="Your current date is ahead of the scheduled time. Are you plannig to go back in time?", status=status.HTTP_400_BAD_REQUEST)
+    return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
 
-            
+class Files(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def post(self, request, *args, **kwargs):
+        if request.method == "POST" and request.FILES["file"]:
+            file = request.FILES["file"]
+            filename = default_storage.save(file.name, file)
+            file_url = default_storage.url(filename)
+            return Response({"file_url": file_url})
 
 
 class SendFile(APIView):

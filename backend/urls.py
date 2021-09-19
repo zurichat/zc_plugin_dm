@@ -77,7 +77,7 @@ urlpatterns = [
     ),
     path("api/v1/delete-message", views.delete_message, name="delete_message"),
     path(
-        "api/v1/<str:org_id>/users/<str:user_id>",
+        "api/v1/<str:org_id>/userprofile/<str:member_id>",
         views.user_profile,
         name="user_profile",
     ),
