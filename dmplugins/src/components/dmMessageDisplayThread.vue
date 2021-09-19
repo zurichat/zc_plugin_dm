@@ -10,11 +10,14 @@
                     class="userProfile-avatar"
                     @click="show_popup_profile((p_state = !p_state))"
                 >
-                    <img src="https://picsum.photos/200/300" alt="{}" />
+                    // Added a ref to get the image
+                    <img ref="msgThreadUserImg" src="https://picsum.photos/200/300" alt="{}" />
                 </div>
                 <div class="usertext-messages">
                     <h5 class="pb-2">
                         <span
+                            <!-- Added a ref to get the user name -->
+                            ref="msgThreadUsername"
                             class="userName"
                             @click="show_popup_profile((p_state = !p_state))"
                             >MamaGee</span
@@ -23,7 +26,8 @@
                     </h5>
                     <div class="text-container">
                         <messageHoverShow v-if="hover" />
-                        <p class="text" v-for="(message,index) in this.$store.state.allSentMsg" :key="index">
+                        // Added a ref to get all messagen clicked
+                        <p ref="msgThreadUserMsg" class="text" v-for="(message,index) in this.$store.state.allSentMsg" :key="index">
                             {{message}}
                         </p>
                     </div>
@@ -116,6 +120,13 @@ export default {
     computed: {
         ...mapGetters(['emojis', 'emojiSet']),
     },
+     
+    // Reply thread by Ozovehe
+    mounted () {
+        this.$store.state.replyThreadMsgs.userImg = this.$refs.msgThreadUserImg.src
+        this.$store.state.replyThreadMsgs.clickedMsg = this.$refs.msgThreadUserMsg.textContent
+        this.$store.state.replyThreadMsgs.username = this.$refs.msgThreadUsername.textContent        
+    }
 };
 </script>
 
