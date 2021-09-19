@@ -78,7 +78,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "frontend", "dist")],
+        'DIRS': [os.path.join(BASE_DIR, "dmspa", "dist")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
