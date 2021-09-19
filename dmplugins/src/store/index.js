@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import apiServices from '../services/apiServices';
+import messages from './modules/messages'
+
 
 Vue.use(Vuex);
 const store = {
@@ -94,6 +96,8 @@ const store = {
             return state.recieveMsg
         }
     },
-    modules: {},
+    modules: {
+        messages,
+    },
 };
 export default new Vuex.Store(store);
