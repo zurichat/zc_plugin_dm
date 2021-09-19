@@ -1,11 +1,11 @@
 <template>
-  <div class="reply-thread">
+  <div v-if="showReplyThread" class="reply-thread">
       <header class="reply-thread-header">
           <div>
                 <p> Thread </p>
                 <span>{{ displayName }}</span>
           </div>
-          <i class="fas fa-times"></i>
+          <i @click="showReplyThread = !showReplyThread" class="fas fa-times"></i>
       </header>
 
       <div class="reply-thread-headerSec">
@@ -78,6 +78,7 @@ export default {
     name: 'ReplyThread',
     data () {
         return {
+            displayThread: false,
             displayNewSentMsg: false,
             sentMessages: '',
             userTwoImg: '',
@@ -93,6 +94,9 @@ export default {
     computed: {
         replyThreadNewMsg () {
             return this.$store.state.replyThreadMsgs.replyThreadNewMsg
+        },
+        showReplyThread () {
+            return this.$store.state.showReplyThread
         }
     },
     methods: {
