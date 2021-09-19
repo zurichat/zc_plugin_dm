@@ -17,10 +17,11 @@ const store = {
         room_id:"6146d126845b436ea04d102e",
         allSentMsg:[ ],
         // For Reply Thread
+        showReplyThread: false,
         replyThreadMsgs: {
-            username: '',
+            username: 'Sandra Bernard',
             userImg: '',
-            clickedMsg: 'validates if the message exists, then sends a publish event to centrifugo after thread message is persisted validates if the message exists, then sends a publish event to centrifugo after thread message is persisted',
+            clickedMsg: 'Clicked messages will be shown here when a user wants to reply in a thread. Thank you',
             senderId: '6145fc9a285e4a18402074f4',
             replyThreadNewMsg: [ ]
         }
