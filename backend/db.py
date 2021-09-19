@@ -5,7 +5,8 @@ import requests, json
 PLUGIN_ID = "6135f65de2358b02686503a7"
 ORG_ID = "6145eee9285e4a18402074cd"
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
-
+ROOMS = "dm_rooms"
+MESSAGES = "dm_messages"
 
 class DataStorage:
     def __init__(self, request=None):
@@ -116,7 +117,6 @@ def send_centrifugo_data(room, data):
 
 DB = DataStorage()
 
-
 def get_user_rooms(collection_name, org_id, user):
     room_list = list()
     rooms = DB.read(collection_name, {"org_id": org_id})
@@ -155,7 +155,7 @@ def get_rooms(user_id):
             except Exception:
                 pass
         if len(data) == 0:
-            data = None
+            data = []
             return data
         return data
     
