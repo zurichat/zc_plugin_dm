@@ -3,7 +3,7 @@ import { registerApplication, start } from 'single-spa';
 registerApplication({
     name: '@zuri/dmplugins',
     app: () => System.import('@zuri/dmplugins'),
-    activeWhen: ['/dm'],
+    activeWhen: ['/'],
 });
 
 // registerApplication({
