@@ -1,8 +1,8 @@
 import { registerApplication, start } from 'single-spa';
 
 registerApplication({
-    name: '@zuri/dmplugins',
-    app: () => System.import('@zuri/dmplugins'),
+    name: '@zuri/zuri-plugin-dm',
+    app: () => System.import('@zuri/zuri-plugin-dm'),
     activeWhen: ['/'],
 });
 
