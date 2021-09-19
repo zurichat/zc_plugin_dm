@@ -705,34 +705,57 @@ def remind_message(request):
         message_id = serialized_data['message_id']
         current_date = serialized_data['current_date']
         scheduled_date = serialized_data['scheduled_date']
-
+        notes_data = serialized_data['notes']
         ##calculate duration and send notification
         local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
-        local_current_date = datetime.strptime(current_date,'%a, %d %b %Y %H:%M:%S %Z')
-        duration = (local_scheduled_date - local_current_date).replace(tzinfo =timezone.utc, microsecond=0).total_seconds()
-        
-        ## get message infos , sender info and recpient info
-        message = DB.read("dm_messages", {"id": message_id})
-        room_id = message['room_id']
-        room = DB.read("dm_rooms", {"_id": room_id})
-        users_in_a_room = room.get("room_user_ids",[]).copy()
-        message_content = message['message']
-        sender_id = message['sender_id']
-        recipient_id = ''
-        if sender_id in users_in_a_room:
-            users_in_a_room.remove(sender_id)
-            recipient_id = users_in_a_room[0]
+        utc_scheduled_date = local_scheduled_date.replace(tzinfo=timezone.utc)
 
-        response_output ={
-            # "message":message,
-            "recipient_id": recipient_id,
-            "sender_id": sender_id,
-            "message":message_content,
-            "scheduled_date": scheduled_date
-        }
-        SendNotificationThread(duration, room_id, response_output, local_scheduled_date).start()
-        return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(data="Bad Format - Follow the format{'message_id'}", status=status.HTTP_400_BAD_REQUEST)
+        local_current_date = datetime.strptime(current_date,'%a, %d %b %Y %H:%M:%S %Z')
+        utc_current_date = local_current_date.replace(tzinfo=timezone.utc)
+        duration = local_scheduled_date - local_current_date
+        duration_sec = duration.total_seconds()
+        if duration_sec > 0:
+        ## get message infos , sender info and recpient info
+            message = DB.read("dm_messages", {"id": message_id})
+            if message:
+                room_id = message['room_id']
+                try:
+                    room = DB.read("dm_rooms", {"_id": room_id})
+                    
+                except Exception as e:
+                    print(e)
+                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
+
+                users_in_a_room = room.get("room_user_ids",[]).copy()
+                message_content = message['message']
+                sender_id = message['sender_id']
+                recipient_id = ''
+                if sender_id in users_in_a_room:
+                    users_in_a_room.remove(sender_id)
+                    recipient_id = users_in_a_room[0]
+                response_output ={
+                    "recipient_id": recipient_id,
+                    "sender_id": sender_id,
+                    "message":message_content,
+                    "scheduled_date": scheduled_date
+                }
+                if notes_data is not None:
+                    try:
+                        notes = message["notes"] or []
+                        notes.append(notes_data)
+                        response = DB.update("dm_messages",message_id, {"notes": notes})
+                    except Exception as e:
+                        notes = []
+                        notes.append(notes_data)
+                        response = DB.update("dm_messages", message_id, {"notes":notes})
+                    if response.get("status") == 200:
+                        response_output["notes"] = notes
+                        return Response(data = response_output,status=status.HTTP_201_CREATED)
+                SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date,).start()
+                return Response(data=response_output, status=status.HTTP_201_CREATED)
+            return Response(data="No such message", status=status.HTTP_400_BAD_REQUEST)
+        return Response(data="Your current date is ahead of the scheduled time. Are you plannig to go back in time?", status=status.HTTP_400_BAD_REQUEST)
+    return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
 
 class Files(APIView):
     parser_classes = (MultiPartParser, FormParser)

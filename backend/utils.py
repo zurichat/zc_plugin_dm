@@ -5,25 +5,27 @@ import time
 from .db import send_centrifugo_data
  
 class SendNotificationThread(Thread):
-    def __init__(self, duration, room_id, response_output,scheduled_date):
+    # def __init__(self, duration, room_id, response_output,scheduled_date):
+    def __init__(self, duration, duration_sec, utc_scheduled_date, utc_current_date):
+    
         self.duration = duration
-        self.room_id = room_id
-        self.response_output = response_output
-        self.scheduled_date = scheduled_date.replace(tzinfo=timezone.utc, microsecond=0)
+        self.duration_sec = duration_sec
+        self.utc_scheduled_date = utc_scheduled_date
+        self.utc_current_date = utc_current_date
         Thread.__init__(self)
 
     def run(self):
         while True:
-            time.sleep(self.duration)
-            current_time = datetime.now(timezone.utc)
-
+            time.sleep(self.duration_sec)
+            current_date = self.utc_current_date + self.duration
             #notification sent to user
-            centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
-            if self.scheduled_date == current_time:
+            # centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
+            if self.utc_scheduled_date == current_date:
+                print('notification sent')
                 break
         
-        for conn in connections:
-            conn.close()
+        # for conn in connections:
+        #     conn.close()
 
 # create new thread to call api
 
