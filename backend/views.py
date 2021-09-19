@@ -15,13 +15,6 @@ from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from .utils import SendNotificationThread
-from datetime import datetime
-import datetime as datetimemodule
-
-
-
-
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 
@@ -223,7 +216,7 @@ def send_thread_message(request,room_id, message_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=RoomSerializer,
-    responses={200: "success", 201: CreateRoomResponse, 400: "Error: Bad Request"},
+    responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
 def create_room(request):
@@ -233,34 +226,36 @@ def create_room(request):
     Then returns the room id when a room is successfully created
     """
 
-            #validate request
- #   if 'Authorization' in request.headers:
- #       token = request.headers['Authorization']
- #   else:
- #       token = request.headers['Cookie']
+    if 'Authorization' in request.headers:
+        token = request.headers['Authorization']
+    else:
+        token = request.headers['Cookie']
 
- #   verify = verify_user(token)
- #   if verify.get("status") == 200:
+    verify = verify_user(token)
+    if verify.get("status_code") == 200:
 
-    serializer = RoomSerializer(data=request.data)
-    if serializer.is_valid():
-        user_ids = serializer.data["room_user_ids"]
-        user_rooms = get_rooms(user_ids[0])
-        for room in user_rooms:
-            room_users = room['room_user_ids']
-            if set(room_users) == set(user_ids):
+        serializer = RoomSerializer(data=requests.data)
+        if serializer.is_valid():
+            user_ids = serializer.data["room_user_ids"]
+            user_rooms = get_rooms(user_ids[0]) + get_rooms(user_ids[1])
+            for room in user_rooms:
+                room_users = room['room_user_ids']
+                if set(room_users) == set(user_ids):
+                    response_output = {
+                        "room_id": room["_id"]
+                    }
+                    return Response(data=response_output, status=status.HTTP_200_OK)
+
+            response = DB.write("dm_rooms", data=serializer.data)
+            data = response.get("data").get("object_id")
+            if response.get("status") == 200:
                 response_output = {
-                    "room_id": room["_id"]
-                }
-                return Response(data=response_output, status=status.HTTP_200_OK)
-    response = DB.write ( "dm_rooms", data=serializer.data )
-    data = response.get ( "data" ).get ( "object_id" )
-    if response.get ( "status" ) == 200:
-        response_output = {
-            "room_id": data
-        }
-        return Response ( data=response_output, status=status.HTTP_201_CREATED )
-    return Response ( status=status.HTTP_400_BAD_REQUEST )
+                    "room_id": data
+                    }
+                return Response(data=response_output, status=status.HTTP_201_CREATED)
+
+        return Response ( status=status.HTTP_400_BAD_REQUEST )
+    return Response ( verify, status=status.HTTP_401_UNAUTHORIZED )
 
 
 @swagger_auto_schema(
@@ -391,7 +386,6 @@ def edit_room(request, pk):
             return Response(room_serializer.data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
-    
 
 
 @swagger_auto_schema(methods=['get'], responses={201: MessageLinkResponse, 400: "Error: Bad Request"})
@@ -684,53 +678,6 @@ def user_profile(request, org_id, user_id):
         return Response(response.json(), status = status.HTTP_401_UNAUTHORIZED)
     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
 
-
-@swagger_auto_schema(methods=['post'], request_body=ReminderSerializer, responses={400: "Error: Bad Request"})
-@api_view(["POST"])
-def remind_message(request):
-    """
-        This is used to remind a user about a  message
-        Your body request should have the format
-        {
-	"mesage_id": "33",
-	"current_date": "Tue, 22 Nov 2011 06:00:00 GMT",
-	"scheduled_date":"Tue, 22 Nov 2011 06:00:00 GMT"
-    }
-    """
-    serializer = ReminderSerializer(data=request.data)
-    if serializer.is_valid():
-        serialized_data = serializer.data
-        message_id = serialized_data['message_id']
-        current_date = serialized_data['current_date']
-        scheduled_date = serialized_data['scheduled_date']
-
-        ##calculate duration and send notification
-        local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
-        local_current_date = datetime.strptime(current_date,'%a, %d %b %Y %H:%M:%S %Z')
-        duration = (local_scheduled_date - local_current_date).replace(tzinfo =timezone.utc, microsecond=0).total_seconds()
-        
-        ## get message infos , sender info and recpient info
-        message = DB.read("dm_messages", {"id": message_id})
-        room_id = message['room_id']
-        room = DB.read("dm_rooms", {"_id": room_id})
-        users_in_a_room = room.get("room_user_ids",[]).copy()
-        message_content = message['message']
-        sender_id = message['sender_id']
-        recipient_id = ''
-        if sender_id in users_in_a_room:
-            users_in_a_room.remove(sender_id)
-            recipient_id = users_in_a_room[0]
-
-        response_output ={
-            # "message":message,
-            "recipient_id": recipient_id,
-            "sender_id": sender_id,
-            "message":message_content,
-            "scheduled_date": scheduled_date
-        }
-        SendNotificationThread(duration, room_id, response_output, local_scheduled_date).start()
-        return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(data="Bad Format - Follow the format{'message_id'}", status=status.HTTP_400_BAD_REQUEST)
 
 class Files(APIView):
     parser_classes = (MultiPartParser, FormParser)
