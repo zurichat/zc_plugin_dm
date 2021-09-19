@@ -1,5 +1,5 @@
 {
-    "name": "@zuri/dmplugins",
+    "name": "@zuri/zuri-plugin-dm",
     "version": "0.1.0",
     "private": true,
     "scripts": {
