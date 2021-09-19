@@ -925,12 +925,13 @@ class Emoji(APIView):
                                 data=response_output, status=status.HTTP_201_CREATED
                             )
                     return Response(
-                        "data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                        "Data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
                     )
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response("Unknown room", status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                "Message or room not found", status=status.HTTP_404_NOT_FOUND
+            )
         return Response(
-            "No file attached, Use send Message api to send only a message",
-            status=status.HTTP_204_NO_CONTENT,
+            status=status.HTTP_400_BAD_REQUEST,
         )
