@@ -36,18 +36,20 @@ export default {
         }
     },
     mounted() {
-      // drop the API here
+      // API endpoint goes here here
       this.axios.get('https://dm.zuri.chat/api/v1/get_organization_members')
       .then(userData => {
         this.usersList = userData;
       })
     },
     methods: {
+      // This function is to close the dropdown when I click outside it
       closeDropdown: function() {
         this.userSearched = '';
       }
     },
     computed: {
+      // This function filters through the returned array of users
       filterUser: function() {
         this.filteredUser = this.usersList.filter((user) => {
           if (user.last_name.toLowerCase().match(this.userSearched.toLowerCase()) || user.first_name.toLowerCase().match(this.userSearched.toLowerCase()) || user.user_name.toLowerCase().match(this.userSearched.toLowerCase()))
