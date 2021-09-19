@@ -685,35 +685,59 @@ def delete_message(request):
 
 
 @swagger_auto_schema(
-    methods=["get"], responses={201: UserProfileResponse, 400: "Error: Bad Request"}
+    methods=["post"],
+    request_body=CookieSerializer,
+    responses={
+        201: UserProfileResponse,
+        400: "Error: Bad Request"
+        }
 )
-@api_view(["GET"])
-def user_profile(request, org_id, user_id):
+@api_view(["GET", "POST"])
+def user_profile(request, org_id, member_id):
     """
     Retrieves the user details of a member in an organization using a unique user_id
     If request is successful, a json output of select user details is returned
     Elif login session is expired or wrong details were entered, a 401 response is returned
     Else a 405 response returns if a wrong method was used
     """
-    url = f"https://api.zuri.chat/organizations/{org_id}/members/{user_id}"
-    # url = f"https://dm.zuri.chat/api/v1/get_organization_members/{user_id}"
+    url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
+    #url = f"https://dm.zuri.chat/api/v1/get_organization_members"
 
     if request.method == "GET":
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()["data"]
-            output = {
-                "name": data["name"],
-                "display_name": data["display_name"],
-                "bio": data["bio"],
-                "pronouns": data["pronouns"],
-                "email": data["email"],
-                "phone": data["phone"],
-                "status": data["status"],
-            }
-            return Response(output, status=status.HTTP_200_OK)
-        return Response(response.json(), status=status.HTTP_401_UNAUTHORIZED)
-    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+        headers = {}
+
+        if "Authorization" in request.headers:
+            headers["Authorization"] = request.headers["Authorization"]
+        else:
+            headers["Cookie"] = request.headers["Cookie"]
+
+        response = requests.get(url, headers=headers)
+
+    elif request.method == "POST":
+        cookie_serializer = CookieSerializer(data=request.data)
+
+        if cookie_serializer.is_valid():
+            cookie = cookie_serializer.data["cookie"]
+            response = requests.get(url, headers={"Cookie": cookie})
+        else:
+            return Response(
+                cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    if response.status_code == 200:
+        data = response.json()["data"]
+        output = {
+            "first_name": data["first_name"],
+            "last_name": data["last_name"],
+            "display_name": data["display_name"],
+            "bio": data["bio"],
+            "pronouns": data["pronouns"],
+            "email": data["email"],
+            "phone": data["phone"],
+            "status": data["status"],
+        }
+        return Response(output, status=status.HTTP_200_OK)
+    return Response(response.json(), status=status.HTTP_401_UNAUTHORIZED)
 
 
 @swagger_auto_schema(
