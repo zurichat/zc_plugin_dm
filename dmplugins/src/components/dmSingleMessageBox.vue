@@ -13,7 +13,7 @@
                     </h4>
                     <p class="m-0">
                         Here you can send messages and share files with
-                        <span class="username-id">@ o4codes</span>
+                        <span class="username-id">@ davidblack</span>
                     </p>
                 </div>
             </div>
