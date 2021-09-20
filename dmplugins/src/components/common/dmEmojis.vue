@@ -1,23 +1,16 @@
 <template>
     <div class="padThis" id="exampleInputEmoji">
         <div class="setWidth">
-            <VEmojiPicker
-                :emojiWithBorder="false"
-                :style="{ width: '440px', height: '200' }"
-                labelSearch="Search"
-                @select="onSelectEmoji"
-                v-show="pickEmoji"
-            />
+            <Picker :data="emojiIndex" set="google" color="rgb(0, 184, 123)" @select="onSelectEmoji" v-show="pickEmoji"/>
         </div>
     </div>
 </template>
 
-/* Instructions for Abisalde --run npm install v-emoji-picker --Add to main.vue
-import VEmojiPicker from 'v-emoji-picker'; import { BootstrapVueIcons,
-BootstrapVue, IconsPlugin } from 'bootstrap-vue'; */
-
 <script>
-import { VEmojiPicker } from 'v-emoji-picker';
+import data from 'emoji-mart-vue-fast/data/google.json'
+import { Picker, EmojiIndex } from 'emoji-mart-vue-fast'
+let emojiIndex = new EmojiIndex(data);
+import 'emoji-mart-vue-fast/css/emoji-mart.css'
 import { mapGetters } from 'vuex';
 
 export default {
@@ -26,10 +19,11 @@ export default {
         VEmojiPicker,
     },
     props: ['onSelectEmoji'],
-    data: () => ({
-        valueInput: '',
-        showDialog: false,
-    }),
+    data(){
+        return {
+            emojiIndex: emojiIndex,
+        }
+    },
     computed: {
         ...mapGetters(['pickEmoji']),
     },
