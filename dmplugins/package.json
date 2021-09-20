@@ -16,6 +16,7 @@
         "bootstrap-vue": "^2.21.2",
         "centrifuge": "^2.8.2",
         "core-js": "^3.6.5",
+        "emoji-mart-vue-fast": "^10.0.1",
         "event-hooks-webpack-plugin": "^2.2.0",
         "fs": "^0.0.1-security",
         "moment": "^2.29.1",
