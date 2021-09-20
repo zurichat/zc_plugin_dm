@@ -15,6 +15,7 @@ class DataStorage:
         self.read_api = (
             "https://api.zuri.chat/data/read/{pgn_id}/{collec_name}/{org_id}?{query}"
         )
+        # self.upload_test_api = "http://127.0.0.1:8000/api/v1/testapi/{pgn_id}"
         self.write_api = "https://api.zuri.chat/data/write"
         self.delete_api = "https://api.zuri.chat/data/delete"
         self.upload_api = "https://api.zuri.chat/upload/file/{pgn_id}"
@@ -104,7 +105,7 @@ class DataStorage:
         else:
             return {"status_code": response.status_code, "message": response.reason}
     
-    def upload(self, file):
+    def upload(self, file):                   #takes in files oh, 1 file
         url = self.upload_api.format(
             pgn_id = self.plugin_id
         )
@@ -123,7 +124,7 @@ class DataStorage:
         url = self.upload_multiple_api.format(
             pgn_id = self.plugin_id
         )
-        files = {"file":files}
+        print(files)  #Just testing shii
         try:
             response = requests.post(url=url, files=files)
         except requests.exceptions.RequestException as e:

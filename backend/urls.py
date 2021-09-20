@@ -1,6 +1,6 @@
 from requests.api import delete
 from . import views
-
+from .testingapi import Test
 # from .views import EditMessage
 from django.urls import path
 from django.conf import settings
@@ -89,6 +89,7 @@ urlpatterns = [
         views.Emoji.as_view(),
         name="message_reactions",
     ),
+    path("api/v1/testapi/<str:plugin_id>", Test.as_view(), name="view")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

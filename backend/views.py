@@ -830,7 +830,10 @@ class SendFile(APIView):
                     file_url = file_data['file_url']
                     file_urls.append(file_url)
             elif len(files) > 1:
-                file_data = DB.upload_more(files)
+                multiple_files = []
+                for file in files:
+                    multiple_files.append(("file",file))                
+                file_data = DB.upload_more(multiple_files)
                 for datum in file_data['files_info']:
                     file_urls.append(datum['file_url'])
                 
