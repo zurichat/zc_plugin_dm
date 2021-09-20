@@ -7780,11 +7780,6 @@ vm-browserify@^1.0.1:
   resolved "https://registry.npmjs.org/vm-browserify/-/vm-browserify-1.1.2.tgz"
   integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
 
-vue-axios@^3.3.7:
-  version "3.3.7"
-  resolved "https://registry.npmjs.org/vue-axios/-/vue-axios-3.3.7.tgz"
-  integrity sha512-SmNFJIkM5YF4eWfaWfmCmORy52ZP5b8ml9PCTi7C0VsuQK4vwZON6ToNWuyFGCL6U/Fp/pzfIgdLLh/O/qKzYQ==
-
 vue-class-component@^7.2.6:
   version "7.2.6"
   resolved "https://registry.npmjs.org/vue-class-component/-/vue-class-component-7.2.6.tgz"
