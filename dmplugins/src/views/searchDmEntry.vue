@@ -12,6 +12,7 @@
                 <b-form-input
                     class="form-input"
                     v-model="userSearched"
+                    @input="searchUser"
                     placeholder="@somebody or somebody@example.com"
                     autofocus
                 ></b-form-input>
@@ -55,26 +56,30 @@ export default {
             filteredUser: [],
         };
     },
-    mounted() {
-        // drop the API here
-        // this.$axios.get('https://dm.zuri.chat/api/v1/get_organization_members')
-        // .then(userData => {
-        //   console.log(userData)
-        //   this.usersList = userData;
 
-        this.$http
-            .get('https://jsonplaceholder.typicode.com/users')
-            .then((userData) => {
-                // console.log(userData)
-                this.usersList = userData.data;
-            });
-    },
+    // drop the API here
+    // this.$axios.get('https://dm.zuri.chat/api/v1/get_organization_members')
+    // .then(userData => {
+    //   console.log(userData)
+    //   this.usersList = userData;
     methods: {
+        searchUser: function() {
+            let bounce = this;
+            this.userList = [];
+            this.$http
+                .get('https://jsonplaceholder.typicode.com/users')
+                .then((userData) => {
+                    // console.log(userData)
+                    userData.data.forEach((user) => {
+                        bounce.filteredUser.push(user);
+                    });
+                });
+        },
         closeDropdown: function() {
             this.userSearched = '';
         },
         changePage: function() {
-            this.$emit('changePage', 'page2');
+            this.$emit('changePage', 'startDirectMessage');
         },
     },
     computed: {
@@ -92,6 +97,9 @@ export default {
             });
         },
     },
+    created() {
+        this.searchUser();
+    },
 };
 </script>
 
@@ -101,7 +109,7 @@ export default {
 }
 
 .dm-search-entry {
-    height: 100%;
+    height: 80vh;
     overflow-x: hidden;
     overflow-y: hidden;
 }
