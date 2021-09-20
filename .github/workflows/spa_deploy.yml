@@ -1,26 +1,18 @@
 name: Zuri DM Deployment File
-
-on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+'on':
   push:
-    branches: [main]
-  #pull_request:
-   # branches: [main]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
+    branches:
+      - main
+  workflow_dispatch: null
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
       - name: Use cached node_modules
         uses: c-hive/gha-yarn-cache@v2
         with:
-         directory: dmplugins
-      
+          directory: dmplugins
       - name: install Dependencies && run build statics
         run: |
           cd dmplugins
@@ -29,13 +21,12 @@ jobs:
           cd ../dmspa
           yarn install
           yarn build
-          
       - name: Git Pull on Server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.ZURI_HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+          host: '${{ secrets.ZURI_HOST }}'
+          username: '${{ secrets.USERNAME }}'
+          password: '${{ secrets.PASSWORD }}'
           script: |
             cd ~/zc_plugin_dm
             git fetch --all 
@@ -46,32 +37,28 @@ jobs:
             yarn install
             cd ../dmspa
             yarn install
-            
-            
       - name: copy dist to server
         uses: Creepios/sftp-action@v1.0.1
         with:
-          host: ${{ secrets.ZURI_HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          localPath: './dmspa/dist/'
-          remotePath: '/home/orpheus/zc_plugin_dm/dmspa/dist'
-      
+          host: '${{ secrets.ZURI_HOST }}'
+          username: '${{ secrets.USERNAME }}'
+          password: '${{ secrets.PASSWORD }}'
+          localPath: ./dmspa/dist/
+          remotePath: /home/orpheus/zc_plugin_dm/dmspa/dist
       - name: copy build to server
         uses: Creepios/sftp-action@v1.0.1
         with:
-          host: ${{ secrets.ZURI_HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          localPath: './client/build/'
-          remotePath: '/home/orpheus/zc_plugin_dm/dmplugins/dist'
-          
+          host: '${{ secrets.ZURI_HOST }}'
+          username: '${{ secrets.USERNAME }}'
+          password: '${{ secrets.PASSWORD }}'
+          localPath: ./client/build/
+          remotePath: /home/orpheus/zc_plugin_dm/dmplugins/dist
       - name: serve app
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.ZURI_HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
+          host: '${{ secrets.ZURI_HOST }}'
+          username: '${{ secrets.USERNAME }}'
+          password: '${{ secrets.PASSWORD }}'
           script: |
             cd ~/zc_plugin_dm
             source env/bin/activate
@@ -79,4 +66,3 @@ jobs:
             python3 manage.py collectstatic --noinput
             fuser -k 9090/tcp
             gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
-       
