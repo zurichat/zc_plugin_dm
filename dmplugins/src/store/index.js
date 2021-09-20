@@ -33,7 +33,7 @@ const store = {
         setShowReply(state, payload) {
             state.showReply = payload;
         },
-        setEmojis(state, payload) {
+        addEmojis(state, payload) {
             state.emojis = payload;
         },
         setEmojiSet(state, payload) {
@@ -50,9 +50,9 @@ const store = {
         }
     },
     actions: {
-        setEmojis({ commit, state }, payload) {
+        addEmojis({ commit, state }, payload) {
             const emojis = [...state.emojis, payload];
-            commit('setEmojis', emojis);
+            commit('addEmojis', emojis);
             const map = emojis.reduce((prev, next) => ({
                 ...prev,
                 [next]: (prev[next] || 0) + 1,
