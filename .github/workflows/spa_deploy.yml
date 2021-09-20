@@ -1,0 +1,82 @@
+name: Zuri DM Deployment File
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [main]
+  #pull_request:
+   # branches: [main]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Use cached node_modules
+        uses: c-hive/gha-yarn-cache@v2
+        with:
+         directory: dmplugins
+      
+      - name: install Dependencies && run build statics
+        run: |
+          cd dmplugins
+          yarn install
+          yarn build
+          cd ../dmspa
+          yarn install
+          yarn build
+          
+      - name: Git Pull on Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ZURI_HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd ~/zc_plugin_dm
+            git fetch --all 
+            git reset --hard origin/main
+            git stash
+            git pull
+            cd dmplugins
+            yarn install
+            cd ../dmspa
+            yarn install
+            
+            
+      - name: copy dist to server
+        uses: Creepios/sftp-action@v1.0.1
+        with:
+          host: ${{ secrets.ZURI_HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          localPath: './dmspa/dist/'
+          remotePath: '/home/orpheus/zc_plugin_dm/dmspa/dist'
+      
+      - name: copy build to server
+        uses: Creepios/sftp-action@v1.0.1
+        with:
+          host: ${{ secrets.ZURI_HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          localPath: './client/build/'
+          remotePath: '/home/orpheus/zc_plugin_dm/dmplugins/dist'
+          
+      - name: serve app
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ZURI_HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd ~/zc_plugin_dm
+            source env/bin/activate
+            pip install -r requirements.txt --upgrade
+            python3 manage.py collectstatic --noinput
+            fuser -k 9090/tcp
+            gunicorn --bind 0.0.0.0:9090 zc_plugin_dm.wsgi --daemon
+       
