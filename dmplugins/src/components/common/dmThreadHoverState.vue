@@ -1,5 +1,5 @@
 <template>
-    <div class="hover-state-message">
+    <div class="hover-state-message d-flex w-100 justify-content-end">
         <div
             class="thread-message-hover-state d-flex flex-row justify-content-between align-items-center"
         >
@@ -46,12 +46,14 @@
             >
                 <b-icon icon="bookmark" font-scale="1.3" />
             </div>
+                <three-dots v-if="ThreeDots" ></three-dots>
             <div
                 class="more-message-action py-1 px-2 thread-message-hover"
                 data-toggle="tooltip"
                 data-placement="topleft"
                 title="More actions"
                 v-b-tooltip.hover.focus
+                @click="ThreeDots=true"
             >
                 <b-iconstack font-scale="1.3">
                     <b-icon stacked icon="dot" shift-v="5" />
@@ -65,12 +67,19 @@
 
 <script>
 import { mapMutations } from 'vuex';
+import ThreeDots from '../ThreeDots.vue'
 
 export default {
     name: 'dmThreadHoverState',
-    data() {
-        return {};
+    components: {
+        ThreeDots,
     },
+    data() {
+        return {
+            ThreeDots: false
+        };
+    },
+    
     methods: {
         ...mapMutations(['setPickEmoji', 'setShowReply']),
         pickEmoji() {
@@ -78,6 +87,9 @@ export default {
         },
         showReply() {
             this.setShowReply(true);
+            // show ReplyThread by Ozovehe
+            this.$store.state.showReplyThread = !this.$store.state
+                .showReplyThread;
         },
     },
 };
@@ -87,7 +99,7 @@ export default {
 .hover-state-message {
     position: absolute;
     right: 0;
-    top: -20%;
+    top: 0;
 }
 
 .thread-message-hover-state {

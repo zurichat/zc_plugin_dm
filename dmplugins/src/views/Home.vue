@@ -64,8 +64,8 @@ div.home {
 }
 
 div.home .direct-message-contents {
-    min-width: 0;
-    min-height: 0;
+    min-width: 100%;
+    min-height: 100%;
     background-color: #f9f9f9;
 }
 
