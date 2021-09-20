@@ -1,4 +1,6 @@
+import re
 from urllib.parse import urlencode
+from django.http import response
 import requests, json
 
 
@@ -13,8 +15,12 @@ class DataStorage:
         self.read_api = (
             "https://api.zuri.chat/data/read/{pgn_id}/{collec_name}/{org_id}?{query}"
         )
+        # self.upload_test_api = "http://127.0.0.1:8000/api/v1/testapi/{pgn_id}"
         self.write_api = "https://api.zuri.chat/data/write"
         self.delete_api = "https://api.zuri.chat/data/delete"
+        self.upload_api = "https://api.zuri.chat/upload/file/{pgn_id}"
+        self.upload_multiple_api = "https://api.zuri.chat/upload/files/{pgn_id}"
+        self.delete_file_api ="https://api.zuri.chat/delete/file/{pgn_id}"
 
         if request is None:
             self.plugin_id = PLUGIN_ID
@@ -98,6 +104,58 @@ class DataStorage:
             return response.json()
         else:
             return {"status_code": response.status_code, "message": response.reason}
+    
+    def upload(self, file):                   #takes in files oh, 1 file
+        url = self.upload_api.format(
+            pgn_id = self.plugin_id
+        )
+        files = {"file":file}
+        try:
+            response = requests.post(url=url, files=files)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json()["data"]
+        else:
+            return {"status_code": response.status_code, "message": response.reason}  
+
+    def upload_more(self, files):
+        url = self.upload_multiple_api.format(
+            pgn_id = self.plugin_id
+        )
+        print(files)  #Just testing shii
+        try:
+            response = requests.post(url=url, files=files)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json()["data"]
+        else:
+            return {"status_code": response.status_code, "message": response.reason}
+
+    def delete_file(self, file_url):
+        url = self.delete_file_api.format(
+            pgn_id = self.plugin_id
+        )
+
+        body = dict(
+            file_url=file_url
+        )
+
+        try:
+            response = requests.post(url=url, json=body)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"status_code": response.status_code, "message": response.reason}
+
+
+
 
 
 def send_centrifugo_data(room, data):
