@@ -27,7 +27,9 @@
                             @click="show_popup_profile((p_state = !p_state))"
                             >MamaGee</span
                         >
-                        <span class="msgTime">5.55pm</span>
+                        <span class="msgTime">{{
+                            getHumanDate(message.created_at)
+                        }}</span>
                     </h5>
                     <div
                         class="text-container"
@@ -114,6 +116,10 @@ export default {
             this.setPickEmoji(false);
             this.setEmojis(emoji.data);
         },
+        //TIME STAMP FUNCTION
+        getHumanDate: function(created_at) {
+            return moment(created_at, 'LT').format('LT');
+        },
         postSelect(name) {
             this.setEmojis(name);
         },
@@ -144,28 +150,34 @@ export default {
     position: relative !important;
     background: #fff;
 }
+
 .conversation-threads {
     margin-bottom: 20px;
 }
+
 .userProfile-avatar {
     cursor: pointer !important;
     padding-right: 16px;
 }
+
 .userProfile-avatar img {
     vertical-align: middle;
     width: 36px;
     height: 36px;
     border-radius: 4px;
 }
+
 .usertext-messages {
     font-size: 15px;
     line-height: 1.8;
 }
+
 .usertext-messages h5 {
     margin-bottom: 0;
     font-size: 16px;
     font-weight: 600;
 }
+
 .usertext-messages span.msgTime {
     padding-left: 8px;
     font-size: 12px;
@@ -178,12 +190,15 @@ export default {
 .usertext-messages .userName {
     cursor: pointer;
 }
+
 .text-container {
     position: relative;
 }
+
 .msgBody:hover {
     background: var(--bg-color-footer);
 }
+
 .thread-reactions,
 .add-reactions {
     background: rgba(29, 28, 29, 0.06);
@@ -192,6 +207,7 @@ export default {
     position: relative;
     cursor: pointer;
 }
+
 .add-reactions {
     margin-left: 5px;
 }
@@ -199,11 +215,13 @@ export default {
     width: 20px;
     height: 20px;
 }
+
 .thread-reactions {
     display: inline-flex;
     justify-content: space-evenly;
     margin-right: 5px;
 }
+
 .reaction-count {
     font-size: 12px;
     margin-top: 2px;
