@@ -89,7 +89,7 @@ urlpatterns = [
         views.Emoji.as_view(),
         name="message_reactions",
     ),
-    path("api/v1/testapi/<str:plugin_id>", Test.as_view(), name="view")
+    path("api/v1/testapi/<str:plugin_id>", Test.as_view(), name="testview")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
