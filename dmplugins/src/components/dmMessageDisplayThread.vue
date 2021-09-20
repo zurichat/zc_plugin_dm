@@ -5,32 +5,38 @@
             @mouseleave="hover = false"
             class="msgBody position-relative"
         >
-            <div class="conversation-threads d-flex flex-row">
+            <div class="conversation-threads d-flex flex-row w-100">
                 <div
                     class="userProfile-avatar"
                     @click="show_popup_profile((p_state = !p_state))"
                 >
-                    <img src="https://picsum.photos/200/300" alt="{}" />
+                    <!-- Added a ref to get the image -->
+                    <img
+                        ref="msgThreadUserImg"
+                        src="https://picsum.photos/200/300"
+                        alt="{}"
+                    />
                 </div>
                 <div class="usertext-messages">
                     <h5 class="pb-2">
+                        <messageHoverShow v-if="hover" />
+                        <!-- Added a ref to get the user name -->
                         <span
+                            ref="msgThreadUsername"
                             class="userName"
                             @click="show_popup_profile((p_state = !p_state))"
                             >MamaGee</span
                         >
                         <span class="msgTime">5.55pm</span>
                     </h5>
-                    <div class="text-container">
-                        <messageHoverShow v-if="hover" />
-                        <p class="text">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing
-                            elit. Eum mollitia aspernatur laboriosam cum
-                            officiis commodi deleniti odit rerum ratione
-                            consectetur. Lorem ipsum dolor sit amet, consectetur
-                            adipiscing elit. Tincidunt adipiscing et, tortor,
-                            fusce quis tellus, enim. A, posuere mi auctor odio
-                            tincidunt magnis.
+                    <div
+                        class="text-container"
+                        v-for="message in showMessages"
+                        :key="message._id"
+                    >
+                        <!-- Added a ref to get all messagen clicked -->
+                        <p ref="msgThreadUserMsg" class="text">
+                            {{ message.message }}
                         </p>
                     </div>
                     <div v-if="emojis.length > 0" class="reactions d-flex">
@@ -86,7 +92,6 @@
 
 <script>
 import { bus } from '@/main.js';
-
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
 import EmojiComp from '../components/common/dmEmojis.vue';
@@ -103,7 +108,7 @@ export default {
         };
     },
     methods: {
-        ...mapActions(['setEmojis']),
+        ...mapActions(['setEmojis', 'fetchMessages']),
         ...mapMutations(['setPickEmoji']),
         onSelectEmoji(emoji) {
             this.setPickEmoji(false);
@@ -120,53 +125,53 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['emojis', 'emojiSet']),
+        ...mapGetters(['emojis', 'emojiSet', 'showMessages']),
+    },
+    // Reply thread by Ozovehe
+    mounted() {
+        this.$store.state.replyThreadMsgs.userImg = this.$refs.msgThreadUserImg.src;
+        this.$store.state.replyThreadMsgs.clickedMsg = this.$refs.msgThreadUserMsg.textContent;
+        this.$store.state.replyThreadMsgs.username = this.$refs.msgThreadUsername.textContent;
+    },
+    created() {
+        this.fetchMessages();
     },
 };
 </script>
 
 <style scoped>
-:root {
-    --main-green: #00b87b;
-}
 .message-thread {
     position: relative !important;
     background: #fff;
 }
 .conversation-threads {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
-
 .userProfile-avatar {
-    cursor: pointer;
+    cursor: pointer !important;
     padding-right: 16px;
 }
-
 .userProfile-avatar img {
     vertical-align: middle;
     width: 36px;
     height: 36px;
     border-radius: 4px;
 }
-
 .usertext-messages {
     font-size: 15px;
     line-height: 1.8;
 }
-
 .usertext-messages h5 {
     margin-bottom: 0;
     font-size: 16px;
     font-weight: 600;
 }
-
 .usertext-messages span.msgTime {
     padding-left: 8px;
     font-size: 12px;
     color: #999999;
     font-weight: 400;
 }
-
 .usertext-messages p {
     margin-bottom: 0;
 }
@@ -176,11 +181,9 @@ export default {
 .text-container {
     position: relative;
 }
-
 .msgBody:hover {
     background: var(--bg-color-footer);
 }
-
 .thread-reactions,
 .add-reactions {
     background: rgba(29, 28, 29, 0.06);
@@ -189,22 +192,18 @@ export default {
     position: relative;
     cursor: pointer;
 }
-
 .add-reactions {
     margin-left: 5px;
 }
-
 .add-reactions img {
     width: 20px;
     height: 20px;
 }
-
 .thread-reactions {
     display: inline-flex;
     justify-content: space-evenly;
     margin-right: 5px;
 }
-
 .reaction-count {
     font-size: 12px;
     margin-top: 2px;
