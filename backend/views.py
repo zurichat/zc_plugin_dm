@@ -814,15 +814,6 @@ def remind_message(request):
         return Response(data="Your current date is ahead of the scheduled time. Are you plannig to go back in time?", status=status.HTTP_400_BAD_REQUEST)
     return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
 
-class Files(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
-    def post(self, request, *args, **kwargs):
-        if request.method == "POST" and request.FILES["file"]:
-            file = request.FILES["file"]
-            filename = default_storage.save(file.name, file)
-            file_url = default_storage.url(filename)
-            return Response({"file_url": file_url})
 
 
 class SendFile(APIView):
@@ -832,19 +823,20 @@ class SendFile(APIView):
         print(request.FILES)
         if request.FILES:
             file_urls = []
-            for fil in request.FILES:
-                file = request.FILES[fil]
-                files = {"file": file}
-
-                response = requests.post(
-                    f'http://{request.META["HTTP_HOST"]}/api/v1/files', files=files
-                )
-                if response.status_code == 200:
-                    file_urls.append(response.json()["file_url"])
-                else:
-                    return Response(
-                        {"status_code": response.status_code, "reason": response.reason}
-                    )
+            files = request.FILES.getlist('file')
+            if len(files) == 1:
+                for file in request.FILES.getlist('file'):
+                    file_data = DB.upload(file)
+                    file_url = file_data['file_url']
+                    file_urls.append(file_url)
+            elif len(files) > 1:
+                multiple_files = []
+                for file in files:
+                    multiple_files.append(("file",file))                
+                file_data = DB.upload_more(multiple_files)
+                for datum in file_data['files_info']:
+                    file_urls.append(datum['file_url'])
+                
 
             request.data["room_id"] = room_id
             print(request)
