@@ -60,12 +60,13 @@ export default {
 <style scoped>
 div.home {
     width: 100%;
+    height: 100vh;
     background-color: #f9f9f9;
 }
 
 div.home .direct-message-contents {
-    min-width: 100%;
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
     background-color: #f9f9f9;
 }
 
