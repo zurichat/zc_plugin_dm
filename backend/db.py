@@ -109,7 +109,7 @@ class DataStorage:
             return {"status_code": response.status_code, "message": response.reason}
     
     def upload(self, file):                   #takes in files oh, 1 file
-        url = self.upload_api.format(
+        url = self.upload_multiple_api.format(
             pgn_id = self.plugin_id
         )
         files = {"file":file}

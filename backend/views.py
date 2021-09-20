@@ -837,8 +837,8 @@ class SendFile(APIView):
                 for file in request.FILES.getlist('file'):
                     file_data = DB.upload(file)
                     if file_data["status"]==200:
-                        file_url = file_data["data"]['file_url']
-                        file_urls.append(file_url)
+                        for datum in file_data["data"]['files_info']:
+                            file_urls.append(datum['file_url'])
                     else:
                         return Response(file_data)
             elif len(files) > 1:
