@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import apiServices from '../services/apiServices';
+import messages from './modules/messages'
+
 
 Vue.use(Vuex);
 const store = {
@@ -9,6 +11,20 @@ const store = {
         showReply: false,
         emojis: [],
         emojiSet: Object.create(null),
+        sendMsg:'',
+        recieveMsg:[],
+        sender_id:'6146ce37845b436ea04d102d',
+        room_id:"6146d126845b436ea04d102e",
+        allSentMsg:[ ],
+        // For Reply Thread
+        showReplyThread: false,
+        replyThreadMsgs: {
+            username: 'Sandra Bernard',
+            userImg: '',
+            clickedMsg: 'Clicked messages will be shown here when a user wants to reply in a thread. Thank you',
+            senderId: '6145fc9a285e4a18402074f4',
+            replyThreadNewMsg: [ ]
+        }
     },
     mutations: {
         setPickEmoji(state, payload) {
@@ -23,6 +39,15 @@ const store = {
         setEmojiSet(state, payload) {
             state.emojiSet = payload;
         },
+        setSendMsg(state,payload){
+            state.allSentMsg.push(payload)
+        },
+        setChat(state,newChat){
+            state.sendMsg = newChat
+        },
+        setReceiveMsg(state,newMsg){
+            state.recieveMsg = newMsg
+        }
     },
     actions: {
         setEmojis({ commit, state }, payload) {
@@ -35,14 +60,29 @@ const store = {
             commit('setEmojiSet', map);
         },
         //making API call to the backend:deveeb
-        async makeRequest() {
+        async makeRequest({commit}){
             try {
-                await apiServices.getClient().then((result) => {
-                    console.log(result.data);
-                });
+                await apiServices.getClient(this.state.room_id,this.state.sender_id,this.state.sendMsg)
+                .then(result => {
+                    //console.log(result.data)
+                    commit('setSendMsg',result.data.data.message)
+                })
             } catch (error) {
-                alert(error);
+                alert(error)
             }
+            this.state.sendMsg = ''    
+        },
+        //getting messages in room
+        async getRequest({commit}){
+            try {
+                await apiServices.recieveClient(this.state.room_id)
+                .then(result => {
+                    console.log(result.data.results)
+                    commit('setReceiveMsg',result.data.results)
+                })
+            } catch (error) {
+                alert(error)
+            }   
         },
     },
     getters: {
@@ -58,7 +98,15 @@ const store = {
         emojiSet(state) {
             return state.emojiSet;
         },
+        getSendMsg(state){
+            return state.sendMsg;
+        },
+        getRecieveMsg(state){
+            return state.recieveMsg
+        }
     },
-    modules: {},
+    modules: {
+        messages,
+    },
 };
 export default new Vuex.Store(store);
