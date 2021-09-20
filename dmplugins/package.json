@@ -18,6 +18,7 @@
         "core-js": "^3.6.5",
         "event-hooks-webpack-plugin": "^2.2.0",
         "fs": "^0.0.1-security",
+        "moment": "^2.29.1",
         "single-spa-vue": "^2.1.0",
         "systemjs-webpack-interop": "^2.3.7",
         "v-emoji-picker": "^2.3.3",
