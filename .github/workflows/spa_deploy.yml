@@ -16,17 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       
-      - name: Use cached node_modules
-        uses: c-hive/gha-yarn-cache@v2
-        with:
-         directory: dmplugins
-      
       - name: install Dependencies && run build statics
         run: |
           cd dmplugins
           yarn install
           yarn build
+          pwd
           cd ../dmspa
+          pwd
           yarn install
           yarn build
           
