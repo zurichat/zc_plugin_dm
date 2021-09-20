@@ -46,12 +46,14 @@
             >
                 <b-icon icon="bookmark" font-scale="1.3" />
             </div>
+                <three-dots v-if="ThreeDots" ></three-dots>
             <div
                 class="more-message-action py-1 px-2 thread-message-hover"
                 data-toggle="tooltip"
                 data-placement="topleft"
                 title="More actions"
                 v-b-tooltip.hover.focus
+                @click="ThreeDots=true"
             >
                 <b-iconstack font-scale="1.3">
                     <b-icon stacked icon="dot" shift-v="5" />
@@ -65,12 +67,19 @@
 
 <script>
 import { mapMutations } from 'vuex';
+import ThreeDots from '../ThreeDots.vue'
 
 export default {
     name: 'dmThreadHoverState',
-    data() {
-        return {};
+    components: {
+        ThreeDots,
     },
+    data() {
+        return {
+            ThreeDots: false
+        };
+    },
+    
     methods: {
         ...mapMutations(['setPickEmoji', 'setShowReply']),
         pickEmoji() {
