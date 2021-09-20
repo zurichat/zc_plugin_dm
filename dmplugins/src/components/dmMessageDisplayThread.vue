@@ -113,8 +113,15 @@ export default {
         ...mapActions(['setEmojis', 'fetchMessages']),
         ...mapMutations(['setPickEmoji']),
         onSelectEmoji(emoji) {
-            this.setPickEmoji(false);
-            this.setEmojis(emoji.data);
+            if(this.postselectEmoji === true) {
+                this.setPickEmoji(false);
+                this.addEmojis(emoji.native);
+                this.postselectEmoji = false;
+            }else {
+                const filteredEmojis = this.emojis.filter((i => emoji => emoji !== emoji.native || --i)(1))
+                this.postAddEmojis(filteredEmojis);
+                this.postselectEmoji = true
+            }
         },
         //TIME STAMP FUNCTION
         getHumanDate: function(created_at) {
