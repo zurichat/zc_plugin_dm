@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import apiServices from '../services/apiServices';
+import messages from './modules/messages'
+
 
 Vue.use(Vuex);
 const store = {
@@ -13,7 +15,16 @@ const store = {
         recieveMsg:[],
         sender_id:'6146ce37845b436ea04d102d',
         room_id:"6146d126845b436ea04d102e",
-        allSentMsg:[],
+        allSentMsg:[ ],
+        // For Reply Thread
+        showReplyThread: false,
+        replyThreadMsgs: {
+            username: 'Sandra Bernard',
+            userImg: '',
+            clickedMsg: 'Clicked messages will be shown here when a user wants to reply in a thread. Thank you',
+            senderId: '6145fc9a285e4a18402074f4',
+            replyThreadNewMsg: [ ]
+        }
     },
     mutations: {
         setPickEmoji(state, payload) {
@@ -94,6 +105,8 @@ const store = {
             return state.recieveMsg
         }
     },
-    modules: {},
+    modules: {
+        messages,
+    },
 };
 export default new Vuex.Store(store);
