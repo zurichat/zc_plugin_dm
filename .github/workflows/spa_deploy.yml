@@ -21,6 +21,8 @@ jobs:
           cd dmplugins
           yarn install
           yarn build
+          cd dist
+          pwd
           
           
       - name: Git Pull on Server
