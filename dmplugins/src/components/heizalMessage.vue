@@ -21,11 +21,12 @@
             </div>
         </div>
         <!--MESSAGES START FROM HERE-->
-        <div
+        <div v-for="message in showMessages" :key="message._id">
+            <div
             @mouseover="hover = true"
             @mouseleave="hover = false"
             class="msgBody position-relative"
-        >
+           >
             <div class="conversation-threads d-flex flex-row">
                 <div class="userProfile-avatar">
                     <img src="https://picsum.photos/200/300" alt="{}" />
@@ -33,9 +34,9 @@
                 <div class="usertext-messages">
                     <h5 class="pb-2">
                         <span class="userName">MamaGee</span>
-                        <span class="msgTime">10:00am</span>
+                        <span class="msgTime">{{ getHumanDate(message.created_at)}}</span>
                     </h5>
-                    <div class="text-container" v-for="message in showMessages" :key="message._id">
+                    <div class="text-container">
                          <messageHoverShow v-if="hover" />
                         <p class="text">
                             {{ message.message}}
@@ -43,6 +44,7 @@
                     </div>
                 </div>
             </div>  
+           </div>
         </div>
     </div>
     <div class="row align-items-end message-box">
@@ -57,6 +59,7 @@
 import { mapActions, mapGetters } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
 import DmInputTextField from '../components/dmInputTextField.vue'
+import moment from 'moment'
 export default {
     name: 'DmMesssageThread',
     components: {
@@ -72,6 +75,10 @@ export default {
     },
     methods: { 
         ...mapActions(["fetchMessages"]),
+        //TIME STAMP FUNCTION
+        getHumanDate : function (created_at) {
+                return moment(created_at, 'LT').format('LT');
+        }
     },
     computed: {
         ...mapGetters(["showMessages"]),
