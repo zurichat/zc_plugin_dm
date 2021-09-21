@@ -113,7 +113,7 @@ export default {
         };
     },
     methods: {
-        ...mapActions(['addEmojis', 'fetchMessages']),
+        ...mapActions(['addEmojis', 'fetchMessages', 'fetchEmojis']),
         ...mapMutations(['setPickEmoji']),
         onSelectEmoji(emoji) {
             this.setPickEmoji(false);
@@ -152,6 +152,7 @@ export default {
     },
     created() {
         this.fetchMessages();
+        this.fetchEmojis();
     },
 };
 </script>

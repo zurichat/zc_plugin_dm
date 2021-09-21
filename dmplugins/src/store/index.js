@@ -15,6 +15,7 @@ const store = {
         recieveMsg:[],
         sender_id:'6146ce37845b436ea04d102d',
         room_id:"6146d126845b436ea04d102e",
+        message_id: "6146d432845b436ea04d103b",
         allSentMsg:[ ],
         // For Reply Thread
         showReplyThread: false,
@@ -53,11 +54,27 @@ const store = {
         addEmojis({ commit, state }, payload) {
             const emojis = [...state.emojis, payload];
             commit('addEmojis', emojis);
-            const map = emojis.reduce((prev, next) => ({
+            const emojiCount = emojis.reduce((prev, value) => ({
                 ...prev,
-                [next]: (prev[next] || 0) + 1,
-            }));
-            commit('setEmojiSet', map);
+                [value]: (prev[value] || 0) + 1
+            }), {});
+            commit('setEmojiSet', emojiCount);
+
+            // apiServices.postEmoji("6146cb29845b436ea04d1029",this.state.message_id, payload)
+            // .then(result => {
+            //     console.log(result.data)
+            // })
+        },
+        async fetchEmojis({commit}){
+            try{
+                await apiServices.getEmojis("6146cb29845b436ea04d1029",this.state.message_id)
+                .then(result =>{
+                    console.log(result.data)
+                    // commit('addEmojis', result.data)
+                })   
+            } catch (error){
+                console.log(error)
+            }
         },
         //making API call to the backend:deveeb
         async makeRequest({commit}){
