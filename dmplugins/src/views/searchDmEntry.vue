@@ -64,26 +64,12 @@ export default {
     //   this.usersList = userData;
     methods: {
         searchUser: function() {
-            let bounce = this;
-            this.userList = [];
             this.$http
                 .get('https://jsonplaceholder.typicode.com/users')
                 .then((userData) => {
                     // console.log(userData)
-                    userData.data.forEach((user) => {
-                        bounce.filteredUser.push(user);
-                    });
+                    this.usersList = userData.data;
                 });
-        },
-        closeDropdown: function() {
-            this.userSearched = '';
-        },
-        changePage: function() {
-            this.$emit('changePage', 'startDirectMessage');
-        },
-    },
-    computed: {
-        filterUser: function() {
             this.filteredUser = this.usersList.filter((user) => {
                 if (
                     user.name
@@ -96,9 +82,12 @@ export default {
                     return user;
             });
         },
-    },
-    created() {
-        this.searchUser();
+        closeDropdown: function() {
+            this.userSearched = '';
+        },
+        changePage: function() {
+            this.$emit('changePage', 'startDirectMessage');
+        },
     },
 };
 </script>
