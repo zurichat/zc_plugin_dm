@@ -51,28 +51,58 @@ const store = {
         }
     },
     actions: {
-        addEmojis({ commit, state }, payload) {
-            const emojis = [...state.emojis, payload];
-            commit('addEmojis', emojis);
-            const emojiCount = emojis.reduce((prev, value) => ({
-                ...prev,
-                [value]: (prev[value] || 0) + 1
-            }), {});
-            commit('setEmojiSet', emojiCount);
+        addEmojis({commit},payload) {
+            // POST IS MESSING UP
+            const newEmoji = {
+                message_id: this.state.message_id,
+                sender_id: this.state.sender_id,
+                data: payload.native,
+                room_id: this.state.room_id,
+                count: 1,
+                created_at: new Date().toISOString()
+            }
+            axios.post("https://dm.zuri.chat/api/v1/rooms/6146cb29845b436ea04d1029/messages/6146d432845b436ea04d103b/reactions", newEmoji)
+            .then(result => {
+                const emojis = result.data.data.reactions;
+                const emojiCount = [...emojis.reduce((r, e) => {
+                    let k = `${e.data}|${e.name}`;
+                    if(!r.has(k)) r.set(k, {...e, count: 1})
+                    else r.get(k).count++
+                    return r;
+                }, new Map).values()];
+                commit('setEmojiSet', emojiCount);
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+        setEmojis({ commit, state }, payload) {
+            // const emojis = payload
+            // commit('addEmojis', emojis);
+            // const emojiCount = emojis.reduce((prev, value) => ({
+            //     ...prev,
+            //     [value]: (prev[value] || 0) + 1
+            // }), {});
+            // commit('setEmojiSet', emojiCount);
 
-            // SERVER IS GIVING ERROR CANNOT POST REACTIONS FOR NOW
             // apiServices.postEmoji("6146cb29845b436ea04d1029",this.state.message_id, payload)
             // .then(result => {
             //     console.log(result.data)
             // })
         },
         async fetchEmojis({commit}){
+            // GET IS WORKING
             try{
-                // SERVER IS GIVING ERROR CANNOT FETCH REACTIONS FOR NOW
                 await apiServices.getEmojis("6146cb29845b436ea04d1029",this.state.message_id)
                 .then(result =>{
-                    console.log(result.data)
-                    // commit('addEmojis', result.data)
+                    const emojis = result.data.data.reactions;
+                    const emojiCount = [...emojis.reduce((r, e) => {
+                        let k = `${e.data}|${e.name}`;
+                        if(!r.has(k)) r.set(k, {...e, count: 1})
+                        else r.get(k).count++
+                        return r;
+                    }, new Map).values()];
+                    commit('setEmojiSet', emojiCount);
+                    commit('addEmojis', result.data.data.reactions);
                 })   
             } catch (error){
                 console.log(error)

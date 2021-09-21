@@ -43,15 +43,15 @@
                     </div>
                     <div v-if="emojis.length > 0" class="reactions d-flex">
                         <div
-                            v-for="(value, name, index) in emojiSet"
+                            v-for="(emoji, index) in emojiSet"
                             :key="index"
                         >
                             <div
                                 class="thread-reactions"
-                                @click="postSelect(name)"
+                                @click="postSelect(emoji)"
                             >
-                                {{ name }}
-                                <div class="reaction-count">{{ value }}</div>
+                                {{ emoji.data }}
+                                <div class="reaction-count">{{ emoji.count }}</div>
                             </div>
                         </div>
                         <div class="add-reactions" @click="addEmoji">
@@ -113,24 +113,26 @@ export default {
         };
     },
     methods: {
-        ...mapActions(['addEmojis', 'fetchMessages', 'fetchEmojis']),
+        ...mapActions(['addEmojis', 'setEmojis', 'fetchMessages', 'fetchEmojis']),
         ...mapMutations(['setPickEmoji']),
         onSelectEmoji(emoji) {
             this.setPickEmoji(false);
-            this.addEmojis(emoji.native);
+            const newEmoji = emoji._sanitized;
+            this.addEmojis(newEmoji);
             this.postselectEmoji = false;
         },
         //TIME STAMP FUNCTION
         // getHumanDate: function(created_at) {
         //     return moment(created_at, 'LT').format('LT');
         // },
-        postSelect(name) {
+        postSelect(emoji) {
+            const newEmoji = emoji._sanitized;
             if(this.postselectEmoji === true) {
-                this.addEmojis(name);
+                this.addEmojis(newEmoji);
                 this.postselectEmoji = false;
             }else {
-                const filteredEmojis = this.emojis.filter((i => emoji => emoji !== name || --i)(1))
-                this.addEmojis(filteredEmojis);
+                const filteredEmojis = this.emojis.filter((i => emoji => emoji !== emoji || --i)(1));
+                this.setEmojis(filteredEmojis);
                 this.postselectEmoji = true;
             }
         }, 
