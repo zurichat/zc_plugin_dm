@@ -15,7 +15,7 @@
                 <div class="direct-message-allmessages-body position-relative">
                     <DmSingleMessageBox />
                 </div>
-                <div class="direct-message-input-footer">
+                <div class="direct-message-input-footer position-relative">
                     <DmInputxtf />
                 </div>
             </div>
