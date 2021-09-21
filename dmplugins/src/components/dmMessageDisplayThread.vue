@@ -27,9 +27,9 @@
                             @click="show_popup_profile((p_state = !p_state))"
                             >MamaGee</span
                         >
-                        <span class="msgTime">{{
-                            getHumanDate(message.created_at)
-                        }}</span>
+                        <span class="msgTime">
+                            5:55 PM
+                        </span>
                     </h5>
                     <div
                         class="text-container"
@@ -97,6 +97,8 @@ import { bus } from '@/main.js';
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
 import EmojiComp from '../components/common/dmEmojis.vue';
+// import moment from 'moment';
+
 export default {
     name: 'DmMesssageThread',
     components: {
@@ -119,9 +121,9 @@ export default {
             this.postselectEmoji = false;
         },
         //TIME STAMP FUNCTION
-        getHumanDate: function(created_at) {
-            return moment(created_at, 'LT').format('LT');
-        },
+        // getHumanDate: function(created_at) {
+        //     return moment(created_at, 'LT').format('LT');
+        // },
         postSelect(name) {
             if(this.postselectEmoji === true) {
                 this.addEmojis(name);

@@ -2,6 +2,7 @@ import re
 from urllib.parse import urlencode
 from django.http import response
 import requests, json
+from .login import login_user
 
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
@@ -9,7 +10,9 @@ ORG_ID = "6145eee9285e4a18402074cd"
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
 ROOMS = "dm_rooms"
 MESSAGES = "dm_messages"
-
+header={
+    'Authorization': f'Bearer {login_user()}'
+}
 class DataStorage:
     def __init__(self, request=None):
         self.read_api = (
@@ -106,19 +109,19 @@ class DataStorage:
             return {"status_code": response.status_code, "message": response.reason}
     
     def upload(self, file):                   #takes in files oh, 1 file
-        url = self.upload_api.format(
+        url = self.upload_multiple_api.format(
             pgn_id = self.plugin_id
         )
         files = {"file":file}
         try:
-            response = requests.post(url=url, files=files)
+            response = requests.post(url=url, files=files, headers=header)
         except requests.exceptions.RequestException as e:
             print(e)
             return None
         if response.status_code == 200:
-            return response.json()["data"]
+            return response.json()
         else:
-            return {"status_code": response.status_code, "message": response.reason}  
+            return {"status": response.status_code, "message": response.reason}  
 
     def upload_more(self, files):
         url = self.upload_multiple_api.format(
@@ -126,14 +129,14 @@ class DataStorage:
         )
         print(files)  #Just testing shii
         try:
-            response = requests.post(url=url, files=files)
+            response = requests.post(url=url, files=files, headers=header)
         except requests.exceptions.RequestException as e:
             print(e)
             return None
         if response.status_code == 200:
-            return response.json()["data"]
+            return response.json()
         else:
-            return {"status_code": response.status_code, "message": response.reason}
+            return {"status": response.status_code, "message": response.reason}
 
     def delete_file(self, file_url):
         url = self.delete_file_api.format(

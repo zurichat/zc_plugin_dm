@@ -817,6 +817,15 @@ def remind_message(request):
 
 
 class SendFile(APIView):
+    """
+    This endpoint is a send message endpoint that can take files, upload them 
+    and return the urls to the uploaded files to the media list in the message 
+    serializer
+    This endpoint uses form data
+    The file must be passed in with the key "file"
+    
+    """
+
     parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, room_id):
@@ -824,18 +833,24 @@ class SendFile(APIView):
         if request.FILES:
             file_urls = []
             files = request.FILES.getlist('file')
-            if len(files) == 1:
+            if len(files) == 1:              
                 for file in request.FILES.getlist('file'):
                     file_data = DB.upload(file)
-                    file_url = file_data['file_url']
-                    file_urls.append(file_url)
+                    if file_data["status"]==200:
+                        for datum in file_data["data"]['files_info']:
+                            file_urls.append(datum['file_url'])
+                    else:
+                        return Response(file_data)
             elif len(files) > 1:
                 multiple_files = []
                 for file in files:
                     multiple_files.append(("file",file))                
                 file_data = DB.upload_more(multiple_files)
-                for datum in file_data['files_info']:
-                    file_urls.append(datum['file_url'])
+                if file_data["status"]==200:
+                    for datum in file_data["data"]['files_info']:
+                        file_urls.append(datum['file_url'])
+                else:
+                    return Response(file_data)
                 
 
             request.data["room_id"] = room_id
