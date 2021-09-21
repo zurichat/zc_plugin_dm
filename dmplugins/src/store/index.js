@@ -60,6 +60,7 @@ const store = {
             }), {});
             commit('setEmojiSet', emojiCount);
 
+            // SERVER IS GIVING ERROR CANNOT POST REACTIONS FOR NOW
             // apiServices.postEmoji("6146cb29845b436ea04d1029",this.state.message_id, payload)
             // .then(result => {
             //     console.log(result.data)
@@ -67,6 +68,7 @@ const store = {
         },
         async fetchEmojis({commit}){
             try{
+                // SERVER IS GIVING ERROR CANNOT FETCH REACTIONS FOR NOW
                 await apiServices.getEmojis("6146cb29845b436ea04d1029",this.state.message_id)
                 .then(result =>{
                     console.log(result.data)
