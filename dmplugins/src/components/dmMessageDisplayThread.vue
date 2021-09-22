@@ -109,31 +109,31 @@ export default {
         return {
             hover: false,
             p_state: false,
+            postselectEmoji: true
         };
     },
     methods: {
-        ...mapActions(['setEmojis', 'fetchMessages']),
+        ...mapActions(['addEmojis', 'fetchMessages', 'fetchEmojis']),
         ...mapMutations(['setPickEmoji']),
         onSelectEmoji(emoji) {
-            if (this.postselectEmoji === true) {
-                this.setPickEmoji(false);
-                this.addEmojis(emoji.native);
-                this.postselectEmoji = false;
-            } else {
-                const filteredEmojis = this.emojis.filter(
-                    ((i) => (emoji) => emoji !== emoji.native || --i)(1)
-                );
-                this.postAddEmojis(filteredEmojis);
-                this.postselectEmoji = true;
-            }
+            this.setPickEmoji(false);
+            this.addEmojis(emoji.native);
+            this.postselectEmoji = false;
         },
         //TIME STAMP FUNCTION
         // getHumanDate: function(created_at) {
         //     return moment(created_at, 'LT').format('LT');
         // },
         postSelect(name) {
-            this.setEmojis(name);
-        },
+            if(this.postselectEmoji === true) {
+                this.addEmojis(name);
+                this.postselectEmoji = false;
+            }else {
+                const filteredEmojis = this.emojis.filter((i => emoji => emoji !== name || --i)(1))
+                this.addEmojis(filteredEmojis);
+                this.postselectEmoji = true;
+            }
+        }, 
         show_popup_profile(p_state) {
             bus.$emit('togleProfilePopUp', p_state);
         },
@@ -152,6 +152,7 @@ export default {
     },
     created() {
         this.fetchMessages();
+        this.fetchEmojis();
     },
 };
 </script>
