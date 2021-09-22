@@ -95,7 +95,7 @@
 import { bus } from '@/main.js';
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
-import EmojiComp from '../components/common/dmEmojis.vue';
+import EmojiComp from '../components/common/emojiComp.vue';
 import moment from 'moment';
 
 export default {
