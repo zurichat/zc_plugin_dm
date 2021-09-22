@@ -54,8 +54,7 @@ export default {
   name: "MarkUnread",
   data(){
     return{
-      // Api: 'https://dm.zuri.chat/api/v1/614841d6e4b2aebf8ec8c8dc/read/new/',
-      Api: 'https://dog.ceo/api/breeds/image/random'
+      Api: 'https://dm.zuri.chat/api/v1/6146feae845b436ea04d110b/read/new/',
       }
     },
       methods:{
