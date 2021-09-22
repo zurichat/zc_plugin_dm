@@ -89,7 +89,7 @@ import { bus } from "@/main.js";
 import { mapActions, mapGetters, mapMutations } from "vuex";
 import messageHoverShow from "../components/common/dmThreadHoverState.vue";
 import EmojiComp from "../components/common/emojiComp.vue";
-// import moment from 'moment';
+import moment from 'moment';
 
 export default {
   name: "DmMesssageThread",
@@ -113,9 +113,9 @@ export default {
       this.addEmojis(newEmoji);
     },
     //TIME STAMP FUNCTION
-    // getHumanDate: function(created_at) {
-    //     return moment(created_at, 'LT').format('LT');
-    // },
+    getHumanDate: function(created_at) {
+        return moment(created_at, 'LT').format('LT');
+    },
     postSelect(emoji) {
       this.setEmojis(emoji);
     },
