@@ -17,11 +17,11 @@
                 </div>
                 <div class="direct-message-input-footer">
                     <DmInputxtf />
-                </div>
+                </div> 
             </div>
         </div>
         <div class="profileContainer">
-            <!-- <ProfileContainer /> -->
+            <FullProfile />
         </div>
     </div>
 </template>
@@ -34,6 +34,7 @@ import Bookmark from '@/components/bookmarks.vue';
 import DmInputxtf from '@/components/dmInputTextField.vue';
 import DmSingleMessageBox from '@/components/dmSingleMessageBox.vue';
 import PopupProfile from '@/components/common/popupProfile';
+import FullProfile from '@/components/FullProfile.vue';
 
 export default {
     name: 'Home',
@@ -43,6 +44,7 @@ export default {
         DmInputxtf,
         DmSingleMessageBox,
         PopupProfile,
+        FullProfile
     },
     data() {
         return {

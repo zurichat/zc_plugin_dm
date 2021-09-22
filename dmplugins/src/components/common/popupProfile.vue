@@ -1,27 +1,30 @@
 <template>
     <div class=" userContainer  shadow  bg-white">
+        <div class="overlay" v-if="userProfile.status == false">
+            <div>
+            <p>Loading.....</p>
+            </div>
+        </div>
         <b-img class="u_icon" :src="userData.profileImage"></b-img>
         <div class="px-3">
             <div style="font-size:22px">
-                <b>{{ userData.displayName }}</b>
+                <b>{{ userProfile.display_name }}</b>
+                <!-- {{userProfile}} -->
             </div>
             <div style="font-size:12px">
                 {{ userData.profession }}<br />
-                {{ userData.gender }}
-                <div class="mt-4">
-                    <a href="#" class="text-decoration-none"
-                        >View Full Profile</a
-                    >
+                {{ userProfile.pronouns }}
+                <div class="mt-4" style="cursor:pointer; color:blue" @click="showFullProfile(true)">
+                    View Full Profile
                 </div>
             </div>
-
             <div class="text-muted">
                 <small style="font-size:;margin-top:32px">Status</small><br />
                 <i class="fa fas fa-cat"></i>
 
                 <div style="margin:26.18px 0 27px 0;  font-size:12px">
-                    <div class="text-muted">Local Time</div>
-                    <div>{{ userData.localTime }}</div>
+                    <div class="text-muted"></div>
+                    <div>{{ userProfile.localTime }}</div>
                 </div>
             </div>
             <div class="d-flex justify-content-between mb-3 popup_footer">
@@ -43,22 +46,40 @@ export default {
     data() {
         return {
             toggle_popup: true,
+            showLoading:false,
             userData: {
                 displayName: 'Mama Gee',
                 profession: 'Frontend Desing Mentor',
                 gender: 'he/her',
-                localTime: '3:15PM',
                 phoneNumber: '021345789',
-                //  profileImage:require('@/assets/images/mamaGee.jpg')
                 profileImage: 'https://picsum.photos/200/300',
             },
         };
     },
-    methods: {},
+    methods: {
+        showFullProfile(status){
+            bus.$emit("showFullProfile", status)
+            bus.$emit("togleProfilePopUp", !status);
+        }
+    },
+    computed:{
+        getTodayTime(){
+            return new Date();
+            // return this.today.getHours() + ":" + this.today.getMinutes();
+        },
+        userProfile(){
+            return this.$store.state.userProfile
+        }
+        // METHOD TO GET THE DATA COMEING FROM dmMessageDisplayThread.vue
+        // getUserProfileDetails(){
+
+        // }
+    },
     created() {
+        // METHOD TO CLOSE THE COMPONENT IF USER CLICK OUTSIDE OF IT
         window.addEventListener('click', (e) => {
             if (!this.$el.contains(e.target)) {
-                window.close();
+                // window.close();
                 // AN EVENT WOULD BE TRIGGERD HERE IF USER CLICK OUTSIDE THE DIV
                 // I WANT THIS COMPONENT TO HIDE WHEN USER CLICK OUTSIDE
             }
@@ -68,6 +89,18 @@ export default {
 </script>
 
 <style scoped>
+.overlay{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(18, 21, 22, 0.466);  /* 100% transparent */
+    color:#fff;
+    text-align: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    font-weight: bolder;
+}
 .popup_footer button {
     width: 117px;
     height: 32px;

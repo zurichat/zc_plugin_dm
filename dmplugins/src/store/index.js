@@ -36,6 +36,15 @@ const store = {
         },
         setReceiveMsg(state,newMsg){
             state.recieveMsg = newMsg
+        },
+
+        getUserProfile(state, payload){
+            // get Local time
+            var options = { hour12: true };
+            let today = new Date();
+            state.userProfile = payload
+            state.userProfile.status = true
+            state.userProfile.localTime = today.toLocaleString('en-GB', options)
         }
     },
     actions: {
@@ -73,7 +82,11 @@ const store = {
                 alert(error)
             }   
         },
+        getUserProfile({commit, state}, payload){
+            commit('getUserProfile',payload)
+        }
     },
+
     getters: {
         pickEmoji(state) {
             return state.pickEmoji;

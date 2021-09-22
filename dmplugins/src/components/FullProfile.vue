@@ -1,15 +1,16 @@
 <template>
 
-    <div class="userContainer shadow bg-white">
+    <div class="userContainer shadow bg-white" style="position:fixed;">
 
         <div     
           class=" header text-white primaryColor d-flex justify-content-between align-items-center px-3 ">
             <h6>Profile</h6>
             
-          <div><i class="fa fa-times" aria-hidden="true"></i></div>
+          <div style="cursor:pointer"  @click="showFullProfile(false)"><i class="fa fa-times" aria-hidden="true"></i></div>
         </div>
-   
         <div style="height: 5.7vh; background-color: var(--bg-color-footer);"></div>
+
+    <div style="overflow:scroll; height:90vh">
         <div class="side-profile px-2">
           <div class="text-center">
           <div class="mx-3">
@@ -17,11 +18,11 @@
           
           </div>
       
-            <div style="font-size:23px"><b>{{userData.displayName}}</b></div>
+            <div style="font-size:23px"><b>{{userProfile.display_name}}</b></div>
             
             <div style="font-size:14px">
                 {{userData.profession}}<br>
-                {{userData.gender}}
+                {{userProfile.pronouns}}
           </div>
           
           <i class="my-4 fa fas fa-cat"></i>
@@ -52,25 +53,28 @@
           <div class="text-left p-3 margin:26.18px 0 27px 0;  font-size:13px">
             <div class="mb-2">
               <div class="text-muted">Display Name</div>
-              <div>{{ userData.displayName }}</div>
+              <div>{{ userProfile.display_name }}</div>
             </div>
 
             <div class="mb-2">
               <div class="text-muted">Local Time</div>
-              <div>{{ userData.localTime }}</div>
+              <div>{{ userProfile.localTime }}</div>
             </div>
 
             <div class="mb-2">
               <div class="text-muted">Phone Number</div>
-              <div>{{ userData.phoneNumber }}</div>
+              <div>{{ userProfile.phone }}</div>
             </div>
           </div>
+        </div>
         </div>
       </div>
   
 </template>
 
 <script>
+import { bus } from '@/main.js';
+
 export default {
   data() {
     return {
@@ -84,6 +88,19 @@ export default {
       },
     };
   },
+  computed:{
+    getTodayTime(){
+            return new Date();
+        },
+    userProfile(){
+            return this.$store.state.userProfile
+        }
+  },
+   methods: {
+        showFullProfile(status){
+            bus.$emit("showFullProfile", status)
+        }
+    },
 };
 </script>
 

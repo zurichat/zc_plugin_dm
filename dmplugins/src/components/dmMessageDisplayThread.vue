@@ -94,6 +94,7 @@ export default {
         return {
             hover: false,
             p_state: false,
+            userToken: "",
         };
     },
     methods: {
@@ -106,9 +107,56 @@ export default {
         postSelect(name) {
             this.setEmojis(name);
         },
-        show_popup_profile(p_state) {
-            bus.$emit('togleProfilePopUp', p_state);
-        },
+        
+        
+      // LOGIN TO GET USER TOKEN
+      getUserProfileDetails(){
+      bus.$emit("togleProfilePopUp", this.p_state);
+
+      const bodyParameters = {
+        email: "funkymikky4ril@yahoo.com",
+        password: "123qwe",
+      };
+      this.$http
+        .post(
+          "https://api.zuri.chat/auth/login",
+          bodyParameters
+        )
+        .then((response) => {
+                    this.userToken = response.data.data.user.token;
+                          // GET USER PROFILE DETAILS
+                    const config = {
+                      headers: { Authorization: `Bearer ${this.userToken}` },
+                    };
+                    this.$http
+                      .get(
+                        "https://dm.zuri.chat/api/v1/614679ee1a5607b13c00bcb7/userprofile/6146fa49845b436ea04d10e9",
+                        config
+                      )
+                      .then((response) => {
+                       
+                        this.getUserProfile(response.data)
+
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                      });
+        }).catch((error)=>{
+          console.log(error)
+        });
+      },
+
+
+
+// THIS FUNCTION PASS VALUE BY BUS TO THE POPUP COMPONENT 
+    show_popup_profile(p_state) {
+      if (this.p_state == true){
+        this.getUserProfileDetails()
+      }else{
+      bus.$emit("togleProfilePopUp", p_state);
+      }
+    },
+
         addEmoji() {
             this.setPickEmoji(true);
         },
