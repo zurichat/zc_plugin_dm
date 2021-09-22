@@ -130,5 +130,10 @@ cursor: pointer;
 
 .attachfilepop{
     transition: 0.5s ease-out;
+    position:absolute;
+    z-index: 3;
+    background: white;
+    bottom:70px;
+    right:100px;
 }
 </style>

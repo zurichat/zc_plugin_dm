@@ -1,5 +1,5 @@
 <template>
-    <div class="parent">
+    <div class="parent position-absolute">
         <div>
             <ul class="child">
                 <li><div>Turn off notififcations for replies</div></li>
@@ -99,7 +99,7 @@ export default {
     color: #3a3a3a;
     bottom: 1.5rem;
     right: 1rem;
-    position: absolute;
+    z-index: 999;
 }
 .child {
     background-color: #fff;
