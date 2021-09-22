@@ -17,6 +17,6 @@ export default {
         });
     },
     recieveClient(room_id) {
-        return axios.get(`https://dm.zuri.chat/api/v1/messages/${room_id}`);
+        return Axios.get(`https://dm.zuri.chat/api/v1/messages/${room_id}`);
     },
 };
