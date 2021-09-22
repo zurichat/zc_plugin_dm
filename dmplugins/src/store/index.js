@@ -15,6 +15,7 @@ const store = {
         recieveMsg:[],
         sender_id:'6146ce37845b436ea04d102d',
         room_id:"6146d126845b436ea04d102e",
+        message_id: "6146d432845b436ea04d103b",
         allSentMsg:[ ],
         // For Reply Thread
         showReplyThread: false,
@@ -33,7 +34,7 @@ const store = {
         setShowReply(state, payload) {
             state.showReply = payload;
         },
-        setEmojis(state, payload) {
+        addEmojis(state, payload) {
             state.emojis = payload;
         },
         setEmojiSet(state, payload) {

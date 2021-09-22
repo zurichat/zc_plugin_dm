@@ -36,8 +36,9 @@
                     <span class="btnf input-emoji-icons">
                         <b-icon-at></b-icon-at>
                     </span>
+                    <Attachfile v-show="attach" />
                     <span class="btnf input-emoji-icons">
-                        <b-icon-paperclip rotate="45"></b-icon-paperclip>
+                        <b-icon-paperclip rotate="45" @click="attach=!attach"></b-icon-paperclip>
                     </span>
                     <span :class="this.sentMsg.length > 0 ? 'send' : 'notSend'">
                         <span class="btnf input-send">
@@ -69,15 +70,21 @@
 <script>
 // importing makeRequest action from vuex store:deveeb
 import {mapActions} from 'vuex'
+import Attachfile from '@/components/attachfile.vue'
 
 export default {
     name: 'inputContainer',
+    components:{
+   Attachfile
+    },
     data() {
         return {
             message: 'Hello',
             sendMsg: '',
+            attach:false,
         };
     },
+    
     mounted(){
         
     },
