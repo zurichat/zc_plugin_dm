@@ -50,14 +50,52 @@ const store = {
         }
     },
     actions: {
-        setEmojis({ commit, state }, payload) {
-            const emojis = [...state.emojis, payload];
-            commit('setEmojis', emojis);
-            const map = emojis.reduce((prev, next) => ({
-                ...prev,
-                [next]: (prev[next] || 0) + 1,
-            }));
-            commit('setEmojiSet', map);
+        async addEmojis({ commit }, payload) {
+            const created = new Date().toISOString();
+            const newEmoji = {
+                aliases: [payload.name],
+                message_id: this.state.message_id,
+                sender_id: this.state.sender_id,
+                data: payload.native,
+                room_id: this.state.room_id,
+                category: "Peoples",
+                count: 1,
+                created_at: created
+            }
+            await axios.post("https://dm.zuri.chat/api/v1/rooms/6146cb29845b436ea04d1029/messages/6146d432845b436ea04d103b/reactions", newEmoji)
+            .catch(error => {
+                console.log(error)
+            })
+        },
+        async setEmojis({state},payload) {
+            const emoji = payload;
+            emoji.count = 1
+            emoji.room_id = state.room_id
+            await axios.post("https://dm.zuri.chat/api/v1/rooms/6146cb29845b436ea04d1029/messages/6146d432845b436ea04d103b/reactions", emoji)
+            .then(result => {
+                console.log(result.data)
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+        async fetchEmojis({ commit }) {
+            // GET IS WORKING
+            try {
+                await apiServices.getEmojis("6146cb29845b436ea04d1029", this.state.message_id)
+                    .then(result => {
+                        const emojis = result.data.data.reactions;
+                        const emojiCount = [...emojis.reduce((r, e) => {
+                            let k = `${e.data}|${e.name}`;
+                            if (!r.has(k)) r.set(k, { ...e, count: 1 })
+                            else r.get(k).count++
+                            return r;
+                        }, new Map).values()];
+                        commit('setEmojiSet', emojiCount);
+                        commit('addEmojis', result.data.data.reactions);
+                    })
+            } catch (error) {
+                console.log(error)
+            }
         },
         //making API call to the backend:deveeb
         async makeRequest({commit}){
