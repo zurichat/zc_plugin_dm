@@ -49,11 +49,11 @@
                 <li><div>In 3 hours</div></li>
                 <li><div>Tomorrow</div></li>
                 <li>
-                    <remind-me></remind-me>
-                    <button>custom</div>
+                    <div @click="remind = !remind">custom</div>
                 </li>
             </ul>
         </div>
+        <remind-me v-if="remind"></remind-me>
     </div>
 </template>
 
@@ -71,7 +71,7 @@ export default {
             Id:
                 'https://dm.zuri.chat/api/v1/613b2db387708d9551acee3b/filter_messages',
             load: false,
-            showReminder: null
+            remind: false
         };
     },
     methods: {
