@@ -48,7 +48,10 @@
                 <li><div>In 1 hour</div></li>
                 <li><div>In 3 hours</div></li>
                 <li><div>Tomorrow</div></li>
-                <li><div>Next week</div></li>
+                <li>
+                    <remind-me></remind-me>
+                    <button>custom</div>
+                </li>
             </ul>
         </div>
     </div>
@@ -56,16 +59,19 @@
 
 <script>
 import { Icon } from '@iconify/vue2';
+import RemindMe from './remindMe.vue';
 export default {
     name: 'ThreeDots',
     components: {
         Icon,
+        RemindMe,
     },
     data() {
         return {
             Id:
                 'https://dm.zuri.chat/api/v1/613b2db387708d9551acee3b/filter_messages',
             load: false,
+            showReminder: null
         };
     },
     methods: {
