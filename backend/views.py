@@ -47,6 +47,7 @@ def info(request):
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/",
+            "create_room_url":"https://dm.zuri.chat/api/v1/createroom"
         },
         "success": "true",
     }

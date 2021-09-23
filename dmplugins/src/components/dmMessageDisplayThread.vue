@@ -41,18 +41,12 @@
                         </p>
                     </div>
                     <div v-if="emojis.length > 0" class="reactions d-flex">
-                        <div
-                            v-for="(value, name, index) in emojiSet"
-                            :key="index"
-                        >
-                            <div
-                                class="thread-reactions"
-                                @click="postSelect(name)"
-                            >
-                                {{ name }}
-                                <div class="reaction-count">{{ value }}</div>
-                            </div>
-                        </div>
+                        <div v-for="(emoji, index) in emojiSet" :key="index">
+              <div class="thread-reactions" @click="postSelect(emoji)">
+                {{ emoji.data }}
+                <div class="reaction-count">{{ emoji.count }}</div>
+              </div>
+            </div>
                         <div class="add-reactions" @click="addEmoji">
                             <svg
                                 width="24"
@@ -112,36 +106,29 @@ export default {
         };
     },
     methods: {
-        ...mapActions(['addEmojis', 'fetchMessages', 'fetchEmojis']),
-        ...mapMutations(['setPickEmoji']),
-        onSelectEmoji(emoji) {
-            this.setPickEmoji(false);
-            this.addEmojis(emoji.native);
-            this.postselectEmoji = false;
-        },
+        ...mapActions(["addEmojis", "setEmojis", "fetchMessages", "fetchEmojis"]),
+    ...mapMutations(["setPickEmoji"]),
+    onSelectEmoji(emoji) {
+      this.setPickEmoji(false);
+      const newEmoji = emoji._sanitized;
+      this.addEmojis(newEmoji);
+    },
         //TIME STAMP FUNCTION
         getHumanDate: function(created_at) {
             return moment(created_at, 'LT').format('LT');
         },
-        postSelect(name) {
-            if(this.postselectEmoji === true) {
-                this.addEmojis(name);
-                this.postselectEmoji = false;
-            }else {
-                const filteredEmojis = this.emojis.filter((i => emoji => emoji !== name || --i)(1))
-                this.addEmojis(filteredEmojis);
-                this.postselectEmoji = true;
-            }
-        }, 
-        show_popup_profile(p_state) {
-            bus.$emit('togleProfilePopUp', p_state);
-        },
-        addEmoji() {
-            this.setPickEmoji(true);
-        },
+        postSelect(emoji) {
+      this.setEmojis(emoji);
+    },
+    show_popup_profile(p_state) {
+      bus.$emit("togleProfilePopUp", p_state);
+    },
+    addEmoji() {
+      this.setPickEmoji(true);
+    },
     },
     computed: {
-        ...mapGetters(['emojis', 'emojiSet', 'showMessages']),
+        ...mapGetters(["emojis", "emojiSet", "showMessages"]),
     },
     // Reply thread by Ozovehe
     mounted() {
