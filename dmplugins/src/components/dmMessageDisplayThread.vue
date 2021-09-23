@@ -4,33 +4,40 @@
             @mouseover="hover = true"
             @mouseleave="hover = false"
             class="msgBody position-relative"
+            v-for="message in showMessages"
+            :key="message._id"
         >
-            <div class="conversation-threads d-flex flex-row">
+            <div class="conversation-threads d-flex flex-row w-100">
                 <div
                     class="userProfile-avatar"
                     @click="show_popup_profile((p_state = !p_state))"
                 >
-                    <img src="https://picsum.photos/200/300" alt="{}" />
+                    <!-- Added a ref to get the image -->
+                    <img
+                        ref="msgThreadUserImg"
+                        src="https://picsum.photos/200/300"
+                        alt="{}"
+                    />
                 </div>
                 <div class="usertext-messages">
                     <h5 class="pb-2">
+                        <!--Hover state of message -->
+                        <messageHoverShow v-if="hover" />
+                        <!-- Added a ref to get the user name -->
                         <span
+                            ref="msgThreadUsername"
                             class="userName"
                             @click="show_popup_profile((p_state = !p_state))"
                             >MamaGee</span
                         >
-                        <span class="msgTime">5.55pm</span>
+                        <span class="msgTime">
+                            {{ getHumanDate(message.created_at) }}
+                        </span>
                     </h5>
                     <div class="text-container">
-                        <messageHoverShow v-if="hover" />
-                        <p class="text">
-                            Lorem ipsum dolor sit, amet consectetur adipisicing
-                            elit. Eum mollitia aspernatur laboriosam cum
-                            officiis commodi deleniti odit rerum ratione
-                            consectetur. Lorem ipsum dolor sit amet, consectetur
-                            adipiscing elit. Tincidunt adipiscing et, tortor,
-                            fusce quis tellus, enim. A, posuere mi auctor odio
-                            tincidunt magnis.
+                        <!-- Added a ref to get all messagen clicked -->
+                        <p ref="msgThreadUserMsg" class="text">
+                            {{ message.message }}
                         </p>
                     </div>
                     <div v-if="emojis.length > 0" class="reactions d-flex">
@@ -86,10 +93,11 @@
 
 <script>
 import { bus } from '@/main.js';
-
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
-import EmojiComp from '../components/common/dmEmojis.vue';
+import EmojiComp from '../components/common/emojiComp.vue';
+import moment from 'moment';
+
 export default {
     name: 'DmMesssageThread',
     components: {
@@ -100,18 +108,31 @@ export default {
         return {
             hover: false,
             p_state: false,
+            postselectEmoji: true
         };
     },
     methods: {
-        ...mapActions(['setEmojis']),
+        ...mapActions(['addEmojis', 'fetchMessages', 'fetchEmojis']),
         ...mapMutations(['setPickEmoji']),
         onSelectEmoji(emoji) {
             this.setPickEmoji(false);
-            this.setEmojis(emoji.data);
+            this.addEmojis(emoji.native);
+            this.postselectEmoji = false;
+        },
+        //TIME STAMP FUNCTION
+        getHumanDate: function(created_at) {
+            return moment(created_at, 'LT').format('LT');
         },
         postSelect(name) {
-            this.setEmojis(name);
-        },
+            if(this.postselectEmoji === true) {
+                this.addEmojis(name);
+                this.postselectEmoji = false;
+            }else {
+                const filteredEmojis = this.emojis.filter((i => emoji => emoji !== name || --i)(1))
+                this.addEmojis(filteredEmojis);
+                this.postselectEmoji = true;
+            }
+        }, 
         show_popup_profile(p_state) {
             bus.$emit('togleProfilePopUp', p_state);
         },
@@ -120,25 +141,33 @@ export default {
         },
     },
     computed: {
-        ...mapGetters(['emojis', 'emojiSet']),
+        ...mapGetters(['emojis', 'emojiSet', 'showMessages']),
+    },
+    // Reply thread by Ozovehe
+    mounted() {
+        this.$store.state.replyThreadMsgs.userImg = this.$refs.msgThreadUserImg.src;
+        this.$store.state.replyThreadMsgs.clickedMsg = this.$refs.msgThreadUserMsg.textContent;
+        this.$store.state.replyThreadMsgs.username = this.$refs.msgThreadUsername.textContent;
+    },
+    created() {
+        this.fetchMessages();
+        this.fetchEmojis();
     },
 };
 </script>
 
 <style scoped>
-:root {
-    --main-green: #00b87b;
-}
 .message-thread {
     position: relative !important;
     background: #fff;
 }
+
 .conversation-threads {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
 
 .userProfile-avatar {
-    cursor: pointer;
+    cursor: pointer !important;
     padding-right: 16px;
 }
 
@@ -166,13 +195,13 @@ export default {
     color: #999999;
     font-weight: 400;
 }
-
 .usertext-messages p {
     margin-bottom: 0;
 }
 .usertext-messages .userName {
     cursor: pointer;
 }
+
 .text-container {
     position: relative;
 }
@@ -193,7 +222,6 @@ export default {
 .add-reactions {
     margin-left: 5px;
 }
-
 .add-reactions img {
     width: 20px;
     height: 20px;

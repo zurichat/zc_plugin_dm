@@ -12,7 +12,7 @@ centrifuge.on('disconnect', function(ctx) {
     console.log('disconnected', ctx);
 });
 
-centrifuge.subscribe('61423bbc9fd1f4f655d445e7', function(ctx) {
+centrifuge.subscribe('6146d126845b436ea04d102e', function(ctx) {
     console.log(ctx);
 });
 

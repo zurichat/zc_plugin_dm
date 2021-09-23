@@ -27,7 +27,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 DEBUG = True #str(os.getenv('DEBUG'))
 
 
-ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1"]
+ALLOWED_HOSTS = ["dm.zuri.chat", "127.0.0.1", "zuri.chat/dm"]
 CORS_ALLOW_ALL_ORIGINS = True
 # CORS_ALLOWED_ORIGINS = [
 #     # "https://zuri.chat",
@@ -78,7 +78,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "frontend", "dist")],
+        'DIRS': [os.path.join(BASE_DIR, "dmspa", "dist")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -144,8 +144,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "frontend", "dist", "static")
+    # os.path.join(BASE_DIR, "frontend", "dist", "static")
+    os.path.join(BASE_DIR, "dmspa", "dist"),
+    os.path.join(BASE_DIR, "dmplugins", "dist")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
