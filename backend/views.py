@@ -47,6 +47,7 @@ def info(request):
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/",
+            "create_room_url":"https://dm.zuri.chat/api/v1/createroom"
         },
         "success": "true",
     }
@@ -89,6 +90,7 @@ def side_bar(request):
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
+                room["room_url"] = f"https://https://dm.zuri.chat/api/v1/messages/{room['_id']}"
                 rooms.append(room)
     
     side_bar = {
