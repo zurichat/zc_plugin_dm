@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Form, FormGroup, Label, Input } from "reactstrap";
 import { DatePicker, TimePicker } from "react-rainbow-components";
-import './RemindMe.css'
+import './remindMe.css'
 
 const RemindMe = () => {
   const [date, setDate] = useState(null);
