@@ -53,12 +53,13 @@
   margin-top: 5px;
 }
 
-Label {
+.labels {
   display: flex;
   padding: 3px;
 }
 
-h3 {
+remind-me-header
+{
   padding: 3px;
   margin-top: 12px;
 }
