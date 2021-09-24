@@ -584,30 +584,25 @@ def retrieve_bookmarks(request, room_id):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-# @api_view(["PUT"])
-# @db_init_with_credentials
-# def mark_read(request, message_id):
-#     """
-#     mark a message as read and unread
-#     """
-#     try:
-#         message = DB.read("dm_messages", {"id": message_id})
-#         read = message["read"]
-#     except Exception as e:
-#         print(e)
-#         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-#     data = {"read": not read}
-#     response = DB.update("dm_messages", message_id, data=data)
-#     message = DB.read("dm_messages", {"id": message_id})
-
-#     if response.get("status") == 200:
-#         return Response(data=data, status=status.HTTP_200_OK)
-#     return Response(status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(["GET", "DELETE"])
+@api_view(["PUT"])
 @db_init_with_credentials
-def delete_message(request, message_id):
-    pass
+def mark_read(request, message_id):
+    """
+    mark a message as read and unread
+    """
+    try:
+        message = DB.read("dm_messages", {"id": message_id})
+        read = message["read"]
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    data = {"read": not read}
+    response = DB.update("dm_messages", message_id, data=data)
+    message = DB.read("dm_messages", {"id": message_id})
+
+    if response.get("status") == 200:
+        return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["PUT"])
@@ -701,27 +696,27 @@ def message_filter(request, room_id):
         )
 
 
-@swagger_auto_schema(
-    methods=["delete"],
-    request_body=DeleteMessageSerializer,
-    responses={400: "Error: Bad Request"},
-)
-@api_view(["DELETE"])
-@db_init_with_credentials
-def delete_message(request):
-    """
-    Deletes a message after taking the message id
-    """
+# @swagger_auto_schema(
+#     methods=["delete"],
+#     request_body=DeleteMessageSerializer,
+#     responses={400: "Error: Bad Request"},
+# )
+# # @api_view(["DELETE"])
+# # @db_init_with_credentials
+# # def delete_message(request):
+# #     """
+# #     Deletes a message after taking the message id
+# #     """
 
-    if request.method == "DELETE":
-        message_id = request.GET.get("message_id")
-        message = DB.read("dm_messages", {"_id": message_id})
-        if message:
-            response = DB.delete("dm_messages", message_id)
-            return Response(response, status.HTTP_200_OK)
-        else:
-            return Response("No such message", status.HTTP_404_NOT_FOUND)
-    return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
+# #     if request.method == "DELETE":
+# #         message_id = request.GET.get("message_id")
+# #         message = DB.read("dm_messages", {"_id": message_id})
+# #         if message:
+# #             response = DB.delete("dm_messages", message_id)
+# #             return Response(response, status.HTTP_200_OK)
+# #         else:
+# #             return Response("No such message", status.HTTP_404_NOT_FOUND)
+# #     return Response(status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @swagger_auto_schema(
@@ -1043,3 +1038,38 @@ class Emoji(APIView):
         return Response(
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+# swagger documentation and function to delete message in rooms
+@swagger_auto_schema(
+    methods=["delete"],
+    request_body=DeleteMessageSerializer,
+    responses={400: "Error: Bad Request"},
+)
+@api_view(["DELETE"])
+@db_init_with_credentials
+def delete_message(request, message_id):
+    """
+    This function deletes message in rooms using message id (message_id)
+    """
+    org_id = ORG_ID
+    plugin_id = PLUGIN_ID
+    coll_name = "dm_messages"
+    if request.method == "GET":
+        url = f"https://api.zuri.chat/data/delete"
+        message_payload = {
+            "organization_id": org_id,
+            "plugin_id": plugin_id,
+            "collection_name": coll_name,
+            "bulk_delete": False,
+            "object_id": message_id,
+            "filter": {},
+        }
+        try:
+            response = requests.request(url=url, json=message_payload)
+            if response.status_code == 200:
+                return Response({"message": "message successfully deleted"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": response.json()['message']}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
