@@ -10,11 +10,11 @@ const RemindMe = () => {
     setDate(date);
   }
   return (
-    <div className="remind-me-wrapper">
-      <Form className="remind-me">
-        <h3 className="remind-me-header">Create a reminder</h3>
-        <FormGroup className="date-wrapper">
-          <Label for="date" classname="labels">Date</Label>
+    <div className="dm-remind-me-wrapper">
+      <Form className="dm-remind-me">
+        <h3 className="dm-remind-me-header">Create a reminder</h3>
+        <FormGroup className="dm-date-wrapper">
+          <Label for="date" classname="dm-labels">Date</Label>
           <DatePicker
             id="datePicker-1"
             value={date}
@@ -23,8 +23,8 @@ const RemindMe = () => {
             formatStyle="large"
           />
         </FormGroup>
-        <FormGroup className="time-wrapper">
-          <Label for="time" classname="labels">Time</Label>
+        <FormGroup className="dm-time-wrapper">
+          <Label for="time" classname="dm-labels">Time</Label>
           <TimePicker
             id="datePicker-1"
             value={date}
@@ -33,15 +33,15 @@ const RemindMe = () => {
             formatStyle="large"
           />
         </FormGroup>
-        <FormGroup className="note-wrapper">
-          <Label for="note" classname="labels">
+        <FormGroup className="dm-note-wrapper">
+          <Label for="note" classname="dm-labels">
             Add a note<em>(optional)</em>
           </Label>
           <Input type="textarea" name="text" id="exampleText" />
         </FormGroup>
-        <FormGroup className="button-wrapper">
-          <Button className="cancel">Cancel</Button>
-          <Button className="create">Create</Button>
+        <FormGroup className="dm-button-wrapper">
+          <Button className="dm-cancel">Cancel</Button>
+          <Button className="dm-create">Create</Button>
         </FormGroup>
       </Form>
     </div>
