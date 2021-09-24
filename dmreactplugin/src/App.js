@@ -8,15 +8,17 @@ import '../src/assets/css/global.module.css';
 
 // Import all Router components
 import ChatHome from './pages/chathome';
+import DmSingleMessageContainer from './components/dmSingleMessageContainer';
 
 const App = () => {
-    return (
-        <Router basename='/dm'>
-            <Switch>
-                <Route exact path='/' component={ChatHome} />
-            </Switch>
-        </Router>
-    );
+  return (
+    <Router basename='/dm'>
+      <Switch>
+        <Route exact path='/' component={ChatHome} />
+        <Route exact path='/message' component={DmSingleMessageContainer} />
+      </Switch>
+    </Router>
+  );
 };
 
 export default App;
