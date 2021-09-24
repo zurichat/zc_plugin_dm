@@ -10,7 +10,7 @@ from django.conf import settings
 
 
 
-app_name = "backend"
+
 
 urlpatterns = [
     path("", views.index, name="index"),
