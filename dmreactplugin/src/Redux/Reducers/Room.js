@@ -6,7 +6,7 @@ const initialState = {
   messages: {},
 };
 
-export default (state = initialState, action) => {
+const roomsReducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATE_ROOM:
       return { ...state, room_id: [...state.room_id, action.payload] };
@@ -21,3 +21,4 @@ export default (state = initialState, action) => {
       return state;
   }
 };
+export default roomsReducer;
