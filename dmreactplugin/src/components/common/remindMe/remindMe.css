@@ -1,4 +1,4 @@
-.remind-me {
+.dm-remind-me {
   position: absolute;
   top: 75px;
   left: 490px;
@@ -15,57 +15,52 @@
   background-color: white;
 }
 
-.remind-me-wrapper {
+.dm-remind-me-wrapper {
   background: #d0cdcd;
   height: 100vh;
   width: 100vw;
 }
 
-.input-container .react-datepicker-wrapper {
-  margin: 12px 0;
-  width: 100%;
-}
-
-.button-wrapper {
+.dm-button-wrapper {
   padding-top: 15px;
   display: flex;
   align-self: flex-end;
 }
 
-.note-wrapper {
+.dm-note-wrapper {
   width: 100%;
   margin-top: 10px;
 }
 
-.time-wrapper {
+.dm-time-wrapper {
   width: 100%;
   margin-top: 10px;
 }
 
 
-.date-wrapper {
+.dm-date-wrapper {
   width: 100%;
   margin-top: 5px;
 }
 
-.labels {
+.dm-labels {
   display: flex;
   padding: 3px;
 }
 
-remind-me-header
+.dm-remind-me-header
 {
   padding: 3px;
   margin-top: 12px;
 }
 
-.cancel {
+.dm-cancel {
   width: 150px;
   color: #000000;
   background-color: #ffffff;
 }
 
-.create {
+.dm-create {
   width: 150px;
   margin-left: 15px;
   background: green;
