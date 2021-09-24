@@ -258,3 +258,8 @@ def get_messages(response, date):
             return res
         return res
     return response
+
+
+def get_user_profile(org_id=None, user_id=None):
+    profile = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/{user_id}",headers=header)
+    return profile.json()
