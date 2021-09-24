@@ -1,5 +1,6 @@
 import json, uuid, re
 from django.http import response
+from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -23,6 +24,8 @@ import datetime as datetimemodule
 
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
+
+from .decorators import db_init_with_credentials
 
 
 def index(request):
@@ -90,7 +93,7 @@ def side_bar(request):
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
-                room["room_url"] = f"https://https://dm.zuri.chat/api/v1/messages/{room['_id']}"
+                room["room_url"] = f"https://dm.zuri.chat/api/v1/messages/{room['_id']}"
                 rooms.append(room)
     
     side_bar = {
@@ -115,6 +118,7 @@ def side_bar(request):
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
+@db_init_with_credentials
 def send_message(request, room_id):
     """
     This endpoint is used to send message to user in rooms.
@@ -169,6 +173,7 @@ def send_message(request, room_id):
     responses={201: ThreadResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
+@db_init_with_credentials
 def send_thread_message(request, room_id, message_id):
     """
     validates if the message exists, then sends
@@ -233,6 +238,7 @@ def send_thread_message(request, room_id, message_id):
     responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
 )
 @api_view(["POST"])
+@db_init_with_credentials
 def create_room(request):
     """
     This function is used to create a room between 2 users.
@@ -272,6 +278,7 @@ def create_room(request):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["GET"])
+@db_init_with_credentials
 def getUserRooms(request, user_id):
     """
     This is used to retrieve all rooms a user is currently active in.
@@ -293,6 +300,7 @@ def getUserRooms(request, user_id):
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
 @api_view(["GET"])
+@db_init_with_credentials
 def room_messages(request, room_id):
     """
     This is used to retrieve messages in a room.
@@ -339,6 +347,7 @@ def room_messages(request, room_id):
     responses={201: RoomInfoResponse, 400: "Error: Bad Request"},
 )
 @api_view(["GET"])
+@db_init_with_credentials
 def room_info(request):
     """
     This is used to retrieve information about a room.
@@ -385,7 +394,16 @@ def room_info(request):
 # /code for updating room
 
 @api_view(["GET", "POST"])
+@db_init_with_credentials
 def edit_room(request, pk):
+    """
+    This is used to update message context using message id as identifier,
+    first --> we check if this message exist, if it does not exist we raise message doesnot exist,
+    if above message exists:
+        pass GET request to view the message one whats to edit.
+        or pass POST with data to update
+        
+    """
     try:
         message = DB.read("dm_messages", {"id": pk})
     except:
@@ -411,6 +429,7 @@ def edit_room(request, pk):
     methods=["get"], responses={201: MessageLinkResponse, 400: "Error: Bad Request"}
 )
 @api_view(["GET"])
+@db_init_with_credentials
 def copy_message_link(request, message_id):
     """
     This is used to retrieve a single message. It takes a message_id as query params.
@@ -434,6 +453,7 @@ def copy_message_link(request, message_id):
 
 
 @api_view(["GET"])
+@db_init_with_credentials
 def read_message_link(request, room_id, message_id):
     """
     This is used to retrieve a single message. It takes a message_id as query params.
@@ -449,6 +469,7 @@ def read_message_link(request, room_id, message_id):
 
 
 @api_view(["GET"])
+@db_init_with_credentials
 def get_links(request, room_id):
     """
     Search messages in a room and return all links found
@@ -471,6 +492,7 @@ def get_links(request, room_id):
 
 
 @api_view(["POST"])
+@db_init_with_credentials
 def save_bookmark(request, room_id):
     """
     save a link as bookmark in a room
@@ -497,6 +519,7 @@ def save_bookmark(request, room_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["GET", "POST"])
+@db_init_with_credentials
 def organization_members(request):
     """
     This endpoint returns a list of members for an organization.
@@ -538,6 +561,7 @@ def organization_members(request):
 
 
 @api_view(["GET"])
+@db_init_with_credentials
 def retrieve_bookmarks(request, room_id):
     """
     Retrieves all saved bookmarks in the room
@@ -557,6 +581,7 @@ def retrieve_bookmarks(request, room_id):
 
 
 @api_view(["PUT"])
+@db_init_with_credentials
 def mark_read(request, message_id):
     """
     mark a message as read and unread
@@ -577,6 +602,7 @@ def mark_read(request, message_id):
 
 
 @api_view(["PUT"])
+@db_init_with_credentials
 def pinned_message(request, message_id):
     """
     This is used to pin a message.
@@ -613,6 +639,7 @@ def pinned_message(request, message_id):
 
 
 @api_view(["DELETE"])
+@db_init_with_credentials
 def delete_pinned_message(request, message_id):
     """
     This is used to delete a pinned message.
@@ -641,6 +668,7 @@ def delete_pinned_message(request, message_id):
 
 
 @api_view(["GET"])
+@db_init_with_credentials
 def message_filter(request, room_id):
     """
     Fetches all the messages in a room, and sort it out according to time_stamp.
@@ -670,6 +698,7 @@ def message_filter(request, room_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["DELETE"])
+@db_init_with_credentials
 def delete_message(request):
     """
     Deletes a message after taking the message id
@@ -748,6 +777,7 @@ def user_profile(request, org_id, member_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["POST"])
+@db_init_with_credentials
 def remind_message(request):
     """
         This is used to remind a user about a  message
@@ -830,6 +860,7 @@ class SendFile(APIView):
 
     parser_classes = (MultiPartParser, FormParser)
 
+    @method_decorator(db_init_with_credentials)
     def post(self, request, room_id):
         print(request.FILES)
         if request.FILES:
@@ -916,6 +947,7 @@ class Emoji(APIView):
     @swagger_auto_schema(
         responses={400: "Error: Bad Request"},
     )
+    @method_decorator(db_init_with_credentials)
     def get(self, request, room_id: str, message_id: str):
         # fetch message related to that reaction
         message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
@@ -943,6 +975,7 @@ class Emoji(APIView):
         request_body=EmojiSerializer,
         responses={400: "Error: Bad Request"},
     )
+    @method_decorator(db_init_with_credentials)
     def post(self, request, room_id: str, message_id: str):
         request.data["message_id"] = message_id
         serializer = EmojiSerializer(data=request.data)

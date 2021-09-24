@@ -29,8 +29,8 @@ class DataStorage:
             self.plugin_id = PLUGIN_ID
             self.organization_id = ORG_ID
         else:
-            self.plugin_id = request.data.get("plugin_id")
-            self.organization_id = request.data.get("org_id")
+            self.plugin_id = request.META.get("PLUGIN_ID", PLUGIN_ID)
+            self.organization_id = request.META.get("ORG_ID")
 
     def write(self, collection_name, data):
         body = dict(
