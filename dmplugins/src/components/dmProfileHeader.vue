@@ -108,7 +108,7 @@
         </transition>
         <div class="addBookmark-overlay" v-if="bookmark">
             <div class="container mx-auto pt-3 pb-3 addBookmark">
-                <div class="row d-flex pt-2 pb-2 mb-3 wrapper">
+                <div class="row d-flex pt-2 pb-2 mb-3 bookmark-link">
                     <div class="col-auto align-self-center link-btn">
                         <button
                             variant="white"
@@ -164,18 +164,7 @@ export default {
             description: `Easily find your team's important links`,
             show: false,
             bookmark: false,
-            bookmarks: [
-                {
-                    id: 0,
-                    link: 'https://dm.zuri.chat/api/v1/sidebar',
-                    description: `${'Delight'} - ${'Yesterday'}`,
-                },
-                {
-                    id: 1,
-                    link: 'https://dm.zuri.chat/api/v1/sidebar',
-                    description: `${'Abisalde'} - ${'Today'}`,
-                },
-            ],
+            bookmarks: [],
         };
     },
     methods: {
@@ -211,6 +200,12 @@ export default {
     height: 24px;
     border-radius: 4px;
     border: 0.5 solid #ccc;
+}
+
+.bookmark-link {
+    cursor: pointer;
+    outline: none;
+    user-select: none;
 }
 
 .profile-avatar h6 {
@@ -360,9 +355,11 @@ button {
     border-radius: 5px;
     outline: none;
 }
-.wrapper:hover {
-    background-color: rgba(0, 97, 195, 0.66);
+
+.bookmark-link:hover {
+    background-color: var(--bg-color-footer);
 }
+
 .b-icon {
     outline: none;
     outline-color: transparent;
@@ -398,7 +395,7 @@ li {
 }
 .addBookmark-overlay {
     position: absolute;
-    right: 5%;
+    left: 1%;
     z-index: 111;
 }
 </style>
