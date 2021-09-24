@@ -54,7 +54,7 @@ export default {
             description: `Easily find your team's important links`,
             show: false,
             days: [
-                { id: 0, day: 'Today' },
+                { id: 0, day: '' },
                 { id: 1, day: 'Last week' },
                 { id: 2, day: 'Last month' },
                 { id: 3, day: 'The very beginning' },

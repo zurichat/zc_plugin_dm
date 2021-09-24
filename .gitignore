@@ -6,6 +6,7 @@ env/
 .env
 static
 
+
 # Django
 *.log
 *.pot
@@ -13,12 +14,13 @@ static
 *__pycache__
 
 *.idea
-=======
-.idea
+
 
 # *media
 *.DS_Store
 /.vscode
 /__pycache__
+.yarn
+*/node_modules
 
-
+node_modules

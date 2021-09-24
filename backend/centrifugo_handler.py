@@ -5,7 +5,7 @@ from requests.exceptions import RequestException
 # CENTRIFUGO settings
 CENTRIFUGO_HOST = "https://realtime.zuri.chat/api"
 CENTRIFUGO_API_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
-
+# local_url = "http://localhost:8000/api"
 
 class CentrifugoHandler:
     """A helper class to handle communication with the Centrifugo server."""

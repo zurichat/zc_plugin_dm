@@ -1,6 +1,6 @@
 <template>
     <div class="row align-items-end message-box">
-        <div class="d-flex flex-column col-auto">
+        <div class="d-flex flex-column">
             <div class="d-flex align-item-center flex-row py-4 px-3">
                 <div class="col-auto align-self-center link-btn ">
                     <button class="btn-outline-disabled btn-dm-chat">
@@ -13,7 +13,7 @@
                     </h4>
                     <p class="m-0">
                         Here you can send messages and share files with
-                        <span class="username-id">@ o4codes</span>
+                        <span class="username-id">@ davidblack</span>
                     </p>
                 </div>
             </div>
@@ -41,7 +41,7 @@ export default {
 
 <style scoped>
 .message-box {
-    height: 75vh;
+    height: 76vh;
     overflow-y: scroll;
     display: flex;
     flex-flow: row wrap;

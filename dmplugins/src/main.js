@@ -6,7 +6,6 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import Axios from 'axios';
-import VueAxios from 'vue-axios';
 
 import { BootstrapVueIcons, BootstrapVue, IconsPlugin } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -21,7 +20,8 @@ import '@fortawesome/fontawesome-free/js/all.js';
 Vue.use(BootstrapVue);
 Vue.use(BootstrapVueIcons);
 Vue.use(IconsPlugin);
-Vue.use(VueAxios, Axios);
+
+Vue.prototype.$http = Axios;
 
 Vue.config.productionTip = false;
 const vueLifecycles = singleSpaVue({
