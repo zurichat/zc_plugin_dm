@@ -15,7 +15,6 @@
         "coverage": "cross-env BABEL_ENV=test jest --coverage"
     },
     "devDependencies": {
-        "axios": "^0.21.1",
         "@babel/core": "^7.15.0",
         "@babel/eslint-parser": "^7.15.0",
         "@babel/plugin-transform-runtime": "^7.15.0",
@@ -45,17 +44,13 @@
         "webpack-merge": "^5.8.0"
     },
     "dependencies": {
+        "emoji-mart": "^3.0.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
+        "react-icons": "^4.2.0",
         "reactstrap": "^8.10.0",
-        "react-redux": "^7.2.3",
-        "react-scripts": "4.0.3",
         "single-spa-react": "^4.3.1",
         "styled-components": "^5.3.1",
-        "yarn": "^1.22.11",
-        "redux": "^4.1.1",
-        "redux-devtools-extension": "^2.13.9",
-        "redux-logger": "^3.0.6",
-        "redux-thunk": "^2.3.0"
+        "yarn": "^1.22.11"
     }
 }
