@@ -118,14 +118,17 @@ urlpatterns = [
         name="message_filter",
     ),
     # Deleting a message without :room_id and :message_id, why???
-    path("api/v1/<str:org_id>/delete-message", views.delete_message, name="delete_message"),
+    path("api/v1/<str:org_id>/delete-message",
+        views.delete_message, 
+        name="delete_message",
+    ),
     path(
         "api/v1/<str:org_id>/members/<str:member_id>/profile",
         views.user_profile,
         name="user_profile",
     ),
     path( # give a descriptive name to this route not just "view"
-        "api/v1/<str:org_id>/rooms/<str:room_id>/messagemedia",
+        "api/v1/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="view"
     ),
