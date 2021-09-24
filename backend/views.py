@@ -310,7 +310,7 @@ def room_messages(request, room_id):
     """
     if request.method == "GET":
         paginator = PageNumberPagination()
-        paginator.page_size = 20
+        paginator.page_size = 30
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
@@ -396,6 +396,14 @@ def room_info(request):
 @api_view(["GET", "POST"])
 @db_init_with_credentials
 def edit_room(request, pk):
+    """
+    This is used to update message context using message id as identifier,
+    first --> we check if this message exist, if it does not exist we raise message doesnot exist,
+    if above message exists:
+        pass GET request to view the message one whats to edit.
+        or pass POST with data to update
+        
+    """
     try:
         message = DB.read("dm_messages", {"id": pk})
     except:
