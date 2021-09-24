@@ -105,7 +105,7 @@ def side_bar(request):
                         data = {"user_name":user_name, "image_url":image_url}
                         profile_list.append(data)
                     elif profile["status"]==500:
-                        profile_list.append("user profile not in database")
+                        profile_list.append({"id":f"{user_id}","message":"user profile not in database"})
                 room["room_user_profiles"] = profile_list
                 room["room_url"] = f"dm/messages/{room['_id']}"
                 rooms.append(room)
