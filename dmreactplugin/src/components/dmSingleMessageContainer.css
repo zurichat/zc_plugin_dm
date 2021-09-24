@@ -1,0 +1,61 @@
+
+.row align-items-end message-box {
+    margin: 30px 20px;
+    padding-top: '5px';   
+}
+
+.card-text ms-3{
+    height: 76vh;
+    overflow-y: scroll;
+    display: flex;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.75;
+    flex-flow: row wrap;
+}
+.timings-p{
+    width: 100%;
+    border: 1px solid gray;
+}
+
+
+/* .timings{
+    font-size: 12px;
+} */ 
+/* .message-box {
+    height: 76vh;
+    overflow-y: scroll;
+    display: flex;
+    flex-flow: row wrap;
+}
+
+
+.welcome-text {
+    width: 100%;
+    border: 1px solid gray;
+}
+
+
+
+.bi-chat-dots.b-icon.bi {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.chat-description h4 {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.75;
+}
+.chat-description p {
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 1.5;
+}
+        
+.username-id {
+    color: var(--color-hover-send);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    padding-left: 5px;
+} */
