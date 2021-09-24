@@ -8,9 +8,9 @@ import "../src/assets/css/global.module.css";
 
 // Import all Router components
 import ChatHome from "./pages/chathome";
-import removePinnedMessage from "./components/common/removePinnedMessageModal/removePinnedMessageModal";
+import removePinnedMessage from "./components/common/pinnedMessage/removePinnedMessageModal";
 import PinnedMessage from "./components/dmPinnedMessages";
-import HoverPinnedMessage from "./components/common/removePinnedMessageModal/hoverViewPinned";
+import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinned";
 
 const App = () => {
   return (
