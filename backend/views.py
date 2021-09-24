@@ -107,7 +107,7 @@ def side_bar(request):
                     elif profile["status"]==500:
                         profile_list.append({"id":f"{user_id}","message":"user profile not in database"})
                 room["room_user_profiles"] = profile_list
-                room["room_url"] = f"dm/messages/{room['_id']}"
+                room["room_url"] = f"dm/{org_id}/{room['_id']}"
                 rooms.append(room)
     side_bar = {
         "name": "DM Plugin",
