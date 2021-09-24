@@ -1,9 +1,3 @@
-.App {
-  font-family: sans-serif;
-  text-align: center;
-  background-color: #000000;
-}
-
 .remind-me {
   position: absolute;
   top: 75px;
@@ -47,6 +41,7 @@
   width: 100%;
   margin-top: 10px;
 }
+
 
 .date-wrapper {
   width: 100%;
