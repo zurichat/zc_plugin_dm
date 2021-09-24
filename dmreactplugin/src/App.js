@@ -8,12 +8,14 @@ import '../src/assets/css/global.module.css';
 
 // Import all Router components
 import ChatHome from './pages/chathome';
+import RemindMe from './components/common/remindMe/remindMe';
 
 const App = () => {
     return (
         <Router basename='/dm'>
             <Switch>
                 <Route exact path='/' component={ChatHome} />
+                <Route path="/remind" component={RemindMe} />
             </Switch>
         </Router>
     );
