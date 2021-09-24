@@ -310,7 +310,7 @@ def room_messages(request, room_id):
     """
     if request.method == "GET":
         paginator = PageNumberPagination()
-        paginator.page_size = 20
+        paginator.page_size = 30
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
