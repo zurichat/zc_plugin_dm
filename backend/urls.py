@@ -6,12 +6,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-<<<<<<< HEAD
-
-app_name = "backend"
-
-=======
->>>>>>> ea365ab4d50be865a7e07acf010776950ada8261
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/info", views.info, name="plugin_info"),
