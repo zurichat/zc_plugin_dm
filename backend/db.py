@@ -229,6 +229,12 @@ def get_room_messages(room_id):
     if response != None:
         if "status_code" in response:
             return response
+        if len(response) == 0:
+            response = None
+            return response
+        for message in response:
+            message["id"] = message.pop("_id")
+        response.reverse()
         return response
     return response
 
