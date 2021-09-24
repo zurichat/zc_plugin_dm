@@ -178,6 +178,7 @@ def send_centrifugo_data(room, data):
 
 DB = DataStorage()
 
+
 def get_user_rooms(collection_name, org_id, user):
     room_list = list()
     rooms = DB.read(collection_name, {"org_id": org_id})
@@ -229,6 +230,12 @@ def get_room_messages(room_id):
     if response != None:
         if "status_code" in response:
             return response
+        if len(response) == 0:
+            response = None
+            return response
+        for message in response:
+            message["id"] = message.pop("_id")
+        response.reverse()
         return response
     return response
 

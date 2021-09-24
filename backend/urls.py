@@ -6,20 +6,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
+<<<<<<< HEAD
 
 app_name = "backend"
 
+=======
+>>>>>>> ea365ab4d50be865a7e07acf010776950ada8261
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages", views.send_message, name="send_message"),
     path(
-        "api/v1/<str:org_id>/rooms/<str:room_id>/message",
-        views.send_message,
-        name="send_message"
-    ),
-    path(
-        "api/v1/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/thread",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
         views.send_thread_message,
         name="send_thread_message",
     ),
