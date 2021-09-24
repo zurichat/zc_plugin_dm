@@ -48,6 +48,7 @@
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "reactstrap": "^8.10.0",
+        "react-rainbow-components": "^1.26.0",
         "react-redux": "^7.2.3",
         "react-scripts": "4.0.3",
         "single-spa-react": "^4.3.1",
