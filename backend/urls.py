@@ -27,7 +27,6 @@ urlpatterns = [
     path("api/v1/room-info", views.room_info, name="roominfo"),
     path("api/v1/getuserrooms", views.getUserRooms, name="get_user_rooms"),
     path("api/v1/reminder", views.remind_message, name="reminder"),
-    # path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
     path("api/v1/rooms/<str:user_id>", views.getUserRooms, name="get_user_rooms"),
     path("api/v1/messages/<str:room_id>", views.room_messages, name="room_messages"),
     path(
