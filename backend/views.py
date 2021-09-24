@@ -53,7 +53,7 @@ def info(request):
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/",
-            "create_room_url": "https://dm.zuri.chat/api/v1/createroom"
+            "create_room_url":"https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
         },
         "success": "true",
     }
@@ -94,11 +94,21 @@ def side_bar(request):
     user_rooms = get_rooms(user_id=user)
     rooms = []
     for room in user_rooms:
+        profile_list=[]
         if "org_id" in room:
             if org_id == room["org_id"]:
-                room["room_url"] = f"https://dm.zuri.chat/api/v1/messages/{room['_id']}"
+                for user_id in room["room_user_ids"]:
+                    profile = get_user_profile(org_id,user_id)
+                    if profile["status"]==200:
+                        user_name=profile["data"]["user_name"]
+                        image_url=profile["data"]["image_url"]
+                        data = {"user_name":user_name, "image_url":image_url}
+                        profile_list.append(data)
+                    elif profile["status"]==500:
+                        profile_list.append("user profile not in database")
+                room["room_user_profiles"] = profile_list
+                room["room_url"] = f"dm/messages/{room['_id']}"
                 rooms.append(room)
-
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
