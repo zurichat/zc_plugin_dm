@@ -9,7 +9,7 @@ from django.views import generic
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
-import requests
+import requests, time
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
@@ -435,7 +435,7 @@ def edit_room(request, pk):
     if above message exists:
         pass GET request to view the message one whats to edit.
         or pass POST with data to update
-        
+
     """
     try:
         message = DB.read("dm_messages", {"id": pk})
@@ -581,6 +581,8 @@ def organization_members(request):
     POST: simulates testing - if request is post, send the cookies through the post request, it would be added
     manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
+    ORG_ID = DB.organization_id
+    
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
 
     if request.method == "GET":
@@ -1117,6 +1119,50 @@ class Emoji(APIView):
         )
 
 
+# @swagger_auto_schema(
+    # methods=["post"],
+    # request_body=ScheduleMessageSerializer,
+    # responses={400: "Error: Bad Request"},
+# )
+@api_view(["POST"])
+@db_init_with_credentials
+def scheduled_messages(request):
+    ORG_ID = DB.organization_id
+    
+    schedule_serializer = ScheduleMessageSerializer(data=request.data)
+    if schedule_serializer.is_valid():
+        data = schedule_serializer.data
+        
+        sender_id = data["sender_id"]
+        room_id = data["room_id"]
+        message = data["message"]
+        timer = data["timer"]
+        
+        now = datetime.now()
+        timer = datetime.strptime(timer, '%Y-%m-%d %H:%M:%S')
+        duration = timer - now
+        duration = duration.total_seconds()
+        
+        url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/rooms/{room_id}/messages"
+        payload = json.dumps({
+            "sender_id": f"{sender_id}",
+            "room_id": f"{room_id}",
+            "message": f"{message}",
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        time.sleep(duration)
+        response = requests.request("POST", url, headers=headers, data=payload)
+    else:
+        return Response(schedule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    if response.status_code == 201:
+        return Response(response.json(), status=status.HTTP_201_CREATED)
+    return Response(response.json(), status=response.status_code)
+
+
 # swagger documentation and function to delete message in rooms
 @swagger_auto_schema(
     methods=["delete"],
@@ -1129,24 +1175,15 @@ def delete_message(request, message_id):
     """
     This function deletes message in rooms using message id (message_id)
     """
-    org_id = ORG_ID
-    plugin_id = PLUGIN_ID
-    coll_name = "dm_messages"
-    if request.method == "GET":
-        url = f"https://api.zuri.chat/data/delete"
-        message_payload = {
-            "organization_id": org_id,
-            "plugin_id": plugin_id,
-            "collection_name": coll_name,
-            "bulk_delete": False,
-            "object_id": message_id,
-            "filter": {},
-        }
-        try:
-            response = requests.request(url=url, json=message_payload)
-            if response.status_code == 200:
-                return Response({"message": "message successfully deleted"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": response.json()['message']}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+    if request.method == "DELETE":
+        message_id = request.GET.get("message_id")
+    try:
+        message = DB.read("dm_messages", {"_id": message_id})
+        if message:
+            response = DB.delete("dm_mesages", {"_id": message_id})
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
