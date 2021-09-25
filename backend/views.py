@@ -93,20 +93,20 @@ def side_bar(request):
     user = request.GET.get("user", None)
     user_rooms = get_rooms(user_id=user)
     rooms = []
+    room_profile={}
     for room in user_rooms:
-        profile_list=[]
         if "org_id" in room:
             if org_id == room["org_id"]:
                 for user_id in room["room_user_ids"]:
                     profile = get_user_profile(org_id,user_id)
                     if profile["status"]==200:
-                        user_name=profile["data"]["user_name"]
-                        image_url=profile["data"]["image_url"]
+                        room_profile["room_name"] = profile["data"]["user_name"]
+                        room_profile["room_image"] = profile["data"]["image_url"]
                         data = {"user_name":user_name, "image_url":image_url}
-                        profile_list.append(data)
+                        rooms.append(data)
                     elif profile["status"]==500:
-                        profile_list.append({"id":f"{user_id}","message":"user profile not in database"})
-                room["room_user_profiles"] = profile_list
+                        rooms.append({"id":f"{user_id}","message":"user profile not in database"})
+
                 room["room_url"] = f"dm/{org_id}/{room['_id']}"
                 rooms.append(room)
     side_bar = {
