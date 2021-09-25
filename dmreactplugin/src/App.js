@@ -1,21 +1,19 @@
-import React from 'react';
+import React from "react";
 
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 // Import all Global CSS components
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../src/assets/css/global.module.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../src/assets/css/global.module.css";
 
 // Import all Router components
-import ChatHome from './pages/chathome';
-import DmSingleMessageContainer from './components/dmSingleMessageContainer';
+import ChatHome from "./pages/chathome";
 
 const App = () => {
   return (
     <Router basename='/dm'>
       <Switch>
         <Route exact path='/' component={ChatHome} />
-        <Route exact path='/message' component={DmSingleMessageContainer} />
       </Switch>
     </Router>
   );
