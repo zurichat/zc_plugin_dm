@@ -12,6 +12,7 @@ import PinnedMessage from "./components/dmPinnedMessages";
 import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinned";
 import AddBookmark from "./components/common/addBookmarkKebab/addBookmark";
 import AddBookmarkLink from "./components/common/addBookmarkKebab/addBookmarkLink";
+import RemindMe from "./components/common/remindMe/remindMe";
 
 const App = () => {
   return (
@@ -22,6 +23,11 @@ const App = () => {
       <Switch>
         <Route exact path="/removeMessage">
           <RemovePinnedMessage />
+        </Route>
+      </Switch>
+      <Switch>
+        <Route exact path="/remindme">
+          <RemindMe />
         </Route>
       </Switch>
       <Switch>

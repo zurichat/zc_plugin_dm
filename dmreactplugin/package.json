@@ -3,7 +3,7 @@
     "scripts": {
         "start": "webpack serve",
         "dev": "concurrently \"yarn start\" \"yarn spa\"",
-        "spa": "cd .. && cd dmspa && yarn start",    
+        "spa": "cd .. && cd dmspa && yarn start",
         "start:standalone": "webpack serve --env standalone",
         "build": "concurrently yarn:build:*",
         "build:webpack": "webpack --mode=production",
@@ -54,11 +54,13 @@
     "dependencies": {
         "babel": "^6.23.0",
         "cli": "^1.0.1",
+        "emoji-mart": "^3.0.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-icon": "^1.0.0",
         "react-icons": "^4.2.0",
         "react-modal": "^3.14.3",
+        "react-rainbow-components": "^1.27.0",
         "react-redux": "^7.2.3",
         "react-scripts": "4.0.3",
         "reactstrap": "^8.10.0",
@@ -66,7 +68,6 @@
         "redux-devtools-extension": "^2.13.9",
         "redux-logger": "^3.0.6",
         "redux-thunk": "^2.3.0",
-        "emoji-mart": "^3.0.1",
         "single-spa-react": "^4.3.1",
         "styled-components": "^5.3.1",
         "yarn": "^1.22.11"
