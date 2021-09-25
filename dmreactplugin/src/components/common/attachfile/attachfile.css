@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap');
+.dm-plugin-files {
+  padding-top: 25px;
+  padding-left: 25px;
+  padding-bottom: 5px;
+}
+.dm-plugin-files p {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 10px;
+}
+.dm-plugin-attach-file {
+  background: #f8f8f8;
+  width: 324px;
+  border-radius: 8px;
+  position: relative;
+  top: 100px;
+  left: 100px;
+  font-family: Lato;
+  color: #616061;
+}
+.dm-plugin-upload-files {
+  border-top: 0.5px solid rgba(0, 0, 0, 0.3);
+  padding-top: 15px;
+  padding-left: 25px;
+  padding-bottom: 25px;
+}
+.dm-plugin-upload-files p {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+  margin-bottom: 10px;
+}
+.dm-plugin-upload-files div span {
+  font-weight: 700;
+  font-size: 16px;
+  font-style: normal;
+  color: #616061;
+}
+.dm-plugin-upload-files label span {
+  font-weight: 700;
+  font-size: 16px;
+  font-style: normal;
+  color: #616061;
+}
+.dm-plugin-upload-files .google-drive-icon {
+  color: #616061;
+}
+.dm-plugin-upload-files .computer-icon {
+  color: #616061;
+}
+.google-drive-icon,
+.computer-icon {
+  margin-right: 15px;
+}
+.dm-plugin-upload-files div {
+  margin-bottom: 15px;
+}
+.dm-plugin-upload-files label {
+  margin-bottom: 15px;
+}
+.dm-plugin-upload-files .google-drive {
+  cursor: pointer;
+}
+.dm-plugin-upload-files .computer {
+  cursor: pointer;
+}
+.dm-plugin-files .all-files {
+  cursor: pointer;
+}
+.dm-plugin-upload-files #upload-btn {
+  display: none;
+}
+.dm-plugin-files .recent-files .image-details {
+  display: inline-block;
+}
+.dm-plugin-files .recent-files .image-details h4 {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+}
+.dm-plugin-files .recent-files .image {
+  width: 36px;
+  display: inline-block;
+  margin-right: 10px;
+}
+.dm-plugin-files .recent-files .image-details p {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 24px;
+}
