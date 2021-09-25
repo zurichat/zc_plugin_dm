@@ -44,7 +44,7 @@ const Home = styled.div`
   & > .chats {
     margin-top: 20px;
     position: relative;
-    top: 40px;
+    top: 80px;
   }
   &.profile-pic {
   }
@@ -82,7 +82,7 @@ const Home = styled.div`
     margin-left: 12px;
   }
 `;
-const ChatHome = () => {
+const ChatHomeMessages = () => {
   const [search, setSearch] = useState("");
 
   const handleSearch = (e) => {
@@ -175,4 +175,4 @@ const ChatHome = () => {
   );
 };
 
-export default ChatHome;
+export default ChatHomeMessages;
