@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import profilePic from "../assets/profilepic.png";
 import styled from "styled-components";
+import { FiHash } from "react-icons/fi";
 
 const Home = styled.div`
   width: 100%;
@@ -44,14 +45,20 @@ const Home = styled.div`
   & > .chats {
     margin-top: 20px;
     position: relative;
-    top: 40px;
+    top: 80px;
   }
-  &.profile-pic {
+  .profile-pic-container {
+    height: 100%;
+    background: green;
+  }
+  .profile-pic {
   }
   & > .chats > .day-chat {
     background: white;
     margin-bottom: 20px;
     padding: 10px;
+    display: flex;
+    flex-direction: column;
   }
   & > .chats > .day-chat > .chat {
     display: flex;
@@ -62,6 +69,8 @@ const Home = styled.div`
   }
   .search-modal {
     background: white;
+    width: 99%;
+    margin: auto;
   }
   .black-text {
     color: black;
@@ -74,15 +83,28 @@ const Home = styled.div`
   }
   .chat {
     width: 100%;
-    margin-bottom: 20px;
 
     position: relative;
   }
   .message-details {
     margin-left: 12px;
   }
+  .hash {
+    position: relative;
+    bottom: 2px;
+  }
+  .day-chat > * {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .username {
+    margin: 0;
+  }
+  .day {
+    margin-bottom: 10px;
+  }
 `;
-const ChatHome = () => {
+const ChatHomeMessages = () => {
   const [search, setSearch] = useState("");
 
   const handleSearch = (e) => {
@@ -93,7 +115,10 @@ const ChatHome = () => {
   return (
     <Home>
       <div className="home-top">
-        <p className="plugin-name">#All Direct Messages</p>
+        <p className="plugin-name">
+          <FiHash className="hash" />
+          All Direct Messages
+        </p>
         <div className="search-box">
           <p>To:</p>
           <input
@@ -118,53 +143,78 @@ const ChatHome = () => {
 
       <div className="chats">
         <div className="day-chat">
-          <p className="black-text">Yesterday</p>
+          <p className="black-text day">Yesterday</p>
           <div className="chat">
-            <div className="profile-pic">
+            <div className="profile-pic-container">
               {" "}
-              <img src={profilePic} alt="Picture" />
+              <img className="profile-pic" src={profilePic} alt="Picture" />
             </div>
             <div className="message-details">
-              <p className="black-text">John Doe</p>
+              <p className="black-text username">John Doe</p>
               <p>John Doe: Meeting starts in 1 hour bro. </p>
             </div>
             <p className="message-time">3:50PM</p>
           </div>
         </div>
         <div className="day-chat">
-          <p className="black-text">Yesterday</p>
+          <p className="black-text day">Yesterday</p>
           <div className="chat">
-            <div className="profile-pic">
+            <div className="profile-pic-container">
               {" "}
-              <img src={profilePic} alt="Picture" />
+              <img className="profile-pic" src={profilePic} alt="Picture" />
             </div>
             <div className="message-details">
-              <p className="black-text">John Doe</p>
+              <p className="black-text username">John Doe</p>
               <p>John Doe: Meeting starts in 1 hour bro. </p>
             </div>
             <p className="message-time">3:50PM</p>
           </div>
         </div>
         <div className="day-chat">
-          <p className="black-text">Wednesday August 26th</p>
+          <p className="black-text day">Wednesday August 26th</p>
           <div className="chat">
-            <div className="profile-pic">
+            <div className="profile-pic-container">
               {" "}
-              <img src={profilePic} alt="Picture" />
+              <img className="profile-pic" src={profilePic} alt="Picture" />
             </div>
             <div className="message-details">
-              <p className="black-text">John Doe</p>
+              <p className="black-text username">John Doe</p>
               <p>John Doe: Meeting starts in 1 hour bro. </p>
             </div>
             <p className="message-time">3:50PM</p>
           </div>
           <div className="chat">
-            <div className="profile-pic">
+            <div className="profile-pic-container">
               {" "}
-              <img src={profilePic} alt="Picture" />
+              <img className="profile-pic" src={profilePic} alt="Picture" />
+            </div>{" "}
+            <div className="message-details">
+              <p className="black-text username">John Doe</p>
+              <p>John Doe: Meeting starts in 1 hour bro. </p>
+            </div>
+            <p className="message-time">3:50PM</p>
+          </div>
+        </div>
+        <div className="day-chat">
+          <p className="black-text day">Yesterday</p>
+          <div className="chat">
+            <div className="profile-pic-container">
+              {" "}
+              <img className="profile-pic" src={profilePic} alt="Picture" />
             </div>
             <div className="message-details">
-              <p className="black-text">John Doe</p>
+              <p className="black-text username">John Doe</p>
+              <p>John Doe: Meeting starts in 1 hour bro. </p>
+            </div>
+            <p className="message-time">3:50PM</p>
+          </div>
+          <div className="chat">
+            <div className="profile-pic-container">
+              {" "}
+              <img className="profile-pic" src={profilePic} alt="Picture" />
+            </div>
+            <div className="message-details">
+              <p className="black-text username">John Doe</p>
               <p>John Doe: Meeting starts in 1 hour bro. </p>
             </div>
             <p className="message-time">3:50PM</p>
@@ -175,4 +225,4 @@ const ChatHome = () => {
   );
 };
 
-export default ChatHome;
+export default ChatHomeMessages;

@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "react-icons": "^4.2.0"
+  "scripts": {
+    "react": "cd dmreactplugin && yarn start",
+    "spa": "cd dmspa && yarn start",
+    "dev": "concurrently \"yarn spa\" \"yarn react\""
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.1"
+  }
+}

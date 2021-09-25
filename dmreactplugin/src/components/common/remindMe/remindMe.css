@@ -1,0 +1,67 @@
+.dm-remind-me {
+  position: absolute;
+  top: 75px;
+  left: 490px;
+  display: flex;
+  flex-direction: column;
+  padding: 13px;
+  padding-top: 0;
+  height: auto;
+  width: 400px;
+  align-items: flex-start;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: white;
+}
+
+.dm-remind-me-wrapper {
+  background: #d0cdcd;
+  height: 100vh;
+  width: 100vw;
+}
+
+.dm-button-wrapper {
+  padding-top: 15px;
+  display: flex;
+  align-self: flex-end;
+}
+
+.dm-note-wrapper {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.dm-time-wrapper {
+  width: 100%;
+  margin-top: 10px;
+}
+
+
+.dm-date-wrapper {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.dm-labels {
+  display: flex;
+  padding: 3px;
+}
+
+.dm-remind-me-header
+{
+  padding: 3px;
+  margin-top: 12px;
+}
+
+.dm-cancel {
+  width: 150px;
+  color: #000000;
+  background-color: #ffffff;
+}
+
+.dm-create {
+  width: 150px;
+  margin-left: 15px;
+  background: green;
+}
