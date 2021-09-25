@@ -8,12 +8,15 @@ import '../src/assets/css/global.module.css';
 
 // Import all Router components
 import ChatHome from './pages/chathome';
+import dmPopupProfile from './components/dmPopupProfile';
 
 const App = () => {
     return (
         <Router basename='/dm'>
             <Switch>
                 <Route exact path='/' component={ChatHome} />
+                <Route exact path='/popup' component={dmPopupProfile} />
+               
             </Switch>
         </Router>
     );
