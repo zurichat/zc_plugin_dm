@@ -8,12 +8,14 @@ import '../src/assets/css/global.module.css';
 
 // Import all Router components
 import ChatHome from './pages/chathome';
+import dmProfileHeader from './components/dmProfileHeader';
 
 const App = () => {
     return (
         <Router basename='/dm'>
             <Switch>
                 <Route exact path='/' component={ChatHome} />
+                <Route exact path='/header' component={dmProfileHeader} />
             </Switch>
         </Router>
     );
