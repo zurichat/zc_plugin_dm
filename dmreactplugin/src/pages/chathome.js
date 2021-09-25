@@ -1,13 +1,12 @@
-import React from 'react';
-import DmFullProfile from '../components/DmFullProfile/DmFullProfile';
+import React from "react";
+import DmFullProfile from "../components/DmFullProfile/DmFullProfile";
 
 const ChatHome = () => {
-    return (
-        <div className='chat-home'>
-            This is the beginning of the chat home page.
-            <DmFullProfile/>
-        </div>
-    );
+  return (
+    <div className="chat-home">
+      <DmFullProfile />
+    </div>
+  );
 };
 
 export default ChatHome;
