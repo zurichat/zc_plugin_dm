@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-
+import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 // Import all Global CSS components
@@ -12,7 +11,6 @@ import RemovePinnedMessage from "./components/common/pinnedMessage/removePinnedM
 import PinnedMessage from "./components/dmPinnedMessages";
 import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinned";
 import AddBookmark from "./components/common/addBookmarkKebab/addBookmark";
-import TextField from "./components/common/addBookmarkKebab/textField";
 import AddBookmarkLink from "./components/common/addBookmarkKebab/addBookmarkLink";
 
 const App = () => {
