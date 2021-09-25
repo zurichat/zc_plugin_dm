@@ -104,8 +104,6 @@ def side_bar(request):
                         image_url=profile["data"]["image_url"]
                         data = {"id":user_id,"user_name":user_name, "image_url":image_url}
                         profile_list.append(data)
-                    elif profile["status"]==500:
-                        profile_list.append({"id":user_id,"message":"user profile not in database"})
                 room["room_user_profiles"] = profile_list
                 room["room_url"] = f"dm/{org_id}/{room['_id']}"
                 rooms.append(room)
