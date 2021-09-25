@@ -1185,3 +1185,31 @@ def delete_message(request, message_id):
     except Exception as e:
         return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+
+
+@api_view(["DELETE"])
+@db_init_with_credentials
+def delete_bookmark(request, room_id):
+    """
+    Deletes a saved bookmark in a room
+    """
+    try:
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if  bookmarks is not None:
+        name = request.query_params.get("name", "")
+        for bookmark in bookmarks:
+            if name == bookmark.get("name", ""):
+                bookmarks.remove(bookmark)
+                break
+        data = {"bookmarks": bookmarks}
+        response = DB.update("dm_rooms", room_id, data=data)
+        if response.get("status") == 200:
+            return Response(status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
