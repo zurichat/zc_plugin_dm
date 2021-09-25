@@ -17,20 +17,22 @@ const PinnedMessage = ({ amount }) => {
     <div
       className="d-inline-flex gap-1 px-3 py-1 rounded-3 position-relative"
       style={{ height: "30px", backgroundColor: "#BCF9E6" }}
-      role="button"
+      aria-hidden
+      onClick={() => {
+        setOpen(!open);
+      }}
     >
       <img src={Pin} alt="pin" className="h-100" />
-      <div
-        aria-hidden
-        onClick={() => {
-          setOpen(!open);
-        }}
-      >{`${amount} Pinned`}</div>
+      <div>{`${amount} Pinned`}</div>
 
       {open ? (
         <div
           className="position-absolute bg-white shadow-sm p-3"
           style={{ width: "400px", top: "100%" }}
+          aria-hidden
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
           {dropDownMessages}
         </div>

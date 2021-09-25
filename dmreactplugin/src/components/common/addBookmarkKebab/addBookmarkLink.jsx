@@ -12,7 +12,7 @@ const AddBookmarkLink = () => {
 
   const Button = (
     <>
-      <NameTextField />
+      <NameTextField label="Name" placeholder="Name" />
       <div className="d-flex justify-content-end">
         <ModalButton onClick={() => setClose(false)} close>
           Cancel

@@ -5,18 +5,16 @@ import link from "../../../assets/img/svg/link.svg";
 const StyledTextField = styled.input`
   border: none;
   outline: none;
-
   &:focus {
-    border: none;
     outline: none;
   }
 `;
 const StyledNameTextField = styled.div`
-  border: 2px solid grey;
+  border: 2px solid gray;
   border-radius: 0.25rem;
-
-  &:focus {
-    border-color: #00b87c;
+  display: flex;
+  &:focus-within {
+    border: 2px solid #00b87c;
   }
 `;
 
@@ -33,7 +31,7 @@ const NameTextField = ({ placeholder, label, value, onChange }) => {
       <label htmlFor={label} style={{ fontSize: "20px" }}>
         {label}
       </label>
-      <div className="">
+      <StyledNameTextField className="focus px-3">
         <img src={link} alt="link" className="some" />
         <StyledTextField
           type="text"
@@ -44,7 +42,7 @@ const NameTextField = ({ placeholder, label, value, onChange }) => {
           onChange={textChange}
           id={label}
         />
-      </div>
+      </StyledNameTextField>
     </div>
   );
 };

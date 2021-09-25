@@ -13,6 +13,7 @@ const AddBookmark = () => {
       onClick={() => {
         setOpen(!open);
       }}
+      role="presentation"
     >
       <img src={Add} alt="pin" className="h-50" />
       <div>Add a bookmark</div>
