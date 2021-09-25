@@ -93,10 +93,11 @@ def side_bar(request):
     user = request.GET.get("user", None)
     user_rooms = get_rooms(user_id=user)
     rooms = []
-    room_profile={}
+    
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
+                room_profile={}
                 for user_id in room["room_user_ids"]:
                     profile = get_user_profile(org_id,user_id)
                     if profile["status"]==200:
