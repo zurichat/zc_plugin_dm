@@ -10,13 +10,7 @@ import "../src/assets/css/global.module.css";
 import ChatHome from "./pages/ChatHome";
 
 const App = () => {
-  return (
-    <Router basename="/dm">
-      <Switch>
-        <Route exact path="/" component={ChatHome} />
-      </Switch>
-    </Router>
-  );
+  return <ChatHome />;
 };
 
 export default App;
