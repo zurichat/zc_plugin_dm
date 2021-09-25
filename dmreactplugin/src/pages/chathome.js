@@ -1,6 +1,5 @@
+
 import React from 'react';
-import DmFullProfile from '../components/DmFullProfile/DmFullProfile';
-import DmProfileHeader from '../components/dmProfileHeader';
 
 const ChatHome = () => {
     return (

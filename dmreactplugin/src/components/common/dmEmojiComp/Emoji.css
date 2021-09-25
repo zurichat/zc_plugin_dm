@@ -1,12 +1,12 @@
 .btn-emoji{
     color: rgb(85, 84, 84);
     font-size: 26px;
-    position: fixed;
-    top: 20px;
-    left: 10px;
+    position: absolute;
+    top: 3.5px;
+    left: 200px;
 }
 .emojipicker{
-    position: fixed;
+    position: absolute;
     top: 50px;
-    left: 10px;
+    left: 200px;
 }
