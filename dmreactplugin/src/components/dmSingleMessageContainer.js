@@ -7,7 +7,13 @@ function dmSingleMessageContainer() {
       <div className='dm-plugin-thread-messages'>
         <div className='dm-plugin-thread-message-group'>
           <div className='dm-plugin-thread-message-image-container'>
-            <img src='' alt='' className='dm-plugin-thread-message-image' />
+            <img
+              src='https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+              alt=''
+              width='36'
+              height='36'
+              className='dm-plugin-thread-message-image'
+            />
           </div>
           <div className='dm-plugin-thread-message-body'>
             <p className='dm-plugin-thread-message-header'>
