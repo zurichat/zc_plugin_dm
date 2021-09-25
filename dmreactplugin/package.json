@@ -48,10 +48,10 @@
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-icons": "^4.2.0",
-        "reactstrap": "^8.10.0",
-        "react-rainbow-components": "^1.26.0",
+        "react-rainbow-components": "^1.27.0",
         "react-redux": "^7.2.3",
         "react-scripts": "4.0.3",
+        "reactstrap": "^8.10.0",
         "single-spa-react": "^4.3.1",
         "styled-components": "^5.3.1",
         "yarn": "^1.22.11"
