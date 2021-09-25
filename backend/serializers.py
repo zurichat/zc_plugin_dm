@@ -1,6 +1,7 @@
 import re
 
 from django.utils import timezone
+from datetime import datetime
 from rest_framework import serializers
 
 
@@ -135,3 +136,15 @@ class CookieSerializer(serializers.Serializer):
 
 class DeleteMessageSerializer(serializers.Serializer):
     message_id = serializers.CharField(max_length=128)
+
+
+class ScheduleMessageSerializer(serializers.Serializer):
+    sender_id = serializers.CharField(max_length=128)
+    room_id = serializers.CharField(max_length=128)
+    message = serializers.CharField()
+    timer = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S")
+
+    def validate_timer(self, timer):
+        if datetime.now() > timer.replace(tzinfo=None):
+            raise serializers.ValidationError("Date cannot be in the past.")
+        return timer
