@@ -1,12 +1,13 @@
 import React from "react";
-import DmFullProfile from "../components/DmFullProfile/DmFullProfile";
-import ThreeDotKebab from "../components/common/threeDotKebabMenu/threeDotKebab";
+import ChatHomeMessages from "./ChatHomeMessages";
+
 
 const ChatHome = () => {
   return (
     <div className="chat-home">
+
       <DmFullProfile />
-      <ThreeDotKebab />
+      <ChatHomeMessages />
     </div>
   );
 };
