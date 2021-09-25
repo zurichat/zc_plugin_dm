@@ -435,7 +435,7 @@ def edit_room(request, pk):
     if above message exists:
         pass GET request to view the message one whats to edit.
         or pass POST with data to update
-        
+
     """
     try:
         message = DB.read("dm_messages", {"id": pk})
@@ -1175,25 +1175,15 @@ def delete_message(request, message_id):
     """
     This function deletes message in rooms using message id (message_id)
     """
-    org_id = ORG_ID
-    plugin_id = PLUGIN_ID
-    coll_name = "dm_messages"
-    if request.method == "GET":
-        url = f"https://api.zuri.chat/data/delete"
-        message_payload = {
-            "organization_id": org_id,
-            "plugin_id": plugin_id,
-            "collection_name": coll_name,
-            "bulk_delete": False,
-            "object_id": message_id,
-            "filter": {},
-        }
-        try:
-            response = requests.request(url=url, json=message_payload)
-            if response.status_code == 200:
-                return Response({"message": "message successfully deleted"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": response.json()['message']}, status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+    if request.method == "DELETE":
+        message_id = request.GET.get("message_id")
+    try:
+        message = DB.read("dm_messages", {"_id": message_id})
+        if message:
+            response = DB.delete("dm_mesages", {"_id": message_id})
+            return Response(response, status=status.HTTP_200_OK)
+        else:
+            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
