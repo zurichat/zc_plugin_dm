@@ -44,7 +44,7 @@ $ `git checkout -b <your_branch_name>`
 
 $ `git push upstream`
 
-##### Push the code to the upstream branch and make a pull-request to the frontend-develop branch
+##### Push the code to the upstream branch and make a pull-request to the **_dev branch_**
 
 <hr>
 
