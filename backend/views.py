@@ -93,20 +93,18 @@ def side_bar(request):
     user = request.GET.get("user", None)
     user_rooms = get_rooms(user_id=user)
     rooms = []
+    
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
-                profile_list=[]
+                room_profile={}
                 for user_id in room["room_user_ids"]:
                     profile = get_user_profile(org_id,user_id)
                     if profile["status"]==200:
-                        user_name=profile["data"]["user_name"]
-                        image_url=profile["data"]["image_url"]
-                        data = {"id":user_id,"user_name":user_name, "image_url":image_url}
-                        profile_list.append(data)
-                room["room_user_profiles"] = profile_list
-                room["room_url"] = f"dm/{org_id}/{room['_id']}"
-                rooms.append(room)
+                        room_profile["room_name"] = profile["data"]["user_name"]
+                        room_profile["room_image"] = profile["data"]["image_url"]
+                        rooms.append(room_profile)
+                room_profile["room_url"] = f"dm/{org_id}/{room['_id']}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
@@ -1187,3 +1185,31 @@ def delete_message(request, message_id):
     except Exception as e:
         return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+
+
+@api_view(["DELETE"])
+@db_init_with_credentials
+def delete_bookmark(request, room_id):
+    """
+    Deletes a saved bookmark in a room
+    """
+    try:
+        room = DB.read("dm_rooms", {"id": room_id})
+        bookmarks = room["bookmarks"] or []
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if  bookmarks is not None:
+        name = request.query_params.get("name", "")
+        for bookmark in bookmarks:
+            if name == bookmark.get("name", ""):
+                bookmarks.remove(bookmark)
+                break
+        data = {"bookmarks": bookmarks}
+        response = DB.update("dm_rooms", room_id, data=data)
+        if response.get("status") == 200:
+            return Response(status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
