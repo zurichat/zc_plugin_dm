@@ -1,5 +1,4 @@
-from requests.api import delete
-from . import views
+from .import views
 from .testingapi import Test
 # from .views import EditMessage
 from django.urls import path
@@ -7,22 +6,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-
-
-
-app_name = "backend"
-
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages", views.send_message, name="send_message"),
     path(
-        "api/v1/<str:org_id>/rooms/<str:room_id>/message",
-        views.send_message,
-        name="send_message"
-    ),
-    path(
-        "api/v1/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/thread",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
         views.send_thread_message,
         name="send_thread_message",
     ),
@@ -107,7 +97,7 @@ urlpatterns = [
         views.delete_pinned_message,
         name="unpin_message",
     ),
-    path( # is this getting a single pinned message or all pinned message in a room???
+    path(  # is this getting a single pinned message or all pinned message in a room???
         "api/v1/<str:org_id>/<str:room_id>/<str:message_id>/pinnedmessage/",
         views.read_message_link,
         name="read_pinned_message",
@@ -118,13 +108,14 @@ urlpatterns = [
         name="message_filter",
     ),
     # Deleting a message without :room_id and :message_id, why???
-    path("api/v1/<str:org_id>/delete-message", views.delete_message, name="delete_message"),
+    path("api/v1/delete-message/<str:message_id>/",
+         views.delete_message, name="delete_message"),
     path(
         "api/v1/<str:org_id>/members/<str:member_id>/profile",
         views.user_profile,
         name="user_profile",
     ),
-    path( # give a descriptive name to this route not just "view"
+    path(  # give a descriptive name to this route not just "view"
         "api/v1/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="view"
@@ -139,6 +130,5 @@ urlpatterns = [
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
- 
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

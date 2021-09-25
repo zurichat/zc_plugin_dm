@@ -8305,6 +8305,14 @@ nanocolors@^0.1.0, nanocolors@^0.1.5:
   resolved "https://registry.yarnpkg.com/nanocolors/-/nanocolors-0.1.12.tgz#8577482c58cbd7b5bb1681db4cf48f11a87fd5f6"
   integrity sha512-2nMHqg1x5PU+unxX7PGY7AuYxl2qDx7PSrTRjizr8sxdd3l/3hBuWWaki62qmtYm2U5i4Z5E7GbjlyDFhs9/EQ==
 
+<<<<<<< HEAD
+=======
+nanocolors@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/nanocolors/-/nanocolors-0.2.1.tgz#0dcc2d7952bd324b8e5ad0829d907e997acf3a97"
+  integrity sha512-2IoEVGHuRGjhAQFzbLdK38agBum4vWW4ods4b2h1FhU5SY/6B9DSLEMziQ8XzPSaitPDJtMnpXTGcGcOocDTXQ==
+
+>>>>>>> abd42e3acc982ad02877f41edfd8d89e91719a9a
 nanoid@^3.1.25:
   version "3.1.25"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.25.tgz#09ca32747c0e543f0e1814b7d3793477f9c8e152"
@@ -12414,6 +12422,7 @@ webpack-dev-middleware@^3.7.2:
     webpack-log "^2.0.0"
 
 webpack-dev-middleware@^5.1.0:
+<<<<<<< HEAD
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-5.1.0.tgz#90a645b077e85f661c5bb967dc32adc3eceb5cfd"
   integrity sha512-oT660AR1gOnU/NTdUQi3EiGR0iXG7CFxmKsj3ylWCBA2khJ8LFHK+sKv3BZEsC11gl1eChsltRhzUq7nWj7XIQ==
@@ -12421,6 +12430,15 @@ webpack-dev-middleware@^5.1.0:
     colorette "^1.2.2"
     memfs "^3.2.2"
     mime-types "^2.1.31"
+=======
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-5.2.0.tgz#3047a66a4c4f53927c3834478054d8105b57dec5"
+  integrity sha512-akBZtC3GIdHCJ2rA4DJAIySTZRPG2T5OVB745cIetwvxWxsdTALXSrL81LjelvRM3xZQyuPKMqTlgBYd+I+z9Q==
+  dependencies:
+    memfs "^3.2.2"
+    mime-types "^2.1.31"
+    nanocolors "^0.2.1"
+>>>>>>> abd42e3acc982ad02877f41edfd8d89e91719a9a
     range-parser "^1.2.1"
     schema-utils "^3.1.0"
 

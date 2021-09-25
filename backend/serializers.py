@@ -23,10 +23,11 @@ class ReminderSerializer(serializers.Serializer):
     message_id = serializers.CharField(max_length=500)
     current_date = serializers.CharField(max_length=500)
     scheduled_date = serializers.CharField(max_length=500)
-    notes = serializers.CharField(required=False,max_length=500)
+    notes = serializers.CharField(required=False, max_length=500)
 
-    class Meta: 
+    class Meta:
         fields = ['__all__']
+
 
 class ThreadSerializer(serializers.Serializer):
     """
@@ -73,9 +74,12 @@ class MessageSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         print(validated_data)
-        instance["sender_id"] = validated_data.get("sender_id", instance["sender_id"])
-        instance["room_id"] = validated_data.get("room_id", instance["room_id"])
-        instance["message"] = validated_data.get("message", instance["message"])
+        instance["sender_id"] = validated_data.get(
+            "sender_id", instance["sender_id"])
+        instance["room_id"] = validated_data.get(
+            "room_id", instance["room_id"])
+        instance["message"] = validated_data.get(
+            "message", instance["message"])
 
         # instance["created_at"] = validated_data.get('created_at', instance["created_at"] ) read only
 
@@ -93,7 +97,8 @@ class RoomSerializer(serializers.Serializer):
     pinned = serializers.ListField(
         child=serializers.CharField(max_length=128), allow_empty=True
     )
-    created_at = serializers.DateTimeField(default=timezone.now, read_only=True)
+    created_at = serializers.DateTimeField(
+        default=timezone.now, read_only=True)
 
     def __str__(self):
         return str()
