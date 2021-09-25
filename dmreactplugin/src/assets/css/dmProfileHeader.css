@@ -1,71 +1,92 @@
-.profileHeader {
+.dm-profileHeader {
     display: flex;
-    background: #00B87C;
+    align-items: center;
+    flex-flow: row;
+    background: #00b87c;
     color: white;
     font-weight: 700;
     padding: 6px 16px;
 }
 
+.dm-profile-header-name-img {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+}
+
 .profileHeader__img {
     width: 24px;
     height: 24px;
-    border-radius:4px ;
-    margin:auto 0;
+    border-radius: 4px;
+    margin: auto 0;
 }
 
 .profileHeader__name {
     margin-bottom: 0;
     font-size: 18px;
     line-height: 32px;
-    margin-left: 1rem;
-    margin-right: 13px;
+    padding-left: 10px;
+    padding-right: 5px;
 }
-.profileHeader__icon{
+
+.profileHeader__icon {
     font-size: 30px;
     font-weight: bold;
     padding: 4px 0;
 }
-.profilePop{
-    background: #F6F6F6;
+
+.profilePop {
+    background: #f6f6f6;
     margin-bottom: 0;
     height: 100%;
+    overflow-y: hidden;
 }
-.profilePop__head{
+
+.profilePop__head {
     background: #fff;
-    padding-top:24px ;
-    padding-left:24px ;
+    padding-top: 24px;
+    padding-left: 24px;
     padding-right: 41px;
 }
-.profilePop__img{
-    width:84px;
-    height :94px;
+
+.profilePop__img {
+    width: 84px;
+    height: 94px;
     border-radius: 4px;
     margin-right: 19px;
 }
-.profilePop__top{
+
+.profilePop__top {
     display: flex;
     justify-content: space-between;
-    
 }
-.profilePop__header{
+
+.profilePop__header {
     display: flex;
 }
-.profilePop__icon{
+
+.profilePop__icon {
     font-size: 30px;
     cursor: pointer;
     color: #333333;
 }
-.profilePop__details__header{
+
+.profilePop__details__header {
     font-size: 25px;
     font-weight: 700;
     margin-bottom: 0;
 }
-.profilePop__details__para{
+
+.profilePop__details__para {
     font-size: 15px;
     color: #616061;
     margin-bottom: 0;
 }
-.profilePop__mute{
+
+.profilePop__mute {
     background: transparent;
     border: 1px solid #979797;
     color: #616061;
@@ -78,52 +99,54 @@
     margin-top: 24px;
     margin-bottom: 21px;
 }
-.profilePop__switch{
+
+.profilePop__switch {
     display: flex;
 }
-.profilePop__switch p{
+
+.profilePop__switch p {
     margin-bottom: 0;
     margin-right: 32px;
     font-size: 15px;
     padding-bottom: 11px;
 }
-.profilePop__switch__1{
-    border-bottom:1px solid #00B87C ;
+
+.profilePop__switch__1 {
+    border-bottom: 1px solid #00b87c;
 }
-.profilePop__body{
-    padding:20px 24px ;
+.profilePop__body {
+    padding: 20px 24px;
 }
 .profilePop__body__card1,
-.profilePop__body__card2{
+.profilePop__body__card2 {
     background: #fff;
     border-radius: 4px;
 }
-.profilePop__body__card1{
+.profilePop__body__card1 {
     font-size: 15px;
     padding: 26px 26px 26px 21px;
     color: #616061;
-
 }
-.profilePop__body__card1 svg{
+.profilePop__body__card1 svg {
     font-size: 25px;
     margin-right: 12px;
 }
-.profilePop__blue{
-    color:#1264A3;
+.profilePop__blue {
+    color: #1264a3;
 }
-h2.profilePop__blue{
-    font-weight:700;
+h2.profilePop__blue {
+    font-weight: 700;
     font-size: 15px;
     margin-bottom: 0;
 }
-.profilePop__body__card2{
+.profilePop__body__card2 {
     margin-top: 21px;
     padding: 24px;
 }
-.profilePop__body__card2 h1{
+.profilePop__body__card2 h1 {
     font-size: 15px;
     font-weight: 700;
 }
-.profilePop__body__card2 p{
+.profilePop__body__card2 p {
     color: #616061;
 }
