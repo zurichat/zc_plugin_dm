@@ -93,20 +93,17 @@ def side_bar(request):
     user = request.GET.get("user", None)
     user_rooms = get_rooms(user_id=user)
     rooms = []
+    room_profile={}
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
-                profile_list=[]
                 for user_id in room["room_user_ids"]:
                     profile = get_user_profile(org_id,user_id)
                     if profile["status"]==200:
-                        user_name=profile["data"]["user_name"]
-                        image_url=profile["data"]["image_url"]
-                        data = {"id":user_id,"user_name":user_name, "image_url":image_url}
-                        profile_list.append(data)
-                room["room_user_profiles"] = profile_list
-                room["room_url"] = f"dm/{org_id}/{room['_id']}"
-                rooms.append(room)
+                        room_profile["room_name"] = profile["data"]["user_name"]
+                        room_profile["room_image"] = profile["data"]["image_url"]
+                        rooms.append(room_profile)
+                room_profile["room_url"] = f"dm/{org_id}/{room['_id']}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
