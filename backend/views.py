@@ -387,7 +387,7 @@ def room_info(request):
                 if "org_id" in current_room:
                     org_id = current_room["org_id"]
                 else:
-                    org_id = "6133c5a68006324323416896"
+                    org_id = ""
                 if len(room_user_ids) > 3:
                     text = f" and {len(room_user_ids)-2} others"
                 elif len(room_user_ids) == 3:
@@ -884,8 +884,8 @@ class SendFile(APIView):
 
     parser_classes = (MultiPartParser, FormParser)
 
-    @method_decorator(db_init_with_credentials)
-    def post(self, request, room_id):
+    # @method_decorator(db_init_with_credentials)
+    def post(self, request, room_id, org_id):
         print(request.FILES)
         if request.FILES:
             file_urls = []
