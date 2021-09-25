@@ -17,12 +17,15 @@ const PinnedMessage = ({ amount }) => {
     <div
       className="d-inline-flex gap-1 px-3 py-1 rounded-3 position-relative"
       style={{ height: "30px", backgroundColor: "#BCF9E6" }}
-      onClick={() => {
-        setOpen(!open);
-      }}
+      role="button"
     >
       <img src={Pin} alt="pin" className="h-100" />
-      <div>{`${amount} Pinned`}</div>
+      <div
+        aria-hidden
+        onClick={() => {
+          setOpen(!open);
+        }}
+      >{`${amount} Pinned`}</div>
 
       {open ? (
         <div

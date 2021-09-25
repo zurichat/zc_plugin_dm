@@ -1,7 +1,7 @@
 import React from "react";
 import style from "styled-components";
 
-const ModalButton = ({ close, children }) => {
+const ModalButton = ({ close, onClick, children }) => {
   const Button = style.button`
     border: ${close ? "1px solid grey" : "none"};
     width: 100px;
@@ -11,15 +11,7 @@ const ModalButton = ({ close, children }) => {
     color: ${close ? "black" : "white"}
     `;
 
-  return (
-    <Button
-      onClick={() => {
-        console.log("onClickListener");
-      }}
-    >
-      {children}
-    </Button>
-  );
+  return <Button onClick={onClick}>{children}</Button>;
 };
 
 export default ModalButton;
