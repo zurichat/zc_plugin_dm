@@ -1,10 +1,13 @@
 import React from "react";
-import DmFullProfile from "../components/DmFullProfile/DmFullProfile";
+import ChatHomeMessages from "./ChatHomeMessages";
+
 
 const ChatHome = () => {
   return (
     <div className="chat-home">
+
       <DmFullProfile />
+      <ChatHomeMessages />
     </div>
   );
 };
