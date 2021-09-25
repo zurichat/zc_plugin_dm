@@ -5,7 +5,9 @@ env/
 /.env
 .env
 static
-
+venv
+.venv
+venv/
 
 # Django
 *.log
