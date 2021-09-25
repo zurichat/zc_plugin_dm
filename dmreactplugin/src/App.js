@@ -11,9 +11,9 @@ import ChatHome from "./pages/chathome";
 
 const App = () => {
   return (
-    <Router basename="/dm">
+    <Router basename='/dm'>
       <Switch>
-        <Route exact path="/" component={ChatHome} />
+        <Route exact path='/' component={ChatHome} />
       </Switch>
     </Router>
   );
