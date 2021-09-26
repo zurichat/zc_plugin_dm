@@ -6,7 +6,7 @@ import DmChatContainerBox from '../components/dmChatContainerBox';
 // Chat Home Page
 const ChatHome = () => {
     return (
-        <div className='dm-newchat-room position-relative w-100'>
+        <div className='dm-newchat-room position-relative w-100 d-flex flex-column'>
             <div className='dm-chatroom-header'>
                 <DmProfileHeader />
                 <BookmarkHeader />
