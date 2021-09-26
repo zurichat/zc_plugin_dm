@@ -88,10 +88,9 @@ def verify_user(token):
 
 
 def side_bar(request):
-    collections = "dm_rooms"
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    user_rooms = get_rooms(user_id=user)
+    user_rooms = get_rooms(user_id=user, org_id=org_id)
     rooms = []
     
     for room in user_rooms:
