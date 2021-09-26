@@ -12,6 +12,8 @@ import PinnedMessage from "./components/dmPinnedMessages";
 import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinned";
 import AddBookmark from "./components/common/addBookmarkKebab/addBookmark";
 import AddBookmarkLink from "./components/common/addBookmarkKebab/addBookmarkLink";
+import BoxInput from "./components/dmBoxInput";
+
 
 const App = () => {
   return (
@@ -42,6 +44,11 @@ const App = () => {
       <Switch>
         <Route exact path="/textField">
           <AddBookmarkLink />
+        </Route>
+      </Switch>
+      <Switch>
+        <Route exact path="/BoxInput">
+          <BoxInput />
         </Route>
       </Switch>
     </Router>
