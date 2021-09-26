@@ -88,10 +88,9 @@ def verify_user(token):
 
 
 def side_bar(request):
-    collections = "dm_rooms"
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    user_rooms = get_rooms(user_id=user)
+    user_rooms = get_rooms(user_id=user, org_id=org_id)
     rooms = []
     
     for room in user_rooms:
@@ -280,7 +279,7 @@ def create_room(request):
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
         user_ids = serializer.data["room_user_ids"]
-        user_rooms = get_rooms(user_ids[0])
+        user_rooms = get_rooms(user_ids[0], DB.organization_id)
         for room in user_rooms:
             room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
@@ -307,7 +306,7 @@ def getUserRooms(request, user_id):
     if there is no room for the user_id it returns a 204 status response.
     """
     if request.method == "GET":
-        res = get_rooms(user_id)
+        res = get_rooms(user_id, DB.organization_id)
         if res == None:
             return Response(
                 data="No rooms available", status=status.HTTP_204_NO_CONTENT
@@ -341,7 +340,7 @@ def room_messages(request, room_id):
         if params_serializer.is_valid():
             room = DB.read("dm_rooms", {"_id": room_id})
             if room:
-                messages = get_room_messages(room_id)
+                messages = get_room_messages(room_id, DB.organization_id)
                 if date != None:
                     messages_by_date = get_messages(messages, date)
                     if messages_by_date == None or "message" in messages_by_date:
