@@ -189,7 +189,10 @@ def get_rooms(user_id, org_id):
     Returns:
         [List]: [description]
     """    
-    response = DB.read("dm_rooms", {"org_id": org_id})
+
+    helper = DataStorage()
+    helper.organization_id = org_id
+    response = helper.read("dm_rooms")
     data =  []
     if response != None:
         if "status_code" in response:
@@ -211,7 +214,9 @@ def get_rooms(user_id, org_id):
 
 # get all the messages in a particular room
 def get_room_messages(room_id, org_id):
-    response = DB.read("dm_messages", {'room_id': room_id, "org_id": org_id})
+    helper = DataStorage()
+    helper.organization_id = org_id
+    response = helper.read("dm_messages", {'room_id': room_id})
     if response != None:
         if "status_code" in response:
             return response
