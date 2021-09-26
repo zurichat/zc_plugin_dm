@@ -280,7 +280,7 @@ def create_room(request):
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
         user_ids = serializer.data["room_user_ids"]
-        user_rooms = get_rooms(user_ids[0])
+        user_rooms = get_rooms(user_ids[0], DB.organization_id)
         for room in user_rooms:
             room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
