@@ -1,0 +1,73 @@
+/*** DM PLUGIN THREAD MESSAGES STYLE START ***/
+
+.dm-plugin-thread-messages {
+    max-height: calc(75px * 8);
+    font-family: 'Lato', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--clr-text);
+    background: var(--clr-background);
+}
+.dm-plugin-thread-messages::-webkit-scrollbar {
+    width: 7px;
+    background: var(--clr-background);
+}
+
+.dm-plugin-thread-messages::-webkit-scrollbar-thumb {
+    width: 7px;
+    background: var(--clr-time);
+    border-radius: 8px;
+}
+
+.dm-plugin-thread-message-group {
+    display: flex;
+    width: 100%;
+    min-height: 75px;
+}
+
+.dm-plugin-thread-message-group:hover {
+    background: var(--clr-hover);
+}
+.dm-plugin-thread-message-image-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: calc(100% - calc(100% - 45px));
+}
+
+.dm-plugin-thread-message-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 3px;
+}
+.dm-plugin-thread-message-body {
+    width: 100%;
+}
+.dm-plugin-thread-message-name {
+    font-weight: 900;
+}
+.dm-plugin-thread-message-time {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--clr-time);
+    margin-left: 7px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+.dm-plugin-thread-message-header {
+    display: flex;
+    text-align: center;
+    margin-bottom: 0;
+}
+.dm-plugin-thread-message-image:hover {
+    cursor: pointer;
+}
+:is(.dm-plugin-thread-message-name, .dm-plugin-thread-message-time):hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.dm-plugin-thread-message-text {
+    margin-bottom: 0;
+}
+
+/*** DM PLUGIN THREAD MESSAGES STYLE END ***/

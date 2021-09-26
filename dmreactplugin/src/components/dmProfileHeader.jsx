@@ -15,12 +15,12 @@ const dmProfileHeader = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     return (
         <div>
-            <header
-                className='dm-profileHeader'
-                onClick={() => setModalIsOpen(true)}
-            >
+            <header className='dm-profileHeader'>
                 {/* Img to be placed here */}
-                <div className='dm-profile-header-name-img'>
+                <div
+                    className='dm-profile-header-name-img'
+                    onClick={() => setModalIsOpen(true)}
+                >
                     <img
                         className='profileHeader__img'
                         src='https://picsum.photos/200'
