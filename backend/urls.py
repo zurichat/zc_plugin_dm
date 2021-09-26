@@ -43,11 +43,6 @@ urlpatterns = [
     ),
     # path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
     path(
-        "api/v1/<str:org_id>/rooms/<str:user_id>",
-        views.getUserRooms,
-        name="get_user_rooms"
-    ),
-    path(
         "api/v1/<str:org_id>/<str:room_id>/messages",
         views.room_messages,
         name="room_messages"
