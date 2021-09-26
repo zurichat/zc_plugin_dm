@@ -125,7 +125,18 @@ urlpatterns = [
         views.Emoji.as_view(),
         name="message_reactions",
     ),
-    path("api/v1/testapi/<str:plugin_id>", Test.as_view(), name="testview")
+    path("api/v1/testapi/<str:plugin_id>", Test.as_view(), name="testview"),
+    path("api/v1/org/<str:org_id>/message/schedule", views.scheduled_messages, name="scheduled_messages"),
+
+
+    path(
+        "api/v1/<str:org_id>/<str:room_id>/bookmark/delete",
+        views.delete_bookmark,
+        name="delete_bookmark"
+    ),
+
+
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
