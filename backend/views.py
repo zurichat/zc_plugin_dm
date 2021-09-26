@@ -301,7 +301,7 @@ def create_room(request):
 )
 @api_view(["GET"])
 @db_init_with_credentials
-def getUserRooms(request, user_id):
+def user_rooms(request, user_id):
     """
     Retrieves all rooms a user is currently active in.
     if there is no room for the user_id it returns a 204 status response.

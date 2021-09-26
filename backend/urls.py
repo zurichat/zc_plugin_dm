@@ -33,8 +33,8 @@ urlpatterns = [
     ),
     path(
         "api/v1/<str:org_id>/<str:user_id>/rooms",
-        views.getUserRooms,
-        name="get_user_rooms"
+        views.user_rooms,
+        name="user_rooms"
     ),
     path(
         "api/v1/<str:org_id>/reminder",
