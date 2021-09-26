@@ -1,6 +1,4 @@
 {
-  "dependencies": {
-    "react-icons": "^4.2.0"
   "scripts": {
     "react": "cd dmreactplugin && yarn start",
     "spa": "cd dmspa && yarn start",
