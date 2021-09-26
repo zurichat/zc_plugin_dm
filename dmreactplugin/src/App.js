@@ -1,5 +1,9 @@
+
+import React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
 
 // Import all Global CSS components
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -13,7 +17,19 @@ import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinne
 import AddBookmark from "./components/common/addBookmarkKebab/addBookmark";
 import AddBookmarkLink from "./components/common/addBookmarkKebab/addBookmarkLink";
 
+import dmSingleMessageContainer from './components/dmSingleMessageContainer';
 const App = () => {
+
+    return (
+        <Router basename='/dm'>
+            <Switch>
+                <Route exact path='/' component={ChatHome} />
+
+                <Route exact path='/message' component={dmSingleMessageContainer} />
+            </Switch>
+        </Router>
+    );
+
   return (
     <Router basename="/dm">
       <Switch>
