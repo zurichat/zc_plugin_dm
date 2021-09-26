@@ -179,21 +179,6 @@ def send_centrifugo_data(room, data):
 DB = DataStorage()
 
 
-def get_user_rooms(collection_name, org_id, user):
-    room_list = list()
-    rooms = DB.read(collection_name, {"org_id": org_id})
-    if rooms == None or "status_code" in rooms:
-        return rooms
-    else:
-        for room in rooms:
-            if "room_user_ids" in room:
-                if user in room.get("room_user_ids"):
-                    room_list.append(room)
-                else:
-                    return room_list
-        return room_list
-
-
 # get rooms for a particular user
 def get_rooms(user_id, org_id):
     """Get the rooms a user is in
