@@ -1,0 +1,33 @@
+.dmHover{
+    margin-top: 10rem;
+}
+ul, li{
+    list-style: none;
+    display: inline;
+}
+li{
+    padding: 8px;
+
+}
+li:hover{
+    background: rgba(196, 196, 196, 0.2);
+    cursor: pointer;
+    border-radius: 3px;
+}
+.dmState{
+    border: 1.5px solid #000;
+    box-shadow: rgba(0, 0, 0, 0.8);
+}
+.dmIcons{
+    position: absolute;
+    background: #ffffff;
+    border-radius: 5px;
+    top: 13%;
+    left:11.6rem;
+    border: 1px solid #c4c4c4;
+    padding: 8px;
+    font-size: 30px;
+}
+span{
+    font-size: 40px;
+}
