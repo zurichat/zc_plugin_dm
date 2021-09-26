@@ -1,18 +1,19 @@
 .dmHover{
     margin-top: 10rem;
 }
-ul, li{
+.dmIcons, .dmLi{
     list-style: none;
     display: inline;
 }
-li{
-    padding: 8px;
+.dmLi{
+    padding: 6px 11px 6px 11px;
+    font-size: 2.5rem;
 
 }
-li:hover{
+.dmLi:hover{
     background: rgba(196, 196, 196, 0.2);
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 9px;
 }
 .dmState{
     border: 1.5px solid #000;
@@ -21,13 +22,18 @@ li:hover{
 .dmIcons{
     position: absolute;
     background: #ffffff;
-    border-radius: 5px;
     top: 13%;
     left:11.6rem;
-    border: 1px solid #c4c4c4;
+    border-radius: 9px;
     padding: 8px;
     font-size: 30px;
+    border: 3px solid #C4C4C4;
+    box-sizing: border-box;
+
 }
-span{
-    font-size: 40px;
+.dmState{
+    font-size: 47.5px;
+}
+.dmCover{
+    border-radius: 9px;
 }
