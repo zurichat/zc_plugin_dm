@@ -553,11 +553,27 @@ def save_bookmark(request, room_id):
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     if serializer.is_valid() and bookmarks is not None:
-        bookmarks.append(serializer.data)
+        if serializer.data not in bookmarks: # bookmark does not exist
+            bookmarks.append(serializer.data)
         data = {"bookmarks": bookmarks}
         response = DB.update("dm_rooms", room_id, data=data)
         if response.get("status") == 200:
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            event_data = dict(
+                status=str(status.HTTP_200_OK),
+                event="bookmark_create",
+                room_id=room_id,
+                data=serializer.data
+            )
+            try:
+                centrifugo_data = centrifugo_client.publish(
+                    room=room_id, data=event_data)  # publish data to centrifugo
+            except:
+                return Response(data="centrifugo server not available", status=status.HTTP_424_FAILED_DEPENDENCY)
+
+            if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(data="message not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
