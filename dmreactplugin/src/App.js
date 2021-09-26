@@ -1,9 +1,7 @@
-
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
+// import React from "react";
+// import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 // Import all Global CSS components
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -16,24 +14,26 @@ import PinnedMessage from "./components/dmPinnedMessages";
 import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinned";
 import AddBookmark from "./components/common/addBookmarkKebab/addBookmark";
 import AddBookmarkLink from "./components/common/addBookmarkKebab/addBookmarkLink";
-
-import dmSingleMessageContainer from './components/dmSingleMessageContainer';
+import DmReplyInThread from "./components/ReplyInThread/dmReplyInThread";
+import dmSingleMessageContainer from "./components/dmSingleMessageContainer";
 const App = () => {
+  // return (
+  //     <Router basename='/dm'>
+  //         <Switch>
+  //             <Route exact path='/' component={ChatHome} />
 
-    return (
-        <Router basename='/dm'>
-            <Switch>
-                <Route exact path='/' component={ChatHome} />
-
-                <Route exact path='/message' component={dmSingleMessageContainer} />
-            </Switch>
-        </Router>
-    );
+  //             <Route exact path='/message' component={dmSingleMessageContainer} />
+  //         </Switch>
+  //     </Router>
+  // );
 
   return (
     <Router basename="/dm">
       <Switch>
         <Route exact path="/" component={ChatHome} />
+      </Switch>
+      <Switch>
+        <Route exact path="/message" component={dmSingleMessageContainer} />
       </Switch>
       <Switch>
         <Route exact path="/removeMessage">
@@ -59,6 +59,9 @@ const App = () => {
         <Route exact path="/textField">
           <AddBookmarkLink />
         </Route>
+      </Switch>
+      <Switch>
+        <Route exact path="/replyInThread" component={DmReplyInThread} />
       </Switch>
     </Router>
   );
