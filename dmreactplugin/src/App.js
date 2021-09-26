@@ -17,6 +17,7 @@ const App = () => {
            <Switch>
              <Route exact path='/' component={ChatHome} />
             </Switch>
+      </Router>
 
   );
 };
