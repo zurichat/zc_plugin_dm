@@ -1170,7 +1170,8 @@ def scheduled_messages(request):
 @db_init_with_credentials
 def delete_message(request, message_id):
     """
-    This function deletes message in rooms using message id (message_id)
+    This function deletes message in rooms using message id(message_id)
+    and organization id (org_id).
     """
     if request.method == "DELETE":
         try:
