@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { BiPlus } from "react-icons/bi";
 import "./dmBookmarkStyle.css";
 import AddBookmarkDropDown from "./dmBookmarkDropDown";
-
 {
   /* <div className='addBookmark-overlay'>
                 <div className='container mx-auto pt-3 pb-3 addBookmark'>
@@ -25,36 +24,44 @@ import AddBookmarkDropDown from "./dmBookmarkDropDown";
 
 const DmBookMarkHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const HoverOutStop = useRef(false);
+  const onHoverMouseOut = () => {
+    if (HoverOutStop.current) {
+    } else {
+      console.log(HoverOutStop.current);
+      setIsOpen(false);
+    }
+  };
   return (
     <>
-      <div className=" dm-bookmark-head">
-        <div className="add-bookmark d-flex flex-flow align-items-center px-3 py-1">
-          <button
-            className="position-relative btn btn-add-bookmark d-flex align-items"
-            onClick={() => {
-              setIsOpen(!isOpen);
+      <button
+        className="position-relative btn btn-add-bookmark d-flex align-items"
+        onClick={() => {
+          setIsOpen(!isOpen);
+        }}
+        onMouseLeave={onHoverMouseOut}
+      >
+        <BiPlus />
+        <p className="m-0">Add a bookmark</p>
+        {isOpen ? (
+          <div
+            className="position-absolute bg-white shadow-sm p-3 dropDown-zindex d-flex flex-column gap-2"
+            style={{ width: "400px", top: "100%", left: "0" }}
+            aria-hidden
+            onClick={(e) => {
+              e.stopPropagation();
             }}
           >
-            <BiPlus />
-            <p className="m-0">Add a bookmark</p>
-            {isOpen ? (
-              <div
-                className="position-absolute bg-white shadow-sm p-3 dropDown-zindex d-flex flex-column gap-2"
-                style={{ width: "400px", top: "100%", left: "0" }}
-                aria-hidden
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <AddBookmarkDropDown />
-                <div className="border-bottom border-secondary"></div>
-                <p className="pl-3 text-start">No recent links</p>
-              </div>
-            ) : null}
-          </button>
-        </div>
-      </div>
+            <AddBookmarkDropDown
+              onOpenModal={(value) => {
+                HoverOutStop.current = value;
+              }}
+            />
+            <div className="border-bottom border-secondary"></div>
+            <p className="pl-3 text-start">No recent links</p>
+          </div>
+        ) : null}
+      </button>
     </>
   );
 };

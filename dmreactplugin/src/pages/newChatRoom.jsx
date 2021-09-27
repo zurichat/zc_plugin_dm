@@ -4,6 +4,7 @@ import BookmarkHeader from "../components/common/addBookmarkKebab/dmBookMark";
 import DmChatContainerBox from "../components/ChatContainer/dmChatContainerBox";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import PinnedMessage from "../components/common/pinnedMessage/dmPinnedMessages";
 
 // Chat Home Page
 const ChatHome = () => {
@@ -34,7 +35,12 @@ const ChatHome = () => {
     <div className="dm-newchat-room position-relative w-100 d-flex flex-column">
       <div className="dm-chatroom-header">
         <DmProfileHeader />
-        <BookmarkHeader />
+        <div className=" dm-bookmark-head">
+          <div className="add-bookmark gap-2 d-flex flex-direction-column flex-flow align-items-center px-3 py-1">
+            <PinnedMessage amount={3} />
+            <BookmarkHeader />
+          </div>
+        </div>
       </div>
       <div className="dm-message-in-out-box w-100 position-relative">
         <DmChatContainerBox />
