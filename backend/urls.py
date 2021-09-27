@@ -6,8 +6,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
+
+
+
+
 urlpatterns = [
     path("", views.index, name="index"),
+    path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
     path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
@@ -43,6 +48,11 @@ urlpatterns = [
         name="reminder"
     ),
     # path('api/v1/getroommessages', views.getRoomMessages, name="room_messages"),
+    path(
+        "api/v1/<str:org_id>/rooms/<str:user_id>",
+        views.getUserRooms,
+        name="get_user_rooms"
+    ),
     path(
         "api/v1/<str:org_id>/<str:room_id>/messages",
         views.room_messages,
@@ -88,12 +98,7 @@ urlpatterns = [
         views.pinned_message,
         name="pin_message",
     ),
-    path(
-        "api/v1/<str:org_id>/messages/<str:message_id>/unpin",
-        views.delete_pinned_message,
-        name="unpin_message",
-    ),
-    path(  # is this getting a single pinned message or all pinned message in a room???
+    path(  # It is getting just one. To be precise, it is getting the message itself
         "api/v1/<str:org_id>/<str:room_id>/<str:message_id>/pinnedmessage/",
         views.read_message_link,
         name="read_pinned_message",
