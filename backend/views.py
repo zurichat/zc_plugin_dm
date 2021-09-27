@@ -9,10 +9,11 @@ from django.views import generic
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
-import requests, time
+import requests
+import time
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.views import APIView
+from rest_framework.views import APIView, exception_handler
 from django.core.files.storage import default_storage
 
 # Import Read Write function to Zuri Core
@@ -53,7 +54,7 @@ def info(request):
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/",
-            "create_room_url":"https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
+            "create_room_url": "https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
         },
         "success": "true",
     }
@@ -96,10 +97,10 @@ def side_bar(request):
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
-                room_profile={}
+                room_profile = {}
                 for user_id in room["room_user_ids"]:
-                    profile = get_user_profile(org_id,user_id)
-                    if profile["status"]==200:
+                    profile = get_user_profile(org_id, user_id)
+                    if profile["status"] == 200:
                         room_profile["room_name"] = profile["data"]["user_name"]
                         room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                         rooms.append(room_profile)
@@ -723,6 +724,43 @@ def pinned_message(request, message_id):
                 data=data, status=status.HTTP_201_CREATED
             )
 
+<<<<<<< HEAD
+=======
+@swagger_auto_schema(
+    methods=["delete"],
+    responses={
+        200: UnpinMessageResponse,
+        400: "Error: Bad Request"
+    }
+)
+@api_view(["DELETE"])
+@db_init_with_credentials
+def delete_pinned_message(request, message_id):
+    """
+    This is used to delete a pinned message.
+    It takes in the message id, gets the room id, generates a link and then check
+    if that link exists. If it exists, it deletes it
+    if not it returns a 400 status response
+    """
+    try:
+        message = DB.read("dm_messages", {"id": message_id})
+        room_id = message["room_id"]
+        room = DB.read("dm_rooms", {"id": room_id})
+        pin = room["pinned"] or []
+        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
+    except Exception as e:
+        print(e)
+        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    if link in pin:
+        print("YES")
+        pin.remove(link)
+        data = {"pinned": pin}
+        response = DB.update("dm_rooms", room_id, data)
+        room = DB.read("dm_rooms", {"id": room_id})
+        if response.get("status") == 200:
+            return Response(data=data, status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+>>>>>>> 92f96dc1d9619998eedd40ae4b219ecb6ba8f467
 
 
 @swagger_auto_schema(
@@ -1137,7 +1175,6 @@ def scheduled_messages(request):
     else:
         return Response(schedule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     if response.status_code == 201:
         return Response(response.json(), status=status.HTTP_201_CREATED)
     return Response(response.json(), status=response.status_code)
@@ -1153,23 +1190,20 @@ def scheduled_messages(request):
 @db_init_with_credentials
 def delete_message(request, message_id):
     """
-    This function deletes message in rooms using message id (message_id)
+    This function deletes message in rooms using message id(message_id)
+    and organization id (org_id).
     """
     if request.method == "DELETE":
-        message_id = request.GET.get("message_id")
-    try:
-        message = DB.read("dm_messages", {"_id": message_id})
-        if message:
-            response = DB.delete("dm_mesages", {"_id": message_id})
-            return Response(response, status=status.HTTP_200_OK)
-        else:
-            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
+        try:
+            message = DB.read("dm_messages", {"_id": message_id})
+            if message:
+                response = DB.delete("dm_messages", {"_id": message_id})
+                centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
+                if centrifugo_data and centrifugo_data.status == 200:
+                    return Response(response, status=status.HTTP_200_OK)
+                return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+        except exception_handler as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -1184,7 +1218,7 @@ def delete_bookmark(request, room_id):
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if  bookmarks is not None:
+    if bookmarks is not None:
         name = request.query_params.get("name", "")
         for bookmark in bookmarks:
             if name == bookmark.get("name", ""):
@@ -1195,6 +1229,7 @@ def delete_bookmark(request, room_id):
         if response.get("status") == 200:
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+<<<<<<< HEAD
 
 @api_view(["GET"])
 def PING(request):
@@ -1206,3 +1241,5 @@ def PING(request):
     except:
         server = {"server":False}
         return JsonResponse(data=server)
+=======
+>>>>>>> 92f96dc1d9619998eedd40ae4b219ecb6ba8f467

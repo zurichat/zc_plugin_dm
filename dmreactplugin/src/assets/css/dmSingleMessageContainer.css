@@ -24,6 +24,13 @@
     width: 100%;
     min-height: 75px;
 }
+.dm-plugin-thread-message-group.isThread {
+    padding: 8px;
+    /* margin-bottom: ; */
+}
+.dm-plugin-thread-message-group.isThread:hover {
+    background: none;
+}
 
 .dm-plugin-thread-message-group:hover {
     background: var(--clr-hover);
