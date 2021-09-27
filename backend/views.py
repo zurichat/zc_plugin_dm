@@ -1229,7 +1229,6 @@ def delete_bookmark(request, room_id):
         if response.get("status") == 200:
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< HEAD
 
 @api_view(["GET"])
 def PING(request):
@@ -1241,5 +1240,3 @@ def PING(request):
     except:
         server = {"server":False}
         return JsonResponse(data=server)
-=======
->>>>>>> 92f96dc1d9619998eedd40ae4b219ecb6ba8f467
