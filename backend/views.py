@@ -678,48 +678,47 @@ def pinned_message(request, message_id):
     reads through the database, gets the room id,
     generates a link and then add it to the pinned key value.
 
-    If the link already exist, it would greet you with a nice response from the developer that wrote it.
+    If the link already exist, it will unpin that particular message already pinned.
     """
     try:
         message = DB.read("dm_messages", {"id": message_id})
-        print(message)
-        room_id = message["room_id"]
-        room = DB.read("dm_rooms", {"id": room_id})
-        pin = room["pinned"] or []
-        print("pppppppppppppppppppppp",pin)
-        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
+        if message:
+            room_id = message["room_id"]
+            room = DB.read("dm_rooms", {"id": room_id})
+            pin = room["pinned"] or []
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if link in pin:
-        pin.remove(link)
+    if message_id in pin:
+        pin.remove(message_id)
         data = {"message_id":message_id,
                 "pinned": pin,
                 "Event":"unpin_message"}
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
-        room = DB.read("dm_rooms", {"id": room_id})
-        centrifugo_data = send_centrifugo_data(
-            room=room_id, data=data
-        )  # publish data to centrifugo
-        if centrifugo_data.get("error", None) == None:
-            return Response(
+        # room = DB.read("dm_rooms", {"id": room_id})
+        if response["status"] == 200:
+            centrifugo_data = send_centrifugo_data(
+                room=room_id, data=data
+                )  # publish data to centrifugo
+            if centrifugo_data.get("error", None) == None:
+                return Response(
                 data=data, status=status.HTTP_201_CREATED
-            )
+                )
+        else:
+            return Response(status=response.status_code)
     else:
-        pin.append(link)
-        print(pin)
+        pin.append(message_id)
         data = {"message_id":message_id,
                 "pinned": pin,
                 "Event":"pin_message"}
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
-        print(response)
-        room = DB.read("dm_rooms", {"id": room_id})
+        # room = DB.read("dm_rooms", {"id": room_id})
         centrifugo_data = send_centrifugo_data(
             room=room_id, data=data
         )  # publish data to centrifugo
-        print(centrifugo_data)
         if centrifugo_data.get("error", None) == None:
-            print("It works")
             return Response(
                 data=data, status=status.HTTP_201_CREATED
             )
