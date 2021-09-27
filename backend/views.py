@@ -725,39 +725,6 @@ def pinned_message(request, message_id):
 
 
 
-# @swagger_auto_schema(
-#     methods=["delete"],
-#     responses={
-#         200: UnpinMessageResponse,
-#         400: "Error: Bad Request"
-#     }
-# )
-# @api_view(["DELETE"])
-# @db_init_with_credentials
-# def delete_pinned_message(request, message_id):
-#     """
-#     This is used to delete a pinned message.
-#     It takes in the message id, gets the room id, generates a link and then check
-#     if that link exists. If it exists, it deletes it
-#     if not it returns a 400 status response
-#     """
-#     try:
-#         message = DB.read("dm_messages", {"id": message_id})
-#         room_id = message["room_id"]
-#         room = DB.read("dm_rooms", {"id": room_id})
-#         pin = room["pinned"] or []
-#         link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
-#     except Exception as e:
-#         print(e)
-#         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-#     if link not in pin:
-#         return Response(data = "This message was not pinned!!!",status=status.HTTP_400_BAD_REQUEST)
-#     else:
-
-
-
-
-
 @swagger_auto_schema(
     methods=["get"],
     responses={
@@ -1228,3 +1195,14 @@ def delete_bookmark(request, room_id):
         if response.get("status") == 200:
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def PING(request):
+    url = "https://api.zuri.chat"
+    try:
+        response = requests.get(url, headers={ "Content-Type" : "application/json"})
+        server = {"server":True}
+        return Response(data=server)
+    except:
+        server = {"server":False}
+        return JsonResponse(data=server)
