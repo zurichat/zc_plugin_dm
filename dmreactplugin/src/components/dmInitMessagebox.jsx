@@ -1,12 +1,15 @@
 import React from 'react';
 import '../assets/css/dmInitMessagebox.css';
+import { BsChatDots } from 'react-icons/bs';
 
 const DmInitMessageBox = () => {
     return (
         <>
             <div class='d-flex align-item-center flex-row py-4 px-3'>
                 <div class='link-btn '>
-                    <button class='btn-outline-disabled btn-dm-chat'></button>
+                    <button class='btn-outline-disabled btn-dm-chat'>
+                        <BsChatDots className='three-dots-initchat' />
+                    </button>
                 </div>
                 <div class='px-3 chat-description'>
                     <h4 class='m-0'>

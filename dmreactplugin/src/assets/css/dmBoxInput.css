@@ -1,63 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
-
-.inputboxcontainer{
-    position: absolute;
-    left: 0%;
-    right: 0%;
-    top: 0%;
-    bottom: 0%;
-    
-    background: #FFFFFF;
-    border: 1px solid #EBEBEB;
-    box-sizing: border-box;
-    border-radius: 4px;
-    Width: 750px;
-    Height: 94px;
-    margin-top: 500px;
-    margin-left: 270px;
-    
-
+.shortcut-btn.btn-inputfield-box {
+    border-right: 2px solid #ccc;
+    border-radius: 0;
 }
 
-.inputboxcontainer >.first-box >input{
-width: 750px;
-height: 54px;
-outline:#FFFFFF;
-border:solid #FFFFFF;;
-font-family: lato;
-border-right: 1px solid #FFFFFF;
+.btn-inputfield-box {
+    background: transparent;
+    border: none;
+    margin-right: 4px;
 }
 
-.inputboxcontainer>.second-box{
+.btn-inputfield-box:hover {
+    background-color: var(--clr-hover);
+}
+
+.send-btn-box.btn-inputfield-box {
+    color: var(--clr-text);
     display: flex;
-    margin: 7px;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
 }
 
-.inputboxcontainer> .bslight, .line, .bold, .italic, .link, .list{
-    margin: 5px;
+.send-btn-box.btn-inputfield-box .sendMessage {
+    border-right: 2px solid #ccc;
+    padding: 0 8px;
 }
 
-.inputboxcontainer> .second-box >div >.line{
-    transform: rotate(52deg);
-    
+.send-btn-box.btn-inputfield-box .dm-schedule-message {
+    padding: 0 4px;
 }
 
-.inputboxcontainer> .second-box >div >.at{
-    margin-left: 470px;
+.send-btn-box.btn-inputfield-box:disabled {
+    color: #fff;
 }
-
-.inputboxcontainer> .at, .clip, .send, .line, .angledown{
-    margin: 5px;
-    justify-content: space-around;
-    
-}
-
-.inputboxcontainer> .second-box >div >.send{
-    transform: rotate(52deg);
-    color:#1D1C1D;
-    
-
-}
-
-
-

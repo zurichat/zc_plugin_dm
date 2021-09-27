@@ -35,15 +35,22 @@ img {
     --clr-background: hsla(0, 0%, 100%, 1);
 }
 
+.dm-newchat-room {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #f9f9f9;
+}
+
 .dm-message-in-out-box {
-    height: 73vh;
+    height: 70vh;
     overflow-y: auto;
 }
 
-.dm-footer-input-field {
-    border: 1px solid violet;
+.dm-message-in-out-box .dm-chatcontainer-box {
+    padding-right: 0;
 }
 
-.dm-chatcontainer-box {
-    background: #f9f9f9;
+.dm-footer-input-field {
+    background: transparent;
 }
