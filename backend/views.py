@@ -377,18 +377,17 @@ def room_messages(request, room_id):
 )
 @api_view(["GET"])
 @db_init_with_credentials
-def room_info(request):
+def room_info(request, room_id):
     """
     Retrieves information about a room.
     It takes the room id as a query param and searches the dm_rooms collection
     If the room exists, a json response of the room details is returned
     Else a 404 response is returned with a "No such room" message
     """
-    room_id = request.GET.get("room_id", None)
+    #room_id = request.GET.get("room_id", None)
     # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
-    print(rooms)
     if rooms is not None:
         for current_room in rooms:
             if current_room["_id"] == room_id:
@@ -800,11 +799,12 @@ def user_profile(request, org_id, member_id):
 
     if request.method == "GET":
         headers = {}
-
+        print(request.headers)
         if "Authorization" in request.headers:
             headers["Authorization"] = request.headers["Authorization"]
         else:
             headers["Cookie"] = request.headers["Cookie"]
+
 
         response = requests.get(url, headers=headers)
 
