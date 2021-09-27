@@ -17,7 +17,7 @@ function ThreeDotKebab() {
      </button>
 
      {
-       firstPopupOpen && <div className="FirstPopup">
+       firstPopupOpen && <div className="Dm-ThreeDotKebab-Menu-FirstPopup">
       <div className="DmMenuListBorder">Turn off notififcations for replies
 
       </div>
@@ -33,13 +33,13 @@ function ThreeDotKebab() {
       </div>
      }
      {
-       secondPopupOpen && <div className="SecondPopup">
+       secondPopupOpen && <div className="Dm-ThreeDotKebab-Menu-SecondPopup">
          <div>In 20 minutes</div>
           <div>In 1 hour</div>
          <div>In 3 hours</div>
          <div>Tomorrow</div>
          <div>Next week</div>
-         <div className="SecondPopupCustom">Custom... <span>M</span> </div>
+         <div className="Dm-ThreeDotKebab-Menu-SecondPopupCustom">Custom... <span>M</span> </div>
        </div>
      }
    </>
