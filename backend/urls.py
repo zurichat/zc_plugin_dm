@@ -6,14 +6,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-<<<<<<< HEAD
 
 
 
 
-
-=======
->>>>>>> 842ffb885acf572b4f2372855cb5c1bb1139f284
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/info", views.info, name="plugin_info"),
@@ -100,12 +96,12 @@ urlpatterns = [
         views.pinned_message,
         name="pin_message",
     ),
-    path(
-        "api/v1/<str:org_id>/messages/<str:message_id>/unpin",
-        views.delete_pinned_message,
-        name="unpin_message",
-    ),
-    path(  # is this getting a single pinned message or all pinned message in a room???
+    # path(
+    #     "api/v1/<str:org_id>/messages/<str:message_id>/unpin",
+    #     views.delete_pinned_message,
+    #     name="unpin_message",
+    # ),
+    path(  # It is getting just one. To be precise, it is getting the message itself
         "api/v1/<str:org_id>/<str:room_id>/<str:message_id>/pinnedmessage/",
         views.read_message_link,
         name="read_pinned_message",
