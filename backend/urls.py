@@ -33,7 +33,7 @@ urlpatterns = [
         name="updateroom"
     ),
     path(
-        "api/v1/<str:org_id>/room-info",
+        "api/v1/<str:org_id>/room_id/<str:room_id>/room-info",
         views.room_info,
         name="roominfo"
     ),
