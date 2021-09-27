@@ -20,7 +20,7 @@ const TextField = ({ placeholder, label, value, onChange }) => {
     onChange(e.target.value);
   };
   return (
-    <div className="d-flex flex-column gap-1">
+    <div className="d-flex flex-column gap-1 align-items-start">
       <label htmlFor={label} style={{ fontSize: "20px" }}>
         {label}
       </label>
