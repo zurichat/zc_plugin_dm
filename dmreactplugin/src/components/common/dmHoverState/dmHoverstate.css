@@ -1,39 +1,35 @@
-.dmHover{
-    margin-top: 10rem;
+.dmHover {
+  margin-top: 1rem;
+  position: relative;
 }
-.dmIcons, .dmLi{
-    list-style: none;
-    display: inline;
-}
-.dmLi{
-    padding: 6px 11px 6px 11px;
-    font-size: 2.5rem;
 
+.dmCover {
+  position: absolute;
+  background: #ffffff;
+  padding: 5px;
+  border: 1px solid #c4c4c4;
+  box-sizing: border-box;
+  right: 3px;
+  border-radius: 5px;
 }
-.dmLi:hover{
-    background: rgba(196, 196, 196, 0.2);
-    cursor: pointer;
-    border-radius: 9px;
-}
-.dmState{
-    border: 1.5px solid #000;
-    box-shadow: rgba(0, 0, 0, 0.8);
-}
-.dmIcons{
-    position: absolute;
-    background: #ffffff;
-    top: 13%;
-    left:11.6rem;
-    border-radius: 9px;
-    padding: 8px;
-    font-size: 30px;
-    border: 3px solid #C4C4C4;
-    box-sizing: border-box;
 
+.dmIcons {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+  padding-left: 0;
 }
-.dmState{
-    font-size: 47.5px;
+
+.dmLi {
+  padding: 8px 10px;
+  font-size: 1.2rem;
 }
-.dmCover{
-    border-radius: 9px;
+.dmLi:hover {
+  background: rgba(196, 196, 196, 0.2);
+  cursor: pointer;
+  border-radius: 9px;
+  outline: none;
 }
+

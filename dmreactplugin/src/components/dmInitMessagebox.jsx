@@ -1,5 +1,6 @@
 import React from "react";
 import "../assets/css/dmInitMessagebox.css";
+import { BsChatDots } from 'react-icons/bs';
 
 const DmInitMessageBox = () => {
   return (
@@ -19,5 +20,4 @@ const DmInitMessageBox = () => {
     </>
   );
 };
-
 export default DmInitMessageBox;
