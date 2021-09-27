@@ -12,7 +12,7 @@ const App = () => {
     return (
         <Router basename='/dm'>
             <Switch>
-                <Route exact path='/' component={ChatHome} />
+                <Route path='/' component={ChatHome} />
             </Switch>
         </Router>
     );

@@ -20,6 +20,4 @@ const ChatHome = () => {
             </div>
         </div>
     );
-};
-
 export default ChatHome;

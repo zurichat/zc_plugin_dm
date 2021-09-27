@@ -9,10 +9,11 @@ from django.views import generic
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
-import requests, time
+import requests
+import time
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.views import APIView
+from rest_framework.views import APIView, exception_handler
 from django.core.files.storage import default_storage
 
 # Import Read Write function to Zuri Core
@@ -53,7 +54,7 @@ def info(request):
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/",
-            "create_room_url":"https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
+            "create_room_url": "https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
         },
         "success": "true",
     }
@@ -92,14 +93,14 @@ def side_bar(request):
     user = request.GET.get("user", None)
     user_rooms = get_rooms(user_id=user, org_id=org_id)
     rooms = []
-    
+
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
-                room_profile={}
+                room_profile = {}
                 for user_id in room["room_user_ids"]:
-                    profile = get_user_profile(org_id,user_id)
-                    if profile["status"]==200:
+                    profile = get_user_profile(org_id, user_id)
+                    if profile["status"] == 200:
                         room_profile["room_name"] = profile["data"]["user_name"]
                         room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                         rooms.append(room_profile)
@@ -458,9 +459,9 @@ def edit_room(request, pk):
 
 
 @swagger_auto_schema(
-    methods=["get"], 
+    methods=["get"],
     responses={
-        201: MessageLinkResponse, 
+        201: MessageLinkResponse,
         400: "Error: Bad Request"
     }
 )
@@ -579,7 +580,7 @@ def organization_members(request):
     manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
     ORG_ID = DB.organization_id
-    
+
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
 
     if request.method == "GET":
@@ -665,7 +666,7 @@ def mark_read(request, message_id):
 @swagger_auto_schema(
     methods=["put"],
     responses={
-        200: PinMessageResponse, 
+        200: PinMessageResponse,
         400: "Error: Bad Request"
     }
 )
@@ -709,7 +710,7 @@ def pinned_message(request, message_id):
 @swagger_auto_schema(
     methods=["delete"],
     responses={
-        200: UnpinMessageResponse, 
+        200: UnpinMessageResponse,
         400: "Error: Bad Request"
     }
 )
@@ -745,7 +746,7 @@ def delete_pinned_message(request, message_id):
 @swagger_auto_schema(
     methods=["get"],
     responses={
-        200: FilterMessageResponse, 
+        200: FilterMessageResponse,
         400: "Error: No such room or invalid Room"
     }
 )
@@ -1125,21 +1126,21 @@ class Emoji(APIView):
 @db_init_with_credentials
 def scheduled_messages(request):
     ORG_ID = DB.organization_id
-    
+
     schedule_serializer = ScheduleMessageSerializer(data=request.data)
     if schedule_serializer.is_valid():
         data = schedule_serializer.data
-        
+
         sender_id = data["sender_id"]
         room_id = data["room_id"]
         message = data["message"]
         timer = data["timer"]
-        
+
         now = datetime.now()
         timer = datetime.strptime(timer, '%Y-%m-%d %H:%M:%S')
         duration = timer - now
         duration = duration.total_seconds()
-        
+
         url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/rooms/{room_id}/messages"
         payload = json.dumps({
             "sender_id": f"{sender_id}",
@@ -1153,7 +1154,6 @@ def scheduled_messages(request):
         response = requests.request("POST", url, headers=headers, data=payload)
     else:
         return Response(schedule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
     if response.status_code == 201:
         return Response(response.json(), status=status.HTTP_201_CREATED)
@@ -1170,23 +1170,20 @@ def scheduled_messages(request):
 @db_init_with_credentials
 def delete_message(request, message_id):
     """
-    This function deletes message in rooms using message id (message_id)
+    This function deletes message in rooms using message id(message_id)
+    and organization id (org_id).
     """
     if request.method == "DELETE":
-        message_id = request.GET.get("message_id")
-    try:
-        message = DB.read("dm_messages", {"_id": message_id})
-        if message:
-            response = DB.delete("dm_mesages", {"_id": message_id})
-            return Response(response, status=status.HTTP_200_OK)
-        else:
-            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
+        try:
+            message = DB.read("dm_messages", {"_id": message_id})
+            if message:
+                response = DB.delete("dm_messages", {"_id": message_id})
+                centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
+                if centrifugo_data and centrifugo_data.status == 200:
+                    return Response(response, status=status.HTTP_200_OK)
+                return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+        except exception_handler as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -1201,7 +1198,7 @@ def delete_bookmark(request, room_id):
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if  bookmarks is not None:
+    if bookmarks is not None:
         name = request.query_params.get("name", "")
         for bookmark in bookmarks:
             if name == bookmark.get("name", ""):
