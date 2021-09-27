@@ -23,5 +23,5 @@ const DmInitMessageBox = () => {
             </div>
         </>
     );
-
+};
 export default DmInitMessageBox;

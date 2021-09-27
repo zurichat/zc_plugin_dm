@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import MessageWrapper from '../common/dmHoverState/dmHoverState';
+import MessageWrapper from '../common/dmHoverState/dmHoverstate';
 import DmInitMessageBox from '../dmInitMessagebox';
 import DmSingleMessageContainer from '../dmSingleMessageContainer';
 import DmReplyInThread from '../ReplyInThread/replyInThread';
-// import styled from "styled-components";
+
 import './chatContainerBox.css';
 
 const DmChatContainerBox = () => {
@@ -19,7 +19,7 @@ const DmChatContainerBox = () => {
 
     return (
         <>
-            <div className='chatContainerBox'>
+            <div className='dm-chatContainerBox w-100 d-flex align-items-end'>
                 <main>
                     <DmInitMessageBox />
                     {}

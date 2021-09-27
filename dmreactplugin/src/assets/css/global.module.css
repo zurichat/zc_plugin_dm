@@ -44,7 +44,12 @@ img {
 
 .dm-message-in-out-box {
     height: 70vh;
-    overflow-y: auto;
+    overflow: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 .dm-message-in-out-box .dm-chatcontainer-box {

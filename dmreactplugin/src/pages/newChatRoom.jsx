@@ -1,7 +1,7 @@
 import React from 'react';
 import DmProfileHeader from '../components/dmProfileHeader';
 import BookmarkHeader from '../components/common/addBookmarkKebab/dmBookMark';
-import DmChatContainerBox from '../components/dmChatContainerBox';
+import DmChatContainerBox from '../components/ChatContainer/dmChatContainerBox';
 import InputBoxField from '../components/dmBoxInputField';
 
 // Chat Home Page
@@ -20,4 +20,5 @@ const ChatHome = () => {
             </div>
         </div>
     );
+};
 export default ChatHome;
