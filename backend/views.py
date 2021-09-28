@@ -1258,7 +1258,6 @@ def delete_message(request, message_id, room_id):
     """
     message_id = request.GET.get("message_id")
     room_id = request.GET.get("room_id")
-    room_id = room_id
     if request.method == "DELETE":
         try:
             message = DB.read("dm_messages", {"_id": message_id})
