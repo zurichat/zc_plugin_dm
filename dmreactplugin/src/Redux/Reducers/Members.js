@@ -2,19 +2,12 @@ import { GET_MEMBERS, GET_MEMBER_PROFILE } from "../Actions/actionTypes";
 
 const initialState = {
   members: null,
-  memberProfile: null,
 };
 
-const membersReducer = (state = initialState, action) => {
+const membersReducer = (state = null, action) => {
   switch (action.type) {
     case GET_MEMBERS:
-      return { ...state, members: { ...action.payload } };
-
-    case GET_MEMBER_PROFILE:
-      return {
-        ...state,
-        memberProfile: { ...action.payload },
-      };
+      return action.payload;
     default:
       return state;
   }

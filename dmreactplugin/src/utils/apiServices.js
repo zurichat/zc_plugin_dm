@@ -13,8 +13,10 @@ const apiConfig = {
 const $http = axios.create({ ...apiConfig });
 
 class APIServices {
-  async getOrgUsers(org_id) {
-    return await $http.get(`/org/${org_id}/members`);
+  async getOrgUsers(org_id, data) {
+    return await $http.get(`/org/${org_id}/members`, data, {
+      withCredentials: true,
+    });
   }
 
   async createChatRoom(org_id, data) {
@@ -25,8 +27,14 @@ class APIServices {
     return await $http.put(`/${org_id}/members/${member_id}`, data);
   }
 
-  async getMemberProfile(org_id, member_id) {
-    return await $http.get(`/org/${org_id}/members/${member_id}/profile`);
+  async getMemberProfile(org_id, member_id, data) {
+    return await $http.get(
+      `/org/${org_id}/members/${member_id}/profile`,
+      data,
+      {
+        withCredentials: true,
+      }
+    );
   }
 
   async postMembersOrg(org_id, member_id, data) {

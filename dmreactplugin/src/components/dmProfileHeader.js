@@ -11,7 +11,9 @@ import {
 import { FiPhone } from "react-icons/fi";
 import { BsClock, BsX, BsEnvelope } from "react-icons/bs";
 
-const dmProfileHeader = ({ user2_id }) => {
+const dmProfileHeader = ({ actualUser }) => {
+  const user = actualUser && actualUser;
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   return (
@@ -20,13 +22,11 @@ const dmProfileHeader = ({ user2_id }) => {
         {/* Img to be placed here */}
         <img
           className="profileHeader__img"
-          src="https://picsum.photos/200"
+          src={user?.image_url}
           alt="Profile Pic"
         />
-        <p className="profileHeader__name">Sandra Bernard</p>
-        {/* <div className='profileHeader__icon'>
-                    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-down" class="svg-inline--fa fa-chevron-down fa-w-14" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"/></svg>      
-                </div> */}
+        <p className="profileHeader__name">{user?.user_name}</p>
+
         <FaAngleDown className="profileHeader__icon" />
       </header>
       <Modal
@@ -50,18 +50,16 @@ const dmProfileHeader = ({ user2_id }) => {
             <div className="profilePop__top">
               <div className="profilePop__header">
                 <img
-                  src="https://picsum.photos/200"
+                  src={user?.image_url}
                   alt="profile pic"
                   className="profilePop__img"
                 />
                 <div className="profilePop__details">
                   <p className="profilePop__details__header">
-                    Mama Gee 🦊 ⭐️{" "}
+                    {user?.first_name} {user?.last_name} 🦊 ⭐️{" "}
                   </p>
-                  <p className="profilePop__details__para">
-                    Frontend Design Mentor{" "}
-                  </p>
-                  <p className="profilePop__details__para">She/Her </p>
+                  <p className="profilePop__details__para">{user?.role} </p>
+                  <p className="profilePop__details__para">{user?.pronouns}</p>
                 </div>
               </div>
               <BsX
@@ -81,15 +79,16 @@ const dmProfileHeader = ({ user2_id }) => {
           <div className="profilePop__body">
             <div className="profilePop__body__card1">
               <p>
-                <BsClock /> 3:15AM Local Time
+                <BsClock /> Joined at: {user?.joined_at.slice(0, -19)}{" "}
+                {user?.joined_at.slice(11, -13)}
               </p>
               <p>
                 <FiPhone />{" "}
-                <span className="profilePop__blue"> +23701877832</span>{" "}
+                <span className="profilePop__blue"> {user?.phone}</span>{" "}
               </p>
               <p>
                 <BsEnvelope />{" "}
-                <span className="profilePop__blue"> mamagee@gmail.com</span>
+                <span className="profilePop__blue"> {user?.email}</span>
               </p>
               <h2 className="profilePop__blue ">View Profile</h2>
             </div>

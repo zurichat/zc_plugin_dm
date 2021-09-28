@@ -11,10 +11,7 @@ import "../src/assets/css/global.module.css";
 import ChatHome from "./pages/newChatRoom";
 import { useDispatch } from "react-redux";
 import { handleGetRooms } from "./Redux/Actions/dmActions";
-import {
-  handleGetMEmberProfile,
-  handleGetMembers,
-} from "./Redux/Actions/Members";
+import { handleGetMembers } from "./Redux/Actions/Members";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -33,7 +30,6 @@ const App = () => {
   useEffect(() => {
     dispatch(handleGetRooms(org_id, loggedInUser_id));
     dispatch(handleGetMembers(org_id));
-    dispatch(handleGetMEmberProfile(org_id, loggedInUser_id));
   }, [location, org_id, loggedInUser_id]);
 
   return (
