@@ -12,8 +12,10 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages", views.search_DM, name="search DM"),
-    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages", views.message_create_get, name="crate_get_message"),
+    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages",
+         views.search_DM, name="search DM"),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
+         views.message_create_get, name="crate_get_message"),
 
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
@@ -106,7 +108,7 @@ urlpatterns = [
         name="message_filter",
     ),
     path(  # might require a room id
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/delete_message/",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/delete_message",
         views.delete_message,
         name="delete_message",
     ),
