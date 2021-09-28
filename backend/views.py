@@ -1329,7 +1329,7 @@ def search_DM(request, user_id):
 
 @api_view(["GET"])
 def PING(request):
-    url = "https://api.zuri.chats"
+    url = "https://api.zuri.chat"
     try:
         response = requests.get(url, headers={ "Content-Type" : "application/json"})
         if response.status_code == 200:
@@ -1339,6 +1339,5 @@ def PING(request):
         print("Either problem occured in the database or the url you entered is wrong")
         print("Please check url and try again or")
         print("Please wait for some time and try again")
-    finally:
         server = {"server":False,}
         return Response(data=server)

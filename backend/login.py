@@ -9,4 +9,3 @@ def login_user():
 
     response = requests.post(url="https://api.zuri.chat/auth/login", json=data)
     return response.json()["data"]["user"]["token"]
-
