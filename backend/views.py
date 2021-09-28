@@ -1179,7 +1179,7 @@ def delete_message(request, message_id):
             if message:
                 response = DB.delete("dm_messages", {"_id": message_id})
                 centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
-                if centrifugo_data and centrifugo_data.status == 200:
+                if centrifugo_data and centrifugo_data.status_code == 200:
                     return Response(response, status=status.HTTP_200_OK)
                 return Response("message not found", status=status.HTTP_404_NOT_FOUND)
         except exception_handler as e:
