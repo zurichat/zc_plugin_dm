@@ -7,19 +7,14 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 
-
-
-
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        views.send_message,
-        name="send_message"
-    ),
+    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages", views.search_DM, name="search DM"),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages", views.message_create_get, name="crate_get_message"),
+
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
         views.send_thread_message,
@@ -45,22 +40,22 @@ urlpatterns = [
         views.user_rooms,
         name="get_user_rooms"
     ),
-    path( #what is this endpoint doing?
+    path(  # what is this endpoint doing?
         "api/v1/org/<str:org_id>/reminder",
         views.remind_message,
         name="reminder"
     ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        views.room_messages,
-        name="room_messages"
-    ),
+    # path(
+    #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
+    #     views.room_messages,
+    #     name="room_messages"
+    # ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
         views.copy_message_link,
         name="copy_message_link",
     ),
-    path( #review needed
+    path(  # review needed
         "getmessage/<str:room_id>/<str:message_id>",
         views.read_message_link,
         name="read_message_link",
@@ -85,12 +80,12 @@ urlpatterns = [
         views.retrieve_bookmarks,
         name="get_bookmarks",
     ),
-    path( #might require a room id
+    path(  # might require a room id
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         views.mark_read,
         name="mark_read"
     ),
-    path( #might require a room id
+    path(  # might require a room id
         "api/v1/org/<str:org_id>/messages/<str:message_id>/pin",
         views.pinned_message,
         name="pin_message",
@@ -105,14 +100,14 @@ urlpatterns = [
         views.read_message_link,
         name="read_pinned_message",
     ),
-    path( # review needed???
+    path(  # review needed???
         "api/v1/<str:org_id>/<str:room_id>/filter_messages",
         views.message_filter,
         name="message_filter",
     ),
-    path( #might require a room id
-        "api/v1/org/<str:org_id>/messages/<str:message_id>",
-        views.delete_message, 
+    path(  # might require a room id
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/delete_message/",
+        views.delete_message,
         name="delete_message",
     ),
     path(
@@ -120,7 +115,7 @@ urlpatterns = [
         views.user_profile,
         name="user_profile",
     ),
-    path( #??? how are the files sent? as messages?
+    path(  # ??? how are the files sent? as messages?
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="media_files"
@@ -131,8 +126,8 @@ urlpatterns = [
         name="message_reactions",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/schedule-message", 
-        views.scheduled_messages, 
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/schedule-message",
+        views.scheduled_messages,
         name="scheduled_messages"
     ),
     path(
