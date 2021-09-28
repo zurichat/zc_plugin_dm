@@ -94,6 +94,8 @@ def side_bar(request):
     user_rooms = get_rooms(user_id=user, org_id=org_id)
     rooms = []
 
+    if user_rooms == None:
+        return user_rooms
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
@@ -102,7 +104,10 @@ def side_bar(request):
                     profile = get_user_profile(org_id, user_id)
                     if profile["status"] == 200:
                         room_profile["room_name"] = profile["data"]["user_name"]
-                        room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        if profile["data"]["image_url"] == "":
+                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        else:
+                            room_profile["room_image"] = profile["data"]["image_url"]
                         rooms.append(room_profile)
                 room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}"
     side_bar = {
