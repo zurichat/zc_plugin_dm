@@ -1,35 +1,33 @@
 .dmHover {
-  margin-top: 1rem;
-  position: relative;
+    position: relative;
 }
 
 .dmCover {
-  position: absolute;
-  background: #ffffff;
-  padding: 5px;
-  border: 1px solid #c4c4c4;
-  box-sizing: border-box;
-  right: 3px;
-  border-radius: 5px;
+    position: absolute;
+    background: #ffffff;
+    padding: 5px;
+    border: 1px solid #c4c4c4;
+    box-sizing: border-box;
+    right: 3px;
+    border-radius: 5px;
 }
 
 .dmIcons {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0;
-  padding-left: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0;
+    padding-left: 0;
 }
 
 .dmLi {
-  padding: 8px 10px;
-  font-size: 1.2rem;
+    padding: 8px 10px;
+    font-size: 1.2rem;
 }
 .dmLi:hover {
-  background: rgba(196, 196, 196, 0.2);
-  cursor: pointer;
-  border-radius: 9px;
-  outline: none;
+    background: rgba(196, 196, 196, 0.2);
+    cursor: pointer;
+    border-radius: 9px;
+    outline: none;
 }
-

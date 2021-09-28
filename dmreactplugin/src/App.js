@@ -7,12 +7,14 @@ import '../src/assets/css/global.module.css';
 
 // Import all Router components
 import ChatHome from './pages/newChatRoom';
+import Pop from './components/dmPopupProfile';
 
 const App = () => {
     return (
         <Router basename='/dm'>
             <Switch>
                 <Route path='/' component={ChatHome} />
+                <Route path='/test' component={Pop} />
             </Switch>
         </Router>
     );

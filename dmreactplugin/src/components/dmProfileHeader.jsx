@@ -15,10 +15,10 @@ const dmProfileHeader = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     return (
         <div>
-            <header className='dm-profileHeader'>
+            <header className='dm-profileHeader d-flex align-items-center'>
                 {/* Img to be placed here */}
                 <div
-                    className='dm-profile-header-name-img'
+                    className='dm-profile-header-name-img d-flex align-items-center'
                     onClick={() => setModalIsOpen(true)}
                 >
                     <img
