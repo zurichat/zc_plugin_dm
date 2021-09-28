@@ -1,4 +1,8 @@
-import { CREATE_ROOM, GET_ROOMS, GET_ROOM_MESSAGES } from "../Actions/Room";
+import {
+  CREATE_ROOM,
+  GET_ROOMS,
+  GET_ROOM_MESSAGES,
+} from "../Actions/actionTypes";
 
 const initialState = {
   room_id: [],
@@ -12,7 +16,7 @@ const roomsReducer = (state = initialState, action) => {
       return { ...state, room_id: [...state.room_id, action.payload] };
 
     case GET_ROOMS:
-      return { ...state, rooms: [...state.rooms, action.payload] };
+      return { ...state, rooms: action.payload };
 
     case GET_ROOM_MESSAGES:
       return { ...state, messages: { ...state.messages, ...action.payload } };

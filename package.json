@@ -5,6 +5,7 @@
     "dev": "concurrently \"yarn spa\" \"yarn react\""
   },
   "devDependencies": {
+    "axios": "^0.21.4",
     "concurrently": "^6.2.1"
   }
 }
