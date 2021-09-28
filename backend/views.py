@@ -512,9 +512,9 @@ def edit_room(request, pk):
 
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="Retrieves the link to a message", 
+    operation_summary="Retrieves the link to a message",
     responses={
-        200: MessageLinkResponse, 
+        200: MessageLinkResponse,
         400: "Error: Bad Request",
         404: "Error: This Message Does Not Exist",
     }
@@ -557,11 +557,12 @@ def read_message_link(request, room_id, message_id):
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
+
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="Retrieves all the links in a room", 
+    operation_summary="Retrieves all the links in a room",
     responses={
-        200: GetLinksResponse, 
+        200: GetLinksResponse,
         404: "Error: Message Not Found",
     }
 )
@@ -738,7 +739,7 @@ def mark_read(request, message_id):
     methods=["put"],
     operation_summary="Pins a message in a room",
     responses={
-        200: PinMessageResponse, 
+        200: PinMessageResponse,
         400: "Error: Bad Request",
         503: "Server Error: Service Unavailable",
     }
@@ -767,26 +768,26 @@ def pinned_message(request, message_id):
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     if message_id in pin:
         pin.remove(message_id)
-        data = {"message_id":message_id,
+        data = {"message_id": message_id,
                 "pinned": pin,
-                "Event":"unpin_message"}
+                "Event": "unpin_message"}
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         if response["status"] == 200:
             centrifugo_data = send_centrifugo_data(
                 room=room_id, data=data
-                )  # publish data to centrifugo
+            )  # publish data to centrifugo
             if centrifugo_data.get("error", None) == None:
                 return Response(
-                data=data, status=status.HTTP_201_CREATED
+                    data=data, status=status.HTTP_201_CREATED
                 )
         else:
             return Response(status=response.status_code)
     else:
         pin.append(message_id)
-        data = {"message_id":message_id,
+        data = {"message_id": message_id,
                 "pinned": pin,
-                "Event":"pin_message"}
+                "Event": "pin_message"}
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         centrifugo_data = send_centrifugo_data(
@@ -796,7 +797,6 @@ def pinned_message(request, message_id):
             return Response(
                 data=data, status=status.HTTP_201_CREATED
             )
-
 
 
 @swagger_auto_schema(
@@ -874,7 +874,7 @@ def user_profile(request, org_id, member_id):
     Else a 405 response returns if a wrong method was used
     Assume member_id is also the same as user_id in an org
     """
-    
+
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
@@ -884,7 +884,6 @@ def user_profile(request, org_id, member_id):
             headers["Authorization"] = request.headers["Authorization"]
         else:
             headers["Cookie"] = request.headers["Cookie"]
-
 
         response = requests.get(url, headers=headers)
     else:
@@ -1258,18 +1257,19 @@ def delete_message(request, message_id):
     This function deletes message in rooms using message id(message_id)
     and organization id (org_id).
     """
+    message_id = request.GET.get("message_id")
     if request.method == "DELETE":
-        message_id = request.GET.get("message_id")
-    try:
-        message = DB.read("dm_messages", {"_id": message_id})
-        if message:
-            response = DB.delete("dm_messages", {"_id": message_id})
-            centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
-            if centrifugo_data and centrifugo_data.status == 200:
-                return Response(response, status=status.HTTP_200_OK)
-            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-    except exception_handler as e:
-        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        try:
+            message = DB.read("dm_messages", {"_id": message_id})
+            if message:
+                response = DB.delete("dm_messages", {"_id": message_id})
+                centrifugo_data = centrifugo_client.publish(
+                    message=message_id, data=response)
+                if centrifugo_data and centrifugo_data.status_code == 200:
+                    return Response(response, status=status.HTTP_200_OK)
+                return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+        except exception_handler as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -1306,6 +1306,7 @@ def delete_bookmark(request, room_id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, user_id):
@@ -1325,13 +1326,15 @@ def search_DM(request, user_id):
         return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
     return Response("keyword cannot be empty",status = status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(["GET"])
 def PING(request):
     url = "https://api.zuri.chat"
     try:
-        response = requests.get(url, headers={ "Content-Type" : "application/json"})
-        server = {"server":True}
+        response = requests.get(
+            url, headers={"Content-Type": "application/json"})
+        server = {"server": True}
         return Response(data=server)
     except:
-        server = {"server":False}
+        server = {"server": False}
         return JsonResponse(data=server)
