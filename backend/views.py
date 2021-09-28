@@ -1195,11 +1195,16 @@ def delete_bookmark(request, room_id):
 
 @api_view(["GET"])
 def PING(request):
-    url = "https://api.zuri.chat"
+    url = "https://api.zuri.chats"
     try:
         response = requests.get(url, headers={ "Content-Type" : "application/json"})
-        server = {"server":True}
+        if response.status_code == 200:
+            server = {"server":True}
+            return Response(data=server)
+    except Exception:
+        print("Either problem occured in the database or the url you entered is wrong")
+        print("Please check url and try again or")
+        print("Please wait for some time and try again")
+    finally:
+        server = {"server":False,}
         return Response(data=server)
-    except:
-        server = {"server":False}
-        return JsonResponse(data=server)
