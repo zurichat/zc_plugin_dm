@@ -15,11 +15,9 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        views.send_message,
-        name="send_message"
-    ),
+    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages", views.search_DM, name="search DM"),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages", views.message_create_get, name="crate_get_message"),
+
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
         views.send_thread_message,
@@ -50,11 +48,11 @@ urlpatterns = [
         views.remind_message,
         name="reminder"
     ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        views.room_messages,
-        name="room_messages"
-    ),
+    # path(
+    #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
+    #     views.room_messages,
+    #     name="room_messages"
+    # ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
         views.copy_message_link,
