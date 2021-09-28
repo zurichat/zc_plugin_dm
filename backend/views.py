@@ -104,10 +104,10 @@ def side_bar(request):
                     profile = get_user_profile(org_id, user_id)
                     if profile["status"] == 200:
                         room_profile["room_name"] = profile["data"]["user_name"]
-                        if profile["data"]["image_url"] == "":
-                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                        else:
+                        if profile["data"]["image_url"]:
                             room_profile["room_image"] = profile["data"]["image_url"]
+                        else:
+                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                         rooms.append(room_profile)
                 room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}"
     side_bar = {
@@ -135,55 +135,90 @@ def side_bar(request):
         400: "Error: Bad Request"
     }
 )
-@api_view(["POST"])
+@api_view(["GET","POST"])
 @db_init_with_credentials
-def send_message(request, room_id):
+def message_create_get(request, room_id):
     """
     Sends messages to users in rooms.
+    Also gets all messages in a room
     It checks if room already exist before sending data.
     It makes a publish event to centrifugo after data
     is persisted
     """
-    request.data["room_id"] = room_id
-    print(request)
-    serializer = MessageSerializer(data=request.data)
+    if request.method == "GET":
+        paginator = PageNumberPagination()
+        paginator.page_size = 30
+        date = request.GET.get("date", None)
+        params_serializer = GetMessageSerializer(data=request.GET.dict())
+        if params_serializer.is_valid():
+            room = DB.read("dm_rooms", {"_id": room_id})
+            if room:
+                messages = get_room_messages(room_id, DB.organization_id)
+                if date != None:
+                    messages_by_date = get_messages(messages, date)
+                    if messages_by_date == None or "message" in messages_by_date:
+                        return Response(
+                            data="No messages available",
+                            status=status.HTTP_204_NO_CONTENT,
+                        )
+                    messages_page = paginator.paginate_queryset(
+                        messages_by_date, request
+                    )
+                    return paginator.get_paginated_response(messages_page)
+                else:
+                    if messages == None or "message" in messages:
+                        return Response(
+                            data="No messages available",
+                            status=status.HTTP_204_NO_CONTENT,
+                        )
+                    result_page = paginator.paginate_queryset(
+                        messages, request)
+                    return paginator.get_paginated_response(result_page)
+            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+        return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if serializer.is_valid():
-        data = serializer.data
-        room_id = data["room_id"]  # room id gotten from client request
+    
+    elif request.method == "POST":
+        request.data["room_id"] = room_id
+        print(request)
+        serializer = MessageSerializer(data=request.data)
 
-        room = DB.read("dm_rooms", {"_id": room_id})
-        if room and room.get('status_code', None) == None:
-            if data["sender_id"] in room.get("room_user_ids", []):
+        if serializer.is_valid():
+            data = serializer.data
+            room_id = data["room_id"]  # room id gotten from client request
 
-                response = DB.write("dm_messages", data=serializer.data)
-                if response.get("status", None) == 200:
+            room = DB.read("dm_rooms", {"_id": room_id})
+            if room and room.get('status_code', None) == None:
+                if data["sender_id"] in room.get("room_user_ids", []):
 
-                    response_output = {
-                        "status": response["message"],
-                        "event": "message_create",
-                        "message_id": response["data"]["object_id"],
-                        "room_id": room_id,
-                        "thread": False,
-                        "data": {
-                            "sender_id": data["sender_id"],
-                            "message": data["message"],
-                            "created_at": data["created_at"],
+                    response = DB.write("dm_messages", data=serializer.data)
+                    if response.get("status", None) == 200:
+
+                        response_output = {
+                            "status": response["message"],
+                            "event": "message_create",
+                            "message_id": response["data"]["object_id"],
+                            "room_id": room_id,
+                            "thread": False,
+                            "data": {
+                                "sender_id": data["sender_id"],
+                                "message": data["message"],
+                                "created_at": data["created_at"],
+                            }
                         }
-                    }
-                    try:
-                        centrifugo_data = centrifugo_client.publish(
-                            room=room_id, data=response_output)  # publish data to centrifugo
-                        if centrifugo_data and centrifugo_data.get("status_code") == 200:
-                            return Response(data=response_output, status=status.HTTP_201_CREATED)
-                        else:
-                            return Response(data="message not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
-                    except:
-                        return Response(data="centrifugo server not available", status=status.HTTP_424_FAILED_DEPENDENCY)
-                return Response(data="message not saved and not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
-        return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+                        try:
+                            centrifugo_data = centrifugo_client.publish(
+                                room=room_id, data=response_output)  # publish data to centrifugo
+                            if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                                return Response(data=response_output, status=status.HTTP_201_CREATED)
+                            else:
+                                return Response(data="message not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                        except:
+                            return Response(data="centrifugo server not available", status=status.HTTP_424_FAILED_DEPENDENCY)
+                    return Response(data="message not saved and not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
+            return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -329,58 +364,58 @@ def user_rooms(request, user_id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@swagger_auto_schema(
-    methods=["get"],
-    operation_summary="Retrieves all messages in a particular room",
-    query_serializer=GetMessageSerializer,
-    responses={
-        200: MessageResponse,
-        204: "No Messages Available",
-        400: "Error: Bad Request",
-        404: "Error: Room Not Found",
-    }
-)
-@api_view(["GET"])
-@db_init_with_credentials
-def room_messages(request, room_id):
-    """
-    Retrieves messages in a room using a room id.
-    It returns a 204 status code if there is no message in the room.
-    The messages can be filter by adding date in the query,
-    it also returns a 204 status if there are no messages.
-    """
-    if request.method == "GET":
-        paginator = PageNumberPagination()
-        paginator.page_size = 30
-        date = request.GET.get("date", None)
-        params_serializer = GetMessageSerializer(data=request.GET.dict())
-        if params_serializer.is_valid():
-            room = DB.read("dm_rooms", {"_id": room_id})
-            if room:
-                messages = get_room_messages(room_id, DB.organization_id)
-                if date != None:
-                    messages_by_date = get_messages(messages, date)
-                    if messages_by_date == None or "message" in messages_by_date:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    messages_page = paginator.paginate_queryset(
-                        messages_by_date, request
-                    )
-                    return paginator.get_paginated_response(messages_page)
-                else:
-                    if messages == None or "message" in messages:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    result_page = paginator.paginate_queryset(
-                        messages, request)
-                    return paginator.get_paginated_response(result_page)
-            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
-        return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+# @swagger_auto_schema(
+#     methods=["get"],
+#     operation_summary="Retrieves all messages in a particular room",
+#     query_serializer=GetMessageSerializer,
+#     responses={
+#         200: MessageResponse,
+#         204: "No Messages Available",
+#         400: "Error: Bad Request",
+#         404: "Error: Room Not Found",
+#     }
+# )
+# @api_view(["GET"])
+# @db_init_with_credentials
+# def room_messages(request, room_id):
+#     """
+#     Retrieves messages in a room using a room id.
+#     It returns a 204 status code if there is no message in the room.
+#     The messages can be filter by adding date in the query,
+#     it also returns a 204 status if there are no messages.
+#     """
+#     if request.method == "GET":
+#         paginator = PageNumberPagination()
+#         paginator.page_size = 30
+#         date = request.GET.get("date", None)
+#         params_serializer = GetMessageSerializer(data=request.GET.dict())
+#         if params_serializer.is_valid():
+#             room = DB.read("dm_rooms", {"_id": room_id})
+#             if room:
+#                 messages = get_room_messages(room_id, DB.organization_id)
+#                 if date != None:
+#                     messages_by_date = get_messages(messages, date)
+#                     if messages_by_date == None or "message" in messages_by_date:
+#                         return Response(
+#                             data="No messages available",
+#                             status=status.HTTP_204_NO_CONTENT,
+#                         )
+#                     messages_page = paginator.paginate_queryset(
+#                         messages_by_date, request
+#                     )
+#                     return paginator.get_paginated_response(messages_page)
+#                 else:
+#                     if messages == None or "message" in messages:
+#                         return Response(
+#                             data="No messages available",
+#                             status=status.HTTP_204_NO_CONTENT,
+#                         )
+#                     result_page = paginator.paginate_queryset(
+#                         messages, request)
+#                     return paginator.get_paginated_response(result_page)
+#             return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+#         return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -477,9 +512,9 @@ def edit_room(request, pk):
 
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="Retrieves the link to a message", 
+    operation_summary="Retrieves the link to a message",
     responses={
-        200: MessageLinkResponse, 
+        200: MessageLinkResponse,
         400: "Error: Bad Request",
         404: "Error: This Message Does Not Exist",
     }
@@ -522,11 +557,12 @@ def read_message_link(request, room_id, message_id):
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
+
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="Retrieves all the links in a room", 
+    operation_summary="Retrieves all the links in a room",
     responses={
-        200: GetLinksResponse, 
+        200: GetLinksResponse,
         404: "Error: Message Not Found",
     }
 )
@@ -703,7 +739,7 @@ def mark_read(request, message_id):
     methods=["put"],
     operation_summary="Pins a message in a room",
     responses={
-        200: PinMessageResponse, 
+        200: PinMessageResponse,
         400: "Error: Bad Request",
         503: "Server Error: Service Unavailable",
     }
@@ -732,26 +768,26 @@ def pinned_message(request, message_id):
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     if message_id in pin:
         pin.remove(message_id)
-        data = {"message_id":message_id,
+        data = {"message_id": message_id,
                 "pinned": pin,
-                "Event":"unpin_message"}
+                "Event": "unpin_message"}
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         if response["status"] == 200:
             centrifugo_data = send_centrifugo_data(
                 room=room_id, data=data
-                )  # publish data to centrifugo
+            )  # publish data to centrifugo
             if centrifugo_data.get("error", None) == None:
                 return Response(
-                data=data, status=status.HTTP_201_CREATED
+                    data=data, status=status.HTTP_201_CREATED
                 )
         else:
             return Response(status=response.status_code)
     else:
         pin.append(message_id)
-        data = {"message_id":message_id,
+        data = {"message_id": message_id,
                 "pinned": pin,
-                "Event":"pin_message"}
+                "Event": "pin_message"}
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         centrifugo_data = send_centrifugo_data(
@@ -761,7 +797,6 @@ def pinned_message(request, message_id):
             return Response(
                 data=data, status=status.HTTP_201_CREATED
             )
-
 
 
 @swagger_auto_schema(
@@ -839,7 +874,7 @@ def user_profile(request, org_id, member_id):
     Else a 405 response returns if a wrong method was used
     Assume member_id is also the same as user_id in an org
     """
-    
+
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
@@ -849,7 +884,6 @@ def user_profile(request, org_id, member_id):
             headers["Authorization"] = request.headers["Authorization"]
         else:
             headers["Cookie"] = request.headers["Cookie"]
-
 
         response = requests.get(url, headers=headers)
     else:
@@ -871,6 +905,7 @@ def user_profile(request, org_id, member_id):
             "first_name": data["first_name"],
             "last_name": data["last_name"],
             "display_name": data["display_name"],
+            "user_name": data["user_name"],
             "image_url": data["image_url"],
             "bio": data["bio"],
             "pronouns": data["pronouns"],
@@ -1222,18 +1257,19 @@ def delete_message(request, message_id):
     This function deletes message in rooms using message id(message_id)
     and organization id (org_id).
     """
+    message_id = request.GET.get("message_id")
     if request.method == "DELETE":
-        message_id = request.GET.get("message_id")
-    try:
-        message = DB.read("dm_messages", {"_id": message_id})
-        if message:
-            response = DB.delete("dm_messages", {"_id": message_id})
-            centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
-            if centrifugo_data and centrifugo_data.status == 200:
-                return Response(response, status=status.HTTP_200_OK)
-            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-    except exception_handler as e:
-        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        try:
+            message = DB.read("dm_messages", {"_id": message_id})
+            if message:
+                response = DB.delete("dm_messages", {"_id": message_id})
+                centrifugo_data = centrifugo_client.publish(
+                    message=message_id, data=response)
+                if centrifugo_data and centrifugo_data.status_code == 200:
+                    return Response(response, status=status.HTTP_200_OK)
+                return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+        except exception_handler as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -1269,13 +1305,36 @@ def delete_bookmark(request, room_id):
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+
+@api_view(["GET"])
+@db_init_with_credentials
+def search_DM(request, user_id):
+    room_id = request.query_params.get('room_id', None)
+    keyword = request.query_params.get('keyword',None)
+    
+    if keyword:
+        rooms = DB.read("dm_rooms") #get all rooms
+        user_rooms = list(filter(lambda room: user_id in room['room_user_ids'], rooms)) #get all rooms with user 
+        if len(user_rooms) != []:
+            if room_id:
+                user_rooms = list(filter(lambda room: room_id == room['_id'], user_rooms)) #check if room_id 
+            if len(user_rooms) != []:
+                pass
+            else:
+                return Response("Room Id not found")
+        return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
+    return Response("keyword cannot be empty",status = status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(["GET"])
 def PING(request):
     url = "https://api.zuri.chat"
     try:
-        response = requests.get(url, headers={ "Content-Type" : "application/json"})
-        server = {"server":True}
+        response = requests.get(
+            url, headers={"Content-Type": "application/json"})
+        server = {"server": True}
         return Response(data=server)
     except:
-        server = {"server":False}
+        server = {"server": False}
         return JsonResponse(data=server)
