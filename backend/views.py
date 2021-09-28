@@ -177,7 +177,7 @@ def message_create_get(request, room_id):
             return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
+
     elif request.method == "POST":
         request.data["room_id"] = room_id
         print(request)
@@ -1312,13 +1312,13 @@ def delete_bookmark(request, room_id):
 def search_DM(request, user_id):
     room_id = request.query_params.get('room_id', None)
     keyword = request.query_params.get('keyword',None)
-    
+
     if keyword:
         rooms = DB.read("dm_rooms") #get all rooms
-        user_rooms = list(filter(lambda room: user_id in room['room_user_ids'], rooms)) #get all rooms with user 
+        user_rooms = list(filter(lambda room: user_id in room['room_user_ids'], rooms)) #get all rooms with user
         if len(user_rooms) != []:
             if room_id:
-                user_rooms = list(filter(lambda room: room_id == room['_id'], user_rooms)) #check if room_id 
+                user_rooms = list(filter(lambda room: room_id == room['_id'], user_rooms)) #check if room_id
             if len(user_rooms) != []:
                 pass
             else:
@@ -1329,12 +1329,16 @@ def search_DM(request, user_id):
 
 @api_view(["GET"])
 def PING(request):
-    url = "https://api.zuri.chat"
+    url = "https://api.zuri.chats"
     try:
-        response = requests.get(
-            url, headers={"Content-Type": "application/json"})
-        server = {"server": True}
+        response = requests.get(url, headers={ "Content-Type" : "application/json"})
+        if response.status_code == 200:
+            server = {"server":True}
+            return Response(data=server)
+    except Exception:
+        print("Either problem occured in the database or the url you entered is wrong")
+        print("Please check url and try again or")
+        print("Please wait for some time and try again")
+    finally:
+        server = {"server":False,}
         return Response(data=server)
-    except:
-        server = {"server": False}
-        return JsonResponse(data=server)
