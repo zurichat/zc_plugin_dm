@@ -1262,8 +1262,9 @@ def delete_message(request, message_id, room_id):
     if request.method == "DELETE":
         try:
             message = DB.read("dm_messages", {"_id": message_id})
+            room = DB.read("dm_rooms", {"_id":room_id})
 
-            if message:
+            if room and message:
                 response = DB.delete("dm_messages", {"_id": message_id})
                 centrifugo_data = centrifugo_client.publish(
                     message=message_id, data=response)
