@@ -108,7 +108,7 @@ urlpatterns = [
         name="message_filter",
     ),
     path(  # might require a room id
-        "api/v1/org/<str:org_id>/room/<str:room_id>/messages/<str:message_id>",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/delete_message/",
         views.delete_message,
         name="delete_message",
     ),
