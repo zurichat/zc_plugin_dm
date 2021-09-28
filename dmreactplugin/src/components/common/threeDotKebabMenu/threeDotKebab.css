@@ -47,7 +47,7 @@
   border-radius: 5px;
   padding-top: 10px;
   position: absolute;
-  top: 110px;
+  top: 80px;
   right: 350px;
   font-family: "lato";
 }
@@ -82,4 +82,15 @@ button {
 }
 .DmPollMessage {
   border-bottom: none !important;
+}
+.Dm-ThreeDotKebab-Menu-FirstPopup {
+  z-index: 1000;
+}
+.Dm-ThreeDotKebab-Menu-SecondPopup {
+  z-index: 1000;
+}
+.Dm-ThreeDotKebab-Menu-FirstPopup {
+  position: absolute;
+  top: 0;
+  left: 70vw;
 }
