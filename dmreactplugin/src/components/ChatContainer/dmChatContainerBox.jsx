@@ -7,7 +7,7 @@ import DmReplyInThread from "../ReplyInThread/replyInThread";
 
 import "./chatContainerBox.css";
 
-const DmChatContainerBox = () => {
+const DmChatContainerBox = ({ user2_id }) => {
   const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
   const [openThread, setOpenThread] = useState(false);
 
@@ -29,7 +29,10 @@ const DmChatContainerBox = () => {
             room_messages?.results?.map((messages) => (
               <div key={messages?.id}>
                 <MessageWrapper handleOpenThread={handleOpenThread}>
-                  <DmSingleMessageContainer messages={messages} />
+                  <DmSingleMessageContainer
+                    messages={messages}
+                    user2_id={user2_id}
+                  />
                 </MessageWrapper>
               </div>
             ))
