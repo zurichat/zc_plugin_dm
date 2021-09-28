@@ -60,7 +60,7 @@ urlpatterns = [
         views.copy_message_link,
         name="copy_message_link",
     ),
-    path(
+    path( #review needed
         "getmessage/<str:room_id>/<str:message_id>",
         views.read_message_link,
         name="read_message_link",
@@ -95,17 +95,17 @@ urlpatterns = [
         views.pinned_message,
         name="pin_message",
     ),
-    path( #???
-        "api/v1/<str:org_id>/messages/<str:message_id>/unpin",
-        views.delete_pinned_message,
-        name="unpin_message",
-    ),
-    path(  # It is getting just one. To be precise, it is getting the message itself
+    # path( #???
+    #     "api/v1/<str:org_id>/messages/<str:message_id>/unpin",
+    #     views.delete_pinned_message,
+    #     name="unpin_message",
+    # ),
+    path(  # review needed
         "api/v1/<str:org_id>/<str:room_id>/<str:message_id>/pinnedmessage/",
         views.read_message_link,
         name="read_pinned_message",
     ),
-    path( #???
+    path( # review needed???
         "api/v1/<str:org_id>/<str:room_id>/filter_messages",
         views.message_filter,
         name="message_filter",
