@@ -1,11 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-const MessageBox = ({ isThread }) => {
-  const Image = styled.img`
-    object-fit: cover;
-    margin-right: 10px;
-  `;
+const Image = styled.img`
+  object-fit: cover;
+  margin-right: 10px;
+`;
 
+const MessageBox = ({ isThread }) => {
   return (
     <div className={`dm-plugin-thread-message-group ${isThread && "isThread"}`}>
       <div className="dm-plugin-thread-message-image-container">
