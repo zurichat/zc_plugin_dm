@@ -1279,3 +1279,44 @@ def PING(request):
     except:
         server = {"server":False}
         return JsonResponse(data=server)
+
+
+class Thread(APIView):
+    """
+    List all messages in thread, or create a new Thread message.
+    """
+
+    @swagger_auto_schema(
+        operation_summary="Retrieves thread messages for a specific message",
+        responses={
+            200: "OK: Success!",
+            400: "Error: Bad Request",
+        },
+    )
+    @method_decorator(db_init_with_credentials)
+    def get(self, request, room_id: str, message_id: str):
+        # fetch message related to that reaction
+        message = DB.read(
+            "dm_messages", {"_id": message_id, "room_id": room_id})
+        if message:
+            print(message)
+            threads = message.get('threads')
+            print(threads)
+            if response:
+                return Response(
+                    data={
+                        "status": message["message"],
+                        "event": "get_message_reactions",
+                        "room_id": message["room_id"],
+                        "message_id": message["_id"],
+                        "data": {
+                            "reactions": message["reactions"],
+                        },
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            return Response(
+                data="Data not retrieved", status=status.HTTP_424_FAILED_DEPENDENCY
+            )
+        return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
+

@@ -6,10 +6,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-
-
-
-
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/ping", views.PING, name="ping"),
