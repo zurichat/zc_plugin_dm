@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import '../assets/css/dmProfileHeader.css';
 import Modal from 'react-modal';
 import {
@@ -11,22 +11,31 @@ import {
 import { FiPhone } from 'react-icons/fi';
 import { BsClock, BsX, BsEnvelope } from 'react-icons/bs';
 
+// import use context
+import { AppContext } from '../App';
+
 const dmProfileHeader = () => {
+    const states = useContext(AppContext);
+    const { actualRoom } = states;
+    console.log(actualRoom);
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    console.log(actualRoom.room_name);
     return (
         <div>
-            <header className='dm-profileHeader'>
+            <header className='dm-profileHeader d-flex align-items-center'>
                 {/* Img to be placed here */}
                 <div
-                    className='dm-profile-header-name-img'
+                    className='dm-profile-header-name-img d-flex align-items-center'
                     onClick={() => setModalIsOpen(true)}
                 >
                     <img
                         className='profileHeader__img'
-                        src='https://picsum.photos/200'
+                        src={`${actualRoom[0].room_image}`}
                         alt='Profile Pic'
                     />
-                    <p className='profileHeader__name'>Sandra Bernard</p>
+                    <p className='profileHeader__name'>
+                        {actualRoom[0].room_name}
+                    </p>
 
                     <FaAngleDown className='profileHeader__icon' />
                 </div>
