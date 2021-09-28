@@ -109,7 +109,7 @@ def side_bar(request):
                         else:
                             room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                         rooms.append(room_profile)
-                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}"
+                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
