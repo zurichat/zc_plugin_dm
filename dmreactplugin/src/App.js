@@ -38,7 +38,7 @@ const App = () => {
     // console.log(roomsReducer)
     const getActualRoom = async () => {
         const res = await fetch(
-            'https://dm.zuri.chat/api/v1/sidebar?org=614679ee1a5607b13c00bcb7&user=6145f987285e4a18402074eb'
+            'https://dm.zuri.chat/api/v1/sidebar?org=614679ee1a5607b13c00bcb7&user=614679ee1a5607b13c00bcb8'
         );
         const data = await res.json();
         const joinedRooms = data.joined_rooms;
