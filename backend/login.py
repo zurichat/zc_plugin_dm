@@ -10,4 +10,7 @@ def login_user():
         response = requests.post(url="https://api.zuri.chat/auth/login", json=data)
     except requests.exceptions.RequestException as e:
         return None
-    return response.json()["data"]["user"]["token"]
+    if response.status_code==200:
+        return response.json()["data"]["user"]["token"]
+    else:
+        return None
