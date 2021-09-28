@@ -19,8 +19,6 @@ from drf_yasg.utils import swagger_auto_schema
 from .utils import SendNotificationThread
 from datetime import datetime
 import datetime as datetimemodule
-
-
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 
@@ -722,23 +720,28 @@ def user_profile(request, org_id, user_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-def remind_message(request):
+def create_reminder(request):
     """
         This is used to remind a user about a  message
         Your body request should have the format
         {
-        "mesage_id": "33",
+        "message_id": "6146ea68845b436ea04d107d",
         "current_date": "Tue, 22 Nov 2011 06:00:00 GMT",
-        "scheduled_date":"Tue, 22 Nov 2011 06:00:00 GMT"
+        "scheduled_date":"Tue, 22 Nov 2011 06:10:00 GMT",
+        "notes": "fff"
     }
     """
     serializer = ReminderSerializer(data=request.data)
     if serializer.is_valid():
         serialized_data = serializer.data
+        print(serialized_data)
         message_id = serialized_data['message_id']
         current_date = serialized_data['current_date']
         scheduled_date = serialized_data['scheduled_date']
-        notes_data = serialized_data['notes']
+        try:
+            notes_data = serialized_data['notes']
+        except:
+            notes_data = ""
         ##calculate duration and send notification
         local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
         utc_scheduled_date = local_scheduled_date.replace(tzinfo=timezone.utc)
@@ -754,11 +757,10 @@ def remind_message(request):
                 room_id = message['room_id']
                 try:
                     room = DB.read("dm_rooms", {"_id": room_id})
-                    
+  
                 except Exception as e:
                     print(e)
                     return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
-
                 users_in_a_room = room.get("room_user_ids",[]).copy()
                 message_content = message['message']
                 sender_id = message['sender_id']
@@ -772,7 +774,7 @@ def remind_message(request):
                     "message":message_content,
                     "scheduled_date": scheduled_date
                 }
-                if notes_data is not None:
+                if len(notes_data) > 0:
                     try:
                         notes = message["notes"] or []
                         notes.append(notes_data)
@@ -784,11 +786,105 @@ def remind_message(request):
                     if response.get("status") == 200:
                         response_output["notes"] = notes
                         return Response(data = response_output,status=status.HTTP_201_CREATED)
-                SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date,).start()
+                SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date).start()
                 return Response(data=response_output, status=status.HTTP_201_CREATED)
             return Response(data="No such message", status=status.HTTP_400_BAD_REQUEST)
         return Response(data="Your current date is ahead of the scheduled time. Are you plannig to go back in time?", status=status.HTTP_400_BAD_REQUEST)
     return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
+
+
+# def reminder(request):
+ 
+#     # posting data to zuri core after validation
+#     plugin_id = PLUGIN_ID
+#     org_id = ORGANIZATION_ID
+#     coll_name = "reminders"
+
+#     reminder = serializer.data
+#     reminder['event_id'] = event_id
+#     reminder['user_id'] = user_id
+
+#     reminder_payload = {
+#         "plugin_id": plugin_id,
+#         "organization_id": org_id,
+#         "collection_name": coll_name,
+#         "bulk_write": False,
+#         "object_id": "",
+#         "filter": {},
+#         "payload": reminder
+#     }
+#     url = 'https://api.zuri.chat/data/write'
+
+#     try:
+#         response = requests.post(url=url, json=reminder_payload)
+
+#         if response.status_code == 201:
+#             return Response(reminder, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response({"error": response.json()['message']}, status=response.status_code)
+
+#     except exceptions.ConnectionError as e:
+#         return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+
+@api_view(['GET'])
+# @permission_classes((UserIsAuthenticated, ))
+def reminder_list(request):
+    """
+        This gets a list of reminders set by the user 
+        { 
+            "user_id":" "
+        }
+    """
+    if request.method == "GET":
+        # getting data from zuri core
+        DB.read("dm_messages",)
+
+        try:
+            response = requests.get(url=url)
+            if response.status_code == 200:
+                reminders_list = response.json()['data']
+                return Response(reminders_list, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": response.json()["message"]}, status=response.status_code)
+        except exceptions.ConnectionError as e:
+            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(['DELETE'])
+# @permission_classes((UserIsAuthenticated, ))
+def delete_reminder(request, id):
+    DB.delete(collection_name, document_id)
+
+    plugin_id = PLUGIN_ID
+    org_id = ORGANIZATION_ID
+    coll_name = "reminders"
+    if request.method == 'DELETE':
+        url = 'https://api.zuri.chat/data/delete'
+
+        payload = {
+            "plugin_id": plugin_id,
+            "organization_id": org_id,
+            "collection_name": coll_name,
+            "bulk_delete": False,
+            "object_id": id,
+            "filter": {}
+        }
+    try:
+        response = requests.post(url=url, json=payload)
+
+        if response.status_code == 200:
+            return Response({"message": "reminder successfully deleted"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": response.json()['message']}, status=response.status_code)
+
+    except exceptions.ConnectionError as e:
+        return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
 
 class Files(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -799,7 +895,6 @@ class Files(APIView):
             filename = default_storage.save(file.name, file)
             file_url = default_storage.url(filename)
             return Response({"file_url": file_url})
-
 
 class SendFile(APIView):
     parser_classes = (MultiPartParser, FormParser)

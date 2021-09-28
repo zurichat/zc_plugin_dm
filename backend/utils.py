@@ -16,6 +16,7 @@ class SendNotificationThread(Thread):
 
     def run(self):
         while True:
+            print(self.utc_scheduled_date)
             time.sleep(self.duration_sec)
             current_date = self.utc_current_date + self.duration
             #notification sent to user
