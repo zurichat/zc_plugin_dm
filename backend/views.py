@@ -1186,10 +1186,6 @@ def delete_message(request, message_id):
         return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
 @api_view(["DELETE"])
 @db_init_with_credentials
 def delete_bookmark(request, room_id):
@@ -1213,3 +1209,23 @@ def delete_bookmark(request, room_id):
         if response.get("status") == 200:
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@db_init_with_credentials
+def search_DM(request, user_id):
+    room_id = request.query_params.get('room_id', None)
+    keyword = request.query_params.get('keyword',None)
+    
+    if keyword:
+        rooms = DB.read("dm_rooms") #get all rooms
+        user_rooms = list(filter(lambda room: user_id in room['room_user_ids'], rooms)) #get all rooms with user 
+        if len(user_rooms) != []:
+            if room_id:
+                user_rooms = list(filter(lambda room: room_id == room['_id'], user_rooms)) #check if room_id 
+            if len(user_rooms) != []:
+                pass
+            else:
+                return Response("Room Id not found")
+        return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
+    return Response("keyword cannot be empty",status = status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,7 @@
 import requests
 from typing import Any, Dict, Optional
 from requests.exceptions import RequestException
+from db import DB
 
 # CENTRIFUGO settings
 CENTRIFUGO_HOST = "https://realtime.zuri.chat/api"
@@ -90,3 +91,5 @@ class CentrifugoHandler:
 # An instance of CentrifugoHandler
 # This will be used when importing the class
 centrifugo_client = CentrifugoHandler()
+# print(DB.read("dm_rooms",{"_id":"61507e39dfe7da5d9f90af09", 'sender_id': ['6148bd77e4b2aebf8ec8cc70']}))
+# print(DB.read("dm_messages")[-1])

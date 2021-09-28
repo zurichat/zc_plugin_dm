@@ -10,6 +10,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
+    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages", views.search_DM, name="search DM"),
     path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages", views.send_message, name="send_message"),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
