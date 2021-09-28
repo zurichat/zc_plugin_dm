@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-
-
-=======
 import React, { useEffect, useState } from 'react';
 import {
     BrowserRouter as Router,
@@ -15,7 +6,6 @@ import {
     useLocation,
 } from 'react-router-dom';
 export const AppContext = React.createContext();
->>>>>>> 9a48c65447a65a76450fc54ca2d52be9b216c99e
 // Import all Global CSS components
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../src/assets/css/global.module.css';
@@ -25,53 +15,7 @@ import ChatHome from './pages/newChatRoom';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleGetRooms } from './Redux/Actions/dmActions';
 
-import dmSingleMessageContainer from './components/dmSingleMessageContainer';
 const App = () => {
-<<<<<<< HEAD
-
-    return (
-        <Router basename='/dm'>
-            <Switch>
-                <Route exact path='/' component={ChatHome} />
-
-                <Route exact path='/message' component={dmSingleMessageContainer} />
-            </Switch>
-        </Router>
-    );
-
-  return (
-    <Router basename="/dm">
-      <Switch>
-        <Route exact path="/" component={ChatHome} />
-      </Switch>
-      <Switch>
-        <Route exact path="/removeMessage">
-          <RemovePinnedMessage />
-        </Route>
-      </Switch>
-      <Switch>
-        <Route exact path="/viewPinned">
-          <PinnedMessage amount={3} />
-        </Route>
-      </Switch>
-      <Switch>
-        <Route exact path="/hoverPinnedMessage">
-          <HoverPinnedMessage />
-        </Route>
-      </Switch>
-      <Switch>
-        <Route exact path="/addBookmark">
-          <AddBookmark />
-        </Route>
-      </Switch>
-      <Switch>
-        <Route exact path="/textField">
-          <AddBookmarkLink />
-        </Route>
-      </Switch>
-    </Router>
-  );
-=======
     const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
     const dispatch = useDispatch();
     const [actualRoom, setActualRoom] = useState([]);
@@ -123,7 +67,6 @@ const App = () => {
             </Router>
         </AppContext.Provider>
     );
->>>>>>> 9a48c65447a65a76450fc54ca2d52be9b216c99e
 };
 
 export default App;
