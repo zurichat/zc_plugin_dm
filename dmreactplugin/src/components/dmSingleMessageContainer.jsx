@@ -18,7 +18,6 @@ function DmSingleMessageContainer() {
             />
           </div>
           <div className="dm-plugin-thread-message-body">
-            {}
             <p className="dm-plugin-thread-message-header">
               <span className="dm-plugin-thread-message-name">John Doe</span>
               <span className="dm-plugin-thread-message-time">10:00AM</span>

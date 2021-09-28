@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import "../assets/css/dmInitMessagebox.css";
+import { BsChatDots } from 'react-icons/bs';
 
 const DmInitMessageBox = () => {
   const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
@@ -21,5 +22,4 @@ const DmInitMessageBox = () => {
     </>
   );
 };
-
 export default DmInitMessageBox;

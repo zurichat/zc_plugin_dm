@@ -1,18 +1,21 @@
 .dm-bookmark-head {
-    background-color: var(--bg-color-footer);
+  background-color: var(--bg-color-footer);
 }
 
 .dm-bookmark-head .add-bookmark .btn.btn-add-bookmark {
-    display: flex;
-    align-items: center;
-    background-color: var(--color-btn-bookmark);
-    border-radius: 4px;
-    padding: 4px 10px;
-    outline: none;
-    user-select: none;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-btn-bookmark);
+  border-radius: 4px;
+  padding: 4px 10px;
+  outline: none;
+  user-select: none;
 }
 
 .btn.btn-add-bookmark p {
-    font-size: 13px;
-    padding-left: 6px;
+  font-size: 13px;
+  padding-left: 6px;
+}
+.dropDown-zindex {
+  z-index: 10;
 }
