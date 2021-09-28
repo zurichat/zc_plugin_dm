@@ -109,7 +109,7 @@ def side_bar(request):
                         else:
                             room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                         rooms.append(room_profile)
-                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}"
+                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
@@ -135,7 +135,7 @@ def side_bar(request):
         400: "Error: Bad Request"
     }
 )
-@api_view(["GET","POST"])
+@api_view(["GET", "POST"])
 @db_init_with_credentials
 def message_create_get(request, room_id):
     """
@@ -176,6 +176,8 @@ def message_create_get(request, room_id):
                     return paginator.get_paginated_response(result_page)
             return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
     elif request.method == "POST":
@@ -1253,22 +1255,25 @@ def scheduled_messages(request):
 )
 @api_view(["DELETE"])
 @db_init_with_credentials
-def delete_message(request, message_id):
+def delete_message(request, message_id, room_id):
     """
-    This function deletes message in rooms using message id(message_id)
-    and organization id (org_id).
+    This function deletes message in rooms using message 
+    organization id (org_id), room id (room_id) and the message id (message_id).
     """
     message_id = request.GET.get("message_id")
+    room_id = request.GET.get("room_id")
     if request.method == "DELETE":
         try:
             message = DB.read("dm_messages", {"_id": message_id})
-            if message:
+            room = DB.read("dm_rooms", {"_id":room_id})
+
+            if room and message:
                 response = DB.delete("dm_messages", {"_id": message_id})
                 centrifugo_data = centrifugo_client.publish(
                     message=message_id, data=response)
                 if centrifugo_data and centrifugo_data.status_code == 200:
                     return Response(response, status=status.HTTP_200_OK)
-                return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
         except exception_handler as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -1307,11 +1312,24 @@ def delete_bookmark(request, room_id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, user_id):
     room_id = request.query_params.get('room_id', None)
+
+    keyword = request.query_params.get('keyword', None)
+
+    if keyword:
+        rooms = DB.read("dm_rooms")  # get all rooms
+        # get all rooms with user
+        user_rooms = list(
+            filter(lambda room: user_id in room['room_user_ids'], rooms))
+        if len(user_rooms) != []:
+            if room_id:
+                # check if room_id
+                user_rooms = list(
+                    filter(lambda room: room_id == room['_id'], user_rooms))
+
     keyword = request.query_params.get('keyword',None)
 
     if keyword:
@@ -1320,12 +1338,13 @@ def search_DM(request, user_id):
         if len(user_rooms) != []:
             if room_id:
                 user_rooms = list(filter(lambda room: room_id == room['_id'], user_rooms)) #check if room_id
+
             if len(user_rooms) != []:
                 pass
             else:
                 return Response("Room Id not found")
         return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
-    return Response("keyword cannot be empty",status = status.HTTP_400_BAD_REQUEST)
+    return Response("keyword cannot be empty", status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
