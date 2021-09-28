@@ -1253,12 +1253,12 @@ def scheduled_messages(request):
 @db_init_with_credentials
 def delete_message(request, message_id, room_id):
     """
-    This function deletes message in rooms using message id(message_id)
-    and organization id (org_id).
+    This function deletes message in rooms using message 
+    organization id (org_id), room id (room_id) and the message id (message_id).
     """
     message_id = request.GET.get("message_id")
     room_id = request.GET.get("room_id")
-    room_id=room_id
+    room_id = room_id
     if request.method == "DELETE":
         try:
             message = DB.read("dm_messages", {"_id": message_id})
