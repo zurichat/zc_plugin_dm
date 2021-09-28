@@ -6,7 +6,7 @@ from .login import login_user
 
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
-ORG_ID = "6145eee9285e4a18402074cd"
+ORG_ID = "614679ee1a5607b13c00bcb7"
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
 ROOMS = "dm_rooms"
 MESSAGES = "dm_messages"
@@ -179,23 +179,8 @@ def send_centrifugo_data(room, data):
 DB = DataStorage()
 
 
-def get_user_rooms(collection_name, org_id, user):
-    room_list = list()
-    rooms = DB.read(collection_name, {"org_id": org_id})
-    if rooms == None or "status_code" in rooms:
-        return rooms
-    else:
-        for room in rooms:
-            if "room_user_ids" in room:
-                if user in room.get("room_user_ids"):
-                    room_list.append(room)
-                else:
-                    return room_list
-        return room_list
-
-
 # get rooms for a particular user
-def get_rooms(user_id):
+def get_rooms(user_id, org_id):
     """Get the rooms a user is in
 
     Args:
@@ -204,7 +189,10 @@ def get_rooms(user_id):
     Returns:
         [List]: [description]
     """    
-    response = DB.read("dm_rooms")
+
+    helper = DataStorage()
+    helper.organization_id = org_id
+    response = helper.read("dm_rooms")
     data =  []
     if response != None:
         if "status_code" in response:
@@ -225,8 +213,10 @@ def get_rooms(user_id):
 
 
 # get all the messages in a particular room
-def get_room_messages(room_id):
-    response = DB.read("dm_messages", {'room_id': room_id})
+def get_room_messages(room_id, org_id):
+    helper = DataStorage()
+    helper.organization_id = org_id
+    response = helper.read("dm_messages", {'room_id': room_id})
     if response != None:
         if "status_code" in response:
             return response

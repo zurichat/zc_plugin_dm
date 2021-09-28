@@ -1,17 +1,21 @@
-import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState, useEffect } from "react";
 
-const AddBookmarkModal = ({ close, children }) => {
-  const [show, setShow] = useState(true);
-  if (close) {
-  } else {
-    setShow(close);
-  }
+const AddBookmarkModal = ({ close, children, onClose }) => {
+  const [show, setShow] = useState(close);
+  useEffect(() => {
+    if (!close && show) {
+      setShow(close);
+      onClose();
+    } else {
+      setShow(close);
+    }
+  }, [close, show]);
+
   return (
     <div
       role="presentation"
       onClick={() => {
-        setShow(false);
+        onClose();
       }}
       className={`${
         show ? "d-flex" : "d-none"
