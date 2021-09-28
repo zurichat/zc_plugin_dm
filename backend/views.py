@@ -9,10 +9,11 @@ from django.views import generic
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
-import requests, time
+import requests
+import time
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.views import APIView
+from rest_framework.views import APIView, exception_handler
 from django.core.files.storage import default_storage
 
 # Import Read Write function to Zuri Core
@@ -53,7 +54,7 @@ def info(request):
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
             "homepage_url": "https://dm.zuri.chat/",
-            "create_room_url":"https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
+            "create_room_url": "https://dm.zuri.chat/api/v1/<str:org_id>/createroom"
         },
         "success": "true",
     }
@@ -92,16 +93,21 @@ def side_bar(request):
     user = request.GET.get("user", None)
     user_rooms = get_rooms(user_id=user, org_id=org_id)
     rooms = []
-    
+
+    if user_rooms == None:
+        return user_rooms
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
-                room_profile={}
+                room_profile = {}
                 for user_id in room["room_user_ids"]:
-                    profile = get_user_profile(org_id,user_id)
-                    if profile["status"]==200:
+                    profile = get_user_profile(org_id, user_id)
+                    if profile["status"] == 200:
                         room_profile["room_name"] = profile["data"]["user_name"]
-                        room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        if profile["data"]["image_url"] == "":
+                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        else:
+                            room_profile["room_image"] = profile["data"]["image_url"]
                         rooms.append(room_profile)
                 room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}"
     side_bar = {
@@ -123,6 +129,7 @@ def side_bar(request):
 @swagger_auto_schema(
     methods=["post"],
     request_body=MessageSerializer,
+    operation_summary="Sends messages to users in a room",
     responses={
         201: MessageResponse,
         400: "Error: Bad Request"
@@ -182,6 +189,7 @@ def send_message(request, room_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=ThreadSerializer,
+    operation_summary="Sends a message as a thread in rooms",
     responses={
         201: ThreadResponse,
         400: "Error: Bad Request"
@@ -253,6 +261,7 @@ def send_thread_message(request, room_id, message_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=RoomSerializer,
+    operation_summary="Creates a new room between users",
     responses={
         201: CreateRoomResponse,
         400: "Error: Bad Request"
@@ -295,8 +304,13 @@ def create_room(request):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all rooms linked to a user id",
     query_serializer=UserRoomsSerializer,
-    responses={400: "Error: Bad Request"},
+    responses={
+        200: "OK: Success",
+        204: "No Rooms Available",
+        400: "Error: Bad Request",
+    },
 )
 @api_view(["GET"])
 @db_init_with_credentials
@@ -317,10 +331,13 @@ def user_rooms(request, user_id):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all messages in a particular room",
     query_serializer=GetMessageSerializer,
     responses={
-        201: MessageResponse,
-        400: "Error: Bad Request"
+        200: MessageResponse,
+        204: "No Messages Available",
+        400: "Error: Bad Request",
+        404: "Error: Room Not Found",
     }
 )
 @api_view(["GET"])
@@ -361,33 +378,34 @@ def room_messages(request, room_id):
                     result_page = paginator.paginate_queryset(
                         messages, request)
                     return paginator.get_paginated_response(result_page)
-            return Response(data="No such room", status=status.HTTP_400_BAD_REQUEST)
+            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all the information about a room",
     query_serializer=RoomInfoSerializer,
     responses={
-        201: RoomInfoResponse,
-        400: "Error: Bad Request"
+        200: RoomInfoResponse,
+        400: "Error: Bad Request",
+        404: "Error: Room Not Found",
     }
 )
 @api_view(["GET"])
 @db_init_with_credentials
-def room_info(request):
+def room_info(request, room_id):
     """
     Retrieves information about a room.
     It takes the room id as a query param and searches the dm_rooms collection
     If the room exists, a json response of the room details is returned
     Else a 404 response is returned with a "No such room" message
     """
-    room_id = request.GET.get("room_id", None)
+    #room_id = request.GET.get("room_id", None)
     # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
-    print(rooms)
     if rooms is not None:
         for current_room in rooms:
             if current_room["_id"] == room_id:
@@ -458,10 +476,12 @@ def edit_room(request, pk):
 
 
 @swagger_auto_schema(
-    methods=["get"], 
+    methods=["get"],
+    operation_summary="Retrieves the link to a message", 
     responses={
-        201: MessageLinkResponse, 
-        400: "Error: Bad Request"
+        200: MessageLinkResponse, 
+        400: "Error: Bad Request",
+        404: "Error: This Message Does Not Exist",
     }
 )
 @api_view(["GET"])
@@ -483,9 +503,7 @@ def copy_message_link(request, message_id):
         }
         return Response(data=message_info, status=status.HTTP_200_OK)
     else:
-        return JsonResponse(
-            {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response(data="The message does not exist", status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])
@@ -504,7 +522,14 @@ def read_message_link(request, room_id, message_id):
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="Retrieves all the links in a room", 
+    responses={
+        200: GetLinksResponse, 
+        404: "Error: Message Not Found",
+    }
+)
 @api_view(["GET"])
 @db_init_with_credentials
 def get_links(request, room_id):
@@ -534,6 +559,7 @@ def get_links(request, room_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=BookmarkSerializer,
+    operation_summary="Saves links as bookmarks in a room",
     responses={400: "Error: Bad Request"}
 )
 @api_view(["POST"])
@@ -562,6 +588,7 @@ def save_bookmark(request, room_id):
 
 @swagger_auto_schema(
     methods=["post"],
+    operation_summary="Retrieves all the members in an organization",
     request_body=CookieSerializer,
     responses={400: "Error: Bad Request"},
 )
@@ -579,7 +606,7 @@ def organization_members(request):
     manually to grant access, PS: please note cookies expire after a set time of inactivity.
     """
     ORG_ID = DB.organization_id
-    
+
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
 
     if request.method == "GET":
@@ -611,6 +638,7 @@ def organization_members(request):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all bookmarks in a room",
     responses={
         200: BookmarkResponse,
         400: "Error: Bad Request"
@@ -639,6 +667,15 @@ def retrieve_bookmarks(request, room_id):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+@swagger_auto_schema(
+    methods=["put"],
+    operation_summary="Marks a message as read or unread",
+    responses={
+        200: "Ok: Success",
+        400: "Error: Bad Request",
+        503: "Server Error: Service Unavailable"
+    }
+)
 @api_view(["PUT"])
 @db_init_with_credentials
 def mark_read(request, message_id):
@@ -664,9 +701,11 @@ def mark_read(request, message_id):
 
 @swagger_auto_schema(
     methods=["put"],
+    operation_summary="Pins a message in a room",
     responses={
         200: PinMessageResponse, 
-        400: "Error: Bad Request"
+        400: "Error: Bad Request",
+        503: "Server Error: Service Unavailable",
     }
 )
 @api_view(["PUT"])
@@ -678,75 +717,60 @@ def pinned_message(request, message_id):
     reads through the database, gets the room id,
     generates a link and then add it to the pinned key value.
 
-    If the link already exist, it would greet you with a nice response from the developer that wrote it.
+    If the link already exist, it will unpin that particular message already pinned.
     """
     try:
         message = DB.read("dm_messages", {"id": message_id})
-        print("message", message)
-        room_id = message["room_id"]
-        print("room id", room_id)
-        room = DB.read("dm_rooms", {"id": room_id})
-        print("room", room)
-        pin = room["pinned"] or []
-        print("pin", pin)
-        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
+        if message:
+            room_id = message["room_id"]
+            room = DB.read("dm_rooms", {"id": room_id})
+            pin = room["pinned"] or []
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if link not in pin:
-        pin.append(link)
-        data = {"pinned": pin}
-        response = DB.update("dm_rooms", room_id, data)
-        room = DB.read("dm_rooms", {"id": room_id})
-        if response.get("status") == 200:
-            return Response(data=room, status=status.HTTP_200_OK)
-    return Response(
-        data="Already exist! why do you want to break my code?",
-        status=status.HTTP_409_CONFLICT,
-    )
+    if message_id in pin:
+        pin.remove(message_id)
+        data = {"message_id":message_id,
+                "pinned": pin,
+                "Event":"unpin_message"}
+        response = DB.update("dm_rooms", room_id, {"pinned": pin})
+        # room = DB.read("dm_rooms", {"id": room_id})
+        if response["status"] == 200:
+            centrifugo_data = send_centrifugo_data(
+                room=room_id, data=data
+                )  # publish data to centrifugo
+            if centrifugo_data.get("error", None) == None:
+                return Response(
+                data=data, status=status.HTTP_201_CREATED
+                )
+        else:
+            return Response(status=response.status_code)
+    else:
+        pin.append(message_id)
+        data = {"message_id":message_id,
+                "pinned": pin,
+                "Event":"pin_message"}
+        response = DB.update("dm_rooms", room_id, {"pinned": pin})
+        # room = DB.read("dm_rooms", {"id": room_id})
+        centrifugo_data = send_centrifugo_data(
+            room=room_id, data=data
+        )  # publish data to centrifugo
+        if centrifugo_data.get("error", None) == None:
+            return Response(
+                data=data, status=status.HTTP_201_CREATED
+            )
 
-
-@swagger_auto_schema(
-    methods=["delete"],
-    responses={
-        200: UnpinMessageResponse, 
-        400: "Error: Bad Request"
-    }
-)
-@api_view(["DELETE"])
-@db_init_with_credentials
-def delete_pinned_message(request, message_id):
-    """
-    This is used to delete a pinned message.
-    It takes in the message id, gets the room id, generates a link and then check
-    if that link exists. If it exists, it deletes it
-    if not it returns a 400 status response
-    """
-    try:
-        message = DB.read("dm_messages", {"id": message_id})
-        room_id = message["room_id"]
-        room = DB.read("dm_rooms", {"id": room_id})
-        pin = room["pinned"] or []
-        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
-    except Exception as e:
-        print(e)
-        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if link in pin:
-        print("YES")
-        pin.remove(link)
-        data = {"pinned": pin}
-        response = DB.update("dm_rooms", room_id, data)
-        room = DB.read("dm_rooms", {"id": room_id})
-        if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retreives messages in a room using a filter",
     responses={
-        200: FilterMessageResponse, 
-        400: "Error: No such room or invalid Room"
+        200: FilterMessageResponse,
+        204: "Ok: No messages available",
+        400: "Error: No such room or invalid Room",
     }
 )
 @api_view(["GET"])
@@ -799,9 +823,11 @@ def message_filter(request, room_id):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves the profile details of a user",
     responses={
-        201: UserProfileResponse,
-        400: "Error: Bad Request"
+        200: UserProfileResponse,
+        401: "Error: Unauthorized Access",
+        405: "Error: Method Not Allowed",
     }
 )
 @api_view(["GET"])
@@ -811,19 +837,23 @@ def user_profile(request, org_id, member_id):
     If request is successful, a json output of select user details is returned
     Elif login session is expired or wrong details were entered, a 401 response is returned
     Else a 405 response returns if a wrong method was used
+    Assume member_id is also the same as user_id in an org
     """
+    
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
         headers = {}
-
+        print(request.headers)
         if "Authorization" in request.headers:
             headers["Authorization"] = request.headers["Authorization"]
         else:
             headers["Cookie"] = request.headers["Cookie"]
 
-        response = requests.get(url, headers=headers)
 
+        response = requests.get(url, headers=headers)
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
     # elif request.method == "POST":
     #     cookie_serializer = CookieSerializer(data=request.data)
 
@@ -841,6 +871,7 @@ def user_profile(request, org_id, member_id):
             "first_name": data["first_name"],
             "last_name": data["last_name"],
             "display_name": data["display_name"],
+            "image_url": data["image_url"],
             "bio": data["bio"],
             "pronouns": data["pronouns"],
             "email": data["email"],
@@ -853,6 +884,7 @@ def user_profile(request, org_id, member_id):
 
 @swagger_auto_schema(
     methods=["post"],
+    operation_summary="Creates message reminders in rooms",
     request_body=ReminderSerializer,
     responses={400: "Error: Bad Request"}
 )
@@ -934,8 +966,8 @@ def remind_message(request):
 
 class SendFile(APIView):
     """
-    This endpoint is a send message endpoint that can take files, upload them 
-    and return the urls to the uploaded files to the media list in the message 
+    This endpoint is a send message endpoint that can take files, upload them
+    and return the urls to the uploaded files to the media list in the message
     serializer
     This endpoint uses form data
     The file must be passed in with the key "file"
@@ -944,6 +976,12 @@ class SendFile(APIView):
 
     parser_classes = (MultiPartParser, FormParser)
 
+    @swagger_auto_schema(
+        operation_summary="Sends files as messages in rooms",
+        responses={
+            201: "OK: File Created!",
+        },
+    )
     # @method_decorator(db_init_with_credentials)
     def post(self, request, room_id, org_id):
         print(request.FILES)
@@ -1028,7 +1066,11 @@ class Emoji(APIView):
     """
 
     @swagger_auto_schema(
-        responses={400: "Error: Bad Request"},
+        operation_summary="Retrieves reactions to messages",
+        responses={
+            200: "OK: Success!",
+            400: "Error: Bad Request",
+        },
     )
     @method_decorator(db_init_with_credentials)
     def get(self, request, room_id: str, message_id: str):
@@ -1057,7 +1099,10 @@ class Emoji(APIView):
 
     @swagger_auto_schema(
         request_body=EmojiSerializer,
-        responses={400: "Error: Bad Request"},
+        operation_summary="Creates and keeps tracks of reactions to messages",
+        responses={
+            201: "OK: Success!",
+            400: "Error: Bad Request"},
     )
     @method_decorator(db_init_with_credentials)
     def post(self, request, room_id: str, message_id: str):
@@ -1116,30 +1161,34 @@ class Emoji(APIView):
         )
 
 
-# @swagger_auto_schema(
-    # methods=["post"],
-    # request_body=ScheduleMessageSerializer,
-    # responses={400: "Error: Bad Request"},
-# )
+@swagger_auto_schema(
+    methods=["post"],
+    operation_summary="Schedules messages in rooms",
+    request_body=ScheduleMessageSerializer,
+    responses={
+        201: "Success: Message Scheduled",
+        400: "Error: Bad Request",
+    },
+)
 @api_view(["POST"])
 @db_init_with_credentials
 def scheduled_messages(request):
     ORG_ID = DB.organization_id
-    
+
     schedule_serializer = ScheduleMessageSerializer(data=request.data)
     if schedule_serializer.is_valid():
         data = schedule_serializer.data
-        
+
         sender_id = data["sender_id"]
         room_id = data["room_id"]
         message = data["message"]
         timer = data["timer"]
-        
+
         now = datetime.now()
         timer = datetime.strptime(timer, '%Y-%m-%d %H:%M:%S')
         duration = timer - now
         duration = duration.total_seconds()
-        
+
         url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/rooms/{room_id}/messages"
         payload = json.dumps({
             "sender_id": f"{sender_id}",
@@ -1154,7 +1203,6 @@ def scheduled_messages(request):
     else:
         return Response(schedule_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     if response.status_code == 201:
         return Response(response.json(), status=status.HTTP_201_CREATED)
     return Response(response.json(), status=response.status_code)
@@ -1163,6 +1211,7 @@ def scheduled_messages(request):
 # swagger documentation and function to delete message in rooms
 @swagger_auto_schema(
     methods=["delete"],
+    operation_summary="Deletes messages from rooms",
     request_body=DeleteMessageSerializer,
     responses={400: "Error: Bad Request"},
 )
@@ -1170,25 +1219,32 @@ def scheduled_messages(request):
 @db_init_with_credentials
 def delete_message(request, message_id):
     """
-    This function deletes message in rooms using message id (message_id)
+    This function deletes message in rooms using message id(message_id)
+    and organization id (org_id).
     """
     if request.method == "DELETE":
         message_id = request.GET.get("message_id")
     try:
         message = DB.read("dm_messages", {"_id": message_id})
         if message:
-            response = DB.delete("dm_mesages", {"_id": message_id})
-            return Response(response, status=status.HTTP_200_OK)
-        else:
+            response = DB.delete("dm_messages", {"_id": message_id})
+            centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
+            if centrifugo_data and centrifugo_data.status == 200:
+                return Response(response, status=status.HTTP_200_OK)
             return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
+    except exception_handler as e:
         return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-
-
+@swagger_auto_schema(
+    methods=["delete"],
+    operation_summary="Deletes bookmarks from rooms",
+    responses={
+        200: "OK: Success",
+        400: "Error: Bad Request",
+        503: "Server Error: Service Unavailable",
+    }
+)
 @api_view(["DELETE"])
 @db_init_with_credentials
 def delete_bookmark(request, room_id):
@@ -1201,7 +1257,7 @@ def delete_bookmark(request, room_id):
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if  bookmarks is not None:
+    if bookmarks is not None:
         name = request.query_params.get("name", "")
         for bookmark in bookmarks:
             if name == bookmark.get("name", ""):
@@ -1212,3 +1268,14 @@ def delete_bookmark(request, room_id):
         if response.get("status") == 200:
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def PING(request):
+    url = "https://api.zuri.chat"
+    try:
+        response = requests.get(url, headers={ "Content-Type" : "application/json"})
+        server = {"server":True}
+        return Response(data=server)
+    except:
+        server = {"server":False}
+        return JsonResponse(data=server)
