@@ -2,7 +2,7 @@ import re
 from urllib.parse import urlencode
 from django.http import response
 import requests, json
-# from .login import login_user
+from .login import login_user
 
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
@@ -10,9 +10,9 @@ ORG_ID = "614679ee1a5607b13c00bcb7"
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
 ROOMS = "dm_rooms"
 MESSAGES = "dm_messages"
-# header={
-#     'Authorization': f'Bearer {login_user()}'
-# }
+header={
+    'Authorization': f'Bearer {login_user()}'
+}
 class DataStorage:
     def __init__(self, request=None):
         self.read_api = (
