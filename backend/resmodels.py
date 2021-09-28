@@ -63,14 +63,19 @@ class UnpinMessageResponse(serializers.Serializer):
     pinned = serializers.ListField(read_only=True)
 
 class FilterMessageResponse(serializers.Serializer):
-    message_id = serializers.CharField(read_only=True),
-    created_at = serializers.DateTimeField(),
-    media = serializers.ListField(read_only=True),
-    message = serializers.CharField(read_only=True),
-    pinned = serializers.BooleanField(),
-    reactions = serializers.ListField(read_only=True),
-    read = serializers.BooleanField(),
-    room_id = serializers.CharField(read_only=True),
-    saved_by = serializers.ListField(read_only=True),
-    sender_id = serializers.CharField(read_only=True),
+    message_id = serializers.CharField(read_only=True)
+    created_at = serializers.DateTimeField()
+    media = serializers.ListField(read_only=True)
+    message = serializers.CharField(read_only=True)
+    pinned = serializers.BooleanField()
+    reactions = serializers.ListField(read_only=True)
+    read = serializers.BooleanField()
+    room_id = serializers.CharField(read_only=True)
+    saved_by = serializers.ListField(read_only=True)
+    sender_id = serializers.CharField(read_only=True)
     threads = serializers.ListField(read_only=True)
+
+class GetLinksResponse(serializers.Serializer):
+    links = serializers.ReadOnlyField()
+    timestamp = serializers.ReadOnlyField()
+    room_id = serializers.ReadOnlyField()
