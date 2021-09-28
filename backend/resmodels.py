@@ -74,3 +74,8 @@ class FilterMessageResponse(serializers.Serializer):
     saved_by = serializers.ListField(read_only=True)
     sender_id = serializers.CharField(read_only=True)
     threads = serializers.ListField(read_only=True)
+
+class GetLinksResponse(serializers.Serializer):
+    links = serializers.ReadOnlyField()
+    timestamp = serializers.ReadOnlyField()
+    room_id = serializers.ReadOnlyField()
