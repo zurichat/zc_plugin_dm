@@ -8,9 +8,16 @@ import {
   handleGetRoomInfo,
   handleGetRoomMessages,
 } from "../Redux/Actions/dmActions";
+import { useSelector } from "react-redux";
 
 // Chat Home Page
 const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
+  const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
+
+  const user2_id =
+    roomsReducer?.room_info?.room_user_ids !== undefined &&
+    roomsReducer?.room_info?.room_user_ids[1];
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -21,11 +28,11 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
   return (
     <div className="dm-newchat-room position-relative w-100 d-flex flex-column">
       <div className="dm-chatroom-header">
-        <DmProfileHeader />
+        <DmProfileHeader user2_id={user2_id} />
         <BookmarkHeader />
       </div>
       <div className="dm-message-in-out-box w-100 position-relative row align-items-end">
-        <DmChatContainerBox />
+        <DmChatContainerBox user2_id={user2_id} />
       </div>
       <div className="dm-footer-input-field w-100 position-relative">
         <InputBoxField />

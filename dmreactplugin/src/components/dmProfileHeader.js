@@ -11,8 +11,9 @@ import {
 import { FiPhone } from "react-icons/fi";
 import { BsClock, BsX, BsEnvelope } from "react-icons/bs";
 
-const dmProfileHeader = () => {
+const dmProfileHeader = ({ user2_id }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
   return (
     <div>
       <header className="profileHeader" onClick={() => setModalIsOpen(true)}>
