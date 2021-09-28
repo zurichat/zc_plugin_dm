@@ -377,18 +377,17 @@ def room_messages(request, room_id):
 )
 @api_view(["GET"])
 @db_init_with_credentials
-def room_info(request):
+def room_info(request, room_id):
     """
     Retrieves information about a room.
     It takes the room id as a query param and searches the dm_rooms collection
     If the room exists, a json response of the room details is returned
     Else a 404 response is returned with a "No such room" message
     """
-    room_id = request.GET.get("room_id", None)
+    #room_id = request.GET.get("room_id", None)
     # org_id = request.GET.get("org_id", None)
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
-    print(rooms)
     if rooms is not None:
         for current_room in rooms:
             if current_room["_id"] == room_id:
@@ -679,68 +678,51 @@ def pinned_message(request, message_id):
     reads through the database, gets the room id,
     generates a link and then add it to the pinned key value.
 
-    If the link already exist, it would greet you with a nice response from the developer that wrote it.
+    If the link already exist, it will unpin that particular message already pinned.
     """
     try:
         message = DB.read("dm_messages", {"id": message_id})
-        print("message", message)
-        room_id = message["room_id"]
-        print("room id", room_id)
-        room = DB.read("dm_rooms", {"id": room_id})
-        print("room", room)
-        pin = room["pinned"] or []
-        print("pin", pin)
-        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
+        if message:
+            room_id = message["room_id"]
+            room = DB.read("dm_rooms", {"id": room_id})
+            pin = room["pinned"] or []
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if link not in pin:
-        pin.append(link)
-        data = {"pinned": pin}
-        response = DB.update("dm_rooms", room_id, data)
-        room = DB.read("dm_rooms", {"id": room_id})
-        if response.get("status") == 200:
-            return Response(data=room, status=status.HTTP_200_OK)
-    return Response(
-        data="Already exist! why do you want to break my code?",
-        status=status.HTTP_409_CONFLICT,
-    )
+    if message_id in pin:
+        pin.remove(message_id)
+        data = {"message_id":message_id,
+                "pinned": pin,
+                "Event":"unpin_message"}
+        response = DB.update("dm_rooms", room_id, {"pinned": pin})
+        # room = DB.read("dm_rooms", {"id": room_id})
+        if response["status"] == 200:
+            centrifugo_data = send_centrifugo_data(
+                room=room_id, data=data
+                )  # publish data to centrifugo
+            if centrifugo_data.get("error", None) == None:
+                return Response(
+                data=data, status=status.HTTP_201_CREATED
+                )
+        else:
+            return Response(status=response.status_code)
+    else:
+        pin.append(message_id)
+        data = {"message_id":message_id,
+                "pinned": pin,
+                "Event":"pin_message"}
+        response = DB.update("dm_rooms", room_id, {"pinned": pin})
+        # room = DB.read("dm_rooms", {"id": room_id})
+        centrifugo_data = send_centrifugo_data(
+            room=room_id, data=data
+        )  # publish data to centrifugo
+        if centrifugo_data.get("error", None) == None:
+            return Response(
+                data=data, status=status.HTTP_201_CREATED
+            )
 
-
-@swagger_auto_schema(
-    methods=["delete"],
-    responses={
-        200: UnpinMessageResponse,
-        400: "Error: Bad Request"
-    }
-)
-@api_view(["DELETE"])
-@db_init_with_credentials
-def delete_pinned_message(request, message_id):
-    """
-    This is used to delete a pinned message.
-    It takes in the message id, gets the room id, generates a link and then check
-    if that link exists. If it exists, it deletes it
-    if not it returns a 400 status response
-    """
-    try:
-        message = DB.read("dm_messages", {"id": message_id})
-        room_id = message["room_id"]
-        room = DB.read("dm_rooms", {"id": room_id})
-        pin = room["pinned"] or []
-        link = f"https://dm.zuri.chat/api/v1/{room_id}/{message_id}/pinnedmessage"
-    except Exception as e:
-        print(e)
-        return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    if link in pin:
-        print("YES")
-        pin.remove(link)
-        data = {"pinned": pin}
-        response = DB.update("dm_rooms", room_id, data)
-        room = DB.read("dm_rooms", {"id": room_id})
-        if response.get("status") == 200:
-            return Response(data=data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -817,11 +799,12 @@ def user_profile(request, org_id, member_id):
 
     if request.method == "GET":
         headers = {}
-
+        print(request.headers)
         if "Authorization" in request.headers:
             headers["Authorization"] = request.headers["Authorization"]
         else:
             headers["Cookie"] = request.headers["Cookie"]
+
 
         response = requests.get(url, headers=headers)
 
@@ -935,8 +918,8 @@ def remind_message(request):
 
 class SendFile(APIView):
     """
-    This endpoint is a send message endpoint that can take files, upload them 
-    and return the urls to the uploaded files to the media list in the message 
+    This endpoint is a send message endpoint that can take files, upload them
+    and return the urls to the uploaded files to the media list in the message
     serializer
     This endpoint uses form data
     The file must be passed in with the key "file"
@@ -1209,3 +1192,14 @@ def delete_bookmark(request, room_id):
         if response.get("status") == 200:
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+def PING(request):
+    url = "https://api.zuri.chat"
+    try:
+        response = requests.get(url, headers={ "Content-Type" : "application/json"})
+        server = {"server":True}
+        return Response(data=server)
+    except:
+        server = {"server":False}
+        return JsonResponse(data=server)
