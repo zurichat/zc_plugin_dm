@@ -94,6 +94,8 @@ def side_bar(request):
     user_rooms = get_rooms(user_id=user, org_id=org_id)
     rooms = []
 
+    if user_rooms == None:
+        return user_rooms
     for room in user_rooms:
         if "org_id" in room:
             if org_id == room["org_id"]:
@@ -102,7 +104,10 @@ def side_bar(request):
                     profile = get_user_profile(org_id, user_id)
                     if profile["status"] == 200:
                         room_profile["room_name"] = profile["data"]["user_name"]
-                        room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        if profile["data"]["image_url"] == "":
+                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        else:
+                            room_profile["room_image"] = profile["data"]["image_url"]
                         rooms.append(room_profile)
                 room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}"
     side_bar = {
@@ -124,6 +129,7 @@ def side_bar(request):
 @swagger_auto_schema(
     methods=["post"],
     request_body=MessageSerializer,
+    operation_summary="Sends messages to users in a room",
     responses={
         201: MessageResponse,
         400: "Error: Bad Request"
@@ -183,6 +189,7 @@ def send_message(request, room_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=ThreadSerializer,
+    operation_summary="Sends a message as a thread in rooms",
     responses={
         201: ThreadResponse,
         400: "Error: Bad Request"
@@ -254,6 +261,7 @@ def send_thread_message(request, room_id, message_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=RoomSerializer,
+    operation_summary="Creates a new room between users",
     responses={
         201: CreateRoomResponse,
         400: "Error: Bad Request"
@@ -296,12 +304,17 @@ def create_room(request):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all rooms linked to a user id",
     query_serializer=UserRoomsSerializer,
-    responses={400: "Error: Bad Request"},
+    responses={
+        200: "OK: Success",
+        204: "No Rooms Available",
+        400: "Error: Bad Request",
+    },
 )
 @api_view(["GET"])
 @db_init_with_credentials
-def getUserRooms(request, user_id):
+def user_rooms(request, user_id):
     """
     Retrieves all rooms a user is currently active in.
     if there is no room for the user_id it returns a 204 status response.
@@ -318,10 +331,13 @@ def getUserRooms(request, user_id):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all messages in a particular room",
     query_serializer=GetMessageSerializer,
     responses={
-        201: MessageResponse,
-        400: "Error: Bad Request"
+        200: MessageResponse,
+        204: "No Messages Available",
+        400: "Error: Bad Request",
+        404: "Error: Room Not Found",
     }
 )
 @api_view(["GET"])
@@ -362,17 +378,19 @@ def room_messages(request, room_id):
                     result_page = paginator.paginate_queryset(
                         messages, request)
                     return paginator.get_paginated_response(result_page)
-            return Response(data="No such room", status=status.HTTP_400_BAD_REQUEST)
+            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all the information about a room",
     query_serializer=RoomInfoSerializer,
     responses={
-        201: RoomInfoResponse,
-        400: "Error: Bad Request"
+        200: RoomInfoResponse,
+        400: "Error: Bad Request",
+        404: "Error: Room Not Found",
     }
 )
 @api_view(["GET"])
@@ -459,9 +477,11 @@ def edit_room(request, pk):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves the link to a message", 
     responses={
-        201: MessageLinkResponse,
-        400: "Error: Bad Request"
+        200: MessageLinkResponse, 
+        400: "Error: Bad Request",
+        404: "Error: This Message Does Not Exist",
     }
 )
 @api_view(["GET"])
@@ -483,9 +503,7 @@ def copy_message_link(request, message_id):
         }
         return Response(data=message_info, status=status.HTTP_200_OK)
     else:
-        return JsonResponse(
-            {"message": "The message does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
+        return Response(data="The message does not exist", status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(["GET"])
@@ -504,7 +522,14 @@ def read_message_link(request, room_id, message_id):
     else:
         return JsonResponse({'message': 'The message does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
-
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="Retrieves all the links in a room", 
+    responses={
+        200: GetLinksResponse, 
+        404: "Error: Message Not Found",
+    }
+)
 @api_view(["GET"])
 @db_init_with_credentials
 def get_links(request, room_id):
@@ -534,6 +559,7 @@ def get_links(request, room_id):
 @swagger_auto_schema(
     methods=["post"],
     request_body=BookmarkSerializer,
+    operation_summary="Saves links as bookmarks in a room",
     responses={400: "Error: Bad Request"}
 )
 @api_view(["POST"])
@@ -562,6 +588,7 @@ def save_bookmark(request, room_id):
 
 @swagger_auto_schema(
     methods=["post"],
+    operation_summary="Retrieves all the members in an organization",
     request_body=CookieSerializer,
     responses={400: "Error: Bad Request"},
 )
@@ -611,6 +638,7 @@ def organization_members(request):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves all bookmarks in a room",
     responses={
         200: BookmarkResponse,
         400: "Error: Bad Request"
@@ -639,6 +667,15 @@ def retrieve_bookmarks(request, room_id):
     return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+@swagger_auto_schema(
+    methods=["put"],
+    operation_summary="Marks a message as read or unread",
+    responses={
+        200: "Ok: Success",
+        400: "Error: Bad Request",
+        503: "Server Error: Service Unavailable"
+    }
+)
 @api_view(["PUT"])
 @db_init_with_credentials
 def mark_read(request, message_id):
@@ -664,9 +701,11 @@ def mark_read(request, message_id):
 
 @swagger_auto_schema(
     methods=["put"],
+    operation_summary="Pins a message in a room",
     responses={
-        200: PinMessageResponse,
-        400: "Error: Bad Request"
+        200: PinMessageResponse, 
+        400: "Error: Bad Request",
+        503: "Server Error: Service Unavailable",
     }
 )
 @api_view(["PUT"])
@@ -727,9 +766,11 @@ def pinned_message(request, message_id):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retreives messages in a room using a filter",
     responses={
         200: FilterMessageResponse,
-        400: "Error: No such room or invalid Room"
+        204: "Ok: No messages available",
+        400: "Error: No such room or invalid Room",
     }
 )
 @api_view(["GET"])
@@ -782,9 +823,11 @@ def message_filter(request, room_id):
 
 @swagger_auto_schema(
     methods=["get"],
+    operation_summary="Retrieves the profile details of a user",
     responses={
-        201: UserProfileResponse,
-        400: "Error: Bad Request"
+        200: UserProfileResponse,
+        401: "Error: Unauthorized Access",
+        405: "Error: Method Not Allowed",
     }
 )
 @api_view(["GET"])
@@ -794,7 +837,9 @@ def user_profile(request, org_id, member_id):
     If request is successful, a json output of select user details is returned
     Elif login session is expired or wrong details were entered, a 401 response is returned
     Else a 405 response returns if a wrong method was used
+    Assume member_id is also the same as user_id in an org
     """
+    
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
@@ -807,7 +852,8 @@ def user_profile(request, org_id, member_id):
 
 
         response = requests.get(url, headers=headers)
-
+    else:
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
     # elif request.method == "POST":
     #     cookie_serializer = CookieSerializer(data=request.data)
 
@@ -825,6 +871,7 @@ def user_profile(request, org_id, member_id):
             "first_name": data["first_name"],
             "last_name": data["last_name"],
             "display_name": data["display_name"],
+            "image_url": data["image_url"],
             "bio": data["bio"],
             "pronouns": data["pronouns"],
             "email": data["email"],
@@ -837,6 +884,7 @@ def user_profile(request, org_id, member_id):
 
 @swagger_auto_schema(
     methods=["post"],
+    operation_summary="Creates message reminders in rooms",
     request_body=ReminderSerializer,
     responses={400: "Error: Bad Request"}
 )
@@ -928,6 +976,12 @@ class SendFile(APIView):
 
     parser_classes = (MultiPartParser, FormParser)
 
+    @swagger_auto_schema(
+        operation_summary="Sends files as messages in rooms",
+        responses={
+            201: "OK: File Created!",
+        },
+    )
     # @method_decorator(db_init_with_credentials)
     def post(self, request, room_id, org_id):
         print(request.FILES)
@@ -1012,7 +1066,11 @@ class Emoji(APIView):
     """
 
     @swagger_auto_schema(
-        responses={400: "Error: Bad Request"},
+        operation_summary="Retrieves reactions to messages",
+        responses={
+            200: "OK: Success!",
+            400: "Error: Bad Request",
+        },
     )
     @method_decorator(db_init_with_credentials)
     def get(self, request, room_id: str, message_id: str):
@@ -1041,7 +1099,10 @@ class Emoji(APIView):
 
     @swagger_auto_schema(
         request_body=EmojiSerializer,
-        responses={400: "Error: Bad Request"},
+        operation_summary="Creates and keeps tracks of reactions to messages",
+        responses={
+            201: "OK: Success!",
+            400: "Error: Bad Request"},
     )
     @method_decorator(db_init_with_credentials)
     def post(self, request, room_id: str, message_id: str):
@@ -1100,11 +1161,15 @@ class Emoji(APIView):
         )
 
 
-# @swagger_auto_schema(
-    # methods=["post"],
-    # request_body=ScheduleMessageSerializer,
-    # responses={400: "Error: Bad Request"},
-# )
+@swagger_auto_schema(
+    methods=["post"],
+    operation_summary="Schedules messages in rooms",
+    request_body=ScheduleMessageSerializer,
+    responses={
+        201: "Success: Message Scheduled",
+        400: "Error: Bad Request",
+    },
+)
 @api_view(["POST"])
 @db_init_with_credentials
 def scheduled_messages(request):
@@ -1146,6 +1211,7 @@ def scheduled_messages(request):
 # swagger documentation and function to delete message in rooms
 @swagger_auto_schema(
     methods=["delete"],
+    operation_summary="Deletes messages from rooms",
     request_body=DeleteMessageSerializer,
     responses={400: "Error: Bad Request"},
 )
@@ -1157,18 +1223,28 @@ def delete_message(request, message_id):
     and organization id (org_id).
     """
     if request.method == "DELETE":
-        try:
-            message = DB.read("dm_messages", {"_id": message_id})
-            if message:
-                response = DB.delete("dm_messages", {"_id": message_id})
-                centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
-                if centrifugo_data and centrifugo_data.status == 200:
-                    return Response(response, status=status.HTTP_200_OK)
-                return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-        except exception_handler as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+        message_id = request.GET.get("message_id")
+    try:
+        message = DB.read("dm_messages", {"_id": message_id})
+        if message:
+            response = DB.delete("dm_messages", {"_id": message_id})
+            centrifugo_data = centrifugo_client.publish(message=message_id, data=response)
+            if centrifugo_data and centrifugo_data.status == 200:
+                return Response(response, status=status.HTTP_200_OK)
+            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+    except exception_handler as e:
+        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(
+    methods=["delete"],
+    operation_summary="Deletes bookmarks from rooms",
+    responses={
+        200: "OK: Success",
+        400: "Error: Bad Request",
+        503: "Server Error: Service Unavailable",
+    }
+)
 @api_view(["DELETE"])
 @db_init_with_credentials
 def delete_bookmark(request, room_id):
