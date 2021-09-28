@@ -41,10 +41,13 @@ class APIServices {
     return await $http.delete(`/${org_id}/messages/${message_id}/unpin`);
   }
 
-  async getRoomInfo(org_id, data) {
-    return await $http.get(`/${org_id}/room-info`, data);
+  async getRoomInfo(org_id, room_id) {
+    return await $http.get(`/${org_id}/room_id/${room_id}/room-info`);
   }
 
+  async getRoomMessages(org_id, room_id) {
+    return await $http.get(`/${org_id}/${room_id}/messages`);
+  }
   async postRoomMessage(org_id, room_id, data) {
     return await $http.post(`/${org_id}/rooms/${room_id}/message`, data);
   }
