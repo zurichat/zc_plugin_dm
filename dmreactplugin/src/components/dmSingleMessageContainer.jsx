@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 
-function DmSingleMessageContainer() {
+function DmSingleMessageContainer({ messages }) {
   const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
   return (
     <>
@@ -19,15 +19,15 @@ function DmSingleMessageContainer() {
           </div>
           <div className="dm-plugin-thread-message-body">
             <p className="dm-plugin-thread-message-header">
-              <span className="dm-plugin-thread-message-name">John Doe</span>
-              <span className="dm-plugin-thread-message-time">10:00AM</span>
+              <span className="dm-plugin-thread-message-name">
+                {messages.sender_id}
+              </span>
+              <span className="dm-plugin-thread-message-time">
+                {messages?.created_at.slice(11, -11)}
+              </span>
             </p>
             <p className="dm-plugin-thread-message-text">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Vestibulum sit placerat tincidunt arcucursus. xz ,nxc,mx c,mx c,mx
-              c,m x,cm x,m ,mx c,mx c,mx ,mznmxz bx,c x,nvdk nd bkcjb dkcb
-              kwbfvbwifdfi bdfvdkv oudhfvhd djcb bb bkb c kjcvdh ,dxlvc hws c
-              dvh ouwsdlfjhcouhasdhflchofc vjk bdhv sjhzdovuhs
+              {messages?.message}{" "}
             </p>
           </div>
         </div>

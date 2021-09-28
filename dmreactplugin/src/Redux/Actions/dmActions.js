@@ -17,7 +17,8 @@ const createRoom = (room_id) => ({
 });
 
 export const handleCreateDmRoom =
-  (org_id, user1_id, user2_id) => async (dispatch) => {
+  (org_id, ...[user1_id, user2_id]) =>
+  async (dispatch) => {
     try {
       const { data } = await APIService.createChatRoom(org_id, {
         data: {

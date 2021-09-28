@@ -42,11 +42,11 @@ class APIServices {
   }
 
   async getRoomInfo(org_id, room_id) {
-    return await $http.get(`/${org_id}/room_id/${room_id}/room-info`);
+    return await $http.get(`/org/${org_id}/rooms/${room_id}/info`);
   }
 
   async getRoomMessages(org_id, room_id) {
-    return await $http.get(`/${org_id}/${room_id}/messages`);
+    return await $http.get(`/org/${org_id}/rooms/${room_id}/messages`);
   }
   async postRoomMessage(org_id, room_id, data) {
     return await $http.post(`/${org_id}/rooms/${room_id}/message`, data);
@@ -78,7 +78,7 @@ class APIServices {
   }
 
   async getRoomUserId(org_id, user_id) {
-    return await $http.get(`/sidebar?org=${org_id}&user=${user_id}`);
+    return await $http.get(`/org/${org_id}/users/${user_id}/rooms`);
   }
 
   async updateMessage(org_id, id, data) {

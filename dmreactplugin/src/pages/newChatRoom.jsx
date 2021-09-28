@@ -1,11 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import DmProfileHeader from "../components/dmProfileHeader";
 import BookmarkHeader from "../components/common/addBookmarkKebab/dmBookMark";
 import DmChatContainerBox from "../components/ChatContainer/dmChatContainerBox";
 import InputBoxField from "../components/dmBoxInputField";
+import { useDispatch } from "react-redux";
+import {
+  handleGetRoomInfo,
+  handleGetRoomMessages,
+} from "../Redux/Actions/dmActions";
+import { useSelector } from "react-redux";
 
 // Chat Home Page
-const ChatHome = () => {
+const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(handleGetRoomMessages(org_id, room_id));
+    dispatch(handleGetRoomInfo(org_id, room_id));
+  }, [dispatch, org_id, loggedInUser_id, room_id]);
+
   return (
     <div className="dm-newchat-room position-relative w-100 d-flex flex-column">
       <div className="dm-chatroom-header">

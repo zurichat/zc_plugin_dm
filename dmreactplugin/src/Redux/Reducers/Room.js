@@ -7,9 +7,9 @@ import {
 
 const initialState = {
   room_ids: null,
-  rooms: {},
+  rooms: null,
   room_info: {},
-  room_messages: {},
+  room_messages: null,
 };
 
 const roomsReducer = (state = initialState, action) => {
