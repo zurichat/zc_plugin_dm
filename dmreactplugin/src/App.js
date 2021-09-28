@@ -30,7 +30,7 @@ const App = () => {
   useEffect(() => {
     dispatch(handleGetRooms(org_id, loggedInUser_id));
     dispatch(handleGetMembers(org_id));
-  }, [location, org_id, loggedInUser_id]);
+  }, [location, org_id, room_id, loggedInUser_id]);
 
   return (
     <Router basename="/dm">
