@@ -6,6 +6,8 @@ def login_user():
     "password": "Owhondah"
 
     }
-
-    response = requests.post(url="https://api.zuri.chat/auth/login", json=data)
+    try:
+        response = requests.post(url="https://api.zuri.chat/auth/login", json=data)
+    except requests.exceptions.RequestException as e:
+        return None
     return response.json()["data"]["user"]["token"]
