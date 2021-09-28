@@ -2,7 +2,7 @@ import re
 from urllib.parse import urlencode
 from django.http import response
 import requests, json
-from .login import login_user
+# from .login import login_user
 
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
@@ -10,9 +10,9 @@ ORG_ID = "614679ee1a5607b13c00bcb7"
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
 ROOMS = "dm_rooms"
 MESSAGES = "dm_messages"
-header={
-    'Authorization': f'Bearer {login_user()}'
-}
+# header={
+#     'Authorization': f'Bearer {login_user()}'
+# }
 class DataStorage:
     def __init__(self, request=None):
         self.read_api = (
@@ -107,7 +107,7 @@ class DataStorage:
             return response.json()
         else:
             return {"status_code": response.status_code, "message": response.reason}
-    
+
     def upload(self, file):                   #takes in files oh, 1 file
         url = self.upload_multiple_api.format(
             pgn_id = self.plugin_id
@@ -121,7 +121,7 @@ class DataStorage:
         if response.status_code == 200:
             return response.json()
         else:
-            return {"status": response.status_code, "message": response.reason}  
+            return {"status": response.status_code, "message": response.reason}
 
     def upload_more(self, files):
         url = self.upload_multiple_api.format(
@@ -188,7 +188,7 @@ def get_rooms(user_id, org_id):
 
     Returns:
         [List]: [description]
-    """    
+    """
 
     helper = DataStorage()
     helper.organization_id = org_id
@@ -208,7 +208,7 @@ def get_rooms(user_id, org_id):
             data = []
             return data
         return data
-    
+
     return response
 
 
