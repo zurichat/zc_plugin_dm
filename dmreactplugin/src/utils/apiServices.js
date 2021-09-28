@@ -13,8 +13,8 @@ const apiConfig = {
 const $http = axios.create({ ...apiConfig });
 
 class APIServices {
-  async getOrgUsers(org_id, data) {
-    return await $http.get(`/organization/${org_id}/members`, data);
+  async getOrgUsers(org_id) {
+    return await $http.get(`/org/${org_id}/members`);
   }
 
   async createChatRoom(org_id, data) {
@@ -25,8 +25,8 @@ class APIServices {
     return await $http.put(`/${org_id}/members/${member_id}`, data);
   }
 
-  async getMembersOrg(org_id, member_id, data) {
-    return await $http.get(`/${org_id}/members/${member_id}`, data);
+  async getMemberProfile(org_id, member_id) {
+    return await $http.get(`/org/${org_id}/members/${member_id}/profile`);
   }
 
   async postMembersOrg(org_id, member_id, data) {
@@ -48,6 +48,7 @@ class APIServices {
   async getRoomMessages(org_id, room_id) {
     return await $http.get(`/org/${org_id}/rooms/${room_id}/messages`);
   }
+
   async postRoomMessage(org_id, room_id, data) {
     return await $http.post(`/${org_id}/rooms/${room_id}/message`, data);
   }

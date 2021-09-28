@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 
 function DmSingleMessageContainer({ messages }) {
-  const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
   return (
     <>
       <div className="dm-plugin-thread-messages">
