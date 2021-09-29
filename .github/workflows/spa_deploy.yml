@@ -19,6 +19,7 @@ jobs:
       - name: install Dependencies && run build statics
         run: |
           cd dmreactplugin
+          git init
           yarn install
           yarn build
           cd dist
