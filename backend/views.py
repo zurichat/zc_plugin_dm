@@ -1022,12 +1022,13 @@ class SendFile(APIView):
     # @method_decorator(db_init_with_credentials)
     def post(self, request, room_id, org_id):
         print(request.FILES)
+        token = request.META.get('HTTP_AUTHORIZATION')
         if request.FILES:
             file_urls = []
             files = request.FILES.getlist('file')
             if len(files) == 1:
                 for file in request.FILES.getlist('file'):
-                    file_data = DB.upload(file)
+                    file_data = DB.upload(file=file, token=token)
                     if file_data["status"] == 200:
                         for datum in file_data["data"]['files_info']:
                             file_urls.append(datum['file_url'])
@@ -1037,7 +1038,7 @@ class SendFile(APIView):
                 multiple_files = []
                 for file in files:
                     multiple_files.append(("file", file))
-                file_data = DB.upload_more(multiple_files)
+                file_data = DB.upload_more(files = multiple_files, token = token)
                 if file_data["status"] == 200:
                     for datum in file_data["data"]['files_info']:
                         file_urls.append(datum['file_url'])
