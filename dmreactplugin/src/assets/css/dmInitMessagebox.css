@@ -17,9 +17,13 @@
 }
 
 .chat-description p {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: normal;
     line-height: 1.5;
+}
+
+.chat-description p:first-child {
+    font-weight: 600;
 }
 
 .dm-username-id {

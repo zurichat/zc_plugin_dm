@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import '../assets/css/dmProfileHeader.css';
 import Modal from 'react-modal';
 import {
@@ -11,15 +11,22 @@ import {
 import { FiPhone } from 'react-icons/fi';
 import { BsClock, BsX, BsEnvelope } from 'react-icons/bs';
 
-// import use context
-import { AppContext } from '../App';
-
-const dmProfileHeader = () => {
-    const states = useContext(AppContext);
-    const { actualRoom } = states;
-    console.log(actualRoom);
+const dmProfileHeader = ({ actualUser }) => {
+    const user = actualUser && actualUser;
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    console.log(actualRoom.room_name);
+
+    const getLocalTime = () => {
+        let date = new Date();
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        let localTime =
+            hours > 12
+                ? hours - 12 + ':' + minutes + 'PM'
+                : hours + ':' + minutes + 'AM';
+
+        return localTime + ' Local Time';
+    };
+
     return (
         <div>
             <header className='dm-profileHeader d-flex align-items-center'>
@@ -30,12 +37,10 @@ const dmProfileHeader = () => {
                 >
                     <img
                         className='profileHeader__img'
-                        src={`${actualRoom[0].room_image}`}
+                        src={user?.image_url}
                         alt='Profile Pic'
                     />
-                    <p className='profileHeader__name'>
-                        {actualRoom[0].room_name}
-                    </p>
+                    <p className='profileHeader__name'>{user?.user_name}</p>
 
                     <FaAngleDown className='profileHeader__icon' />
                 </div>
@@ -62,19 +67,20 @@ const dmProfileHeader = () => {
                         <div className='profilePop__top'>
                             <div className='profilePop__header'>
                                 <img
-                                    src='https://picsum.photos/200'
-                                    alt='profile pic'
+                                    src={user?.image_url}
+                                    alt={user?.first_name}
                                     className='profilePop__img'
                                 />
                                 <div className='profilePop__details'>
                                     <p className='profilePop__details__header'>
-                                        Mama Gee 🦊 ⭐️{' '}
+                                        {user?.first_name} {user?.last_name} 🦊
+                                        ⭐️{' '}
                                     </p>
                                     <p className='profilePop__details__para'>
-                                        Frontend Design Mentor{' '}
+                                        {user?.role}
                                     </p>
                                     <p className='profilePop__details__para'>
-                                        She/Her{' '}
+                                        {user?.pronouns}
                                     </p>
                                 </div>
                             </div>
@@ -94,21 +100,21 @@ const dmProfileHeader = () => {
                     </div>
                     <div className='profilePop__body'>
                         <div className='profilePop__body__card1'>
-                            <p>
-                                <BsClock /> 3:15AM Local Time
+                            <p className='d-flex align-items-center'>
+                                <BsClock /> {getLocalTime()}{' '}
                             </p>
-                            <p>
+                            <p className='d-flex align-items-center'>
                                 <FiPhone />{' '}
                                 <span className='profilePop__blue'>
                                     {' '}
-                                    +23701877832
+                                    {user?.phone}
                                 </span>{' '}
                             </p>
-                            <p>
+                            <p className='d-flex align-items-center'>
                                 <BsEnvelope />{' '}
                                 <span className='profilePop__blue'>
                                     {' '}
-                                    mamagee@gmail.com
+                                    {user?.email}
                                 </span>
                             </p>
                             <h2 className='profilePop__blue '>View Profile</h2>

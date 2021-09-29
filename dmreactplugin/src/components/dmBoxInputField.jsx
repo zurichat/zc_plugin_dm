@@ -170,20 +170,3 @@ const RightChatEditor = styled.div`
     display: flex;
     align-items: center;
 `;
-
-const SendButton = styled.div`
-    background: #007a5a;
-    color: #d9d9d9;
-    border-radius: 5px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.25s ease;
-
-    :hover {
-        transform: scale(0.9);
-    }
-`;
