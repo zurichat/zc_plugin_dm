@@ -1,21 +1,25 @@
 .Dm-ThreeDotKebab-Menu-FirstPopup {
   /* padding: 20px; */
   background: #f8f8ff;
-  width: 300px;
+  width: 306px;
+  height: 378px;
   border-radius: 8px;
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.18);
   position: absolute;
   left: 1000px;
+  padding-bottom: 15px;
 }
 .Dm-ThreeDotKebab-Menu-FirstPopup div {
-  padding: 10px;
+  padding: 12px;
   border-bottom: solid 0.1px;
   font-family: "Lato", sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   color: #3a3a3a;
   bottom: 1.5rem;
   right: 1rem;
-  height: 50px;
+  line-height: 24px;
+  padding-left: 32px;
+  padding-right: 23px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -37,14 +41,14 @@
   /* padding: 20px; */
   border: 1px solid #c4c4c4;
   width: 198px;
-  height: 190px;
+  height: 184px;
   background: #fefefe;
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.08);
   border-radius: 5px;
   padding-top: 10px;
   position: absolute;
-  top: 125px;
-  right: 360px;
+  top: 80px;
+  right: 350px;
   font-family: "lato";
 }
 .Dm-ThreeDotKebab-Menu-SecondPopup div {
@@ -57,7 +61,7 @@
   font-style: normal;
   display: flex;
   justify-content: space-between;
-  padding-left: 20px;
+  padding-left: 32px;
   color: #616061;
 }
 .Dm-ThreeDotKebab-Menu-SecondPopupCustom {
@@ -65,7 +69,8 @@
   align-items: center;
   justify-content: space-between;
 }
-.Dm-ThreeDotKebab-Menu-SecondPopupCustom span {
+.Dm-ThreeDotKebab-Menu-SecondPopupCustom,
+span {
   padding-right: 20px;
 }
 
@@ -77,4 +82,15 @@ button {
 }
 .DmPollMessage {
   border-bottom: none !important;
+}
+.Dm-ThreeDotKebab-Menu-FirstPopup {
+  z-index: 1000;
+}
+.Dm-ThreeDotKebab-Menu-SecondPopup {
+  z-index: 1000;
+}
+.Dm-ThreeDotKebab-Menu-FirstPopup {
+  position: absolute;
+  top: 0;
+  left: 70vw;
 }

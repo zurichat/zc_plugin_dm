@@ -78,7 +78,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "dmspa", "dist")],
+        'DIRS': [os.path.join(BASE_DIR, "dmspa", "dist"),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -150,9 +150,21 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [
     # os.path.join(BASE_DIR, "frontend", "dist", "static")
     os.path.join(BASE_DIR, "dmspa", "dist"),
-    os.path.join(BASE_DIR, "dmplugins", "dist")
+    # os.path.join(BASE_DIR, "dmplugins", "dist"),
+    os.path.join(BASE_DIR,"dmreactplugin","dist")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'relative_paths': False,
+    "DISPLAY_OPERATION_ID": False,
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        }
+    },
+}
