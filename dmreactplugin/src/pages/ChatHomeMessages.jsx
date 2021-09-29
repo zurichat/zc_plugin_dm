@@ -87,7 +87,7 @@ const ChatHome = () => {
 
   const handleSearch = (e) => {
     setSearch(e.target.value);
-    console.log(search);
+    // console.log(search);
   };
 
   return (

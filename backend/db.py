@@ -107,7 +107,7 @@ class DataStorage:
             return response.json()
         else:
             return {"status_code": response.status_code, "message": response.reason}
-    
+
     def upload(self, file):                   #takes in files oh, 1 file
         url = self.upload_multiple_api.format(
             pgn_id = self.plugin_id
@@ -121,7 +121,7 @@ class DataStorage:
         if response.status_code == 200:
             return response.json()
         else:
-            return {"status": response.status_code, "message": response.reason}  
+            return {"status": response.status_code, "message": response.reason}
 
     def upload_more(self, files):
         url = self.upload_multiple_api.format(
@@ -188,7 +188,7 @@ def get_rooms(user_id, org_id):
 
     Returns:
         [List]: [description]
-    """    
+    """
 
     helper = DataStorage()
     helper.organization_id = org_id
@@ -208,7 +208,7 @@ def get_rooms(user_id, org_id):
             data = []
             return data
         return data
-    
+
     return response
 
 
