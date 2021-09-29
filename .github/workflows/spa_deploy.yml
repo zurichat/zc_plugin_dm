@@ -50,7 +50,7 @@ jobs:
           host: ${{ secrets.ZURI_HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          localPath: './dmplugins/dist/'
+          localPath: './dmreactplugin/dist/'
           remotePath: '/home/orpheus/zc_plugin_dm/dmreactplugin/dist'
           
       - name: serve app
