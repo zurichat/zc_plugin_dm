@@ -6,7 +6,7 @@ import DmChatContainerBox from '../components/ChatContainer/dmChatContainerBox';
 import InputBoxField from '../components/dmBoxInputField';
 
 // Chat Home Page
-const ChatHome = () => {
+const ChatHome = (props) => {
     return (
         <div className='dm-newchat-room position-relative w-100 d-flex flex-column'>
             <div className='dm-chatroom-header'>

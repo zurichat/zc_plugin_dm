@@ -20,30 +20,24 @@ const App = () => {
   const dispatch = useDispatch()
   const [actualRoom, setActualRoom] = useState([])
   let location = useLocation()
-  let room_id =
-    location.pathname.split('/')[location.pathname.split('/').length - 1]
-  // const org_id = '614679ee1a5607b13c00bcb7'
-  let org_id =
-    location.pathname.split('/')[location.pathname.split('/').length - 2]
+  let [org_id, room_id, user_id] = location.pathname.split('/').filter(item => item.length > 11)
 
-  console.log(org_id, room_id)
-  // org_id, user_id
   // useEffect(() => {
-  //   dispatch(
-  //     // pass in the org_id and the user_id from the url
-  //     handleGetRooms('614679ee1a5607b13c00bcb7', '6145f987285e4a18402074eb')
-  //   )
-  // }, [dispatch])
-
-  // console.log(roomsReducer)
-  const getActualRoom = async () => {
-    const res = await fetch(
-      'https://dm.zuri.chat/api/v1/sidebar?org=614679ee1a5607b13c00bcb7&user=6145f987285e4a18402074eb'
-    )
-    const data = await res.json()
+    //   dispatch(
+      //     // pass in the org_id and the user_id from the url
+      //     handleGetRooms('614679ee1a5607b13c00bcb7', '6145f987285e4a18402074eb')
+      //   )
+      // }, [dispatch])
+      
+      // console.log(roomsReducer)
+      const getActualRoom = async () => {
+        const res = await fetch(
+          `https://dm.zuri.chat/api/v1/sidebar?org=${org_id}&user=${user_id}`
+          )
+          const data = await res.json()
     const joinedRooms = data.joined_rooms
     const actualRoom = joinedRooms.filter(
-      (room) => room.room_url === `/dm/${org_id}/${room_id}`
+      (room) => room.room_url === `/dm/${org_id}/${room_id}/${user_id}`
     )
     setActualRoom(actualRoom)
   }
@@ -58,9 +52,8 @@ const App = () => {
   return (
     <AppContext.Provider value={{ actualRoom }}>
       <Router basename='/dm'>
-        {/* {console.log(actualRoom)} */}
         <Switch>
-          <Route exact path={`/${org_id}/${room_id}`}>
+          <Route exact path={`/${org_id}/${room_id}/${user_id}`}>
             <ChatHome />
           </Route>
         </Switch>
