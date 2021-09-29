@@ -21,14 +21,8 @@ const App = () => {
 
   let location = useLocation();
 
-  let org_id =
-    location.pathname.split("/")[location.pathname.split("/").length - 3];
-
-  let room_id =
-    location.pathname.split("/")[location.pathname.split("/").length - 2];
-
-  let loggedInUser_id =
-    location.pathname.split("/")[location.pathname.split("/").length - 1];
+  let [org_id, room_id, loggedInUser_id] = location.pathname.split('/').filter(string => string.length > 11)
+  
 
   useEffect(() => {
     dispatch(handleGetRooms(org_id, loggedInUser_id));
