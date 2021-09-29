@@ -4,8 +4,6 @@ import BookmarkHeader from "../components/common/addBookmarkKebab/dmBookMark";
 import DmChatContainerBox from "../components/ChatContainer/dmChatContainerBox";
 import InputBoxField from "../components/dmBoxInputField";
 import PinnedMessage from "../components/common/pinnedMessage/dmPinnedMessages";
-
-// Chat Home Page
 import { useDispatch } from "react-redux";
 import {
     handleGetRoomInfo,
@@ -32,11 +30,9 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
         <div className="dm-newchat-room position-relative w-100 d-flex flex-column">
             <div className="dm-chatroom-header">
                 <DmProfileHeader user2_id={user2_id} />
-                <div className=" dm-bookmark-head">
-                    <div className="add-bookmark gap-2 d-flex flex-direction-column flex-flow align-items-center px-3 py-1">
-                        <PinnedMessage amount={3} />
-                        <BookmarkHeader />
-                    </div>
+                <div className="add-bookmark gap-2 d-flex flex-direction-column flex-flow align-items-center px-3 py-1">
+                    <PinnedMessage amount={3} />
+                    <BookmarkHeader />
                 </div>
             </div>
             <div className="dm-message-in-out-box w-100 position-relative row align-items-end">
