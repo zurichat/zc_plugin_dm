@@ -6,9 +6,11 @@ import { FiShare2 } from 'react-icons/fi';
 import { CgBookmark } from 'react-icons/cg';
 import { CgMoreVertical } from 'react-icons/cg';
 import ReactTooltip from 'react-tooltip';
+import ThreeDotKebab from '../threeDotKebabMenu/threeDotKebab';
 
 function MessageWrapper({ children, handleOpenThread }) {
   const [isShown, setIsShown] = useState(false);
+  const [isAppear, setIsAppear] = useState(false)
 
   return (
     <div
@@ -44,16 +46,20 @@ function MessageWrapper({ children, handleOpenThread }) {
               />
             </li>
             <li className='dmLi'>
-              <CgMoreVertical
+              <CgMoreVertical className="Dm-ThreeDotkebabMenu-MoreActions"
+              onClick={() => setIsAppear(!isAppear)}
                 ref={(ref) => (this.fooRef = ref)}
                 data-tip='More actions'
               />
+             
             </li>
           </ul>
           <ReactTooltip />
+           
         </div>
       )}
       {children}
+      {isAppear && <ThreeDotKebab className="Dm-ThreeDotKebabMenu-Appear"/>}
     </div>
   );
 }
