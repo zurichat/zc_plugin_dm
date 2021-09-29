@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+// import { useDispatch, useSelector } from 'react-redux';
 
 // import styling
 import styled from 'styled-components';
@@ -17,6 +18,8 @@ import { FiAtSign, FiBold, FiPaperclip } from 'react-icons/fi';
 import { Button } from 'react-bootstrap';
 
 const dmBoxInputField = () => {
+    // const { input } = useSelector((state) => state.);
+
     const [messageInput, setMessageInput] = useState('');
 
     const sendMessage = (e) => {
