@@ -39,6 +39,7 @@ jobs:
             git stash
             git pull
             cd dmreactplugin
+            git init
             yarn install
             cd ../dmspa/
             yarn install
