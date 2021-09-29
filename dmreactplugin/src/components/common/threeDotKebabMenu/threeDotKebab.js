@@ -8,16 +8,10 @@ import { HiOutlineExternalLink } from "react-icons/hi"
 import { MdPoll } from "react-icons/md"
 // import { IoLogoMedium } from "react-icons/io"
 function ThreeDotKebab() {
-  const [firstPopupOpen,setFirstPopupOpen]=useState(false)
+  
   const [secondPopupOpen,setSecondPopupOpen]=useState(false)
   return ( <>
-     <button onClick={()=>setFirstPopupOpen(!firstPopupOpen)}>
-       {/* This is a button for testing the onclick threeDotkebab menu from the hover state */}
-       ThreeDots
-     </button>
-
-     {
-       firstPopupOpen && <div className="Dm-ThreeDotKebab-Menu-FirstPopup">
+     <div className="Dm-ThreeDotKebab-Menu-FirstPopup">
       <div className="DmMenuListBorder">Turn off notififcations for replies
 
       </div>
@@ -31,7 +25,7 @@ function ThreeDotKebab() {
       <div className="DmPollMore DmPollMoreSpecial"> <MdPoll/>  Turn question into poll</div> 
       <div className="DmPollMore">More message shortcuts <HiOutlineExternalLink /></div>
       </div>
-     }
+     
      {
        secondPopupOpen && <div className="Dm-ThreeDotKebab-Menu-SecondPopup">
          <div>In 20 minutes</div>

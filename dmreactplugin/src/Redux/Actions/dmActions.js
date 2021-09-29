@@ -1,50 +1,40 @@
 // Import all API endpoints
-import axios from "axios";
 import APIService from "../../utils/apiServices";
 
 // import all action types
 import {
-  GET_MEMBERS,
   CREATE_ROOM,
   GET_ROOMS,
-  GET_SOCKETS,
-  GET_MESSAGES,
-  SEND_MESSAGE,
-  GET_PINNED_MESSAGE,
-  MESSAGE_REACTION,
+  GET_ROOM_INFO,
+  GET_ROOM_MESSAGES,
 } from "./actionTypes";
 
-// Get Organization Members
-export const handleGetMembers = (org_id) => async (dispatch) => {
-  try {
-    const res = await APIService.getOrgUsers(org_id);
+// Create Room
 
-    dispatch({ type: GET_MEMBERS, payload: res.data.data });
-  } catch (error) {
-    console.log(error);
-  }
-};
+const createRoom = (room_id) => ({
+  type: CREATE_ROOM,
+  payload: room_id,
+});
 
-export const createDmRoom =
-  (org_id, user1_id, user2_id) => async (dispatch) => {
+export const handleCreateDmRoom =
+  (org_id, ...[user1_id, user2_id]) =>
+  async (dispatch) => {
     try {
-      const res = await APIService.createChatRoom(org_id, {
+      const { data } = await APIService.createChatRoom(org_id, {
         data: {
           org_id: org_id,
           room_user_ids: [user1_id, user2_id],
-          bookmark: ["string"],
-          pinned: ["string"],
+          bookmark: [],
+          pinned: [],
         },
       });
-
-      dispatch({ type: CREATE_ROOM, payload: res.data.data });
+      await dispatch(createRoom(data));
     } catch (error) {
-      console.log(error);
+      console.log(`Error from handleCreateDmRoom: ${error}`);
     }
   };
 
 // Get rooms
-
 const getRooms = (rooms) => ({
   type: GET_ROOMS,
   payload: rooms,
@@ -53,8 +43,38 @@ const getRooms = (rooms) => ({
 export const handleGetRooms = (org_id, user_id) => async (dispatch) => {
   try {
     const { data } = await APIService.getRoomUserId(org_id, user_id);
-    dispatch(getRooms(data));
+    await dispatch(getRooms(data));
   } catch (error) {
-    console.log(`Error from handleGetROoms: ${error}`);
+    console.log(`Error from handleGetRooms: ${error}`);
+  }
+};
+
+// Get room Info
+const getRoomInfo = (info) => ({
+  type: GET_ROOM_INFO,
+  payload: info,
+});
+
+export const handleGetRoomInfo = (org_id, room_id) => async (dispatch) => {
+  try {
+    const { data } = await APIService.getRoomInfo(org_id, room_id);
+    await dispatch(getRoomInfo(data));
+  } catch (error) {
+    console.log(`Error from handleGetRoomInfo: ${error}`);
+  }
+};
+
+// Get room messages
+const getRoomMessages = (message) => ({
+  type: GET_ROOM_MESSAGES,
+  payload: message,
+});
+
+export const handleGetRoomMessages = (org_id, room_id) => async (dispatch) => {
+  try {
+    const { data } = await APIService.getRoomMessages(org_id, room_id);
+    await dispatch(getRoomMessages(data));
+  } catch (error) {
+    console.log(`Error from handleGetRoomMEssages: ${error}`);
   }
 };
