@@ -4,42 +4,49 @@
             @mouseover="hover = true"
             @mouseleave="hover = false"
             class="msgBody position-relative"
+            v-for="message in showMessages"
+            :key="message._id"
         >
-            <div class="conversation-threads d-flex flex-row">
+            <div class="conversation-threads d-flex flex-row w-100">
                 <div
                     class="userProfile-avatar"
                     @click="show_popup_profile((p_state = !p_state))"
                 >
-                    <img src="https://picsum.photos/200/300" alt="{}" />
+                    <!-- Added a ref to get the image -->
+                    <img
+                        ref="msgThreadUserImg"
+                        src="https://picsum.photos/200/300"
+                        alt="{}"
+                    />
                 </div>
                 <div class="usertext-messages">
                     <h5 class="pb-2">
+                        <!--Hover state of message -->
+                        <messageHoverShow v-if="hover" />
+                        <!-- Added a ref to get the user name -->
                         <span
+                            ref="msgThreadUsername"
                             class="userName"
                             @click="show_popup_profile((p_state = !p_state))"
                             >MamaGee</span
                         >
-                        <span class="msgTime">5.55pm</span>
+                        <span class="msgTime">
+                            {{ getHumanDate(message.created_at) }}
+                        </span>
                     </h5>
                     <div class="text-container">
-                        <messageHoverShow v-if="hover" />
-                        <p class="text" v-for="(message,index) in this.$store.state.allSentMsg" :key="index">
-                            {{message}}
+                        <!-- Added a ref to get all messagen clicked -->
+                        <p ref="msgThreadUserMsg" class="text">
+                            {{ message.message }}
                         </p>
                     </div>
                     <div v-if="emojis.length > 0" class="reactions d-flex">
-                        <div
-                            v-for="(value, name, index) in emojiSet"
-                            :key="index"
-                        >
-                            <div
-                                class="thread-reactions"
-                                @click="postSelect(name)"
-                            >
-                                {{ name }}
-                                <div class="reaction-count">{{ value }}</div>
-                            </div>
-                        </div>
+                        <div v-for="(emoji, index) in emojiSet" :key="index">
+              <div class="thread-reactions" @click="postSelect(emoji)">
+                {{ emoji.data }}
+                <div class="reaction-count">{{ emoji.count }}</div>
+              </div>
+            </div>
                         <div class="add-reactions" @click="addEmoji">
                             <svg
                                 width="24"
@@ -80,10 +87,11 @@
 
 <script>
 import { bus } from '@/main.js';
-
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import messageHoverShow from '../components/common/dmThreadHoverState.vue';
-import EmojiComp from '../components/common/dmEmojis.vue';
+import EmojiComp from '../components/common/emojiComp.vue';
+import moment from 'moment';
+
 export default {
     name: 'DmMesssageThread',
     components: {
@@ -94,45 +102,59 @@ export default {
         return {
             hover: false,
             p_state: false,
+            postselectEmoji: true
         };
     },
     methods: {
-        ...mapActions(['setEmojis']),
-        ...mapMutations(['setPickEmoji']),
-        onSelectEmoji(emoji) {
-            this.setPickEmoji(false);
-            this.setEmojis(emoji.data);
+        ...mapActions(["addEmojis", "setEmojis", "fetchMessages", "fetchEmojis"]),
+    ...mapMutations(["setPickEmoji"]),
+    onSelectEmoji(emoji) {
+      this.setPickEmoji(false);
+      const newEmoji = emoji._sanitized;
+      this.addEmojis(newEmoji);
+    },
+        //TIME STAMP FUNCTION
+        getHumanDate: function(created_at) {
+            return moment(created_at, 'LT').format('LT');
         },
-        postSelect(name) {
-            this.setEmojis(name);
-        },
-        show_popup_profile(p_state) {
-            bus.$emit('togleProfilePopUp', p_state);
-        },
-        addEmoji() {
-            this.setPickEmoji(true);
-        },
+        postSelect(emoji) {
+      this.setEmojis(emoji);
+    },
+    show_popup_profile(p_state) {
+      bus.$emit("togleProfilePopUp", p_state);
+    },
+    addEmoji() {
+      this.setPickEmoji(true);
+    },
     },
     computed: {
-        ...mapGetters(['emojis', 'emojiSet']),
+        ...mapGetters(["emojis", "emojiSet", "showMessages"]),
+    },
+    // Reply thread by Ozovehe
+    mounted() {
+        this.$store.state.replyThreadMsgs.userImg = this.$refs.msgThreadUserImg.src;
+        this.$store.state.replyThreadMsgs.clickedMsg = this.$refs.msgThreadUserMsg.textContent;
+        this.$store.state.replyThreadMsgs.username = this.$refs.msgThreadUsername.textContent;
+    },
+    created() {
+        this.fetchMessages();
+        this.fetchEmojis();
     },
 };
 </script>
 
 <style scoped>
-:root {
-    --main-green: #00b87b;
-}
 .message-thread {
     position: relative !important;
     background: #fff;
 }
+
 .conversation-threads {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
 }
 
 .userProfile-avatar {
-    cursor: pointer;
+    cursor: pointer !important;
     padding-right: 16px;
 }
 
@@ -160,13 +182,13 @@ export default {
     color: #999999;
     font-weight: 400;
 }
-
 .usertext-messages p {
     margin-bottom: 0;
 }
 .usertext-messages .userName {
     cursor: pointer;
 }
+
 .text-container {
     position: relative;
 }
@@ -187,7 +209,6 @@ export default {
 .add-reactions {
     margin-left: 5px;
 }
-
 .add-reactions img {
     width: 20px;
     height: 20px;

@@ -33,11 +33,12 @@
   -->
   <script type="systemjs-importmap">
     {
-      "imports": {
-        "@zuri/zuri-plugin-dm": "https://dm.zuri.chat/js/app.js",
-        "vue": "https://cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js",
-        "vue-router": "https://cdn.jsdelivr.net/npm/vue-router@3.1.6/dist/vue-router.min.js",
-        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js"
+      "imports": { 
+        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
+        "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
+        "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
+        "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"
       }
     }
   </script>
@@ -50,10 +51,11 @@
     <script type="systemjs-importmap">
     {
       "imports": {
-        "@zuri/zuri-plugin-dm": "https://dm.zuri.chat/js/app.js",
+        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
+        "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
         "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
-        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js"
-      }
+        "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"
     }
   </script>
     <% } %>
