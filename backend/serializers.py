@@ -154,6 +154,3 @@ class ScheduleMessageSerializer(serializers.Serializer):
             raise serializers.ValidationError("Date cannot be in the past.")
         return timer
 
-class MessageSearchSerializer(serializers.Serializer):
-    keyword = serializers.CharField(max_length=128)
-    users = serializers.ListField(child=serializers.URLField(), allow_empty=True, required=False, default=[] )
