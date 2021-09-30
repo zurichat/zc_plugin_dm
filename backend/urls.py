@@ -15,7 +15,7 @@ urlpatterns = [
     path("api/v1/org/<str:org_id>/users/<str:user_id>/messages/search", 
          views.search_DM, name="search DM"),
     path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",  
-         views.MessageCreateGet.as_view(), name="create_get_message"),
+         views.message_create_get, name="create_get_message"),
 
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
