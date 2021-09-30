@@ -96,21 +96,22 @@ def side_bar(request):
     rooms = []
 
     if user_rooms == None:
-        return user_rooms
-    for room in user_rooms:
-        if "org_id" in room:
-            if org_id == room["org_id"]:
-                room_profile = {}
-                for user_id in room["room_user_ids"]:
-                    profile = get_user_profile(org_id, user_id)
-                    if profile["status"] == 200:
-                        room_profile["room_name"] = profile["data"]["user_name"]
-                        if profile["data"]["image_url"]:
-                            room_profile["room_image"] = profile["data"]["image_url"]
-                        else:
-                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                        rooms.append(room_profile)
-                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
+        pass
+    else:
+        for room in user_rooms:
+            if "org_id" in room:
+                if org_id == room["org_id"]:
+                    room_profile = {}
+                    for user_id in room["room_user_ids"]:
+                        profile = get_user_profile(org_id, user_id)
+                        if profile["status"] == 200:
+                            room_profile["room_name"] = profile["data"]["user_name"]
+                            if profile["data"]["image_url"]:
+                                room_profile["room_image"] = profile["data"]["image_url"]
+                            else:
+                                room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            rooms.append(room_profile)
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
