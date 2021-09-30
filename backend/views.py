@@ -93,9 +93,7 @@ def side_bar(request):
     user = request.GET.get("user", None)
     response = get_rooms(user_id=user, org_id=org_id)
     user_rooms = response
-    print(user_rooms)
     rooms = []
-
     if user_rooms == None:
         pass
     else:
