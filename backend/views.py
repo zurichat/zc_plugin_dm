@@ -1,4 +1,5 @@
 import json
+from typing import Dict, List
 import uuid
 import re
 from django.http import response
@@ -8,12 +9,15 @@ from django.shortcuts import render
 from django.views import generic
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
-from rest_framework import status
+from rest_framework import status, generics
 import requests
 import time
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.views import APIView, exception_handler
+from rest_framework.views import (
+    APIView,
+    exception_handler,
+)
 from django.core.files.storage import default_storage
 
 # Import Read Write function to Zuri Core
@@ -1131,8 +1135,8 @@ class Emoji(APIView):
             400: "Error: Bad Request",
         },
     )
-    @method_decorator(db_init_with_credentials)
-    def get(self, request, room_id: str, message_id: str):
+    # @method_decorator(db_init_with_credentials)
+    def get(self, request, org_id: str, room_id: str, message_id: str):
         # fetch message related to that reaction
         message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
         if message:
@@ -1160,8 +1164,8 @@ class Emoji(APIView):
         operation_summary="Creates and keeps tracks of reactions to messages",
         responses={201: "OK: Success!", 400: "Error: Bad Request"},
     )
-    @method_decorator(db_init_with_credentials)
-    def post(self, request, room_id: str, message_id: str):
+    # @method_decorator(db_init_with_credentials)
+    def post(self, request, org_id: str, room_id: str, message_id: str):
         request.data["message_id"] = message_id
         serializer = EmojiSerializer(data=request.data)
 
@@ -1389,10 +1393,12 @@ def PING(request):
         return JsonResponse(data=server)
 
 
-class Thread(APIView):
+class ThreadListView(generics.ListCreateAPIView):
     """
     List all messages in thread, or create a new Thread message.
     """
+
+    serializer_class = ThreadSerializer
 
     @swagger_auto_schema(
         operation_summary="Retrieves thread messages for a specific message",
@@ -1401,28 +1407,213 @@ class Thread(APIView):
             400: "Error: Bad Request",
         },
     )
-    @method_decorator(db_init_with_credentials)
-    def get(self, request, room_id: str, message_id: str):
-        # fetch message related to that reaction
+    # @method_decorator(db_init_with_credentials)
+    def get(
+        self,
+        request,
+        org_id: str,
+        room_id: str,
+        message_id: str,
+    ) -> Response:
+        """Retrieves all thread messages attached to a specific message
+
+        Args:
+            org_id (str): The organisation id
+            room_id (str): The room id where the dm occured
+            message_id (str): The message id for which we want to get the thread messages
+
+        Returns:
+            Response: Contains a list of thread messsages
+        """
+        # fetch message parent of the thread
         message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
-        if message:
-            print(message)
+        if message and message.get("status_code", None) == None:
             threads = message.get("threads")
-            print(threads)
-            if response:
-                return Response(
-                    data={
-                        "status": message["message"],
-                        "event": "get_message_reactions",
-                        "room_id": message["room_id"],
-                        "message_id": message["_id"],
-                        "data": {
-                            "reactions": message["reactions"],
-                        },
-                    },
-                    status=status.HTTP_200_OK,
-                )
             return Response(
-                data="Data not retrieved", status=status.HTTP_424_FAILED_DEPENDENCY
+                data={
+                    "room_id": message["room_id"],
+                    "message_id": message["_id"],
+                    "data": {
+                        "threads": threads,
+                    },
+                },
+                status=status.HTTP_200_OK,
             )
-        return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
+
+        return Response("No such message", status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(
+        operation_summary="Create a thread message for a specific message",
+        request_body=ThreadSerializer,
+        responses={
+            200: "OK: Success!",
+            400: "Error: Bad Request",
+        },
+    )
+    def post(
+        self,
+        request,
+        org_id: str,
+        room_id: str,
+        message_id: str,
+    ) -> Response:
+        """
+        Validates if the message exists, then sends
+        a publish event to centrifugo after
+        thread message is persisted.
+        """
+
+        request.data["message_id"] = message_id
+        serializer = ThreadSerializer(data=request.data)
+
+        if serializer.is_valid():
+            data = serializer.data
+            message_id = data["message_id"]
+            sender_id = data["sender_id"]
+
+            message = DB.read(
+                MESSAGES, {"_id": message_id, "room_id": room_id}
+            )  # fetch message from zc
+
+            if message and message.get("status_code", None) == None:
+                threads = message.get("threads", [])  # get threads
+                del data["message_id"]  # remove message id from request to zc core
+                # assigns an id to each message in thread
+                data["_id"] = str(uuid.uuid1())
+                threads.append(data)  # append new message to list of thread
+
+                room = DB.read(ROOMS, {"_id": message["room_id"]})
+                if sender_id in room.get("room_user_ids", []):
+
+                    response = DB.update(
+                        MESSAGES, message["_id"], {"threads": threads}
+                    )  # update threads in db
+                    if response and response.get("status", None) == 200:
+
+                        response_output = {
+                            "status": response["message"],
+                            "event": "thread_message_create",
+                            "thread_id": data["_id"],
+                            "room_id": message["room_id"],
+                            "message_id": message["_id"],
+                            "thread": True,
+                            "data": {
+                                "sender_id": data["sender_id"],
+                                "message": data["message"],
+                                "created_at": data["created_at"],
+                            },
+                        }
+
+                        try:
+                            centrifugo_data = centrifugo_client.publish(
+                                room=room_id, data=response_output
+                            )  # publish data to centrifugo
+                            if (
+                                centrifugo_data
+                                and centrifugo_data.get("status_code") == 200
+                            ):
+                                return Response(
+                                    data=response_output, status=status.HTTP_201_CREATED
+                                )
+                            else:
+                                return Response(
+                                    data="message not sent",
+                                    status=status.HTTP_424_FAILED_DEPENDENCY,
+                                )
+                        except:
+                            return Response(
+                                data="centrifugo server not available",
+                                status=status.HTTP_424_FAILED_DEPENDENCY,
+                            )
+                    return Response(
+                        "data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                return Response("sender not in room", status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                "message or room not found", status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve a single thread message, update a thread message or delete.
+    """
+
+    serializer_class = ThreadSerializer
+    queryset = ""
+    lookup_field = "thread_message_id"
+
+    @swagger_auto_schema(
+        operation_summary="Deletes a specifc thread message for a specific parent message",
+        responses={
+            200: "OK: Success!",
+            400: "Error: Bad Request",
+        },
+    )
+    def delete(
+        self,
+        request,
+        org_id: str,
+        room_id: str,
+        message_id: str,
+        thread_message_id: str,
+    ) -> Response:
+        """Deletes a specifc thread message for a specific parent message
+
+        Args:
+            request (Request): The incoming HTTP request
+            org_id (str): The organisation id
+            room_id (str): The room id where the dm occured
+            message_id (str): The message id for which we want to get the thread messages
+            thread_message_id (str): The thread message id to delete
+
+        Returns:
+            Response: Contains a new list of thread messsages
+        """
+        message = DB.read(MESSAGES, {"_id": message_id, "room_id": room_id})
+        if message and message.get("status_code", None) == None:
+            threads: List[Dict] = message.get("threads")
+            if threads:
+                for thread in threads:
+                    # removes the specific thread message
+                    if thread_message_id == thread.get("_id"):
+                        threads.remove(thread)
+                        break
+                data = {"threads": threads}
+                response = DB.update(MESSAGES, message_id, data=data)
+                if response.get("status", None) == 200:
+                    response_output = {
+                        "status": response["message"],
+                        "event": "thread_message_delete",
+                        "thread_id": thread_message_id,
+                        "room_id": room_id,
+                        "message_id": message_id,
+                        "data": {
+                            "threads": threads,
+                        },
+                    }
+                    try:
+                        # publish data to centrifugo
+                        centrifugo_data = centrifugo_client.publish(
+                            room=room_id, data=response_output
+                        )
+                        if (
+                            centrifugo_data
+                            and centrifugo_data.get("status_code") == 200
+                        ):
+                            return Response(
+                                data=response_output, status=status.HTTP_200_OK
+                            )
+                        else:
+                            return Response(
+                                data="Message not sent",
+                                status=status.HTTP_424_FAILED_DEPENDENCY,
+                            )
+                    except:
+                        return Response(
+                            data="Centrifugo server not available",
+                            status=status.HTTP_424_FAILED_DEPENDENCY,
+                        )
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
