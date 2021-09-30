@@ -29,16 +29,22 @@ const DmChatContainerBox = ({ user2_id }) => {
       <div className='dm-chatContainerBox w-100 d-flex align-items-end'>
         <main className='dm-chat-main-container'>
           {room_messages?.results
-            ? room_messages?.results?.map((messages) => (
-                <div key={messages?.id}>
-                  <MessageWrapper handleOpenThread={handleOpenThread}>
-                    <DmSingleMessageContainer
-                      messages={messages}
-                      user2_id={user2_id}
-                    />
-                  </MessageWrapper>
-                </div>
-              ))
+            ? room_messages?.results
+                ?.sort((first, second) => {
+                  const firstDate = new Date(first.created_at);
+                  const secondDate = new Date(second.created_at);
+                  return secondDate - firstDate;
+                })
+                .map((messages) => (
+                  <div key={messages?.id}>
+                    <MessageWrapper handleOpenThread={handleOpenThread}>
+                      <DmSingleMessageContainer
+                        messages={messages}
+                        user2_id={user2_id}
+                      />
+                    </MessageWrapper>
+                  </div>
+                ))
             : null}
           <DmInitMessageBox secondUser={user} />
         </main>
