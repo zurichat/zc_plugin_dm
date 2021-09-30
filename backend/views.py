@@ -91,7 +91,8 @@ def verify_user(token):
 def side_bar(request):
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    user_rooms = get_rooms(user_id=user, org_id=org_id)
+    response = requests.get(f"http://127.0.0.1:8000/api/v1/org/{org_id}/users/{user}/rooms")
+    user_rooms = response.json()
     rooms = []
 
     if user_rooms == None:
