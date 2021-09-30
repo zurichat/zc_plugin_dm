@@ -29,7 +29,7 @@ const DmInitMessageBox = ({ secondUser }) => {
             >
               @{secondUser?.user_name}
             </span>
-            <ReactTooltip id='userInfoPopUp'>
+            <ReactTooltip id='userInfoPopUp' effect='solid'>
               <div className='dm-message-data-tip-pop-up'>
                 <img
                   src={secondUser?.image_url}
@@ -38,13 +38,18 @@ const DmInitMessageBox = ({ secondUser }) => {
                   width='20'
                   height='20'
                 />
-                <span className='dm-message-data-tip-pop-up-fullname'>
-                  {`${secondUser?.first_name} ${secondUser?.last_name}`}
-                </span>
+                {secondUser?.first_name && secondUser?.last_name && (
+                  <span className='dm-message-data-tip-pop-up-fullname'>
+                    {`${secondUser?.first_name} ${secondUser?.last_name}`}
+                  </span>
+                )}
+
                 <span className='dm-message-data-tip-pop-up-active-status'></span>
-                <span className='dm-message-data-tip-pop-up-username'>
-                  {secondUser?.user_name}
-                </span>
+                {secondUser?.user_name && (
+                  <span className='dm-message-data-tip-pop-up-username'>
+                    {secondUser?.user_name}
+                  </span>
+                )}
                 {secondUser?.status && (
                   <span className='dm-message-data-tip-pop-up-status'>
                     {secondUser?.status}
