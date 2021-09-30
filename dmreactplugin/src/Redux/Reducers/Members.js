@@ -1,18 +1,16 @@
+import { GET_MEMBERS, GET_MEMBER_PROFILE } from '../Actions/actionTypes';
+
 const initialState = {
-    members: {},
+    members: null,
 };
 
-const membersReducer = (state = initialState, action) => {
+const membersReducer = (state = null, action) => {
     switch (action.type) {
         case GET_MEMBERS:
-            return { ...state, members: action.payload };
-
-        case CREATE_MEMBERS:
-            return {
-                ...state,
-                members: { ...state.members, ...action.payload },
-            };
+            return action.payload;
         default:
             return state;
     }
 };
+
+export default membersReducer;

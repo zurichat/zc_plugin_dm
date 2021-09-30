@@ -1,11 +1,11 @@
-from .import views
+from . import views
 from .testingapi import Test
+
 # from .views import EditMessage
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
-
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -18,34 +18,30 @@ urlpatterns = [
          views.MessageCreateGet.as_view(), name="create_get_message"),
 
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
-        views.send_thread_message,
-        name="send_thread_message",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
+        views.update_thread_message,
+        name="update_thread_message",
     ),
-    path(
-        "api/v1/org/<str:org_id>/room",
-        views.create_room,
-        name="create_room"
-    ),
+    path("api/v1/org/<str:org_id>/room", views.create_room, name="create_room"),
+    
+
     path(
         "api/v1/org/<str:org_id>/updatemessage/<str:pk>",
         views.edit_room,
-        name="updateroom"
+        name="updateroom",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/info",
         views.room_info,
-        name="room_info"
+        name="room_info",
     ),
     path(
         "api/v1/org/<str:org_id>/users/<str:user_id>/rooms",
         views.user_rooms,
-        name="get_user_rooms"
+        name="get_user_rooms",
     ),
     path(  # what is this endpoint doing?
-        "api/v1/org/<str:org_id>/reminder",
-        views.remind_message,
-        name="reminder"
+        "api/v1/org/<str:org_id>/reminder", views.remind_message, name="reminder"
     ),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
@@ -65,12 +61,12 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/links",
         views.get_links,
-        name="get_links"
+        name="get_links",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/new-bookmark",
         views.save_bookmark,
-        name="create_bookmark"
+        name="create_bookmark",
     ),
     path(
         "api/v1/org/<str:org_id>/members",
@@ -85,7 +81,7 @@ urlpatterns = [
     path(  # might require a room id
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         views.mark_read,
-        name="mark_read"
+        name="mark_read",
     ),
     path(  # might require a room id
         "api/v1/org/<str:org_id>/messages/<str:message_id>/pin",
@@ -120,7 +116,7 @@ urlpatterns = [
     path(  # ??? how are the files sent? as messages?
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
-        name="media_files"
+        name="media_files",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reactions",
@@ -130,18 +126,25 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/schedule-message",
         views.scheduled_messages,
-        name="scheduled_messages"
+        name="scheduled_messages",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/bookmark",
         views.delete_bookmark,
-        name="delete_bookmark"
+        name="delete_bookmark",
     ),
-
-
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
+        views.ThreadListView.as_view(),
+        name="messages_thread_list",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>",
+        views.ThreadDetailView.as_view(),
+        name="messages_thread_detail",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
