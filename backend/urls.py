@@ -22,11 +22,11 @@ urlpatterns = [
         views.message_create_get,
         name="crate_get_message",
     ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
-        views.send_thread_message,
-        name="send_thread_message",
-    ),
+    # path(
+    #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
+    #     views.send_thread_message,
+    #     name="send_thread_message",
+    # ),
     path("api/v1/org/<str:org_id>/room", views.create_room, name="create_room"),
     path(
         "api/v1/org/<str:org_id>/updatemessage/<str:pk>",
@@ -135,6 +135,16 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/bookmark",
         views.delete_bookmark,
         name="delete_bookmark",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
+        views.ThreadListView.as_view(),
+        name="messages_thread_list",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>",
+        views.ThreadDetailView.as_view(),
+        name="messages_thread_detail",
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
