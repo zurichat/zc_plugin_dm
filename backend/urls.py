@@ -23,6 +23,11 @@ urlpatterns = [
         name="send_thread_message",
     ),
     path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
+        views.update_thread_message,
+        name="update_thread_message",
+    ),
+    path(
         "api/v1/org/<str:org_id>/room",
         views.create_room,
         name="create_room"

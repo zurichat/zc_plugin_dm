@@ -321,6 +321,73 @@ def send_thread_message(request, room_id, message_id):
         return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(["PUT"])
+@db_init_with_credentials
+def update_thread_message(request, room_id, message_id, message_uuid):
+    """
+    This update a particular thread message
+    """
+    if request.method == "PUT":
+        thread_serializer = ThreadSerializer(data=request.data)
+        if thread_serializer.is_valid():
+            thread_data = thread_serializer.data
+            sender_id = thread_data["sender_id"]
+            message_id = thread_data["message_id"] 
+            messages = DB.read("dm_messages", {"room_id": room_id})
+            if messages:
+                if "status_code" in messages:
+                    if messages.get("status_code") == 404:
+                        return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                    return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+                for message in messages:
+                    if message.get("_id") == message_id:
+                        thread = message
+                        break
+                    thread = None
+                if thread:
+                    thread_messages = thread.get("threads", [])
+                    for thread_message in thread_messages:
+                        if thread_message.get("_id") == message_uuid:
+                            current_thread_message = thread_message
+                            break
+                        current_thread_message = None
+                    if current_thread_message:
+                        if current_thread_message["sender_id"] == sender_id and thread["_id"] == message_id:
+                            current_thread_message["message"] = thread_data["message"]
+                            response = DB.update("dm_messages", thread["_id"], {"threads": thread_messages})
+                            if response and response.get("status") == 200:
+                                response_output = {
+                                    "status": response["message"],
+                                    "event": "thread_message_update",
+                                    "thread_id": current_thread_message["_id"],
+                                    "room_id": thread["room_id"],
+                                    "message_id": thread["_id"],
+                                    "thread": True,
+                                    "data": {
+                                        "sender_id": thread_data["sender_id"],
+                                        "message": thread_data["message"],
+                                        "created_at": thread_data["created_at"],
+                                    },
+                                    "edited": True,
+                                }
+                                try:
+                                    centrifugo_data = centrifugo_client.publish(
+                                        room=room_id, data=response_output)
+                                    if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                                        return Response(data=response_output, status=status.HTTP_201_CREATED)
+                                    else:
+                                        return Response(data="Message not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+                                except Exception:
+                                    return Response(data="Centrifugo server not available", status=status.HTTP_424_FAILED_DEPENDENCY)
+                            return Response(data="Message not updated", status=status.HTTP_424_FAILED_DEPENDENCY) 
+                        return Response(data="Sender_id or message_id invalid", status=status.HTTP_400_BAD_REQUEST)
+                    return Response(data="Thread message not found", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Message not found", status=status.HTTP_404_NOT_FOUND)
+            return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
+        return Response(thread_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @swagger_auto_schema(
     methods=["post"],
     request_body=RoomSerializer,
