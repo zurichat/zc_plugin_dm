@@ -324,10 +324,12 @@ def send_thread_message(request, room_id, message_id):
 @api_view(["PUT"])
 @db_init_with_credentials
 def update_thread_message(request, room_id, message_id, message_uuid):
+    """
+    This update a particular thread message
+    """
     if request.method == "PUT":
         thread_serializer = ThreadSerializer(data=request.data)
         if thread_serializer.is_valid():
-#            thread_serializer.save()
             thread_data = thread_serializer.data
             sender_id = thread_data["sender_id"]
             message_id = thread_data["message_id"] 
