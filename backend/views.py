@@ -622,7 +622,7 @@ def room_info(request, room_id):
     Else a 404 response is returned with a "No such room" message
     """
     # room_id = request.GET.get("room_id", None)
-    # org_id = request.GET.get("org_id", None)
+    org_id = DB.organization_id
     room_collection = "dm_rooms"
     rooms = DB.read(room_collection)
     if rooms is not None:
@@ -638,20 +638,30 @@ def room_info(request, room_id):
                     created_at = ""
                 if "org_id" in current_room:
                     org_id = current_room["org_id"]
-                else:
-                    org_id = ""
+                
                 if len(room_user_ids) > 3:
                     text = f" and {len(room_user_ids)-2} others"
                 elif len(room_user_ids) == 3:
-                    text = "and 1 other"
+                    text = " and 1 other"
                 else:
                     text = " only"
+                user1 = get_user_profile(org_id=org_id, user_id=room_user_ids[0])
+                if user1["status"] == 200:
+                    user_name_1 = user1["data"]["user_name"]
+                else:
+                    user_name_1 = room_user_ids[0]
+                
+                user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
+                if user2["status"] == 200:
+                    user_name_2 = user2["data"]["user_name"]
+                else:
+                    user_name_2 = room_user_ids[1]
                 room_data = {
                     "room_id": room_id,
                     "org_id": org_id,
                     "room_user_ids": room_user_ids,
                     "created_at": created_at,
-                    "description": f"This room contains the coversation between {room_user_ids[0]} and {room_user_ids[1]}{text}",
+                    "description": f"This room contains the coversation between {user_name_1} and {user_name_2}{text}",
                     "Number of users": f"{len(room_user_ids)}",
                 }
                 return Response(data=room_data, status=status.HTTP_200_OK)
@@ -1250,7 +1260,7 @@ class SendFile(APIView):
                 room_id = data["room_id"]  # room id gotten from client request
 
                 room = DB.read("dm_rooms", {"_id": room_id})
-                if room:
+                if room and room.get("status_code", None) == None:
                     if data["sender_id"] in room.get("room_user_ids", []):
                         data["media"] = file_urls
                         response = DB.write("dm_messages", data=data)
@@ -1270,28 +1280,36 @@ class SendFile(APIView):
                                 },
                             }
 
-                            centrifugo_data = send_centrifugo_data(
-                                room=room_id, data=response_output
-                            )  # publish data to centrifugo
-                            # print(centrifugo_data)
-                            if centrifugo_data["message"].get("error", None) == None:
+                            try:
+                                centrifugo_data = centrifugo_client.publish(
+                                    room=room_id, data=response_output
+                                )  # publish data to centrifugo
+                                if (
+                                    centrifugo_data
+                                    and centrifugo_data.get("status_code") == 200
+                                ):
+                                    return Response(
+                                        data=response_output, status=status.HTTP_201_CREATED
+                                    )
+                                else:
+                                    return Response(
+                                        data="message not sent",
+                                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                                    )
+                            except:
                                 return Response(
-                                    data=response_output, status=status.HTTP_201_CREATED
+                                    data="centrifugo server not available",
+                                    status=status.HTTP_424_FAILED_DEPENDENCY,
                                 )
                         return Response(
-                            data="data not sent",
+                            data="message not saved and not sent",
                             status=status.HTTP_424_FAILED_DEPENDENCY,
                         )
                     return Response(
                         "sender not in room", status=status.HTTP_400_BAD_REQUEST
                     )
-                return Response("room not found", status=status.HTTP_404_NOT_FOUND)
+                return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(
-            "No file attached, Use send Message api to send only a message",
-            status=status.HTTP_204_NO_CONTENT,
-        )
 
 
 class Emoji(APIView):
