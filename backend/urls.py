@@ -18,10 +18,11 @@ urlpatterns = [
         name="search DM",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        views.message_create_get,
-        name="crate_get_message",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
+        views.update_thread_message,
+        name="update_thread_message",
     ),
+    path("api/v1/org/<str:org_id>/room", views.create_room, name="create_room"),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
     #     views.send_thread_message,

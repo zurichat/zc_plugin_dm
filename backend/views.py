@@ -95,27 +95,30 @@ def verify_user(token):
 def side_bar(request):
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    user_rooms = get_rooms(user_id=user, org_id=org_id)
+    response = get_rooms(user_id=user, org_id=org_id)
+    user_rooms = response
     rooms = []
-
     if user_rooms == None:
-        return user_rooms
-    for room in user_rooms:
-        if "org_id" in room:
-            if org_id == room["org_id"]:
-                room_profile = {}
-                for user_id in room["room_user_ids"]:
-                    profile = get_user_profile(org_id, user_id)
-                    if profile["status"] == 200:
-                        room_profile["room_name"] = profile["data"]["user_name"]
-                        if profile["data"]["image_url"]:
-                            room_profile["room_image"] = profile["data"]["image_url"]
-                        else:
-                            room_profile[
-                                "room_image"
-                            ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                        rooms.append(room_profile)
-                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
+        pass
+    else:
+        for room in user_rooms:
+            if "org_id" in room:
+                if org_id == room["org_id"]:
+                    room_profile = {}
+                    for user_id in room["room_user_ids"]:
+                        profile = get_user_profile(org_id, user_id)
+                        if profile["status"] == 200:
+                            room_profile["room_name"] = profile["data"]["user_name"]
+                            if profile["data"]["image_url"]:
+                                room_profile["room_image"] = profile["data"][
+                                    "image_url"
+                                ]
+                            else:
+                                room_profile[
+                                    "room_image"
+                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            rooms.append(room_profile)
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
@@ -245,81 +248,215 @@ def message_create_get(request, room_id):
     operation_summary="Sends a message as a thread in rooms",
     responses={201: ThreadResponse, 400: "Error: Bad Request"},
 )
-@api_view(["POST"])
+@api_view(["POST", "GET"])
 @db_init_with_credentials
 def send_thread_message(request, room_id, message_id):
     """
-    validates if the message exists, then sends
+    Post_method: validates if the message exists, then sends
     a publish event to centrifugo after
     thread message is persisted.
+    Get method: Validate if the room and the message exist, then retrives
+    all thread messages under the message.
     """
-    request.data["message_id"] = message_id
-    serializer = ThreadSerializer(data=request.data)
 
-    if serializer.is_valid():
-        data = serializer.data
-        message_id = data["message_id"]
-        sender_id = data["sender_id"]
+    if request.method == "POST":
 
-        message = DB.read(
-            "dm_messages", {"_id": message_id, "room_id": room_id}
-        )  # fetch message from zc
+        request.data["message_id"] = message_id
+        serializer = ThreadSerializer(data=request.data)
 
-        if message and message.get("status_code", None) == None:
-            threads = message.get("threads", [])  # get threads
-            del data["message_id"]  # remove message id from request to zc core
-            # assigns an id to each message in thread
-            data["_id"] = str(uuid.uuid1())
-            threads.append(data)  # append new message to list of thread
+        if serializer.is_valid():
+            data = serializer.data
+            message_id = data["message_id"]
+            sender_id = data["sender_id"]
 
-            room = DB.read("dm_rooms", {"_id": message["room_id"]})
-            if sender_id in room.get("room_user_ids", []):
+            message = DB.read(
+                "dm_messages", {"_id": message_id, "room_id": room_id}
+            )  # fetch message from zc
 
-                response = DB.update(
-                    "dm_messages", message["_id"], {"threads": threads}
-                )  # update threads in db
-                if response and response.get("status", None) == 200:
+            if message and message.get("status_code", None) == None:
+                threads = message.get("threads", [])  # get threads
+                del data["message_id"]  # remove message id from request to zc core
+                # assigns an id to each message in thread
+                data["_id"] = str(uuid.uuid1())
+                threads.append(data)  # append new message to list of thread
 
-                    response_output = {
-                        "status": response["message"],
-                        "event": "thread_message_create",
-                        "thread_id": data["_id"],
-                        "room_id": message["room_id"],
-                        "message_id": message["_id"],
-                        "thread": True,
-                        "data": {
-                            "sender_id": data["sender_id"],
-                            "message": data["message"],
-                            "created_at": data["created_at"],
-                        },
-                    }
+                room = DB.read("dm_rooms", {"_id": message["room_id"]})
+                if sender_id in room.get("room_user_ids", []):
 
-                    try:
-                        centrifugo_data = centrifugo_client.publish(
-                            room=room_id, data=response_output
-                        )  # publish data to centrifugo
-                        if (
-                            centrifugo_data
-                            and centrifugo_data.get("status_code") == 200
-                        ):
+                    response = DB.update(
+                        "dm_messages", message["_id"], {"threads": threads}
+                    )  # update threads in db
+                    if response and response.get("status", None) == 200:
+
+                        response_output = {
+                            "status": response["message"],
+                            "event": "thread_message_create",
+                            "thread_id": data["_id"],
+                            "room_id": message["room_id"],
+                            "message_id": message["_id"],
+                            "thread": True,
+                            "data": {
+                                "sender_id": data["sender_id"],
+                                "message": data["message"],
+                                "created_at": data["created_at"],
+                            },
+                        }
+
+                        try:
+                            centrifugo_data = centrifugo_client.publish(
+                                room=room_id, data=response_output
+                            )  # publish data to centrifugo
+                            if (
+                                centrifugo_data
+                                and centrifugo_data.get("status_code") == 200
+                            ):
+                                return Response(
+                                    data=response_output, status=status.HTTP_201_CREATED
+                                )
+                            else:
+                                return Response(
+                                    data="message not sent",
+                                    status=status.HTTP_424_FAILED_DEPENDENCY,
+                                )
+                        except:
                             return Response(
-                                data=response_output, status=status.HTTP_201_CREATED
-                            )
-                        else:
-                            return Response(
-                                data="message not sent",
+                                data="centrifugo server not available",
                                 status=status.HTTP_424_FAILED_DEPENDENCY,
                             )
-                    except:
-                        return Response(
-                            data="centrifugo server not available",
-                            status=status.HTTP_424_FAILED_DEPENDENCY,
-                        )
+                    return Response(
+                        "data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                return Response("sender not in room", status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                "message or room not found", status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "GET":
+        all_messages = DB.read("dm_messages", {"room_id": room_id})
+        if all_messages:
+            if "status_code" in all_messages:
+                if all_messages.get("status_code") == 404:
+                    return Response(
+                        data="No data on zc core", status=status.HTTP_404_NOT_FOUND
+                    )
                 return Response(
-                    "data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                    data="Problem with zc core",
+                    status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
-            return Response("sender not in room", status=status.HTTP_404_NOT_FOUND)
-        return Response("message or room not found", status=status.HTTP_404_NOT_FOUND)
+            for message in all_messages:
+                if message.get("_id") == message_id:
+                    current_message = message
+                    break
+                current_message = None
+            if current_message:
+                data = current_message.get("threads", [])
+                data.reverse()
+                return Response(data, status=status.HTTP_200_OK)
+            return Response(data="Message not found", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def update_thread_message(request, room_id, message_id, message_uuid):
+    """
+    This update a particular thread message
+    """
+    if request.method == "PUT":
+        thread_serializer = ThreadSerializer(data=request.data)
+        if thread_serializer.is_valid():
+            thread_data = thread_serializer.data
+            sender_id = thread_data["sender_id"]
+            message_id = thread_data["message_id"]
+            messages = DB.read("dm_messages", {"room_id": room_id})
+            if messages:
+                if "status_code" in messages:
+                    if messages.get("status_code") == 404:
+                        return Response(
+                            data="No data on zc core", status=status.HTTP_404_NOT_FOUND
+                        )
+                    return Response(
+                        data="Problem with zc core",
+                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                    )
+                for message in messages:
+                    if message.get("_id") == message_id:
+                        thread = message
+                        break
+                    thread = None
+                if thread:
+                    thread_messages = thread.get("threads", [])
+                    for thread_message in thread_messages:
+                        if thread_message.get("_id") == message_uuid:
+                            current_thread_message = thread_message
+                            break
+                        current_thread_message = None
+                    if current_thread_message:
+                        if (
+                            current_thread_message["sender_id"] == sender_id
+                            and thread["_id"] == message_id
+                        ):
+                            current_thread_message["message"] = thread_data["message"]
+                            response = DB.update(
+                                "dm_messages",
+                                thread["_id"],
+                                {"threads": thread_messages},
+                            )
+                            if response and response.get("status") == 200:
+                                response_output = {
+                                    "status": response["message"],
+                                    "event": "thread_message_update",
+                                    "thread_id": current_thread_message["_id"],
+                                    "room_id": thread["room_id"],
+                                    "message_id": thread["_id"],
+                                    "thread": True,
+                                    "data": {
+                                        "sender_id": thread_data["sender_id"],
+                                        "message": thread_data["message"],
+                                        "created_at": thread_data["created_at"],
+                                    },
+                                    "edited": True,
+                                }
+                                try:
+                                    centrifugo_data = centrifugo_client.publish(
+                                        room=room_id, data=response_output
+                                    )
+                                    if (
+                                        centrifugo_data
+                                        and centrifugo_data.get("status_code") == 200
+                                    ):
+                                        return Response(
+                                            data=response_output,
+                                            status=status.HTTP_201_CREATED,
+                                        )
+                                    else:
+                                        return Response(
+                                            data="Message not sent",
+                                            status=status.HTTP_424_FAILED_DEPENDENCY,
+                                        )
+                                except Exception:
+                                    return Response(
+                                        data="Centrifugo server not available",
+                                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                                    )
+                            return Response(
+                                data="Message not updated",
+                                status=status.HTTP_424_FAILED_DEPENDENCY,
+                            )
+                        return Response(
+                            data="Sender_id or message_id invalid",
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    return Response(
+                        data="Thread message not found",
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+                return Response(
+                    data="Message not found", status=status.HTTP_404_NOT_FOUND
+                )
+            return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
+        return Response(thread_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -327,7 +464,11 @@ def send_thread_message(request, room_id, message_id):
     methods=["post"],
     request_body=RoomSerializer,
     operation_summary="Creates a new room between users",
-    responses={201: CreateRoomResponse, 400: "Error: Bad Request"},
+    responses={
+        200: "ok: Room already exist",
+        201: CreateRoomResponse,
+        400: "Error: Bad Request",
+    },
 )
 @api_view(["POST"])
 @db_init_with_credentials
@@ -338,15 +479,6 @@ def create_room(request):
     Then returns the room id when a room is successfully created
     """
 
-    # validate request
-    #   if 'Authorization' in request.headers:
-    #       token = request.headers['Authorization']
-    #   else:
-    #       token = request.headers['Cookie']
-
-    #   verify = verify_user(token)
-    #   if verify.get("status") == 200:
-
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
         user_ids = serializer.data["room_user_ids"]
@@ -355,13 +487,38 @@ def create_room(request):
             room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
                 response_output = {"room_id": room["_id"]}
+
                 return Response(data=response_output, status=status.HTTP_200_OK)
-    response = DB.write("dm_rooms", data=serializer.data)
-    data = response.get("data").get("object_id")
-    if response.get("status") == 200:
-        response_output = {"room_id": data}
-        return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        response = DB.write("dm_rooms", data=serializer.data)
+        data = response.get("data").get("object_id")
+        if response.get("status") == 200:
+            response_output = {
+                "status": response["message"],
+                "event": "create-room",
+                "data": {"room_id": data},
+            }
+            try:
+                centrifugo_data = centrifugo_client.publish(
+                    room=data, data=response_output
+                )  # publish data to centrifugo
+                print(centrifugo_data)
+                if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                    return Response(
+                        data=response_output, status=status.HTTP_201_CREATED
+                    )
+                else:
+                    return Response(
+                        data="room created but centrifugo failed",
+                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                    )
+            except:
+                return Response(
+                    data="centrifugo server not available",
+                    status=status.HTTP_424_FAILED_DEPENDENCY,
+                )
+        return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+    return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -637,12 +794,25 @@ def save_bookmark(request, room_id):
     try:
         serializer = BookmarkSerializer(data=request.data)
         room = DB.read("dm_rooms", {"id": room_id})
-        bookmarks = room["bookmarks"] or []
+        bookmarks = room.get("bookmarks", [])
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
     if serializer.is_valid() and bookmarks is not None:
-        bookmarks.append(serializer.data)
+        # if link already bookmarked, perform an update else create new
+        bookmark = [
+            bookmark
+            for bookmark in bookmarks
+            if bookmark["link"] == serializer.data["link"]
+        ]
+        if bookmark:
+            bookmarks.remove(bookmark[0])
+            bookmark[0].update(serializer.data)
+            bookmarks.append(bookmark[0])
+        else:
+            bookmarks.append(serializer.data)
+
         data = {"bookmarks": bookmarks}
         response = DB.update("dm_rooms", room_id, data=data)
         if response.get("status") == 200:
@@ -1048,12 +1218,13 @@ class SendFile(APIView):
     # @method_decorator(db_init_with_credentials)
     def post(self, request, room_id, org_id):
         print(request.FILES)
+        token = request.META.get("HTTP_AUTHORIZATION")
         if request.FILES:
             file_urls = []
             files = request.FILES.getlist("file")
             if len(files) == 1:
                 for file in request.FILES.getlist("file"):
-                    file_data = DB.upload(file)
+                    file_data = DB.upload(file=file, token=token)
                     if file_data["status"] == 200:
                         for datum in file_data["data"]["files_info"]:
                             file_urls.append(datum["file_url"])
@@ -1063,7 +1234,7 @@ class SendFile(APIView):
                 multiple_files = []
                 for file in files:
                     multiple_files.append(("file", file))
-                file_data = DB.upload_more(multiple_files)
+                file_data = DB.upload_more(files=multiple_files, token=token)
                 if file_data["status"] == 200:
                     for datum in file_data["data"]["files_info"]:
                         file_urls.append(datum["file_url"])
