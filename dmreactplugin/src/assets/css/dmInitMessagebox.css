@@ -1,35 +1,59 @@
 .btn-dm-chat {
-    width: 45px;
-    height: 45px;
-    background-color: #fff;
-    box-shadow: 0 3px 6px rgba(97, 96, 97, 0.03);
-    padding: 0;
-    border: none;
-    user-select: none;
-    cursor: pointer;
-    outline: none;
+  width: 45px;
+  height: 45px;
+  background-color: #fff;
+  box-shadow: 0 3px 6px rgba(97, 96, 97, 0.03);
+  padding: 0;
+  border: none;
+  user-select: none;
+  cursor: pointer;
+  outline: none;
 }
 
 .chat-description h4 {
-    font-size: 15px;
-    font-weight: 700;
-    line-height: 1.75;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.75;
 }
 
 .chat-description p {
-    font-size: 15px;
-    font-weight: normal;
-    line-height: 1.5;
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1.5;
 }
 
 .chat-description p:first-child {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .dm-username-id {
-    color: var(--color-hover-send);
-    cursor: pointer;
-    user-select: none;
-    outline: none;
-    padding-left: 5px;
+  color: var(--color-hover-send);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  padding-left: 5px;
+}
+.dmInitmessageHeadText {
+  font-size: 15px;
+}
+
+.dmInitmessageSubText {
+  font-size: 13px;
+}
+.dmSecondUsersName:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.dm-message-data-tip-pop-up {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dm-message-data-tip-pop-up .dm-message-data-tip-pop-up-image {
+  border-radius: 5px;
+}
+.dm-message-data-tip-pop-up-fullname,
+.dm-message-data-tip-pop-up-username {
+  font-weight: 600;
+  font-size: calc(1rem - 1px);
 }

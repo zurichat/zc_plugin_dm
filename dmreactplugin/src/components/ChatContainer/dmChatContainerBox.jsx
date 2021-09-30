@@ -19,11 +19,16 @@ const DmChatContainerBox = ({ user2_id }) => {
     setOpenThread(false);
   };
 
+  const membersReducer = useSelector(({ membersReducer }) => membersReducer);
+  const actualUser =
+    membersReducer && membersReducer.find((member) => member._id === user2_id);
+  const user = actualUser ? actualUser : null;
+  console.log('This is the userooooo' + user?.name);
   return (
     <>
       <div className='dm-chatContainerBox w-100 d-flex align-items-end'>
         <main className='dm-chat-main-container'>
-          <DmInitMessageBox />
+          <DmInitMessageBox secondUser={user} />
 
           {room_messages?.results
             ? room_messages?.results
