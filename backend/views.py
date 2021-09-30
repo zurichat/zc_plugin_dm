@@ -236,9 +236,11 @@ def message_create_get(request, room_id):
 @db_init_with_credentials
 def send_thread_message(request, room_id, message_id):
     """
-    validates if the message exists, then sends
+    Post_method: validates if the message exists, then sends
     a publish event to centrifugo after
     thread message is persisted.
+    Get method: Validate if the room and the message exist, then retrives
+    all thread messages under the message.
     """
     
 
