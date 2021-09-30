@@ -134,26 +134,19 @@ def side_bar(request):
     }
     return JsonResponse(side_bar, safe=False)
 
-
-class MessageCreateGet(APIView):
-    """
-    Sends messages to users in rooms.
-    Gets all messages in a room
-    """
-
-    @swagger_auto_schema(
-        operation_summary="Retrieves all messages in a particular room",
-        query_serializer=GetMessageSerializer,
-        responses={
-            200: MessageResponse,
-            204: "No Messages Available",
-            400: "Error: Bad Request",
-            404: "Error: Room Not Found",
+@swagger_auto_schema(
+    methods=["post","get"],
+    query_serializer=GetMessageSerializer,
+    operation_summary="Creates and get messages",
+   responses={
+            201: MessageResponse,
+            400: "Error: Bad Request"
         }
-    )
-    
-    @method_decorator(db_init_with_credentials)
-    def get(self, request, room_id):  
+)
+@api_view(["GET","POST"])
+@db_init_with_credentials
+def message_create_get(request, room_id):
+    if request.method == "GET":
         paginator = PageNumberPagination()
         paginator.page_size = 30
         date = request.GET.get("date", None)
@@ -184,17 +177,7 @@ class MessageCreateGet(APIView):
             return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-    @swagger_auto_schema(
-        request_body=MessageSerializer,
-        operation_summary="Sends messages to users in a room",
-        responses={
-            201: MessageResponse,
-            400: "Error: Bad Request"
-        }
-    )
-    @method_decorator(db_init_with_credentials)
-    def post(self, request, room_id): 
+    elif request.method == "POST":
         request.data["room_id"] = room_id
         print(request)
         serializer = MessageSerializer(data=request.data)
