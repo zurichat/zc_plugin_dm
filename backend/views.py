@@ -91,25 +91,26 @@ def verify_user(token):
 def side_bar(request):
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    user_rooms = get_rooms(user_id=user, org_id=org_id)
+    response = get_rooms(user_id=user, org_id=org_id)
+    user_rooms = response
     rooms = []
-
     if user_rooms == None:
-        return user_rooms
-    for room in user_rooms:
-        if "org_id" in room:
-            if org_id == room["org_id"]:
-                room_profile = {}
-                for user_id in room["room_user_ids"]:
-                    profile = get_user_profile(org_id, user_id)
-                    if profile["status"] == 200:
-                        room_profile["room_name"] = profile["data"]["user_name"]
-                        if profile["data"]["image_url"]:
-                            room_profile["room_image"] = profile["data"]["image_url"]
-                        else:
-                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                        rooms.append(room_profile)
-                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
+        pass
+    else:
+        for room in user_rooms:
+            if "org_id" in room:
+                if org_id == room["org_id"]:
+                    room_profile = {}
+                    for user_id in room["room_user_ids"]:
+                        profile = get_user_profile(org_id, user_id)
+                        if profile["status"] == 200:
+                            room_profile["room_name"] = profile["data"]["user_name"]
+                            if profile["data"]["image_url"]:
+                                room_profile["room_image"] = profile["data"]["image_url"]
+                            else:
+                                room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            rooms.append(room_profile)
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
@@ -325,6 +326,7 @@ def send_thread_message(request, room_id, message_id):
     request_body=RoomSerializer,
     operation_summary="Creates a new room between users",
     responses={
+        200: "ok: Room already exist",
         201: CreateRoomResponse,
         400: "Error: Bad Request"
     }
@@ -338,15 +340,6 @@ def create_room(request):
     Then returns the room id when a room is successfully created
     """
 
-    # validate request
-    #   if 'Authorization' in request.headers:
-    #       token = request.headers['Authorization']
-    #   else:
-    #       token = request.headers['Cookie']
-
-    #   verify = verify_user(token)
-    #   if verify.get("status") == 200:
-
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
         user_ids = serializer.data["room_user_ids"]
@@ -354,14 +347,33 @@ def create_room(request):
         for room in user_rooms:
             room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
-                response_output = {"room_id": room["_id"]}
+                response_output = {
+                                    "room_id": room["_id"]
+                                   }
+
                 return Response(data=response_output, status=status.HTTP_200_OK)
-    response = DB.write("dm_rooms", data=serializer.data)
-    data = response.get("data").get("object_id")
-    if response.get("status") == 200:
-        response_output = {"room_id": data}
-        return Response(data=response_output, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        response = DB.write("dm_rooms", data=serializer.data)
+        data = response.get("data").get("object_id")
+        if response.get("status") == 200:
+            response_output = {
+                                "status": response["message"],
+                                "event": "create-room",
+                                "data": {"room_id": data
+                                         }
+                            }
+            try:
+                centrifugo_data = centrifugo_client.publish (
+                    room=data, data=response_output )  # publish data to centrifugo
+                print(centrifugo_data)
+                if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
+                    return Response ( data=response_output, status=status.HTTP_201_CREATED )
+                else:
+                    return Response ( data="room created but centrifugo failed", status=status.HTTP_424_FAILED_DEPENDENCY )
+            except:
+                return Response ( data="centrifugo server not available", status=status.HTTP_424_FAILED_DEPENDENCY )
+        return Response ( "data not sent", status=status.HTTP_424_FAILED_DEPENDENCY )
+    return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
