@@ -1355,7 +1355,6 @@ def delete_bookmark(request, room_id):
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, user_id):
-    serializer = MessageSearchSerializer(data=request.data)
     paginator = PageNumberPagination()
     paginator.page_size = 30
     
