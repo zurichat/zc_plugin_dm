@@ -91,7 +91,7 @@ def verify_user(token):
 def side_bar(request):
     org_id = request.GET.get("org", None)
     user = request.GET.get("user", None)
-    response = requests.get(f"http://127.0.0.1:8000/api/v1/org/{org_id}/users/{user}/rooms")
+    response = requests.get(f"https://dm.zuri.chat/api/v1/org/{org_id}/users/{user}/rooms")
     user_rooms = response.json()
     rooms = []
 
