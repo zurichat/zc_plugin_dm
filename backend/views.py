@@ -314,6 +314,7 @@ def send_thread_message(request, room_id, message_id):
                 current_message = None
             if current_message:
                 data = current_message.get("threads", [])
+                data.reverse()
                 return Response(data, status=status.HTTP_200_OK)
             return Response(data="Message not found", status=status.HTTP_404_NOT_FOUND)
         return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
