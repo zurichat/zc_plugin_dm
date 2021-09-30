@@ -18,7 +18,8 @@ jobs:
       
       - name: install Dependencies && run build statics
         run: |
-          cd dmplugins
+          cd dmreactplugin
+          git init
           yarn install
           yarn build
           cd dist
@@ -37,7 +38,8 @@ jobs:
             git reset --hard origin/main
             git stash
             git pull
-            cd dmplugins
+            cd dmreactplugin
+            git init
             yarn install
             cd ../dmspa/
             yarn install
@@ -49,8 +51,8 @@ jobs:
           host: ${{ secrets.ZURI_HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          localPath: './dmplugins/dist/'
-          remotePath: '/home/orpheus/zc_plugin_dm/dmplugins/dist'
+          localPath: './dmreactplugin/dist/'
+          remotePath: '/home/orpheus/zc_plugin_dm/dmreactplugin/dist'
           
       - name: serve app
         uses: appleboy/ssh-action@master
