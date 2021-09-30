@@ -715,12 +715,22 @@ def save_bookmark(request, room_id):
     try:
         serializer = BookmarkSerializer(data=request.data)
         room = DB.read("dm_rooms", {"id": room_id})
-        bookmarks = room["bookmarks"] or []
+        bookmarks = room.get("bookmarks", [])
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
     if serializer.is_valid() and bookmarks is not None:
-        bookmarks.append(serializer.data)
+        # if link already bookmarked, perform an update else create new
+        bookmark = [
+            bookmark for bookmark in bookmarks if bookmark["link"] == serializer.data["link"]]
+        if bookmark:
+            bookmarks.remove(bookmark[0])
+            bookmark[0].update(serializer.data)
+            bookmarks.append(bookmark[0])
+        else:
+            bookmarks.append(serializer.data)
+
         data = {"bookmarks": bookmarks}
         response = DB.update("dm_rooms", room_id, data=data)
         if response.get("status") == 200:
