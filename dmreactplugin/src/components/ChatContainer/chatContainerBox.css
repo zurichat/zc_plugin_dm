@@ -18,4 +18,6 @@
   transition: all 0.005s ease-out;
 }
 .dm-chat-main-container {
+  display: flex;
+  flex-direction: column-reverse;
 }

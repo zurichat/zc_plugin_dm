@@ -18,7 +18,7 @@ function DmSingleMessageContainer({ messages, user2_id }) {
   return (
     <>
       <div className='dm-plugin-thread-messages'>
-        <div className='dm-plugin-thread-message-group px-3 py-2'>
+        <div className='dm-plugin-thread-message-group px-3 py-3'>
           <div className='dm-plugin-thread-message-image-container'>
             <img
               src={user?.image_url}

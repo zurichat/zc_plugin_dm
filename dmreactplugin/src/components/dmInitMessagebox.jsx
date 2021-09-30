@@ -29,7 +29,11 @@ const DmInitMessageBox = ({ secondUser }) => {
             >
               @{secondUser?.user_name}
             </span>
-            <ReactTooltip id='userInfoPopUp' effect='solid'>
+            <ReactTooltip
+              id='userInfoPopUp'
+              effect='solid'
+              className='dm-toolTip-custom-class'
+            >
               <div className='dm-message-data-tip-pop-up'>
                 <img
                   src={secondUser?.image_url}

@@ -57,3 +57,9 @@
   font-weight: 600;
   font-size: calc(1rem - 1px);
 }
+
+.dm-toolTip-custom-class {
+  padding: 5px 8px !important;
+  opacity: 1 !important;
+  border-radius: 8px !important;
+}
