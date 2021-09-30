@@ -33,13 +33,15 @@ const StyledImgCover = styled.div`
   padding: 5px;
 `;
 
-const AddBookmarkDropDown = () => {
+const AddBookmarkDropDown = ({ onOpenModal }) => {
   let [open, setOpen] = useState(false);
   let openModal = () => {
     setOpen(true);
+    onOpenModal(true);
   };
   let closeModal = () => {
     setOpen(false);
+    onOpenModal(false);
   };
   return (
     <>
