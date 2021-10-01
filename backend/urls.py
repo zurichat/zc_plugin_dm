@@ -153,7 +153,11 @@ urlpatterns = [
         views.ThreadEmoji.as_view(),
         name="message_thread_reaction",
     ),
-    
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/star", 
+        views.star_room, 
+        name="star_room"
+        ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

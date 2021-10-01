@@ -258,3 +258,15 @@ def get_messages(response, date):
 def get_user_profile(org_id=None, user_id=None):
     profile = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/{user_id}", headers=header)
     return profile.json()
+
+# moves starred users in dm to a list
+def user_starred_rooms(user_id, org_id):
+    rooms = get_rooms(user_id, org_id)
+    starred_rooms = []
+    for room in rooms:
+        try:
+            if room["starred"] == True:
+                starred_rooms.append(room)
+        except Exception:
+            pass
+    return starred_rooms

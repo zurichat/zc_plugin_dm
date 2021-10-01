@@ -1714,4 +1714,31 @@ class ThreadEmoji(APIView):
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
-    
+@api_view(["PUT"])
+@db_init_with_credentials
+def star_room(request, room_id):
+    """
+    stars users and moves to starred list
+    """
+    if request.method == "PUT":
+        room = DB.read("dm_rooms", {"_id": room_id})
+        if room:
+            if "status_code" in room:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                else:
+                    return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            
+            else:
+                starred = room["starred"]
+                data = {"starred": not starred}
+                response = DB.update("dm_rooms", room_id, data=data)
+                if response and response.get("status") == 200:
+                    return Response(data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
+                
+        else:
+            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
