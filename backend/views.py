@@ -144,7 +144,42 @@ def side_bar(request):
             400: "Error: Bad Request"
         }
 )
-
+@api_view(["GET","POST"])
+@db_init_with_credentials
+def message_create_get(request, room_id):
+    if request.method == "GET":
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        date = request.GET.get("date", None)
+        print(request.GET.dict())
+        params_serializer = GetMessageSerializer(data=request.GET.dict())
+        if params_serializer.is_valid():
+            room = DB.read("dm_rooms", {"_id": room_id})
+            if room:
+                messages = get_room_messages(room_id, DB.organization_id)
+                if date != None:
+                    messages_by_date = get_messages(messages, date)
+                    if messages_by_date == None or "message" in messages_by_date:
+                        return Response(
+                            data="No messages available",
+                            status=status.HTTP_204_NO_CONTENT,
+                        )
+                    else:
+                        messages_page = paginator.paginate_queryset(
+                            messages_by_date, request
+                        )
+                        return paginator.get_paginated_response(messages_page)
+                else:
+                    if messages == None or "message" in messages:
+                        return Response(
+                            data="No messages available",
+                            status=status.HTTP_204_NO_CONTENT,
+                        )
+                    result_page = paginator.paginate_queryset(messages, request)
+                    return paginator.get_paginated_response(result_page)
+            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == "POST":
         request.data["room_id"] = room_id
