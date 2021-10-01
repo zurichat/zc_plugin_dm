@@ -127,7 +127,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
-        "button_url":"/dm",
+        "button_url":f"/dm/{org_id}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
@@ -149,7 +149,7 @@ def side_bar(request):
 def message_create_get(request, room_id):
     if request.method == "GET":
         paginator = PageNumberPagination()
-        paginator.page_size = 30
+        paginator.page_size = 20
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
@@ -163,10 +163,11 @@ def message_create_get(request, room_id):
                             data="No messages available",
                             status=status.HTTP_204_NO_CONTENT,
                         )
-                    messages_page = paginator.paginate_queryset(
-                        messages_by_date, request
-                    )
-                    return paginator.get_paginated_response(messages_page)
+                    else:
+                        messages_page = paginator.paginate_queryset(
+                            messages_by_date, request
+                        )
+                        return paginator.get_paginated_response(messages_page)
                 else:
                     if messages == None or "message" in messages:
                         return Response(
@@ -175,8 +176,10 @@ def message_create_get(request, room_id):
                         )
                     result_page = paginator.paginate_queryset(messages, request)
                     return paginator.get_paginated_response(result_page)
-            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
-        return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == "POST":
         request.data["room_id"] = room_id
