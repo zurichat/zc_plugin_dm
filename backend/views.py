@@ -1685,7 +1685,7 @@ class ThreadEmoji(APIView):
             if current_thread_message:
                 return Response(
                     data={
-                        "status": message["message"],
+                        "status": "200",
                         "event": "get_thread_message_reactions",
                         "room_id": message["room_id"],
                         "message_id": message["_id"],
@@ -1699,4 +1699,61 @@ class ThreadEmoji(APIView):
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
-    
+    def post(self, request, org_id: str, room_id: str, message_id: str, thread_message_id: str):
+        request.data["message_id"] = thread_message_id
+        serializer = EmojiSerializer(data=request.data)
+
+        if serializer.is_valid():
+            data = serializer.data
+#            data["count"] += 1
+            thread_message_id = data["message_id"]
+            sender_id = data["sender_id"]
+            data_storage = DataStorage()
+            data_storage.organization_id = org_id
+            
+            # fetch message related to that reaction
+            message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+            if message:
+                if "status_code" in message:
+                    return Response(
+                    data="Unable to retrieve data from zc core", 
+                    status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                # get reactions
+                current_thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+                if current_thread_message:
+                    reactions = current_thread_message[0].get("reactions", [])
+                    reactions.append(data)
+                    # update reactions for a message
+                    response = data_storage.update("dm_messages", message_id, {"threads": current_thread_message})
+                    if response.get("status", None) == 200:
+                        response_output = {
+                            "status": response["message"],
+                            "event": "add_thread_message_reaction",
+                            "reaction_id": str(uuid.uuid1()),
+                            "parent_message_id": message["_id"],
+                            "thread_message_id": current_thread_message[0]["_id"],
+                            "data": {
+                                "sender_id": sender_id,
+                                "reaction": data["data"],
+                                "created_at": data["created_at"],
+                            },
+                        }
+                        centrifugo_data = centrifugo_client.publish(
+                            room=message["room_id"], data=response_output
+                        )  # publish data to centrifugo
+                        if centrifugo_data["message"].get("error", None) == None:
+                            return Response(
+                                data=response_output, status=status.HTTP_201_CREATED
+                            )
+                    return Response(
+                        "Data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                return Response(data="Not such thread message", status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                "Message or room not found", status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )  
