@@ -12,16 +12,25 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages/search", 
-        views.search_DM, 
-        name="search DM"
+
+    path(
+        "api/v1/org/<str:org_id>/users/<str:user_id>/messages/search", 
+         views.search_DM,
+         name="search DM"
     ),
-    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",  
-        views.message_create_get, 
-        name="create_get_message"
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",  
+         views.message_create_get,
+         name="create_get_message"
     ),
-    path("api/v1/org/<str:org_id>/room", 
-        views.create_room, 
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
+        views.update_thread_message,
+        name="update_thread_message",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/room",
+        views.create_room,
         name="create_room"
     ),
     path(
@@ -40,7 +49,9 @@ urlpatterns = [
         name="get_user_rooms",
     ),
     path(  # what is this endpoint doing?
-        "api/v1/org/<str:org_id>/reminder", views.remind_message, name="reminder"
+        "api/v1/org/<str:org_id>/reminder",
+        views.remind_message,
+        name="reminder",
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
@@ -72,7 +83,7 @@ urlpatterns = [
         views.retrieve_bookmarks,
         name="get_bookmarks",
     ),
-    path(  # might require a room id
+    path( 
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         views.mark_read,
         name="mark_read",
@@ -97,8 +108,8 @@ urlpatterns = [
         views.message_filter,
         name="message_filter",
     ),
-    path(  # might require a room id
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/delete_message",
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/message",
         views.delete_message,
         name="delete_message",
     ),
@@ -107,7 +118,7 @@ urlpatterns = [
         views.user_profile,
         name="user_profile",
     ),
-    path(  # ??? how are the files sent? as messages?
+    path( 
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="media_files",
