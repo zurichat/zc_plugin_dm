@@ -12,6 +12,7 @@ import '../src/assets/css/global.module.css';
 
 // import chat components here
 import ChatHome from './pages/newChatRoom';
+import AllDms from './pages/allDms/AllDms';
 
 // Import REDUX action
 import { useDispatch } from 'react-redux';
@@ -28,8 +29,8 @@ const App = () => {
         .filter((string) => string.length > 11);
 
     useEffect(() => {
-        dispatch(handleGetRooms(org_id, loggedInUser_id));
-        dispatch(handleGetMembers(org_id));
+       org_id && loggedInUser_id && dispatch(handleGetRooms(org_id, loggedInUser_id));
+       org_id && dispatch(handleGetMembers(org_id));
     }, [location, org_id, loggedInUser_id]);
 
     return (
@@ -43,6 +44,15 @@ const App = () => {
                             org_id={org_id}
                             loggedInUser_id={loggedInUser_id}
                             room_id={room_id}
+                        />
+                    )}
+                />
+                <Route
+                    exact
+                    path={`/${org_id}/all-dms`}
+                    render={() => (
+                        <AllDms
+                            org_id={org_id}
                         />
                     )}
                 />
