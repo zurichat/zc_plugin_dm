@@ -1255,11 +1255,19 @@ def delete_bookmark(request, room_id):
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    paginator = PageNumberPagination()
-    paginator.page_size = 30
     
     keyword = request.query_params.get('keyword',"")
     users = request.query_params.getlist('id',[])
+    limit = request.query_params.get('limit',20)
+    
+    try: 
+        if type(limit) == str: limit = int(limit)
+    except ValueError:
+        limit=20
+    
+    paginator = PageNumberPagination()
+    paginator.page_size = limit
+    
     rooms = DB.read("dm_rooms") #get all rooms
     user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
     if user_rooms != []:
@@ -1288,16 +1296,16 @@ def search_DM(request, member_id):
                                 if message['room_id'] in room_ids and message['message'].find(keyword) != -1] 
         
         user_rooms_messages.extend(user_rooms_threads)
-        for message in user_rooms_messages:
-            if 'read' in message.keys(): del message['read']
-            if 'pinned' in message.keys():del message['pinned']
-            if 'saved_by' in message.keys():del message['saved_by']
-            if 'threads' in message.keys(): del message['threads']
-            if 'thread' not in message.keys(): message['thread'] = False
-        result_page = paginator.paginate_queryset(user_rooms_messages, request)
-        return paginator.get_paginated_response(result_page)
-        # return Response(user_rooms_messages, status=status.HTTP_200_OK)   
-    return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
+        if user_rooms_messages != []:
+            for message in user_rooms_messages:
+                if 'read' in message.keys(): del message['read']
+                if 'pinned' in message.keys():del message['pinned']
+                if 'saved_by' in message.keys():del message['saved_by']
+                if 'threads' in message.keys(): del message['threads']
+                if 'thread' not in message.keys(): message['thread'] = False
+            result_page = paginator.paginate_queryset(user_rooms_messages, request)
+            return paginator.get_paginated_response(result_page) 
+    return Response([], status=status.HTTP_200_OK)
 
 
 
