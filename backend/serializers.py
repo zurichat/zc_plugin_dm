@@ -44,6 +44,9 @@ class ThreadSerializer(serializers.Serializer):
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
     )
+    reactions = serializers.ListField(
+        required=False, default=[], child=EmojiSerializer()
+    )
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -153,3 +156,4 @@ class ScheduleMessageSerializer(serializers.Serializer):
         if datetime.now() > timer.replace(tzinfo=None):
             raise serializers.ValidationError("Date cannot be in the past.")
         return timer
+
