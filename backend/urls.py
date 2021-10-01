@@ -14,7 +14,7 @@ urlpatterns = [
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
 
     path(
-        "api/v1/org/<str:org_id>/users/<str:user_id>/messages/search", 
+        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search", 
          views.search_DM,
          name="search DM"
     ),
@@ -23,11 +23,11 @@ urlpatterns = [
          views.message_create_get,
          name="create_get_message"
     ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
-        views.update_thread_message,
-        name="update_thread_message",
-    ),
+    # path(
+    #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
+    #     views.update_thread_message,
+    #     name="update_thread_message",
+    # ),
     path(
         "api/v1/org/<str:org_id>/room",
         views.create_room,
