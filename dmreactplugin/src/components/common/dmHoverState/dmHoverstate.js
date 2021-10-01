@@ -8,7 +8,7 @@ import { CgMoreVertical } from 'react-icons/cg';
 import ReactTooltip from 'react-tooltip';
 import ThreeDotKebab from '../threeDotKebabMenu/threeDotKebab';
 
-function MessageWrapper({ children, handleOpenThread }) {
+function MessageWrapper({ children, handleOpenThread, messages }) {
   const [isShown, setIsShown] = useState(false);
   const [isAppear, setIsAppear] = useState(false)
 
@@ -59,7 +59,7 @@ function MessageWrapper({ children, handleOpenThread }) {
         </div>
       )}
       {children}
-      {isAppear && <ThreeDotKebab className="Dm-ThreeDotKebabMenu-Appear"/>}
+      {isAppear && <ThreeDotKebab className="Dm-ThreeDotKebabMenu-Appear" messages={messages}/>}
     </div>
   );
 }
