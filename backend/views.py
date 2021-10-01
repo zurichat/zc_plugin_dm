@@ -137,7 +137,7 @@ def side_bar(request):
 @swagger_auto_schema(
     methods=["post","get"],
     query_serializer=GetMessageSerializer,
-    operation_summary="Creates and get messag614e3787f31a74e068e4d49ees",
+    operation_summary="Creates and get messages",
    responses={
             201: MessageResponse,
             400: "Error: Bad Request"
@@ -1699,3 +1699,4 @@ class ThreadEmoji(APIView):
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
+    
