@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
+
     path(
         "api/v1/org/<str:org_id>/users/<str:user_id>/messages/search", 
          views.search_DM,
@@ -52,11 +53,6 @@ urlpatterns = [
         views.remind_message,
         name="reminder",
     ),
-    # path(
-    #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-    #     views.room_messages,
-    #     name="room_messages"
-    # ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
         views.copy_message_link,
@@ -151,6 +147,11 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>",
         views.ThreadDetailView.as_view(),
         name="messages_thread_detail",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions",
+        views.ThreadEmoji.as_view(),
+        name="message_thread_reaction",
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
