@@ -22,7 +22,7 @@ function DmSingleMessageContainer({ messages, user2_id }) {
           <div className='dm-plugin-thread-message-image-container'>
             <img
               src={user?.image_url}
-              alt='Profile Picture'
+              alt=''
               width='36'
               height='36'
               className='dm-plugin-thread-message-image'
