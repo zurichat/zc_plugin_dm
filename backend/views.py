@@ -127,7 +127,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
-        "button_url":"/dm",
+        "button_url":f"/dm/{org_id}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
@@ -151,7 +151,6 @@ def message_create_get(request, room_id):
         paginator = PageNumberPagination()
         paginator.page_size = 20
         date = request.GET.get("date", None)
-        print(request.GET.dict())
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
             room = DB.read("dm_rooms", {"_id": room_id})
@@ -177,7 +176,8 @@ def message_create_get(request, room_id):
                         )
                     result_page = paginator.paginate_queryset(messages, request)
                     return paginator.get_paginated_response(result_page)
-            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+            else:
+                return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
