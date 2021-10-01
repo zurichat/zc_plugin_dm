@@ -57,8 +57,8 @@ def info(request):
             "scaffold_structure": "Monolith",
             "team": "HNG 8.0/Team Orpheus",
             "sidebar_url": "https://dm.zuri.chat/api/v1/sidebar",
-            "homepage_url": "https://dm.zuri.chat/",
-            "create_room_url": "https://dm.zuri.chat/api/v1/<str:org_id>/createroom",
+            "homepage_url": "https://dm.zuri.chat/dm",
+            "create_room_url": "https://dm.zuri.chat/api/v1/<str:org_id>/room",
         },
         "success": "true",
     }
@@ -127,6 +127,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
+        "button_url":"/dm",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
