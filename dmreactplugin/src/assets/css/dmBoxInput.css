@@ -1,0 +1,37 @@
+.shortcut-btn.btn-inputfield-box {
+    border-right: 2px solid #ccc;
+    border-radius: 0;
+}
+
+.btn-inputfield-box {
+    background: transparent;
+    border: none;
+    margin-right: 4px;
+}
+
+.btn-inputfield-box:hover {
+    background-color: var(--clr-hover);
+}
+
+.send-btn-box.btn-inputfield-box {
+    color: var(--clr-text);
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+}
+
+.send-btn-box.btn-inputfield-box .sendMessage {
+    border-right: 2px solid #ccc;
+    padding: 0 8px;
+}
+
+.send-btn-box.btn-inputfield-box .dm-schedule-message {
+    padding: 0 4px;
+}
+
+.send-btn-box.btn-inputfield-box:disabled {
+    color: #fff;
+}

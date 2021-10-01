@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-import link from "../../../assets/img/svg/link.svg";
+import link from "../../../../assets/img/svg/link.svg";
+
 const StyledTextField = styled.input`
   border: none;
   outline: none;
@@ -13,6 +14,7 @@ const StyledNameTextField = styled.div`
   border: 2px solid gray;
   border-radius: 0.25rem;
   display: flex;
+  width: 100%;
   &:focus-within {
     border: 2px solid #00b87c;
   }
@@ -27,12 +29,12 @@ const NameTextField = ({ placeholder, label, value, onChange }) => {
     onChange(e.target.value);
   };
   return (
-    <div className="d-flex flex-column gap-1">
+    <div className="d-flex flex-column gap-1 align-items-start">
       <label htmlFor={label} style={{ fontSize: "20px" }}>
         {label}
       </label>
-      <StyledNameTextField className="focus px-3">
-        <img src={link} alt="link" className="some" />
+      <StyledNameTextField className="px-3">
+        <img src={link} alt="link" />
         <StyledTextField
           type="text"
           className="d-block w-100 p-3 text-secondary rounded-2"

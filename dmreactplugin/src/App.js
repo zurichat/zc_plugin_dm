@@ -1,22 +1,44 @@
+import React, { useEffect } from 'react';
+import {
+    BrowserRouter as Router,
+    Route,
+    Switch,
+    useLocation,
+} from 'react-router-dom';
 
+<<<<<<< HEAD
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+=======
+// import css styles here
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../src/assets/css/global.module.css';
 
-// Import all Global CSS components
-import "bootstrap/dist/css/bootstrap.min.css";
-import "../src/assets/css/global.module.css";
+// import chat components here
+import ChatHome from './pages/newChatRoom';
+import AllDms from './pages/allDms/AllDms';
+>>>>>>> b98ada53b9fe6694665110191cf2101a01f0c2ec
 
-// Import all Router components
-import ChatHome from "./pages/chathome";
-import RemovePinnedMessage from "./components/common/pinnedMessage/removePinnedMessageModal";
-import PinnedMessage from "./components/dmPinnedMessages";
-import HoverPinnedMessage from "./components/common/pinnedMessage/hoverViewPinned";
-import AddBookmark from "./components/common/addBookmarkKebab/addBookmark";
-import AddBookmarkLink from "./components/common/addBookmarkKebab/addBookmarkLink";
+// Import REDUX action
+import { useDispatch } from 'react-redux';
+import { handleGetRooms } from './Redux/Actions/dmActions';
+import { handleGetMembers } from './Redux/Actions/Members';
 
-import dmSingleMessageContainer from './components/dmSingleMessageContainer';
 const App = () => {
+    const dispatch = useDispatch();
 
+    let location = useLocation();
+
+    let [org_id, room_id, loggedInUser_id] = location.pathname
+        .split('/')
+        .filter((string) => string.length > 11);
+
+    useEffect(() => {
+       org_id && loggedInUser_id && dispatch(handleGetRooms(org_id, loggedInUser_id));
+       org_id && dispatch(handleGetMembers(org_id));
+    }, [location, org_id, loggedInUser_id]);
+
+<<<<<<< HEAD
     
   return (
     <Router basename="/dm">
@@ -51,6 +73,34 @@ const App = () => {
       </Switch>
     </Router>
   );
+=======
+    return (
+        <Router basename='/dm'>
+            <Switch>
+                <Route
+                    exact
+                    path={`/${org_id}/${room_id}/${loggedInUser_id}`}
+                    render={() => (
+                        <ChatHome
+                            org_id={org_id}
+                            loggedInUser_id={loggedInUser_id}
+                            room_id={room_id}
+                        />
+                    )}
+                />
+                <Route
+                    exact
+                    path={`/${org_id}/all-dms`}
+                    render={() => (
+                        <AllDms
+                            org_id={org_id}
+                        />
+                    )}
+                />
+            </Switch>
+        </Router>
+    );
+>>>>>>> b98ada53b9fe6694665110191cf2101a01f0c2ec
 };
 
 export default App;

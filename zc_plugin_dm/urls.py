@@ -22,33 +22,42 @@ from drf_yasg import openapi
 
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="Zuri Chat Direct Messaging Plugin API",
-      default_version='v1',
-      description="Compiled By Team Orpheus HNGi8",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="dm_plugin@zuri.chat"),
-      license=openapi.License(name="BSD License"),
-   ),
-   url="https://dm.zuri.chat",
-# url="http://127.0.0.1:8000",
-   public=True,
-   permission_classes=(permissions.AllowAny,),
-   #validators=["ssv"],
+    openapi.Info(
+        title="Zuri Chat Direct Messaging Plugin API",
+        default_version="v1",
+        description="Contains all the available endpoints for the Zuri Chat DM plugin as compiled By Team Orpheus HNGi8",
+        terms_of_service="https://dm.zuri.chat/dm/policies/terms/",
+        contact=openapi.Contact(email="dm_plugin@zuri.chat"),
+    ),
+    url="https://dm.zuri.chat",
+    # url="http://127.0.0.1:8000",
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    # validators=["ssv"],
 )
 
 
-#app urls
+# app urls
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('backend.urls')),
-    path('dm', include('backend.urls')),
+    path("admin/", admin.site.urls),
+    path("", include("backend.urls")),
+    path("dm", include("backend.urls")),
 ]
 
 
-#documentation urls
+# documentation urls
 urlpatterns += [
-   url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-   url(r'^docs/v1/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-   url(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    url(
+        r"^swagger(?P<format>\.json|\.yaml)$",
+        schema_view.without_ui(cache_timeout=0),
+        name="schema-json",
+    ),
+    url(
+        r"^docs/v1/$",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    url(
+        r"^redoc/$", schema_view.with_ui("redoc", cache_timeout=0), name="schema-redoc"
+    ),
 ]

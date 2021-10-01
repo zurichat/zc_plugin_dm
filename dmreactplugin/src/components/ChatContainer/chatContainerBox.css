@@ -1,0 +1,23 @@
+.dm-chatContainerBox {
+  width: 100%;
+  height: 100%;
+  padding-right: 0;
+  overflow: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.dm-chatContainerBox::-webkit-scrollbar {
+  display: none;
+}
+.asideContent {
+  width: 0;
+}
+
+.asideContent.active {
+  width: 340px;
+  transition: all 0.005s ease-out;
+}
+.dm-chat-main-container {
+  display: flex;
+  flex-direction: column-reverse;
+}
