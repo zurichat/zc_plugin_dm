@@ -12,7 +12,7 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path("api/v1/org/<str:org_id>/users/<str:user_id>/messages/search", 
+    path("api/v1/org/<str:org_id>/members/<str:member_id>/messages/search", 
          views.search_DM, name="search DM"),
     path("api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",  
          views.message_create_get, name="create_get_message"),
