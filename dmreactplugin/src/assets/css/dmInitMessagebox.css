@@ -6,7 +6,7 @@
   padding: 0;
   border: none;
   user-select: none;
-  cursor: pointer;
+
   outline: none;
 }
 
@@ -35,10 +35,12 @@
 }
 .dmInitmessageHeadText {
   font-size: 15px;
+  margin-bottom: 0;
 }
 
 .dmInitmessageSubText {
   font-size: 13px;
+  margin-bottom: 0;
 }
 .dmSecondUsersName:hover {
   text-decoration: underline;
@@ -62,4 +64,9 @@
   padding: 5px 8px !important;
   opacity: 1 !important;
   border-radius: 8px !important;
+}
+.dm-init-message-box-chatdots {
+  vertical-align: middle;
+  width: 15.75px;
+  height: 15.75px;
 }
