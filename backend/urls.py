@@ -153,6 +153,7 @@ urlpatterns = [
         views.ThreadEmoji.as_view(),
         name="message_thread_reaction",
     ),
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
