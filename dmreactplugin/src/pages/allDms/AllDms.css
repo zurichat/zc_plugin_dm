@@ -26,16 +26,19 @@
     padding: 10px 16px;
     background: #FFF;
     display: flex;
+    align-items: center;
 }
 
 .alldms-searchusers p{
     margin: 0 10px 0 0;
+    font-size: 13px;
 }
 
 .alldms-searchusers-content{
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    width: 100%;
 }
 
 .alldms-seleteduserstag{
@@ -101,6 +104,21 @@
     border-radius: 5px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.14);
     overflow-y: scroll;
+}
+
+.alldms-searchedusersmodal .loading-text{
+    display: flex;
+    align-items: center;
+}
+
+.alldms-searchedusersmodal .loading-gif{
+    width: 20px;
+    margin-left: 20px;
+    margin-right: 10px;
+
+}
+.alldms-searchedusersmodal .notFound-text{
+    margin-left: 20px;
 }
 
 .alldms-searchedusersmodal .user{
