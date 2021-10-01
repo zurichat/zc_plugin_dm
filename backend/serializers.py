@@ -44,6 +44,9 @@ class ThreadSerializer(serializers.Serializer):
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
     )
+    reactions = serializers.ListField(
+        required=False, default=[], child=EmojiSerializer()
+    )
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def __str__(self):

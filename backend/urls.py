@@ -137,6 +137,11 @@ urlpatterns = [
         views.ThreadDetailView.as_view(),
         name="messages_thread_detail",
     ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions",
+        views.ThreadEmoji.as_view(),
+        name="message_thread_reaction",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

@@ -137,7 +137,7 @@ def side_bar(request):
 @swagger_auto_schema(
     methods=["post","get"],
     query_serializer=GetMessageSerializer,
-    operation_summary="Creates and get messages",
+    operation_summary="Creates and get messag614e3787f31a74e068e4d49ees",
    responses={
             201: MessageResponse,
             400: "Error: Bad Request"
@@ -1082,7 +1082,6 @@ class Emoji(APIView):
     def post(self, request, org_id: str, room_id: str, message_id: str):
         request.data["message_id"] = message_id
         serializer = EmojiSerializer(data=request.data)
-
         if serializer.is_valid():
             data = serializer.data
             data["count"] += 1
@@ -1129,6 +1128,7 @@ class Emoji(APIView):
                 "Message or room not found", status=status.HTTP_404_NOT_FOUND
             )
         return Response(
+            data=serializer.errors,
             status=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -1658,4 +1658,44 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
                 )
             return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
         return Response(thread_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+class ThreadEmoji(APIView):
+    """
+    List all Emoji reactions, or create a new Emoji reaction.
+    """
+    def get(
+        self, 
+        request, 
+        org_id: str, 
+        room_id: str, 
+        message_id: str, 
+        thread_message_id: str):
+
+        data_storage = DataStorage()
+        data_storage.organization_id = org_id
+        message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        if message:
+            if "status_code" in message:
+                return Response(
+                    data="Unable to retrieve data from zc core", 
+                    status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+            current_thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+            if current_thread_message:
+                return Response(
+                    data={
+                        "status": message["message"],
+                        "event": "get_thread_message_reactions",
+                        "room_id": message["room_id"],
+                        "message_id": message["_id"],
+                        "thread_message_id": current_thread_message[0]["_id"], 
+                        "data": {
+                            "reactions": current_thread_message[0]["reactions"],
+                        },
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+        return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
+
