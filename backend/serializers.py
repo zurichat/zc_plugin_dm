@@ -31,18 +31,21 @@ class ReminderSerializer(serializers.Serializer):
 
 
 class ThreadSerializer(serializers.Serializer):
-    """
-    this will server as a serializer to hold threads
-    under a particular message.
-    The threads serializer will be used in the
-    Message serializer
-    """
+    # """
+    # this will server as a serializer to hold threads
+    # under a particular message.
+    # The threads serializer will be used in the
+    # Message serializer
+    # """
 
     message_id = serializers.CharField(max_length=128)
     sender_id = serializers.CharField(max_length=128)
     message = serializers.CharField()
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
+    )
+    reactions = serializers.ListField(
+        required=False, default=[], child=EmojiSerializer()
     )
     created_at = serializers.DateTimeField(default=timezone.now)
 
@@ -153,3 +156,4 @@ class ScheduleMessageSerializer(serializers.Serializer):
         if datetime.now() > timer.replace(tzinfo=None):
             raise serializers.ValidationError("Date cannot be in the past.")
         return timer
+
