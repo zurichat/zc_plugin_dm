@@ -127,7 +127,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
-        "button_url":"/dm",
+        "button_url":f"/dm/{org_id}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
@@ -149,7 +149,7 @@ def side_bar(request):
 def message_create_get(request, room_id):
     if request.method == "GET":
         paginator = PageNumberPagination()
-        paginator.page_size = 30
+        paginator.page_size = 20
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
@@ -163,10 +163,11 @@ def message_create_get(request, room_id):
                             data="No messages available",
                             status=status.HTTP_204_NO_CONTENT,
                         )
-                    messages_page = paginator.paginate_queryset(
-                        messages_by_date, request
-                    )
-                    return paginator.get_paginated_response(messages_page)
+                    else:
+                        messages_page = paginator.paginate_queryset(
+                            messages_by_date, request
+                        )
+                        return paginator.get_paginated_response(messages_page)
                 else:
                     if messages == None or "message" in messages:
                         return Response(
@@ -175,8 +176,10 @@ def message_create_get(request, room_id):
                         )
                     result_page = paginator.paginate_queryset(messages, request)
                     return paginator.get_paginated_response(result_page)
-            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
-        return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == "POST":
         request.data["room_id"] = room_id
@@ -1255,49 +1258,60 @@ def delete_bookmark(request, room_id):
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    paginator = PageNumberPagination()
-    paginator.page_size = 30
     
     keyword = request.query_params.get('keyword',"")
     users = request.query_params.getlist('id',[])
-    rooms = DB.read("dm_rooms") #get all rooms
-    user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
-    if user_rooms != []:
-        if users != []:
-            rooms_checked = []
-            for user in users:
-                rooms_checked += [room for room in user_rooms 
-                               if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
-            user_rooms = rooms_checked
-        all_messages = DB.read("dm_messages") #get all messages
-        thread_messages = [] # get all thread messages
-        for message in all_messages:
-            threads  = message.get('threads',[])
-            for thread in threads:
-                thread['room_id'] = message.get('room_id')
-                thread['message_id'] = message.get('_id')
-                thread['thread'] = True
-                thread_messages.append(thread)
-            
+    limit = request.query_params.get('limit',20)
+    
+    try: 
+        if type(limit) == str: limit = int(limit)
+    except ValueError:
+        limit=20
+    
+    paginator = PageNumberPagination()
+    paginator.page_size = limit
+      
+    try:
+        rooms = DB.read("dm_rooms") #get all rooms
+        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
+        if user_rooms != []:
+            if users != []:
+                rooms_checked = []
+                for user in users:
+                    rooms_checked += [room for room in user_rooms 
+                                if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
+                user_rooms = rooms_checked
+            all_messages = DB.read("dm_messages") #get all messages
+            thread_messages = [] # get all thread messages
+            for message in all_messages:
+                threads  = message.get('threads',[])
+                for thread in threads:
+                    thread['room_id'] = message.get('room_id')
+                    thread['message_id'] = message.get('_id')
+                    thread['thread'] = True
+                    thread_messages.append(thread)
+                
 
-        room_ids = [room['_id'] for room in user_rooms]
-        
-        user_rooms_messages = [message for message in all_messages 
-                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
-        user_rooms_threads = [message for message in thread_messages 
-                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1] 
-        
-        user_rooms_messages.extend(user_rooms_threads)
-        for message in user_rooms_messages:
-            if 'read' in message.keys(): del message['read']
-            if 'pinned' in message.keys():del message['pinned']
-            if 'saved_by' in message.keys():del message['saved_by']
-            if 'threads' in message.keys(): del message['threads']
-            if 'thread' not in message.keys(): message['thread'] = False
-        result_page = paginator.paginate_queryset(user_rooms_messages, request)
-        return paginator.get_paginated_response(result_page)
-        # return Response(user_rooms_messages, status=status.HTTP_200_OK)   
-    return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
+            room_ids = [room['_id'] for room in user_rooms]
+            
+            user_rooms_messages = [message for message in all_messages 
+                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
+            user_rooms_threads = [message for message in thread_messages 
+                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1] 
+            
+            user_rooms_messages.extend(user_rooms_threads)
+            if user_rooms_messages != []:
+                for message in user_rooms_messages:
+                    if 'read' in message.keys(): del message['read']
+                    if 'pinned' in message.keys():del message['pinned']
+                    if 'saved_by' in message.keys():del message['saved_by']
+                    if 'threads' in message.keys(): del message['threads']
+                    if 'thread' not in message.keys(): message['thread'] = False
+                result_page = paginator.paginate_queryset(user_rooms_messages, request)
+                return paginator.get_paginated_response(result_page) 
+        return Response([], status=status.HTTP_200_OK)
+    except:
+        return Response([], status=status.HTTP_200_OK)
 
 
 
