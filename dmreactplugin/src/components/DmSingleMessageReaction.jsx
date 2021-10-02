@@ -1,16 +1,18 @@
 import React from "react";
 import styled from "styled-components";
-import profilePic from "./beke.jpg";
+
 import { VscReactions } from "react-icons/vsc";
-import { GrEmoji } from "react-icons/gr";
 
 const ReactionContainer = styled.div`
   margin-left: 60px;
   margin-top: 0;
+  font-size: 12px;
   > img {
-    height: 20px;
+    height: 18px;
+    width: 18px;
     border-radius: 5px;
     margin-right: 5px;
+    cursor: pointer;
   }
   > .replies-details {
     display: flex;
@@ -18,33 +20,49 @@ const ReactionContainer = styled.div`
   > .replies-details > p {
     margin-right: 10px;
   }
+  .grey {
+    color: #616061;
+  }
+  .blue {
+    color: #1264a3;
+  }
 `;
 const Emojis = styled.div`
-  .icon {
-    font-size: 20px;
-  }
   margin-left: 60px;
+  margin-bottom: 5px;
   display: flex;
+
+  .emoji-container {
+    background: #efefef;
+    margin-right: 5px;
+    border-radius: 30%;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .current-reactions {
+    display: flex;
+    align-items: center;
+  }
+  h6 {
+    font-size: 12;
+  }
 `;
-const DmSingleMessageReaction = () => {
+const DmSingleMessageReaction = ({ user }) => {
   return (
     <div>
       <Emojis>
-        <div className="single-emoji">
-          <GrEmoji className="icon" />
-        </div>
-        <div>
+        <div className="emoji-container">😉1</div>
+        <div className="emoji-container">
           <VscReactions className="icon" />
         </div>
       </Emojis>
       <ReactionContainer>
-        <img src={profilePic} alt="" />
-        <img src={profilePic} alt="" />
-        <img src={profilePic} alt="" />
-        <img src={profilePic} alt="" />
+        <img src={user?.image_url} alt="" />
         <div className="replies-details">
-          <p>4 replies</p>
-          <p>Last reply 1 hour ago</p>
+          <p className="blue">4 replies</p>
+          <p className="grey">Last reply 1 hour ago</p>
         </div>
       </ReactionContainer>
     </div>

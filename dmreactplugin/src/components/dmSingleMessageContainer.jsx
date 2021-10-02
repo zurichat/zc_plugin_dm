@@ -41,7 +41,7 @@ function DmSingleMessageContainer({ messages, user2_id }) {
             <p className="dm-plugin-thread-message-text">{messages?.message}</p>
           </div>
         </div>
-        <DmSingleMessageReaction />
+        <DmSingleMessageReaction user={user} />
       </div>
     </>
   );
