@@ -192,6 +192,11 @@ urlpatterns = [
         views.get_all_threads,
         name="get_all_threads",
     ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
+        views.star_room,
+        name="star_room",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

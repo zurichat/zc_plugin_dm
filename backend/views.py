@@ -273,11 +273,14 @@ def create_room(request, member_id):
             # print("            --------FAE-------              \n\r")
             user_ids = serializer.data["room_member_ids"]
             user_rooms = get_rooms(user_ids[0], DB.organization_id)
-            for room in user_rooms:
-                room_users = room["room_user_ids"]
-                if set(room_users) == set(user_ids):
-                    response_output = {"room_id": room["_id"]}
-                    return Response(data=response_output, status=status.HTTP_200_OK)
+            if "status_code" in user_rooms:
+                pass
+            else:
+                for room in user_rooms:
+                    room_users = room["room_user_ids"]
+                    if set(room_users) == set(user_ids):
+                        response_output = {"room_id": room["_id"]}
+                        return Response(data=response_output, status=status.HTTP_200_OK)
 
             fields = {
                 "org_id": serializer.data["org_id"],
@@ -295,9 +298,6 @@ def create_room(request, member_id):
 
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            # for user in user_ids:
-            #     if user is not user_id:
-            #         profile = get_user_profile (DB.organization_id, user)
             response_output = {
                 "event": "sidebar_update",
                 "plugin_id": "dm.zuri.chat",
@@ -2421,4 +2421,34 @@ def get_all_threads(request, member_id: str):
 
         return Response(data="No rooms created yet", status=status.HTTP_204_NO_CONTENT)
 
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def star_room(request, room_id, member_id):
+    """
+    Endpoint for starring and unstarring a user, it moves the user from the dm list to a starred dm list
+    """
+    if request.method == "PUT":
+        room = DB.read("dm_rooms", {"_id": room_id})
+        if room:
+            if member_id in room.get("room_member_ids", []) or member_id in room.get(
+                "room_user_ids", []
+            ):
+                data = room.get("starred", [])
+                if member_id in data:
+                    data.remove(member_id)
+                else:
+                    data.append(member_id)
+
+                response = DB.update("dm_rooms", room_id, {"starred": data})
+                print(response)
+                if response and response.get("status_code", None) == None:
+                    return Response("Sucess", status=status.HTTP_200_OK)
+                return Response(
+                    data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY
+                )
+            return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)
+        return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
