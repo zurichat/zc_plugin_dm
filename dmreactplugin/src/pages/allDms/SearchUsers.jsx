@@ -99,13 +99,14 @@ const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
 
         if (e.keyCode === 13) {
             onCreateRoom();
+            setSearchModalOpen(true);
         }
     };
 
     useEffect(() => {
         if (roomsReducer.room_id) {
             setRoomLoading(false);
-            const redirectTo = `/${org_id}/${roomsReducer.room._id}/${loggedInUser_id}`;
+            const redirectTo = `/${org_id}/${roomsReducer.room_id}/${loggedInUser_id}`;
 
             history.push(redirectTo);
         }
@@ -190,7 +191,8 @@ const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
                             : ''
                     }
                     onChange={searchUser}
-                    onKeyDown={clearTag}
+                    onKeyDown={onKeyEvent}
+                    ref={searchInputRef}
                     value={searchInputValue}
                 />
                 <div className='alldms-searchedusersmodal-wrapper'>
