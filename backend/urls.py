@@ -152,6 +152,11 @@ urlpatterns = [
         views.update_thread_read_status,
         name="update_thread_read_status",
     ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/channel_message",
+        views.send_thread_message_to_channel,
+        name="send_thread_messsage_to_channel",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
