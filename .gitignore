@@ -18,6 +18,7 @@ venv/
 *.idea
 
 *Pipfile.lock
+Pipfile.lock
 # *media
 *.DS_Store
 /.vscode

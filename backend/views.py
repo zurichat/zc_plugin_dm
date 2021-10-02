@@ -981,60 +981,60 @@ def create_reminder(request):
 
 
 
-@api_view(['GET'])
-# @permission_classes((UserIsAuthenticated, ))
-def reminder_list(request):
-    """
-        This gets a list of reminders set by the user 
-        { 
-            "user_id":" "
-        }
-    """
-    if request.method == "GET":
-        # getting data from zuri core
-        DB.read("dm_messages",)
+# @api_view(['GET'])
+# # @permission_classes((UserIsAuthenticated, ))
+# def reminder_list(request):
+#     """
+#         This gets a list of reminders set by the user 
+#         { 
+#             "user_id":" "
+#         }
+#     """
+#     if request.method == "GET":
+#         # getting data from zuri core
+#         DB.read("dm_messages",)
 
-        try:
-            response = requests.get(url=url)
-            if response.status_code == 200:
-                reminders_list = response.json()['data']
-                return Response(reminders_list, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": response.json()["message"]}, status=response.status_code)
-        except exceptions.ConnectionError as e:
-            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+#         try:
+#             response = requests.get(url=url)
+#             if response.status_code == 200:
+#                 reminders_list = response.json()['data']
+#                 return Response(reminders_list, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({"error": response.json()["message"]}, status=response.status_code)
+#         except exceptions.ConnectionError as e:
+#             return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
 
 
-@api_view(['DELETE'])
-# @permission_classes((UserIsAuthenticated, ))
-def delete_reminder(request, id):
-    DB.delete(collection_name, document_id)
+# @api_view(['DELETE'])
+# # @permission_classes((UserIsAuthenticated, ))
+# def delete_reminder(request, id):
+#     DB.delete(collection_name, document_id)
 
-    plugin_id = PLUGIN_ID
-    org_id = ORGANIZATION_ID
-    coll_name = "reminders"
-    if request.method == 'DELETE':
-        url = 'https://api.zuri.chat/data/delete'
+#     plugin_id = PLUGIN_ID
+#     org_id = ORGANIZATION_ID
+#     coll_name = "reminders"
+#     if request.method == 'DELETE':
+#         url = 'https://api.zuri.chat/data/delete'
 
-        payload = {
-            "plugin_id": plugin_id,
-            "organization_id": org_id,
-            "collection_name": coll_name,
-            "bulk_delete": False,
-            "object_id": id,
-            "filter": {}
-        }
-    try:
-        response = requests.post(url=url, json=payload)
+#         payload = {
+#             "plugin_id": plugin_id,
+#             "organization_id": org_id,
+#             "collection_name": coll_name,
+#             "bulk_delete": False,
+#             "object_id": id,
+#             "filter": {}
+#         }
+#     try:
+#         response = requests.post(url=url, json=payload)
 
-        if response.status_code == 200:
-            return Response({"message": "reminder successfully deleted"},
-                            status=status.HTTP_200_OK)
-        else:
-            return Response({"error": response.json()['message']}, status=response.status_code)
+#         if response.status_code == 200:
+#             return Response({"message": "reminder successfully deleted"},
+#                             status=status.HTTP_200_OK)
+#         else:
+#             return Response({"error": response.json()['message']}, status=response.status_code)
 
-    except exceptions.ConnectionError as e:
-        return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+#     except exceptions.ConnectionError as e:
+#         return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
 
 
 
