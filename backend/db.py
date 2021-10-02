@@ -260,7 +260,7 @@ def get_user_profile(org_id=None, user_id=None):
     return profile.json()
 
 
-def sidebar_emitter(org_id, member_id):
+def sidebar_emitter(org_id, member_id, group_room_name=None):  # group_room_name = None or a String of Names
     user_rooms = get_rooms(user_id=member_id, org_id=org_id)
     rooms = []
     if user_rooms == None:
@@ -271,9 +271,17 @@ def sidebar_emitter(org_id, member_id):
                 room_profile = {}
                 for user_id in room["room_user_ids"]:
                     if user_id != member_id:
+                        print (user_id)
                         profile = get_user_profile(org_id, user_id)
                         if profile["status"] == 200:
-                            room_profile["room_name"] = profile["data"]["user_name"]
+                            
+                            
+                            if group_room_name and len(group_room_name.split(',')) > 2:  # if group_room_name != None && Len of List after split > 2
+                                room_profile["room_name"] = group_room_name  # overwrite room_name in profile to = String of Names
+                            else:
+                                room_profile["room_name"] = profile["data"]["user_name"]
+                                
+                            
                             if profile["data"]["image_url"]:
                                 room_profile["room_image"] = profile["data"]["image_url"]
                             else:
@@ -282,4 +290,7 @@ def sidebar_emitter(org_id, member_id):
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                             rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
-    return rooms
+    if len(rooms) > 1:
+        return rooms[-1]
+    else:
+        return rooms

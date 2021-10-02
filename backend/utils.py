@@ -14,7 +14,7 @@ def send_centrifugo_data(room, data):
     # url = "http://localhost:8000/api"
     headers = {
         "Content-type": "application/json",
-        "Authorization": "apikey " + CENTRIFUGO_TOKEN,
+        "Authorization": "apikey " + CENTRIFUGO_API_TOKEN,
     }
     command = {"method": "publish", "params": {"channel": room, "data": data}}
     try:
