@@ -12,7 +12,7 @@ import { FiPhone } from "react-icons/fi";
 import { BsClock, BsX, BsEnvelope } from "react-icons/bs";
 import StarButtonButton from "./starPersonButton";
 
-const dmProfileHeader = ({ actualUser }) => {
+const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
     const user = actualUser && actualUser;
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -27,7 +27,11 @@ const dmProfileHeader = ({ actualUser }) => {
 
         return localTime + " Local Time";
     };
-
+    const handleViewProfile = () => {
+        setNone("block");
+        setGrid("grid");
+        setModalIsOpen(false);
+    };
     return (
         <div>
             <header className='dm-profileHeader d-flex align-items-center'>
@@ -121,7 +125,13 @@ const dmProfileHeader = ({ actualUser }) => {
                                     {user?.email}
                                 </span>
                             </p>
-                            <h2 className='profilePop__blue '>View Profile</h2>
+                            <h2
+                                className='profilePop__blue'
+                                style={{ cursor: "pointer" }}
+                                onClick={handleViewProfile}
+                            >
+                                View Profile
+                            </h2>
                         </div>
                         <div className='profilePop__body__card2'>
                             <h1>Files</h1>

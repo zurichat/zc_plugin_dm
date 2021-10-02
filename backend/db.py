@@ -2,8 +2,21 @@ import re
 from urllib.parse import urlencode
 from django.http import response
 import requests, json
-from .login import login_user
 
+
+def login_user():
+    data = {
+        "email": "sam@gmail.com",
+        "password": "Owhondah"
+    }
+    try:
+        response = requests.post(url="https://api.zuri.chat/auth/login", json=data)
+    except requests.exceptions.RequestException as e:
+        return e
+    if response.status_code==200:
+        return response.json()["data"]["user"]["token"]
+    else:
+        return None
 
 PLUGIN_ID = "6135f65de2358b02686503a7"
 ORG_ID = "614679ee1a5607b13c00bcb7"
@@ -202,17 +215,17 @@ def get_rooms(user_id, org_id):
         if "status_code" in response:
             return response
         for room in response:
-            try:
-                users_room_list = room['room_user_ids']
-                if user_id in users_room_list:
-                    data.append(room)
-            except Exception:
-                pass
+            if "serializer" in room:
+                try:
+                    users_room_list = room["serializer"]["room_member_ids"]
+                    if user_id in users_room_list:
+                        data.append(room)
+                except Exception:
+                    pass
         if len(data) == 0:
             data = []
             return data
         return data
-
     return response
 
 
@@ -258,3 +271,30 @@ def get_messages(response, date):
 def get_user_profile(org_id=None, user_id=None):
     profile = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/{user_id}", headers=header)
     return profile.json()
+
+
+def sidebar_emitter(org_id, member_id):
+    response = get_rooms(user_id=member_id, org_id=org_id)
+    user_rooms = response
+    rooms = []
+    if user_rooms == None:
+        pass
+    else:
+        for room in user_rooms:
+            if "org_id" in room["serializer"]:
+                if org_id == room["serializer"]["org_id"]:
+                    room_profile = {}
+                    for user_id in room["serializer"]["room_member_ids"]:
+                        if user_id != member_id:
+                            profile = get_user_profile(org_id, user_id)
+                            if profile["status"] == 200:
+                                room_profile["room_name"] = profile["data"]["user_name"]
+                                if profile["data"]["image_url"]:
+                                    room_profile["room_image"] = profile["data"]["image_url"]
+                                else:
+                                    room_profile[
+                                        "room_image"
+                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                rooms.append(room_profile)
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
+                    return rooms[-1]
