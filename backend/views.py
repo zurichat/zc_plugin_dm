@@ -441,7 +441,7 @@ def edit_message(request, message_id, room_id):
         if room_serializer.is_valid():
             data = room_serializer.data
             data = {"message":request.data["message"]}
-            print(data)
+            # print(data)
             response = DB.update("dm_messages", message_id, data)
             if response.get("status") == 200:
                 data = {
