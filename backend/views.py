@@ -1800,4 +1800,4 @@ class ThreadEmoji(APIView):
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
-    
+
