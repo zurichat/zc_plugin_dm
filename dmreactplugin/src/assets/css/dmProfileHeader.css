@@ -64,6 +64,7 @@
     font-size: 25px;
     font-weight: 700;
     margin-bottom: 0;
+    display: flex;
 }
 .profilePop__details__para {
     font-size: 15px;

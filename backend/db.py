@@ -178,19 +178,6 @@ class DataStorage:
 
 
 
-def send_centrifugo_data(room, data):
-    url = "https://realtime.zuri.chat/api"
-    # url = "http://localhost:8000/api"
-    headers = {
-        "Content-type": "application/json",
-        "Authorization": "apikey " + CENTRIFUGO_TOKEN,
-    }
-    command = {"method": "publish", "params": {"channel": room, "data": data}}
-    try:
-        response = requests.post(url=url, headers=headers, json=command)
-        return {"status_code": response.status_code, "message": response.json()}
-    except Exception as e:
-        print(e)
 
 
 DB = DataStorage()
@@ -295,7 +282,7 @@ def sidebar_emitter(org_id, member_id):
                                     "room_image"
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                             rooms.append(room_profile)
-                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
     if len(rooms) > 1:
         return rooms[-1]
     else:
