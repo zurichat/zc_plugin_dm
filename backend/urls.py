@@ -158,6 +158,7 @@ urlpatterns = [
         views.ThreadEmoji.as_view(),
         name="message_thread_reaction",
     ),
+    path('xxx/<str:org_id>/<str:abc>', views.xxx, name = "ddd"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
