@@ -381,8 +381,26 @@ def room_info(request, room_id):
 
         if "room_user_ids" in current_room:
             room_user_ids = current_room["room_user_ids"]
+        elif "room_member_ids" in current_room:
+            room_user_ids = current_room["room_member_ids"] 
         else:
             room_user_ids = ""
+        if "starred" in current_room:
+            starred = current_room["starred"]
+        else:
+            starred = ""
+        if "pinned" in current_room:
+            pinned = current_room["pinned"]
+        else:
+            pinned = ""
+        if "bookmark" in current_room:
+            bookmark = current_room["bookmark"]
+        else:
+            bookmark = ""
+        if "private" in current_room:
+            private = current_room["private"]
+        else:
+            private = ""
         if "created_at" in current_room:
             created_at = current_room["created_at"]
         else:
@@ -418,7 +436,12 @@ def room_info(request, room_id):
             "room_user_ids": room_user_ids,
             "created_at": created_at,
             "description": f"This room contains the coversation between {user_name_1} and {user_name_2}{text}",
+            "starred": starred,
+            "pinned": pinned,
+            "private": private,
+            "bookmarks": bookmark,
             "Number of users": f"{len(room_user_ids)}",
+
         }
         return Response(data=room_data, status=status.HTTP_200_OK)
     return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
