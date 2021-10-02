@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status, generics
 import requests
 import time
+from .utils import send_centrifugo_data
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import (
@@ -19,20 +20,15 @@ from rest_framework.views import (
     exception_handler,
 )
 from django.core.files.storage import default_storage
-
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from .utils import SendNotificationThread
 from datetime import datetime
 import datetime as datetimemodule
-
-
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
-
 from .decorators import db_init_with_credentials
 
 
@@ -102,10 +98,10 @@ def side_bar(request):
         pass
     else:
         for room in user_rooms:
-            if "org_id" in room["serializer"]:
-                if org_id == room["serializer"]["org_id"]:
+            if "org_id" in room:
+                if org_id == room["org_id"]:
                     room_profile = {}
-                    for user_id in room["serializer"]["room_member_ids"]:
+                    for user_id in room["room_user_ids"]:
                         if user_id != user:
                             profile = get_user_profile(org_id, user_id)
                             if profile["status"] == 200:
@@ -253,7 +249,7 @@ def message_create_get(request, room_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def create_room(request, user_id):
+def create_room(request, member_id):
     """
     Creates a room between users.
     It takes the id of the users involved, sends a write request to the database .
@@ -264,19 +260,22 @@ def create_room(request, user_id):
         user_ids = serializer.data["room_member_ids"]
         user_rooms = get_rooms(user_ids[0], DB.organization_id)
         for room in user_rooms:
-            room_users = room["room_member_ids"]
+            room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
                 response_output = {
                                      "room_id": room["_id"]
                                     }
                 return Response(data=response_output, status=status.HTTP_200_OK)
 
-        fields = { "serializer": serializer.data,
-                        "bookmark": [],
-                         "pinned": [],
-                         "starred": False
-
-                        }
+        fields = {"org_id": serializer.data["org_id"],
+                  "room_user_ids": serializer.data["room_member_ids"],
+                  "room_name": serializer.data["room_name"],
+                  "private": serializer.data["private"],
+                  "created_at": serializer.data["created_at"],
+                  "bookmark": [],
+                  "pinned": [],
+                  "starred": [ ]
+                  }
 
         response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
@@ -293,15 +292,14 @@ def create_room(request, user_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=user_id)]
+                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
                     }
             }
 
             try:
                 centrifugo_data = centrifugo_client.publish (
-                    room=f"{DB.organization_id}_{user_id}_sidebar", data=response_output )  # publish data to centrifugo
+                    room=f"{DB.organization_id}_{member_id}_sidebar", data=response_output )  # publish data to centrifugo
                 if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
-                    print(centrifugo_data)
                     return Response ( data=response_output, status=status.HTTP_201_CREATED )
                 else:
                     return Response(
@@ -729,7 +727,7 @@ def pinned_message(request, message_id):
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     if message_id in pin:
         pin.remove(message_id)
-        data = {"message_id": message_id, "pinned": pin, "Event": "unpin_message"}
+        data = {"message_id": message_id, "pinned": pin, "Event": "unpin_message"} # this event key is in capslock
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         if response["status"] == 200:
@@ -831,26 +829,16 @@ def user_profile(request, org_id, member_id):
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
-        headers = {}
-        print(request.headers)
-        if "Authorization" in request.headers:
-            headers["Authorization"] = request.headers["Authorization"]
-        else:
-            headers["Cookie"] = request.headers["Cookie"]
-
-        response = requests.get(url, headers=headers)
+        header = {'Authorization': f'Bearer {login_user()}'}
+        # print(request.headers)
+        # if "Authorization" in request.headers:
+        #     headers["Authorization"] = request.headers["Authorization"]
+        # else:
+        #     headers["Cookie"] = request.headers["Cookie"]
+        response = requests.get(url, headers=header)
+        
     else:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    # elif request.method == "POST":
-    #     cookie_serializer = CookieSerializer(data=request.data)
-
-    #     if cookie_serializer.is_valid():
-    #         cookie = cookie_serializer.data["cookie"]
-    #         response = requests.get(url, headers={"Cookie": cookie})
-    #     else:
-    #         return Response(
-    #             cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-    #         )
 
     if response.status_code == 200:
         data = response.json()["data"]
@@ -877,28 +865,30 @@ def user_profile(request, org_id, member_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-@db_init_with_credentials
-def remind_message(request):
+def create_reminder(request):
     """
         This is used to remind a user about a  message
         Your body request should have the format
         {
-        "mesage_id": "33",
+        "message_id": "6146ea68845b436ea04d107d",
         "current_date": "Tue, 22 Nov 2011 06:00:00 GMT",
-        "scheduled_date":"Tue, 22 Nov 2011 06:00:00 GMT"
+        "scheduled_date":"Tue, 22 Nov 2011 06:10:00 GMT",
+        "notes": "fff"
     }
     """
     serializer = ReminderSerializer(data=request.data)
     if serializer.is_valid():
         serialized_data = serializer.data
-        message_id = serialized_data["message_id"]
-        current_date = serialized_data["current_date"]
-        scheduled_date = serialized_data["scheduled_date"]
-        notes_data = serialized_data["notes"]
-        # calculate duration and send notification
-        local_scheduled_date = datetime.strptime(
-            scheduled_date, "%a, %d %b %Y %H:%M:%S %Z"
-        )
+        print(serialized_data)
+        message_id = serialized_data['message_id']
+        current_date = serialized_data['current_date']
+        scheduled_date = serialized_data['scheduled_date']
+        try:
+            notes_data = serialized_data['notes']
+        except:
+            notes_data = ""
+        ##calculate duration and send notification
+        local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
         utc_scheduled_date = local_scheduled_date.replace(tzinfo=timezone.utc)
 
         local_current_date = datetime.strptime(current_date, "%a, %d %b %Y %H:%M:%S %Z")
@@ -912,15 +902,14 @@ def remind_message(request):
                 room_id = message["room_id"]
                 try:
                     room = DB.read("dm_rooms", {"_id": room_id})
-
+  
                 except Exception as e:
                     print(e)
-                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
-                users_in_a_room = room.get("room_user_ids", []).copy()
-                message_content = message["message"]
-                sender_id = message["sender_id"]
-                recipient_id = ""
+                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
+                users_in_a_room = room.get("room_user_ids",[]).copy()
+                message_content = message['message']
+                sender_id = message['sender_id']
+                recipient_id = ''
                 if sender_id in users_in_a_room:
                     users_in_a_room.remove(sender_id)
                     recipient_id = users_in_a_room[0]
@@ -930,7 +919,7 @@ def remind_message(request):
                     "message": message_content,
                     "scheduled_date": scheduled_date,
                 }
-                if notes_data is not None:
+                if len(notes_data) > 0:
                     try:
                         notes = message["notes"] or []
                         notes.append(notes_data)
@@ -945,15 +934,8 @@ def remind_message(request):
                         )
                     if response.get("status") == 200:
                         response_output["notes"] = notes
-                        return Response(
-                            data=response_output, status=status.HTTP_201_CREATED
-                        )
-                SendNotificationThread(
-                    duration,
-                    duration_sec,
-                    utc_scheduled_date,
-                    utc_current_date,
-                ).start()
+                        return Response(data = response_output,status=status.HTTP_201_CREATED)
+                # SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date).start()
                 return Response(data=response_output, status=status.HTTP_201_CREATED)
             return Response(data="No such message", status=status.HTTP_400_BAD_REQUEST)
         return Response(
@@ -962,6 +944,102 @@ def remind_message(request):
         )
     return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
 
+
+# def reminder(request):
+ 
+#     # posting data to zuri core after validation
+#     plugin_id = PLUGIN_ID
+#     org_id = ORGANIZATION_ID
+#     coll_name = "reminders"
+
+#     reminder = serializer.data
+#     reminder['event_id'] = event_id
+#     reminder['user_id'] = user_id
+
+#     reminder_payload = {
+#         "plugin_id": plugin_id,
+#         "organization_id": org_id,
+#         "collection_name": coll_name,
+#         "bulk_write": False,
+#         "object_id": "",
+#         "filter": {},
+#         "payload": reminder
+#     }
+#     url = 'https://api.zuri.chat/data/write'
+
+#     try:
+#         response = requests.post(url=url, json=reminder_payload)
+
+#         if response.status_code == 201:
+#             return Response(reminder, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response({"error": response.json()['message']}, status=response.status_code)
+
+#     except exceptions.ConnectionError as e:
+#         return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+
+@api_view(['GET'])
+# @permission_classes((UserIsAuthenticated, ))
+def reminder_list(request):
+    """
+        This gets a list of reminders set by the user 
+        { 
+            "user_id":" "
+        }
+    """
+    if request.method == "GET":
+        # getting data from zuri core
+        DB.read("dm_messages",)
+
+        try:
+            response = requests.get(url=url)
+            if response.status_code == 200:
+                reminders_list = response.json()['data']
+                return Response(reminders_list, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": response.json()["message"]}, status=response.status_code)
+        except exceptions.ConnectionError as e:
+            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(['DELETE'])
+# @permission_classes((UserIsAuthenticated, ))
+def delete_reminder(request, id):
+    DB.delete(collection_name, document_id)
+
+    plugin_id = PLUGIN_ID
+    org_id = ORGANIZATION_ID
+    coll_name = "reminders"
+    if request.method == 'DELETE':
+        url = 'https://api.zuri.chat/data/delete'
+
+        payload = {
+            "plugin_id": plugin_id,
+            "organization_id": org_id,
+            "collection_name": coll_name,
+            "bulk_delete": False,
+            "object_id": id,
+            "filter": {}
+        }
+    try:
+        response = requests.post(url=url, json=payload)
+
+        if response.status_code == 200:
+            return Response({"message": "reminder successfully deleted"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": response.json()['message']}, status=response.status_code)
+
+    except exceptions.ConnectionError as e:
+        return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+class Files(APIView):
+    parser_classes = (MultiPartParser, FormParser)
 
 class SendFile(APIView):
     """

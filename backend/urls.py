@@ -29,7 +29,7 @@ urlpatterns = [
     #     name="update_thread_message",
     # ),
     path(
-        "api/v1/org/<str:org_id>/user/<str:user_id>/room",
+        "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         views.create_room,
         name="create_room"
     ),
@@ -48,10 +48,10 @@ urlpatterns = [
         views.user_rooms,
         name="get_user_rooms",
     ),
-    path(  # what is this endpoint doing?
+    path(  #it is creating a reminder for a message
         "api/v1/org/<str:org_id>/reminder",
-        views.remind_message,
-        name="reminder",
+        views.create_reminder,
+        name="create_reminder",
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
