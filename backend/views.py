@@ -258,26 +258,38 @@ def create_room(request, member_id):
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
         user_ids = serializer.data["room_member_ids"]
-        user_rooms = get_rooms(user_ids[0], DB.organization_id)
-        for room in user_rooms:
-            room_users = room["room_user_ids"]
-            if set(room_users) == set(user_ids):
-                response_output = {
-                                     "room_id": room["_id"]
-                                    }
-                return Response(data=response_output, status=status.HTTP_200_OK)
+        
+        if len(user_ids) > 2:
+            # print("            --------MUKHTAR-------              \n\r")        
+            response = group_room(request, member_id)
+            if response.get('get_group_data'):
+                return Response(data=response['room_id'], status=response['status_code'])
+        
+        else:
+            # print("            --------FAE-------              \n\r")        
+            user_ids = serializer.data["room_member_ids"]
+            user_rooms = get_rooms(user_ids[0], DB.organization_id)
+            for room in user_rooms:
+                room_users = room["room_user_ids"]
+                if set(room_users) == set(user_ids):
+                    response_output = {
+                                         "room_id": room["_id"]
+                                        }
+                    return Response(data=response_output, status=status.HTTP_200_OK)
+			
+            fields = {"org_id": serializer.data["org_id"],
+                      "room_user_ids": serializer.data["room_member_ids"],
+                      "room_name": serializer.data["room_name"],
+                      "private": serializer.data["private"],
+                      "created_at": serializer.data["created_at"],
+                      "bookmark": [],
+                      "pinned": [],
+                      "starred": [ ]
+                          }
 
-        fields = {"org_id": serializer.data["org_id"],
-                  "room_user_ids": serializer.data["room_member_ids"],
-                  "room_name": serializer.data["room_name"],
-                  "private": serializer.data["private"],
-                  "created_at": serializer.data["created_at"],
-                  "bookmark": [],
-                  "pinned": [],
-                  "starred": [ ]
-                  }
+            response = DB.write("dm_rooms", data=fields)
+            # ===============================
 
-        response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
             # for user in user_ids:
@@ -292,7 +304,7 @@ def create_room(request, member_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
+                        "joined_rooms": sidebar_emitter(org_id=DB.organization_id, member_id=member_id, group_room_name=serializer.data["room_name"])  # added extra param
                     }
             }
 
@@ -981,60 +993,60 @@ def create_reminder(request):
 
 
 
-@api_view(['GET'])
-# @permission_classes((UserIsAuthenticated, ))
-def reminder_list(request):
-    """
-        This gets a list of reminders set by the user 
-        { 
-            "user_id":" "
-        }
-    """
-    if request.method == "GET":
-        # getting data from zuri core
-        DB.read("dm_messages",)
+# @api_view(['GET'])
+# # @permission_classes((UserIsAuthenticated, ))
+# def reminder_list(request):
+#     """
+#         This gets a list of reminders set by the user 
+#         { 
+#             "user_id":" "
+#         }
+#     """
+#     if request.method == "GET":
+#         # getting data from zuri core
+#         DB.read("dm_messages",)
 
-        try:
-            response = requests.get(url=url)
-            if response.status_code == 200:
-                reminders_list = response.json()['data']
-                return Response(reminders_list, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": response.json()["message"]}, status=response.status_code)
-        except exceptions.ConnectionError as e:
-            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+#         try:
+#             response = requests.get(url=url)
+#             if response.status_code == 200:
+#                 reminders_list = response.json()['data']
+#                 return Response(reminders_list, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({"error": response.json()["message"]}, status=response.status_code)
+#         except exceptions.ConnectionError as e:
+#             return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
 
 
-@api_view(['DELETE'])
-# @permission_classes((UserIsAuthenticated, ))
-def delete_reminder(request, id):
-    DB.delete(collection_name, document_id)
+# @api_view(['DELETE'])
+# # @permission_classes((UserIsAuthenticated, ))
+# def delete_reminder(request, id):
+#     DB.delete(collection_name, document_id)
 
-    plugin_id = PLUGIN_ID
-    org_id = ORGANIZATION_ID
-    coll_name = "reminders"
-    if request.method == 'DELETE':
-        url = 'https://api.zuri.chat/data/delete'
+#     plugin_id = PLUGIN_ID
+#     org_id = ORGANIZATION_ID
+#     coll_name = "reminders"
+#     if request.method == 'DELETE':
+#         url = 'https://api.zuri.chat/data/delete'
 
-        payload = {
-            "plugin_id": plugin_id,
-            "organization_id": org_id,
-            "collection_name": coll_name,
-            "bulk_delete": False,
-            "object_id": id,
-            "filter": {}
-        }
-    try:
-        response = requests.post(url=url, json=payload)
+#         payload = {
+#             "plugin_id": plugin_id,
+#             "organization_id": org_id,
+#             "collection_name": coll_name,
+#             "bulk_delete": False,
+#             "object_id": id,
+#             "filter": {}
+#         }
+#     try:
+#         response = requests.post(url=url, json=payload)
 
-        if response.status_code == 200:
-            return Response({"message": "reminder successfully deleted"},
-                            status=status.HTTP_200_OK)
-        else:
-            return Response({"error": response.json()['message']}, status=response.status_code)
+#         if response.status_code == 200:
+#             return Response({"message": "reminder successfully deleted"},
+#                             status=status.HTTP_200_OK)
+#         else:
+#             return Response({"error": response.json()['message']}, status=response.status_code)
 
-    except exceptions.ConnectionError as e:
-        return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+#     except exceptions.ConnectionError as e:
+#         return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
 
 
 
@@ -1253,7 +1265,7 @@ class Emoji(APIView):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def scheduled_messages(request):
+def scheduled_messages(request, room_id):
     ORG_ID = DB.organization_id
 
     schedule_serializer = ScheduleMessageSerializer(data=request.data)
@@ -1378,13 +1390,13 @@ def search_DM(request, member_id):
 
     try:
         rooms = DB.read("dm_rooms") #get all rooms
-        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
+        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]) or member_id in room.get('room_member_ids',[]), rooms)) #get all rooms with user
         if user_rooms != []:
             if users != []:
                 rooms_checked = []
                 for user in users:
                     rooms_checked += [room for room in user_rooms
-                                if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
+                                if set(room.get('room_user_ids',[])) == set([member_id,user]) or  set(room.get('room_member_ids',[])) == set([member_id,user])] #get rooms with other specified users
                 user_rooms = rooms_checked
             all_messages = DB.read("dm_messages") #get all messages
             thread_messages = [] # get all thread messages
@@ -1893,3 +1905,51 @@ def send_reply(request, room_id, message_id):
             )
         return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def group_room(request, member_id):
+	serializer = RoomSerializer(data=request.data)
+	if serializer.is_valid():
+		user_ids = serializer.data["room_member_ids"]
+		
+		if len(user_ids) > 9:
+			response = {
+				"get_group_data": True,
+				"status_code": 400,
+				"room_id": "Group cannot have over 9 total users"
+			}
+			return response
+		else:
+			all_rooms = DB.read("dm_rooms")
+			group_rooms = []
+			for room_obj in all_rooms:
+				try:
+					room_members = room_obj['room_user_ids']
+					if len(room_members) > 2 and set(room_members) == set(user_ids):
+						group_rooms.append(room_obj['_id'])
+						response = {
+							"get_group_data": True,
+							"status_code": 200,
+							"room_id": room_obj["_id"]
+						}
+						return response
+				except KeyError:
+					pass
+					# print("Object has no key of Serializer")
+			
+			# print("group rooms =", group_rooms)
+					
+			fields = {
+				"org_id": serializer.data["org_id"],
+				"room_user_ids": serializer.data["room_member_ids"],
+				"room_name": serializer.data["room_name"],
+				"private": serializer.data["private"],
+				"created_at": serializer.data["created_at"],
+				"bookmark": [],
+				"pinned": [],
+				"starred": [ ]
+			}
+			response = DB.write("dm_rooms", data=fields)
+			
+		return response
+
