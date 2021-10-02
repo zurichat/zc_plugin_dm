@@ -396,17 +396,22 @@ def room_info(request, room_id):
             text = " and 1 other"
         else:
             text = " only"
-        user1 = get_user_profile(org_id=org_id, user_id=room_user_ids[0])
-        if user1["status"] == 200:
-            user_name_1 = user1["data"]["user_name"]
+        if  len(room_user_ids) >= 1:
+            user1 = get_user_profile(org_id=org_id, user_id=room_user_ids[0])
+            if user1["status"] == 200:
+                user_name_1 = user1["data"]["user_name"]
+            else:
+                user_name_1 = room_user_ids[0]
+        else: 
+            user_name_1 = "Some user"
+        if len(room_user_ids) > 1:
+            user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
+            if user2["status"] == 200:
+                user_name_2 = user2["data"]["user_name"]
+            else:
+                user_name_2 = room_user_ids[1]
         else:
-            user_name_1 = room_user_ids[0]
-
-        user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
-        if user2["status"] == 200:
-            user_name_2 = user2["data"]["user_name"]
-        else:
-            user_name_2 = room_user_ids[1]
+            user_name_2 = "Some user"
         room_data = {
             "room_id": room_id,
             "org_id": org_id,
