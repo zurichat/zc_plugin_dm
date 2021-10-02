@@ -27,14 +27,11 @@ const DmChatContainerBox = ({ user2_id }) => {
     membersReducer && membersReducer.find((member) => member._id === user2_id);
 
   const user = actualUser ? actualUser : null;
-<<<<<<< HEAD
-=======
 
   centrifugeClient('6150e69005c9716b90f33f3a', (ctx) => {
     console.log('This is centrifigo ' + ctx);
   });
 
->>>>>>> 7b08c4e51cadecc4fb3b312c853ab22ebfec9a66
   return (
     <>
       <div className='dm-chatContainerBox w-100 d-flex align-items-end'>
