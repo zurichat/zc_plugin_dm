@@ -12,16 +12,15 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-
     path(
         "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
-         views.search_DM,
-         name="search DM"
+        views.search_DM,
+        name="search DM",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-         views.message_create_get,
-         name="create_get_message"
+        views.message_create_get,
+        name="create_get_message",
     ),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
@@ -31,7 +30,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         views.create_room,
-        name="create_room"
+        name="create_room",
     ),
     path(
         "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
@@ -48,7 +47,7 @@ urlpatterns = [
         views.user_rooms,
         name="get_user_rooms",
     ),
-    path(  #it is creating a reminder for a message
+    path(  # it is creating a reminder for a message
         "api/v1/org/<str:org_id>/reminder",
         views.create_reminder,
         name="create_reminder",
@@ -123,7 +122,7 @@ urlpatterns = [
         views.SendFile.as_view(),
         name="media_files",
     ),
-    path( 
+    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reply",
         views.send_reply,
         name="reply",
@@ -187,6 +186,11 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/pinned",
         views.pinned_thread_message,
         name="pinned_thread_messsage",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/users/<str:member_id>/threads",
+        views.get_all_threads,
+        name="get_all_threads",
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
