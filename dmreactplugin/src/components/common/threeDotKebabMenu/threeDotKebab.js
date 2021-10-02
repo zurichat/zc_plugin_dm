@@ -1,23 +1,30 @@
-import React, { useState } from "react";
-import "./threeDotKebab.css";
-import { FaUniregistry } from "react-icons/fa";
-import { IoIosArrowForward } from "react-icons/io";
-import { RiParkingLine } from "react-icons/ri";
-import { BiEditAlt } from "react-icons/bi";
-import { HiOutlineExternalLink } from "react-icons/hi";
-import { MdPoll } from "react-icons/md";
+import React, {useState} from "react"
+import "./threeDotKebab.css"
+import { FaUniregistry } from "react-icons/fa"
+import { IoIosArrowForward } from "react-icons/io"
+import { RiParkingLine } from "react-icons/ri"
+import { BiEditAlt } from "react-icons/bi"
+import { HiOutlineExternalLink } from "react-icons/hi"
+import { MdPoll } from "react-icons/md"
 import { FaTrashAlt } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
+import { handleDeleteRoomMessage } from '../../../Redux/Actions/dmActions';
+// import { IoLogoMedium } from "react-icons/io"
+
 
   
- function ThreeDotKebab({messages}) {
+function ThreeDotKebab({messages}) {
   const [secondPopupOpen, setSecondPopupOpen] = useState(false);
   const [dmdeletepopup, setdmdeletepopup] = useState(false);
+  const [secondPopupOpen,setSecondPopupOpen]=useState(false);
+
+  const dispatch = useDispatch()
+
   // const messages = useSelector(({roomsReducer}) => roomsReducer);
   // console.log(messages)
   const OnDeleteMessage = () => {
-    
-         }
+    dispatch(handleDeleteRoomMessage(org_id, room_id, message_id))
+  }
   return (
     <>
       <div className="Dm-ThreeDotKebab-Menu-FirstPopup">
@@ -67,8 +74,8 @@ import { useSelector } from "react-redux";
         </div>
         </div>
       )
-}
-         </>
+      }
+    </>
   );
 }
 export default ThreeDotKebab;

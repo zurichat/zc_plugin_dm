@@ -1,14 +1,22 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import SelectedUsersTag from './SelectedUsersTag';
 import SearchedUsersModal from './SearchedUsersModal';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { handleCreateDmRoom } from '../../Redux/Actions/dmActions';
 
 
-const SearchUsers = ({ orgUsers })=>{
+const SearchUsers = ({ orgUsers, org_id, loggedInUser_id })=>{
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
     const [searchInputValue, setSearchInputValue] = useState('');
     const [fetchLoading, setFetchLoading] = useState(true)
+    const [roomLoading, setRoomLoading] = useState(false)
+
+    const searchInputRef = useRef(null)
+
+    const dispatch = useDispatch()
 
     const filterUser = (searchInput, allUsers)=>{
         const newFilteredUsers = allUsers.filter((user)=>(
@@ -45,6 +53,7 @@ const SearchUsers = ({ orgUsers })=>{
 
         setSearchInputValue('')
         setSearchModalOpen(false)
+        searchInputRef.current.focus()
     }
 
     const deselectUser = (user)=>{
@@ -53,15 +62,40 @@ const SearchUsers = ({ orgUsers })=>{
         ))
 
         setSelectedUsers(newSelectedUsers)
+        searchInputRef.current.focus()
     }
 
-    const clearTag = (e)=>{
+    const onCreateRoom = ()=>{
+        setRoomLoading(true)
+        const room_name_list = selectedUsers.map((user)=>(
+            user.user_name
+        ))
+
+        const room_name = room_name_list.join(', ')
+
+        const selectedUsersIds = selectedUsers.map((user)=>(
+            user._id
+        ))
+
+        if(selectedUsers.length){
+            dispatch(handleCreateDmRoom({
+                org_id, 
+                member_id: loggedInUser_id, 
+                user_ids: selectedUsersIds,
+                room_name
+            }))
+        }
+
+
+    }
+
+    const onKeyEvent = (e)=>{
         if(e.keyCode === 8 && !searchInputValue){
-            const newSelectedUsers = selectedUsers.filter((selectedUser, i)=>(
-                selectedUsers.length - 1 !== i
-            ))
-    
-            setSelectedUsers(newSelectedUsers)
+            deselectUser(selectedUsers[selectedUsers.length - 1])
+        }
+
+        if(e.keyCode === 13){
+            onCreateRoom()
         }
     }
 
@@ -98,23 +132,44 @@ const SearchUsers = ({ orgUsers })=>{
                     selectedUsers[3] &&
                     <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
                 }
+                {
+                    selectedUsers[4] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
+                }
+                {
+                    selectedUsers[5] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
+                }
+                {
+                    selectedUsers[6] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
+                }
+                {
+                    selectedUsers[7] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
+                }
+                {
+                    selectedUsers[8] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
+                }
                 <input
                     type='text'
                     placeholder={!selectedUsers.length? '@somebody or somebody@example.com': ''}
                     onChange = {searchUser}
-                    onKeyDown = {clearTag}
+                    onKeyDown = {onKeyEvent}
+                    ref={searchInputRef}
                     value={searchInputValue}
                 />
                 <div className='alldms-searchedusersmodal-wrapper'>
                 {
                     searchModalOpen &&
-                    <SearchedUsersModal searchedUsers = {filteredUsers} onSelectUser = {selectUser} loading = {fetchLoading}/>
+                    <SearchedUsersModal searchedUsers = {filteredUsers} onSelectUser = {selectUser} loading = {fetchLoading} roomLoading = {roomLoading}/>
                 }
                 </div>
                 {
                     selectedUsers.length === 8 &&
                     <div className='alldms-searchusers-warning'>
-                            <p>Only 8 people can be in a direct message</p>
+                        <p>Only 8 people can be in a direct message</p>
                     </div>
                 }
             </div>
