@@ -29,7 +29,7 @@ urlpatterns = [
     #     name="update_thread_message",
     # ),
     path(
-        "api/v1/org/<str:org_id>/room",
+        "api/v1/org/<str:org_id>/user/<str:user_id>/room",
         views.create_room,
         name="create_room"
     ),
@@ -122,6 +122,11 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="media_files",
+    ),
+    path( 
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reply",
+        views.send_reply,
+        name="reply",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reactions",
