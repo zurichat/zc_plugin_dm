@@ -2232,6 +2232,7 @@ def star_room(request, room_id, member_id):
                 return Response(data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)
         return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
+
     
     elif request.method == "GET":
         room = DB.read("dm_rooms", {"_id": room_id})
@@ -2243,3 +2244,22 @@ def star_room(request, room_id, member_id):
                 return Response({"status":False}, status=status.HTTP_200_OK)
             return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)                     
         return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def close_conversation(request, room_id, member_id):
+    if request.method == "PUT":
+        room = DB.read("dm_rooms", {"_id":room_id})
+        if room or room is not None :
+            room_users=room['room_user_ids']
+            if member_id in room_users:
+                room_users.remove(member_id)
+                print(room_users)
+                data = {'room_user_ids':room_users}
+                print(data)
+                response = DB.update("dm_rooms", room_id, data=data)
+                return Response(response, status=status.HTTP_200_OK)
+            return Response("You are not authorized", status=status.HTTP_401_UNAUTHORIZED)
+        return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
+    return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
