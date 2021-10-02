@@ -2209,7 +2209,7 @@ def group_room(request, member_id):
 			
 		return response
 
-@api_view(["PUT"])
+@api_view(["PUT","GET"])
 @db_init_with_credentials
 def star_room(request, room_id, member_id):
     """
@@ -2228,9 +2228,18 @@ def star_room(request, room_id, member_id):
                 response = DB.update("dm_rooms", room_id,{"starred":data})
                 print(response)
                 if response and response.get("status_code",None) == None:
-                    return Response("Sucess", status=status.HTTP_200_OK)
+                    return Response("Success", status=status.HTTP_200_OK)
                 return Response(data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
             return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)
         return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
-
+    
+    elif request.method == "GET":
+        room = DB.read("dm_rooms", {"_id": room_id})
+        if room:
+            if member_id in room.get("room_member_ids", []) or member_id in room.get("room_user_ids", []):
+                data =  room.get("starred",[])
+                if member_id in data:
+                   return Response({"status":True}, status=status.HTTP_200_OK)
+                return Response({"status":False}, status=status.HTTP_200_OK)
+            return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)                     
+        return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
