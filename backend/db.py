@@ -295,7 +295,7 @@ def sidebar_emitter(org_id, member_id):
                                     "room_image"
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                             rooms.append(room_profile)
-                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
     if len(rooms) > 1:
         return rooms[-1]
     else:
