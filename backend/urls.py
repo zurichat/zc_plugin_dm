@@ -146,7 +146,12 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions/<str:reaction_id>",
         views.delete_thread_emoji_reaction,
         name="delete_thread_message_reaction",
-    )
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/read_status",
+        views.update_thread_read_status,
+        name="update_thread_read_status",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

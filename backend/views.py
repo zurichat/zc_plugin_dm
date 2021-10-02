@@ -1815,3 +1815,27 @@ def delete_thread_emoji_reaction(request, room_id, message_id, thread_message_id
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response(data="Message or room not found", status=status.HTTP_404_NOT_FOUND)
     return Response(staus=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def update_thread_read_status(request, room_id, message_id, thread_message_id):
+    if request.method == "PUT":
+        message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        if message:
+            if "status_code" in message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            else:
+                thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+                if thread_message:
+                    thread_message[0]["read"] = not thread_message[0]["read"]
+                    data = {"read": thread_message[0]["read"]}
+                    response = DB.update("dm_messages", message_id, {"threads": message["threads"]})
+                    if response and response.get("status") == 200:
+                        return Response(data, status=status.HTTP_201_CREATED)
+                    return Response(data="Message status not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
+                return Response(data="Thread message not found", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
