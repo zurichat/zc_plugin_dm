@@ -1,0 +1,5 @@
+.dm-plugin-full-page {
+  grid-template-columns: 7fr 3fr;
+  grid-column-gap: 5px;
+  background: #f6f6f6;
+}

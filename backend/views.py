@@ -102,10 +102,10 @@ def side_bar(request):
         pass
     else:
         for room in user_rooms:
-            if "org_id" in room["serializer"]:
-                if org_id == room["serializer"]["org_id"]:
+            if "org_id" in room:
+                if org_id == room["org_id"]:
                     room_profile = {}
-                    for user_id in room["serializer"]["room_member_ids"]:
+                    for user_id in room["room_user_ids"]:
                         if user_id != user:
                             profile = get_user_profile(org_id, user_id)
                             if profile["status"] == 200:
@@ -253,7 +253,7 @@ def message_create_get(request, room_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def create_room(request, user_id):
+def create_room(request, member_id):
     """
     Creates a room between users.
     It takes the id of the users involved, sends a write request to the database .
@@ -264,19 +264,22 @@ def create_room(request, user_id):
         user_ids = serializer.data["room_member_ids"]
         user_rooms = get_rooms(user_ids[0], DB.organization_id)
         for room in user_rooms:
-            room_users = room["room_member_ids"]
+            room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
                 response_output = {
                                      "room_id": room["_id"]
                                     }
                 return Response(data=response_output, status=status.HTTP_200_OK)
 
-        fields = { "serializer": serializer.data,
-                        "bookmark": [],
-                         "pinned": [],
-                         "starred": False
-
-                        }
+        fields = {"org_id": serializer.data["org_id"],
+                  "room_user_ids": serializer.data["room_member_ids"],
+                  "room_name": serializer.data["room_name"],
+                  "private": serializer.data["private"],
+                  "created_at": serializer.data["created_at"],
+                  "bookmark": [],
+                  "pinned": [],
+                  "starred": { }
+                  }
 
         response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
@@ -293,15 +296,14 @@ def create_room(request, user_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=user_id)]
+                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
                     }
             }
 
             try:
                 centrifugo_data = centrifugo_client.publish (
-                    room=f"{DB.organization_id}_{user_id}_sidebar", data=response_output )  # publish data to centrifugo
+                    room=f"{DB.organization_id}_{member_id}_sidebar", data=response_output )  # publish data to centrifugo
                 if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
-                    print(centrifugo_data)
                     return Response ( data=response_output, status=status.HTTP_201_CREATED )
                 else:
                     return Response(
