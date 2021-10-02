@@ -102,22 +102,21 @@ def side_bar(request):
         pass
     else:
         for room in user_rooms:
-            if "org_id" in room:
-                if org_id == room["org_id"]:
+            if "org_id" in room["serializer"]:
+                if org_id == room["serializer"]["org_id"]:
                     room_profile = {}
-                    for user_id in room["room_member_ids"]:
-                        profile = get_user_profile(org_id, user_id)
-                        if profile["status"] == 200:
-                            room_profile["room_name"] = profile["data"]["user_name"]
-                            if profile["data"]["image_url"]:
-                                room_profile["room_image"] = profile["data"][
-                                    "image_url"
-                                ]
-                            else:
-                                room_profile[
-                                    "room_image"
-                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            rooms.append(room_profile)
+                    for user_id in room["serializer"]["room_member_ids"]:
+                        if user_id != user:
+                            profile = get_user_profile(org_id, user_id)
+                            if profile["status"] == 200:
+                                room_profile["room_name"] = profile["data"]["user_name"]
+                                if profile["data"]["image_url"]:
+                                    room_profile["room_image"] = profile["data"]["image_url"]
+                                else:
+                                    room_profile[
+                                        "room_image"
+                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
@@ -282,9 +281,9 @@ def create_room(request, user_id):
         response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            for user in user_ids:
-                if user is not user_id:
-                    profile = get_user_profile (DB.organization_id, user)
+            # for user in user_ids:
+            #     if user is not user_id:
+            #         profile = get_user_profile (DB.organization_id, user)
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -294,15 +293,13 @@ def create_room(request, user_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [{"room_image": profile["data"]["image_url"],
-                                            "room_name": serializer.data["room_name"],
-                                            "room_url": f"/dm/{DB.organization_id}/{data}"}]
-                                }
+                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=user_id)]
+                    }
             }
 
             try:
                 centrifugo_data = centrifugo_client.publish (
-                    room="614679ee1a5607b13c00bcb7_6146f82c845b436ea04d10e1_sidebar", data=response_output )  # publish data to centrifugo
+                    room=f"{DB.organization_id}_{user_id}_sidebar", data=response_output )  # publish data to centrifugo
                 if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
                     print(centrifugo_data)
                     return Response ( data=response_output, status=status.HTTP_201_CREATED )
