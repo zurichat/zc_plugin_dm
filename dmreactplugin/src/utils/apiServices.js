@@ -19,8 +19,10 @@ class APIServices {
         });
     }
 
-    async createChatRoom(org_id, data) {
-        return await $http.post(`/${org_id}/createroom`, data);
+    async createChatRoom(org_id, member_id, data) {
+        console.log('here')
+        console.log(data)
+        return await $http.post(`/org/${org_id}/users/${member_id}/room`, data);
     }
 
     async updateMembers(org_id, member_id, data) {
@@ -99,6 +101,14 @@ class APIServices {
 
     async postUpdateMesage(org_id, id, data) {
         return await $http.post(`/${org_id}/updatemessage/${id}`, data);
+    }
+
+    async createRoomMessage(org_id, room_id, data){
+        return await $http.post(`/org/${org_id}/rooms/${room_id}/messages`,data)
+    async deleteMessage(org_id, room_id, message_id) {
+        return await $http.delete(
+            `/${org_id}/rooms/${room_id}/messages/${message_id}/message`,
+        );
     }
 }
 

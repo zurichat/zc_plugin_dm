@@ -20,43 +20,46 @@ import { handleGetRooms } from "./Redux/Actions/dmActions";
 import { handleGetMembers } from "./Redux/Actions/Members";
 
 const App = () => {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  let location = useLocation();
+    let location = useLocation();
 
-  let [org_id, room_id, loggedInUser_id] = location.pathname
-    .split("/")
-    .filter((string) => string.length > 11);
+    let [org_id, room_id, loggedInUser_id] = location.pathname
+        .split('/')
+        .filter((string) => string.length > 11);
 
-  useEffect(() => {
-    org_id &&
-      loggedInUser_id &&
-      dispatch(handleGetRooms(org_id, loggedInUser_id));
-    org_id && dispatch(handleGetMembers(org_id));
-  }, [location, org_id, loggedInUser_id]);
+    useEffect(() => {
+       org_id && loggedInUser_id && dispatch(handleGetRooms(org_id, loggedInUser_id));
+       org_id && dispatch(handleGetMembers(org_id));
+    }, [location, org_id, loggedInUser_id]);
 
-  return (
-    <Router basename="/dm">
-      <Switch>
-        <Route
-          exact
-          path={`/${org_id}/${room_id}/${loggedInUser_id}`}
-          render={() => (
-            <ChatHome
-              org_id={org_id}
-              loggedInUser_id={loggedInUser_id}
-              room_id={room_id}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={`/${org_id}/all-dms`}
-          render={() => <AllDms org_id={org_id} />}
-        />
-      </Switch>
-    </Router>
-  );
+    return (
+        <Router basename='/dm'>
+            <Switch>
+                <Route
+                    exact
+                    path={`/${org_id}/${room_id}/${loggedInUser_id}`}
+                    render={() => (
+                        <ChatHome
+                            org_id={org_id}
+                            loggedInUser_id={loggedInUser_id}
+                            room_id={room_id}
+                        />
+                    )}
+                />
+                <Route
+                    exact
+                    path={`/${org_id}/${room_id}/all-dms`}
+                    render={() => (
+                        <AllDms
+                            org_id={org_id}
+                            loggedInUser_id={room_id}
+                        />
+                    )}
+                />
+            </Switch>
+        </Router>
+    );
 };
 
 export default App;
