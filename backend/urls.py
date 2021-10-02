@@ -197,6 +197,9 @@ urlpatterns = [
         views.star_room,
         name="star_room",
     ),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
+        views.close_conversation, 
+        name="close_conversation"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
