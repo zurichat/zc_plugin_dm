@@ -242,6 +242,11 @@ def get_room_messages(room_id, org_id):
             return response
         for message in response:
             message["id"] = message.pop("_id")
+            message["total_replies"] = len(message["threads"])
+            if message["total_replies"] == 0:
+                message["has_thread"] = False
+            else:
+                message["has_thread"] = True
         response.reverse()
         return response
     return response
