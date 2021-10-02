@@ -1,6 +1,7 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import '../assets/css/dmSingleMessageContainer.css';
+import React from "react";
+import { useSelector } from "react-redux";
+import "../assets/css/dmSingleMessageContainer.css";
+import DmSingleMessageReaction from "./DmSingleMessageReaction";
 
 function DmSingleMessageContainer({ messages, user2_id }) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
@@ -12,34 +13,35 @@ function DmSingleMessageContainer({ messages, user2_id }) {
   const messageTime = messages?.created_at;
   const localeTime = new Date(messageTime).toLocaleTimeString(
     {},
-    { hour: '2-digit', minute: '2-digit' }
+    { hour: "2-digit", minute: "2-digit" }
   );
 
   return (
     <>
-      <div className='dm-plugin-thread-messages'>
-        <div className='dm-plugin-thread-message-group px-3 py-3'>
-          <div className='dm-plugin-thread-message-image-container'>
+      <div className="dm-plugin-thread-messages">
+        <div className="dm-plugin-thread-message-group px-3 py-3">
+          <div className="dm-plugin-thread-message-image-container">
             <img
               src={user?.image_url}
-              alt='Profile Picture'
-              width='36'
-              height='36'
-              className='dm-plugin-thread-message-image'
+              alt="Profile Picture"
+              width="36"
+              height="36"
+              className="dm-plugin-thread-message-image"
             />
           </div>
-          <div className='dm-plugin-thread-message-body'>
-            <p className='dm-plugin-thread-message-header'>
-              <span className='dm-plugin-thread-message-name'>
+          <div className="dm-plugin-thread-message-body">
+            <p className="dm-plugin-thread-message-header">
+              <span className="dm-plugin-thread-message-name">
                 {user?.user_name}
               </span>
-              <span className='dm-plugin-thread-message-time'>
+              <span className="dm-plugin-thread-message-time">
                 {localeTime}
               </span>
             </p>
-            <p className='dm-plugin-thread-message-text'>{messages?.message}</p>
+            <p className="dm-plugin-thread-message-text">{messages?.message}</p>
           </div>
         </div>
+        <DmSingleMessageReaction />
       </div>
     </>
   );
