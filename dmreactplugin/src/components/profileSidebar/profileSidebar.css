@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+.dm-plugin-full-profile {
+  z-index: 10000;
+}
+.dm-plugin-full-profile-navbar {
+  display: flex;
+  list-style: none;
+  justify-content: space-between;
+  background: #00b87c;
+  color: #fff;
+  height: 44px;
+}
+.dm-plugin-full-profile-navbar li {
+  padding: 8px;
+  font-family: Lato;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  text-align: left;
+}
+.dm-plugin-full-profile-section {
+  height: 31px;
+  background: #e1fdf4;
+}
+.dm-plugin-full-profile-sidebar {
+  background: #f6f6f6;
+}
+.dm-plugin-full-profile-full-profile {
+  width: 97%;
+  background: #fff;
+  padding: 12px 12px 50px 12px;
+  max-height: calc(100vh - 75px);
+  overflow-y: scroll;
+}
+.dm-plugin-full-profile-full-profile-image {
+  width: 100%;
+  height: 324px;
+  border-radius: 4px;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.dm-plugin-full-profile-full-profile-details {
+  padding-top: 25px;
+}
+.fa-times-dm-plugin {
+  -webkit-text-stroke: 2px white;
+}
+.dm-plugin-full-profile-full-profile-details .name {
+  font-family: Lato;
+  font-size: 25px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 30px;
+  text-align: center;
+  color: #1d1d1d;
+  text-transform: capitalize;
+  margin-bottom: 15px;
+}
+.dm-plugin-full-profile-full-profile-details .position {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 18px;
+  text-transform: capitalize;
+  text-align: center;
+  color: #616061;
+}
+.dm-plugin-full-profile-full-profile-details .pronouns {
+  font-family: Lato;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 18px;
+  text-transform: capitalize;
+  text-align: center;
+  color: #616061;
+  margin-bottom: 15px;
+}
+.dm-plugin-full-profile-full-profile-details .other-info {
+  text-transform: capitalize;
+  color: #999;
+  font-family: Lato;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 13px;
+  line-height: 16px;
+  margin-bottom: 5px;
+}
+.dm-plugin-full-profile-full-profile-details .other-info-answer {
+  text-transform: capitalize;
+  font-family: Lato;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 18px;
+  color: #616061;
+}
+.dm-plugin-full-profile-full-profile-details .profile-buttons {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  padding: 0px 2.5rem;
+  margin: 1.6rem 0;
+}
+
+.dm-plugin-full-profile-full-profile-details .profile-buttons .btn {
+  text-align: center;
+  color: #999999;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dm-plugin-full-profile-full-profile-details .profile-buttons .btn-icon {
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+.dm-plugin-full-profile-full-profile-details
+  .profile-buttons
+  .more-options-modal {
+  position: absolute;
+  bottom: -10.5rem;
+  color: #3a3a3a;
+  background: #f8f8f8;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  width: 20rem;
+  padding: 1.5rem;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.dm-plugin-full-profile-full-profile-details
+  .profile-buttons
+  .more-options-modal
+  .top {
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.3);
+  padding-bottom: 25px;
+}
+
+.dm-plugin-full-profile-full-profile-details
+  .profile-buttons
+  .more-options-modal
+  .top
+  p {
+  margin: 0;
+}
+
+.dm-plugin-full-profile-full-profile-details
+  .profile-buttons
+  .more-options-modal
+  .bottom {
+  position: relative;
+  padding-top: 25px;
+}
+
+.dm-plugin-full-profile-full-profile-details
+  .profile-buttons
+  .more-options-modal
+  .bottom
+  p {
+  margin: 0 0 5px 0;
+}
+
+.dm-plugin-full-profile-full-profile-details
+  .profile-buttons
+  .more-options-modal
+  .bottom
+  .copy-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+}
+.dm-plugin-full-profile-full-profile::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.dm-plugin-full-profile-full-profile::-webkit-scrollbar-track {
+  display: none;
+}
+
+.dm-plugin-full-profile-full-profile::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  border-radius: 20px;
+}
