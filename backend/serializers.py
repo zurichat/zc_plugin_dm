@@ -92,15 +92,11 @@ class MessageSerializer(serializers.Serializer):
 
 class RoomSerializer(serializers.Serializer):
     org_id = serializers.CharField(max_length=128, required=True)
-    room_user_ids = serializers.ListField(
+    room_member_ids = serializers.ListField(
         child=serializers.CharField(max_length=128), allow_empty=False, required=True
     )
-    bookmarks = serializers.ListField(
-        child=serializers.CharField(max_length=128), allow_empty=True
-    )
-    pinned = serializers.ListField(
-        child=serializers.CharField(max_length=128), allow_empty=True
-    )
+    room_name = serializers.CharField(max_length=128, required=True)
+    private = serializers.BooleanField(default=True, read_only=True)
     created_at = serializers.DateTimeField(
         default=timezone.now, read_only=True)
 

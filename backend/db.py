@@ -203,7 +203,7 @@ def get_rooms(user_id, org_id):
             return response
         for room in response:
             try:
-                users_room_list = room['room_user_ids']
+                users_room_list = room['room_member_ids']
                 if user_id in users_room_list:
                     data.append(room)
             except Exception:
