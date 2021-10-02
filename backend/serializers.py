@@ -38,9 +38,9 @@ class ThreadSerializer(serializers.Serializer):
     # Message serializer
     # """
 
-    message_id = serializers.CharField(max_length=128)
-    sender_id = serializers.CharField(max_length=128)
-    message = serializers.CharField()
+    message_id = serializers.CharField(max_length=128, required=False)
+    sender_id = serializers.CharField(max_length=128, required=False)
+    message = serializers.CharField(required=False)
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
     )
@@ -70,6 +70,9 @@ class MessageSerializer(serializers.Serializer):
     threads = serializers.ListField(
         required=False, default=[], child=ThreadSerializer()
     )
+    replied_message = serializers.ListField(
+        required=False, default=[]
+    )
     reactions = serializers.ListField(
         required=False, default=[], child=EmojiSerializer()
     )
@@ -94,15 +97,11 @@ class MessageSerializer(serializers.Serializer):
 
 class RoomSerializer(serializers.Serializer):
     org_id = serializers.CharField(max_length=128, required=True)
-    room_user_ids = serializers.ListField(
+    room_member_ids = serializers.ListField(
         child=serializers.CharField(max_length=128), allow_empty=False, required=True
     )
-    bookmarks = serializers.ListField(
-        child=serializers.CharField(max_length=128), allow_empty=True
-    )
-    pinned = serializers.ListField(
-        child=serializers.CharField(max_length=128), allow_empty=True
-    )
+    room_name = serializers.CharField(max_length=128, required=True)
+    private = serializers.BooleanField(default=True, read_only=True)
     created_at = serializers.DateTimeField(
         default=timezone.now, read_only=True)
 
@@ -158,4 +157,3 @@ class ScheduleMessageSerializer(serializers.Serializer):
         if datetime.now() > timer.replace(tzinfo=None):
             raise serializers.ValidationError("Date cannot be in the past.")
         return timer
-
