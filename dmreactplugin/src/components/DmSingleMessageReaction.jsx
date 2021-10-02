@@ -7,7 +7,12 @@ const ReactionContainer = styled.div`
   margin-left: 60px;
   margin-top: 0;
   font-size: 12px;
-  > img {
+  display: flex;
+  :hover {
+    background: #efefef;
+  }
+
+  > .replies-images > img {
     height: 18px;
     width: 18px;
     border-radius: 5px;
@@ -25,6 +30,10 @@ const ReactionContainer = styled.div`
   }
   .blue {
     color: #1264a3;
+    :hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
   }
 `;
 const Emojis = styled.div`
@@ -45,27 +54,26 @@ const Emojis = styled.div`
     display: flex;
     align-items: center;
   }
-  h6 {
-    font-size: 12;
-  }
 `;
-const DmSingleMessageReaction = ({ user }) => {
+const DmSingleMessageReaction = ({ user, handleOpenThread }) => {
   return (
-    <div>
+    <>
       <Emojis>
         <div className="emoji-container">😉1</div>
         <div className="emoji-container">
           <VscReactions className="icon" />
         </div>
       </Emojis>
-      <ReactionContainer>
-        <img src={user?.image_url} alt="" />
+      <ReactionContainer onClick={handleOpenThread}>
+        <div className="replies-images">
+          <img src={user?.image_url} alt="" />
+        </div>
         <div className="replies-details">
           <p className="blue">4 replies</p>
           <p className="grey">Last reply 1 hour ago</p>
         </div>
       </ReactionContainer>
-    </div>
+    </>
   );
 };
 

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 import DmSingleMessageReaction from "./DmSingleMessageReaction";
 
-function DmSingleMessageContainer({ messages, user2_id }) {
+function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
@@ -41,7 +41,10 @@ function DmSingleMessageContainer({ messages, user2_id }) {
             <p className="dm-plugin-thread-message-text">{messages?.message}</p>
           </div>
         </div>
-        <DmSingleMessageReaction user={user} />
+        <DmSingleMessageReaction
+          handleOpenThread={handleOpenThread}
+          user={user}
+        />
       </div>
     </>
   );
