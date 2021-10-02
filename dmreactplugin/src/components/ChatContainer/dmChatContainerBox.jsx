@@ -4,6 +4,8 @@ import MessageWrapper from '../common/dmHoverState/dmHoverstate';
 import DmInitMessageBox from '../dmInitMessagebox';
 import DmSingleMessageContainer from '../dmSingleMessageContainer';
 import DmReplyInThread from '../ReplyInThread/replyInThread';
+import { RiArrowDownSLine } from 'react-icons/ri';
+import centrifugeClient from '../../utils/centrifugoClient';
 
 import './chatContainerBox.css';
 
@@ -23,7 +25,11 @@ const DmChatContainerBox = ({ user2_id }) => {
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
-  console.log('This is the userooooo' + user?.name);
+
+  centrifugeClient('6150e69005c9716b90f33f3a', (ctx) => {
+    console.log('This is centrifigo '+ctx);
+  });
+
   return (
     <>
       <div className='dm-chatContainerBox w-100 d-flex align-items-end'>
@@ -46,6 +52,10 @@ const DmChatContainerBox = ({ user2_id }) => {
                   </div>
                 ))
             : null}
+          <div className='dm-chat-main-container-sticky-date'>
+            <span></span>
+            <RiArrowDownSLine />
+          </div>
           <DmInitMessageBox secondUser={user} />
         </main>
         <aside className={`asideContent ${openThread ? 'active' : ''}`}>

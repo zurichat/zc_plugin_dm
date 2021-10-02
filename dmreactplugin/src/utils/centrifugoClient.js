@@ -1,9 +1,4 @@
-import Centrifuge from 'centrifuge';
-
-const centrClient = new Centrifuge('wss://centrifuge.io/connection/websocket');
-
-centrClient.subscribe(`${room_id}`, function (message) {
-    console.log(message);
-});
-
-centrClient.connect();
+import { SubscribeToChannel } from '@zuri/control';
+export default function centrifugeClient(room_id, centrifigoCallback) {
+  SubscribeToChannel(room_id, centrifigoCallback);
+}
