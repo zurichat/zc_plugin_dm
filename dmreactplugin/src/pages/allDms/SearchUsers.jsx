@@ -4,11 +4,23 @@ import SearchedUsersModal from './SearchedUsersModal';
 
 
 const SearchUsers = ({ orgUsers })=>{
-    const newOrgUsers = orgUsers && orgUsers
-    const [filteredUsers, setFilteredUsers] = useState(newOrgUsers);
+    const [filteredUsers, setFilteredUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
-    const [searchInputValue, setSearchInputValue] = useState('')
+    const [searchInputValue, setSearchInputValue] = useState('');
+    const [fetchLoading, setFetchLoading] = useState(true)
+
+    const filterUser = (searchInput, allUsers)=>{
+        const newFilteredUsers = allUsers.filter((user)=>(
+            user.user_name.toLowerCase().includes(searchInput.toLowerCase()) ||
+            user.first_name.toLowerCase()
+            .concat(` ${user.last_name.toLowerCase()}`)
+            .includes(searchInput.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchInput.toLowerCase())
+        ))
+
+        setFilteredUsers(newFilteredUsers)
+    }
 
     const searchUser = (e)=>{
         const searchInput = e.target.value
@@ -19,17 +31,7 @@ const SearchUsers = ({ orgUsers })=>{
             setSearchModalOpen(false)
         }
 
-        console.log(filteredUsers)
-
-        const newFilteredUsers = filteredUsers.filter((user)=>(
-            user.user_name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            user.first_name.toLowerCase()
-            .concat(` ${user.last_name.toLowerCase()}`)
-            .includes(searchInput.toLowerCase())
-        ))
-
-        setFilteredUsers(newFilteredUsers)
-        console.log(newFilteredUsers)
+        filterUser(searchInput, orgUsers || [])
     }
 
     const selectUser = (user)=>{
@@ -37,11 +39,12 @@ const SearchUsers = ({ orgUsers })=>{
             selectedUser._id  === user._id
         )))
 
-        if(!exists){
+        if(!exists && selectedUsers.length < 8){
             setSelectedUsers(selectedUsers.concat(user))
         }
 
         setSearchInputValue('')
+        setSearchModalOpen(false)
     }
 
     const deselectUser = (user)=>{
@@ -52,11 +55,23 @@ const SearchUsers = ({ orgUsers })=>{
         setSelectedUsers(newSelectedUsers)
     }
 
-    useEffect(()=>{
-        setFilteredUsers(orgUsers)
-        console.log(orgUsers)
-    }, [orgUsers])
+    const clearTag = (e)=>{
+        if(e.keyCode === 8 && !searchInputValue){
+            const newSelectedUsers = selectedUsers.filter((selectedUser, i)=>(
+                selectedUsers.length - 1 !== i
+            ))
+    
+            setSelectedUsers(newSelectedUsers)
+        }
+    }
 
+    useEffect(()=>{ 
+        filterUser(searchInputValue, orgUsers || [])
+        if( orgUsers && orgUsers.length){
+            setFetchLoading(false)
+        }
+
+    }, [orgUsers])
 
     return(
         <div className="alldms-searchusers">
@@ -71,21 +86,37 @@ const SearchUsers = ({ orgUsers })=>{
                     selectedUsers[0] &&
                     <SelectedUsersTag selectedUser = {selectedUsers[0]} onClose = {deselectUser}/>
                 }
+                {
+                    selectedUsers[1] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[1]} onClose = {deselectUser}/>
+                }
+                {
+                    selectedUsers[2] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[2]} onClose = {deselectUser}/>
+                }
+                {
+                    selectedUsers[3] &&
+                    <SelectedUsersTag selectedUser = {selectedUsers[3]} onClose = {deselectUser}/>
+                }
                 <input
                     type='text'
                     placeholder={!selectedUsers.length? '@somebody or somebody@example.com': ''}
                     onChange = {searchUser}
+                    onKeyDown = {clearTag}
                     value={searchInputValue}
                 />
                 <div className='alldms-searchedusersmodal-wrapper'>
                 {
                     searchModalOpen &&
-                    <SearchedUsersModal searchedUsers = {filteredUsers} onSelectUser = {selectUser}/>
+                    <SearchedUsersModal searchedUsers = {filteredUsers} onSelectUser = {selectUser} loading = {fetchLoading}/>
                 }
                 </div>
-                <div className='alldms-searchusers-warning'>
-                    <p>Only 8 people can be in a direct message</p>
-                </div>
+                {
+                    selectedUsers.length === 8 &&
+                    <div className='alldms-searchusers-warning'>
+                            <p>Only 8 people can be in a direct message</p>
+                    </div>
+                }
             </div>
         </div>
     )
