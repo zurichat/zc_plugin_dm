@@ -109,9 +109,7 @@ def side_bar(request):
                                 if profile["data"]["image_url"]:
                                     room_profile["room_image"] = profile["data"]["image_url"]
                                 else:
-                                    room_profile[
-                                        "room_image"
-                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                    room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                                 rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
@@ -122,7 +120,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
-        "button_url":f"/dm/{org_id}/all-dms",
+        "button_url":f"/dm/{org_id}/{user}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
