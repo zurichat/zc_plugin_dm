@@ -259,13 +259,16 @@ def create_room(request, member_id):
     if serializer.is_valid():
         user_ids = serializer.data["room_member_ids"]
         user_rooms = get_rooms(user_ids[0], DB.organization_id)
-        for room in user_rooms:
-            room_users = room["room_user_ids"]
-            if set(room_users) == set(user_ids):
-                response_output = {
-                                     "room_id": room["_id"]
-                                    }
-                return Response(data=response_output, status=status.HTTP_200_OK)
+        if "status_code" in user_rooms:
+            pass
+        else:
+            for room in user_rooms:
+                room_users = room["room_user_ids"]
+                if set(room_users) == set(user_ids):
+                    response_output = {
+                                         "room_id": room["_id"]
+                                        }
+                    return Response(data=response_output, status=status.HTTP_200_OK)
 
         fields = {"org_id": serializer.data["org_id"],
                   "room_user_ids": serializer.data["room_member_ids"],
@@ -278,11 +281,7 @@ def create_room(request, member_id):
                   }
 
         response = DB.write("dm_rooms", data=fields)
-        data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            # for user in user_ids:
-            #     if user is not user_id:
-            #         profile = get_user_profile (DB.organization_id, user)
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
