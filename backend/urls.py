@@ -48,10 +48,10 @@ urlpatterns = [
         views.user_rooms,
         name="get_user_rooms",
     ),
-    path(  #it is creating a reminder for a message
+    path(  # what is this endpoint doing?
         "api/v1/org/<str:org_id>/reminder",
-        views.create_reminder,
-        name="create_reminder",
+        views.remind_message,
+        name="reminder",
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
