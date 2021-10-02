@@ -38,9 +38,9 @@ class ThreadSerializer(serializers.Serializer):
     # Message serializer
     # """
 
-    message_id = serializers.CharField(max_length=128)
-    sender_id = serializers.CharField(max_length=128)
-    message = serializers.CharField()
+    message_id = serializers.CharField(max_length=128, required=False)
+    sender_id = serializers.CharField(max_length=128, required=False)
+    message = serializers.CharField(required=False)
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
     )
@@ -156,4 +156,3 @@ class ScheduleMessageSerializer(serializers.Serializer):
         if datetime.now() > timer.replace(tzinfo=None):
             raise serializers.ValidationError("Date cannot be in the past.")
         return timer
-
