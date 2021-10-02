@@ -183,6 +183,11 @@ urlpatterns = [
         views.read_thread_message_link,
         name="read_thread_messsage_link",
     ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/pinned",
+        views.pinned_thread_message,
+        name="pinned_thread_messsage",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

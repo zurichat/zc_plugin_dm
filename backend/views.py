@@ -1951,14 +1951,57 @@ def read_thread_message_link(request, room_id, message_id, thread_message_id):
     if request.method == "GET":
         message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
         if message:
+            if "status_code" in message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
             thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
             if thread_message:
                 return JsonResponse({"message": thread_message[0]["message"]})
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
-        return Response(data="No parent message found", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
+@api_view(["PUT"])
+@db_init_with_credentials
+def pinned_thread_message(request, room_id, message_id, thread_message_id):
+    message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    if message:
+        if "status_code" in message:
+            if "status_code" == 404:
+                return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+            return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+        room = DB.read("dm_rooms", {"id": room_id})
+        pin = room["pinned"] or []
+        thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+        if thread_message:
+            pinned_thread_list = [thread_pin for thread_pin in pin if isinstance(thread_pin, dict)]
+            pinned_thread_ids = [val.get("thread_message_id") for val in pinned_thread_list]
+            if thread_message_id in pinned_thread_ids:
+                current_pin = {key:value for (key,value) in pinned_thread_list.items() if value == thread_message_id}
+                pin.remove(current_pin)
+                data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "unpin_thread_message"}
+                response = DB.update("dm_rooms", room_id, {"pinned": pin})
+                if response["status"] == 200:
+                    centrifugo_data = send_centrifugo_data(
+                        room=room_id, data=data
+                    )  # publish data to centrifugo
+                    if centrifugo_data.get("error", None) == None:
+                        return Response(data=data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(status=response.status_code)
+            else:
+                current_pin = {"message_id": message_id, "thread_message_id": thread_message_id}
+                pin.append(current_pin)
+                data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "pin_thread_message"}
+                response = DB.update("dm_rooms", room_id, {"pinned": pin})
+                centrifugo_data = send_centrifugo_data(
+                    room=room_id, data=data
+                )  # publish data to centrifugo
+                if centrifugo_data.get("error", None) == None:
+                    return Response(data=data, status=status.HTTP_201_CREATED)
+        return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+    return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["POST"])
 @db_init_with_credentials
