@@ -12,14 +12,14 @@ const DmInitMessageBox = ({ secondUser }) => {
       <div className='d-flex align-item-center flex-row py-4 px-3'>
         <div className='link-btn '>
           <button className='btn-outline-disabled btn-dm-chat'>
-            <BsChatDots />
+            <BsChatDots className='dm-init-message-box-chatdots' />
           </button>
         </div>
         <div className='px-3 chat-description'>
-          <h6 className='m-0 dmInitmessageHeadText'>
+          <h6 className='dmInitmessageHeadText'>
             This conversation is just between the two of you
           </h6>
-          <p className='m-0 dmInitmessageSubText'>
+          <p className='dmInitmessageSubText'>
             Here you can send messages and share files with{' '}
             <span
               style={{ color: '#1264A3' }}

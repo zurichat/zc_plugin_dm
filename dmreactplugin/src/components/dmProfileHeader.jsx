@@ -23,7 +23,7 @@ const dmProfileHeader = ({ actualUser }) => {
        eventTitle: () => {
            console.log(user)
             setModalIsOpen(true)
-          //Block of code to be triggered on title click
+          //Block of code to be triggered on title click 
         }
       }
     
