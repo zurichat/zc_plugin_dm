@@ -109,9 +109,7 @@ def side_bar(request):
                                 if profile["data"]["image_url"]:
                                     room_profile["room_image"] = profile["data"]["image_url"]
                                 else:
-                                    room_profile[
-                                        "room_image"
-                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                    room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                                 rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
@@ -122,7 +120,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
-        "button_url":f"/dm/{org_id}/all-dms",
+        "button_url":f"/dm/{org_id}/{user}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
@@ -258,26 +256,38 @@ def create_room(request, member_id):
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
         user_ids = serializer.data["room_member_ids"]
-        user_rooms = get_rooms(user_ids[0], DB.organization_id)
-        for room in user_rooms:
-            room_users = room["room_user_ids"]
-            if set(room_users) == set(user_ids):
-                response_output = {
-                                     "room_id": room["_id"]
-                                    }
-                return Response(data=response_output, status=status.HTTP_200_OK)
+        
+        if len(user_ids) > 2:
+            # print("            --------MUKHTAR-------              \n\r")        
+            response = group_room(request, member_id)
+            if response.get('get_group_data'):
+                return Response(data=response['room_id'], status=response['status_code'])
+        
+        else:
+            # print("            --------FAE-------              \n\r")        
+            user_ids = serializer.data["room_member_ids"]
+            user_rooms = get_rooms(user_ids[0], DB.organization_id)
+            for room in user_rooms:
+                room_users = room["room_user_ids"]
+                if set(room_users) == set(user_ids):
+                    response_output = {
+                                         "room_id": room["_id"]
+                                        }
+                    return Response(data=response_output, status=status.HTTP_200_OK)
+			
+            fields = {"org_id": serializer.data["org_id"],
+                      "room_user_ids": serializer.data["room_member_ids"],
+                      "room_name": serializer.data["room_name"],
+                      "private": serializer.data["private"],
+                      "created_at": serializer.data["created_at"],
+                      "bookmark": [],
+                      "pinned": [],
+                      "starred": [ ]
+                          }
 
-        fields = {"org_id": serializer.data["org_id"],
-                  "room_user_ids": serializer.data["room_member_ids"],
-                  "room_name": serializer.data["room_name"],
-                  "private": serializer.data["private"],
-                  "created_at": serializer.data["created_at"],
-                  "bookmark": [],
-                  "pinned": [],
-                  "starred": [ ]
-                  }
+            response = DB.write("dm_rooms", data=fields)
+            # ===============================
 
-        response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
             # for user in user_ids:
@@ -292,7 +302,7 @@ def create_room(request, member_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
+                        "joined_rooms": sidebar_emitter(org_id=DB.organization_id, member_id=member_id, group_room_name=serializer.data["room_name"])  # added extra param
                     }
             }
 
@@ -1253,7 +1263,7 @@ class Emoji(APIView):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def scheduled_messages(request):
+def scheduled_messages(request, room_id):
     ORG_ID = DB.organization_id
 
     schedule_serializer = ScheduleMessageSerializer(data=request.data)
@@ -1893,3 +1903,51 @@ def send_reply(request, room_id, message_id):
             )
         return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def group_room(request, member_id):
+	serializer = RoomSerializer(data=request.data)
+	if serializer.is_valid():
+		user_ids = serializer.data["room_member_ids"]
+		
+		if len(user_ids) > 9:
+			response = {
+				"get_group_data": True,
+				"status_code": 400,
+				"room_id": "Group cannot have over 9 total users"
+			}
+			return response
+		else:
+			all_rooms = DB.read("dm_rooms")
+			group_rooms = []
+			for room_obj in all_rooms:
+				try:
+					room_members = room_obj['room_user_ids']
+					if len(room_members) > 2 and set(room_members) == set(user_ids):
+						group_rooms.append(room_obj['_id'])
+						response = {
+							"get_group_data": True,
+							"status_code": 200,
+							"room_id": room_obj["_id"]
+						}
+						return response
+				except KeyError:
+					pass
+					# print("Object has no key of Serializer")
+			
+			# print("group rooms =", group_rooms)
+					
+			fields = {
+				"org_id": serializer.data["org_id"],
+				"room_user_ids": serializer.data["room_member_ids"],
+				"room_name": serializer.data["room_name"],
+				"private": serializer.data["private"],
+				"created_at": serializer.data["created_at"],
+				"bookmark": [],
+				"pinned": [],
+				"starred": [ ]
+			}
+			response = DB.write("dm_rooms", data=fields)
+			
+		return response
+
