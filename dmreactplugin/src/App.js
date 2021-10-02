@@ -1,23 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import {
-    BrowserRouter as Router,
-    Route,
-    Switch,
-    useLocation,
-} from 'react-router-dom';
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  useLocation,
+} from "react-router-dom";
 
 // import css styles here
-import 'bootstrap/dist/css/bootstrap.min.css';
-import '../src/assets/css/global.module.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../src/assets/css/global.module.css";
 
 // import chat components here
-import ChatHome from './pages/newChatRoom';
-import AllDms from './pages/allDms/AllDms';
+import ChatHome from "./pages/newChatRoom";
+import AllDms from "./pages/allDms/AllDms";
 
 // Import REDUX action
-import { useDispatch } from 'react-redux';
-import { handleGetRooms } from './Redux/Actions/dmActions';
-import { handleGetMembers } from './Redux/Actions/Members';
+import { useDispatch } from "react-redux";
+import { handleGetRooms } from "./Redux/Actions/dmActions";
+import { handleGetMembers } from "./Redux/Actions/Members";
 
 const App = () => {
     const dispatch = useDispatch();
