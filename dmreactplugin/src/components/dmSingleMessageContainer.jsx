@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux';
 import '../assets/css/dmSingleMessageContainer.css';
 import ReactTooltip from 'react-tooltip';
 
-
 function DmSingleMessageContainer({ messages, user2_id }) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
+
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
@@ -34,7 +34,7 @@ function DmSingleMessageContainer({ messages, user2_id }) {
           <div className='dm-plugin-thread-message-image-container'>
             <img
               src={user?.image_url}
-              alt=''
+              alt='user image'
               width='36'
               height='36'
               className='dm-plugin-thread-message-image'
@@ -59,6 +59,21 @@ function DmSingleMessageContainer({ messages, user2_id }) {
               />
             </p>
             <p className='dm-plugin-thread-message-text'>{messages?.message}</p>
+            <span>
+              {messages?.media?.map((media) => (
+                <img
+                  src={media}
+                  alt='Message Media'
+                  height='15px'
+                  width='15px'
+                />
+              ))}
+            </span>
+            <span>
+              {messages?.reactions?.map((reaction) => (
+                <span>{reaction?.data}</span>
+              ))}
+            </span>
           </div>
         </div>
       </div>

@@ -22,12 +22,14 @@ const DmChatContainerBox = ({ user2_id }) => {
   };
 
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
+
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
+
   const user = actualUser ? actualUser : null;
 
   centrifugeClient('6150e69005c9716b90f33f3a', (ctx) => {
-    console.log('This is centrifigo '+ctx);
+    console.log('This is centrifigo ' + ctx);
   });
 
   return (
@@ -43,7 +45,10 @@ const DmChatContainerBox = ({ user2_id }) => {
                 })
                 .map((messages) => (
                   <div key={messages?.id}>
-                    <MessageWrapper handleOpenThread={handleOpenThread}>
+                    <MessageWrapper
+                      handleOpenThread={handleOpenThread}
+                      messages={messages}
+                    >
                       <DmSingleMessageContainer
                         messages={messages}
                         user2_id={user2_id}

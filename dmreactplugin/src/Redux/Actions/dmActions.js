@@ -7,6 +7,7 @@ import {
   GET_ROOMS,
   GET_ROOM_INFO,
   GET_ROOM_MESSAGES,
+  DELETE_ROOM_MESSAGE
 } from "./actionTypes";
 
 // Create Room
@@ -17,18 +18,17 @@ const createRoom = (room_id) => ({
 });
 
 export const handleCreateDmRoom =
-  (org_id, ...[user1_id, user2_id]) =>
+  ({org_id, member_id, user_ids, room_name}) =>
   async (dispatch) => {
     try {
-      const { data } = await APIService.createChatRoom(org_id, {
-        data: {
+      const { data } = await APIService.createChatRoom(org_id, member_id, {
           org_id: org_id,
-          room_user_ids: [user1_id, user2_id],
-          bookmark: [],
-          pinned: [],
-        },
-      });
-      await dispatch(createRoom(data));
+          room_member_ids: user_ids,
+          room_name: room_name
+        }
+      );
+      console.log(data)
+      await dispatch(createRoom(data.room_id));
     } catch (error) {
       console.log(`Error from handleCreateDmRoom: ${error}`);
     }
@@ -76,5 +76,22 @@ export const handleGetRoomMessages = (org_id, room_id) => async (dispatch) => {
     await dispatch(getRoomMessages(data));
   } catch (error) {
     console.log(`Error from handleGetRoomMEssages: ${error}`);
+  }
+};
+
+
+// Delete room message
+
+const deleteRoomMessage = (response)=>({
+  type: DELETE_ROOM_MESSAGE,
+  payload: response
+})
+
+export const handleDeleteRoomMessage = (org_id, room_id, message_id) => async (dispatch) => {
+  try {
+    const { data } = await APIService.deleteMessage(org_id, room_id, message_id);
+    await dispatch(deleteRoomMessage(data));
+  } catch (error) {
+    console.log(`Error from handleDeleteRoomMessage: ${error}`);
   }
 };

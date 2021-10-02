@@ -6,7 +6,7 @@ import {
 } from "../Actions/actionTypes";
 
 const initialState = {
-  room_ids: null,
+  room_id: null,
   rooms: null,
   room_info: {},
   room_messages: null,
@@ -15,7 +15,7 @@ const initialState = {
 const roomsReducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATE_ROOM:
-      return { ...state, room_ids: action.payload };
+      return { ...state, room_id: action.payload };
 
     case GET_ROOMS:
       return { ...state, rooms: action.payload };
