@@ -367,55 +367,10 @@ def room_info(request, room_id):
     # room_id = request.GET.get("room_id", None)
     org_id = DB.organization_id
     room_collection = "dm_rooms"
-<<<<<<< HEAD
-    rooms = DB.read(room_collection)
-    if rooms is not None:
-        for current_room in rooms:
-            if current_room["_id"] == room_id:
-                if "room_user_ids" in current_room:
-                    room_user_ids = current_room["room_user_ids"]
-                else:
-                    room_user_ids = ""
-                if "created_at" in current_room:
-                    created_at = current_room["created_at"]
-                else:
-                    created_at = ""
-                if "org_id" in current_room:
-                    org_id = current_room["org_id"]
-
-                if len(room_user_ids) > 3:
-                    text = f" and {len(room_user_ids)-2} others"
-                elif len(room_user_ids) == 3:
-                    text = " and 1 other"
-                else:
-                    text = " only"
-                user1 = get_user_profile(org_id=org_id, user_id=room_user_ids[0])
-                if user1["status"] == 200:
-                    user_name_1 = user1["data"]["user_name"]
-                else:
-                    user_name_1 = room_user_ids[0]
-
-                user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
-                if user2["status"] == 200:
-                    user_name_2 = user2["data"]["user_name"]
-                else:
-                    user_name_2 = room_user_ids[1]
-                room_data = {
-                    "room_id": room_id,
-                    "org_id": org_id,
-                    "room_user_ids": room_user_ids,
-                    "created_at": created_at,
-                    "description": f"This room contains the coversation between {user_name_1} and {user_name_2}{text}",
-                    "Number of users": f"{len(room_user_ids)}",
-                }
-                return Response(data=room_data, status=status.HTTP_200_OK)
-        return Response(data="No such Room", status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
-=======
     current_room = DB.read(room_collection, {"_id": room_id})
     print(current_room)
     if current_room and current_room.get("status_code", None) == None:
-        
+
         if "room_user_ids" in current_room:
             room_user_ids = current_room["room_user_ids"]
         else:
@@ -426,7 +381,7 @@ def room_info(request, room_id):
             created_at = ""
         if "org_id" in current_room:
             org_id = current_room["org_id"]
-        
+
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
         elif len(room_user_ids) == 3:
@@ -438,7 +393,7 @@ def room_info(request, room_id):
             user_name_1 = user1["data"]["user_name"]
         else:
             user_name_1 = room_user_ids[0]
-        
+
         user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
         if user2["status"] == 200:
             user_name_2 = user2["data"]["user_name"]
@@ -454,8 +409,7 @@ def room_info(request, room_id):
         }
         return Response(data=room_data, status=status.HTTP_200_OK)
     return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
-    
->>>>>>> 24cd4b914b38f895f0fc399cee80712dce15538f
+
 
 
 # /code for updating room
@@ -1786,8 +1740,6 @@ class ThreadEmoji(APIView):
                 )
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
-<<<<<<< HEAD
-=======
 
 
 
@@ -1795,7 +1747,7 @@ class ThreadEmoji(APIView):
 @db_init_with_credentials
 def send_reply(request, room_id, message_id):
     """
-    This endpoint is used to send a reply message 
+    This endpoint is used to send a reply message
     It takes in the a room_id and the message_id of the message being replied to
     Stores the data of the replied message in a field "replied message"
     """
@@ -1812,7 +1764,7 @@ def send_reply(request, room_id, message_id):
     if serializer.is_valid():
         data = serializer.data
         room_id = data["room_id"]  # room id gotten from client request
-        
+
         room = DB.read("dm_rooms", {"_id": room_id})
         if room and room.get("status_code", None) == None:
             if data["sender_id"] in room.get("room_user_ids", []):
@@ -1863,4 +1815,3 @@ def send_reply(request, room_id, message_id):
             )
         return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
->>>>>>> 24cd4b914b38f895f0fc399cee80712dce15538f
