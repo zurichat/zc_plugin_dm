@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import '../assets/css/dmProfileHeader.css';
-import Modal from 'react-modal';
+import React, { useState } from "react";
+import "../assets/css/dmProfileHeader.css";
+import Modal from "react-modal";
 import {
     FaAngleDown,
     FaRegBellSlash,
     FaRegClock,
     FaRegEnvelope,
     FaTimes,
-} from 'react-icons/fa';
-import { FiPhone } from 'react-icons/fi';
-import { BsClock, BsX, BsEnvelope } from 'react-icons/bs';
+} from "react-icons/fa";
+import { FiPhone } from "react-icons/fi";
+import { BsClock, BsX, BsEnvelope } from "react-icons/bs";
+import StarButtonButton from "./starPersonButton";
 
-const dmProfileHeader = ({ actualUser }) => {
+const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
     const user = actualUser && actualUser;
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
@@ -21,12 +22,16 @@ const dmProfileHeader = ({ actualUser }) => {
         let minutes = date.getMinutes();
         let localTime =
             hours > 12
-                ? hours - 12 + ':' + minutes + 'PM'
-                : hours + ':' + minutes + 'AM';
+                ? hours - 12 + ":" + minutes + "PM"
+                : hours + ":" + minutes + "AM";
 
-        return localTime + ' Local Time';
+        return localTime + " Local Time";
     };
-
+    const handleViewProfile = () => {
+        setNone("block");
+        setGrid("grid");
+        setModalIsOpen(false);
+    };
     return (
         <div>
             <header className='dm-profileHeader d-flex align-items-center'>
@@ -51,14 +56,14 @@ const dmProfileHeader = ({ actualUser }) => {
                 ariaHideApp={false}
                 style={{
                     overlay: {
-                        backgroundColor: 'hsla(0, 0%, 0%, 0.4)',
+                        backgroundColor: "hsla(0, 0%, 0%, 0.4)",
                     },
                     content: {
-                        width: '680px',
-                        height: 'auto',
-                        borderRadius: '8px',
-                        margin: '0 auto',
-                        padding: '0px',
+                        width: "680px",
+                        height: "auto",
+                        borderRadius: "8px",
+                        margin: "0 auto",
+                        padding: "0px",
                     },
                 }}
             >
@@ -73,8 +78,11 @@ const dmProfileHeader = ({ actualUser }) => {
                                 />
                                 <div className='profilePop__details'>
                                     <p className='profilePop__details__header'>
-                                        {user?.first_name} {user?.last_name} 🦊
-                                        ⭐️{' '}
+                                        <div>
+                                            {user?.first_name} {user?.last_name}{" "}
+                                            🦊 ⭐️
+                                        </div>
+                                        <StarButtonButton />
                                     </p>
                                     <p className='profilePop__details__para'>
                                         {user?.role}
@@ -90,7 +98,7 @@ const dmProfileHeader = ({ actualUser }) => {
                             />
                         </div>
                         <button className='profilePop__mute'>
-                            {' '}
+                            {" "}
                             <FaRegBellSlash /> Mute
                         </button>
                         <div className='profilePop__switch'>
@@ -101,23 +109,29 @@ const dmProfileHeader = ({ actualUser }) => {
                     <div className='profilePop__body'>
                         <div className='profilePop__body__card1'>
                             <p className='d-flex align-items-center'>
-                                <BsClock /> {getLocalTime()}{' '}
+                                <BsClock /> {getLocalTime()}{" "}
                             </p>
                             <p className='d-flex align-items-center'>
-                                <FiPhone />{' '}
+                                <FiPhone />{" "}
                                 <span className='profilePop__blue'>
-                                    {' '}
+                                    {" "}
                                     {user?.phone}
-                                </span>{' '}
+                                </span>{" "}
                             </p>
                             <p className='d-flex align-items-center'>
-                                <BsEnvelope />{' '}
+                                <BsEnvelope />{" "}
                                 <span className='profilePop__blue'>
-                                    {' '}
+                                    {" "}
                                     {user?.email}
                                 </span>
                             </p>
-                            <h2 className='profilePop__blue '>View Profile</h2>
+                            <h2
+                                className='profilePop__blue'
+                                style={{ cursor: "pointer" }}
+                                onClick={handleViewProfile}
+                            >
+                                View Profile
+                            </h2>
                         </div>
                         <div className='profilePop__body__card2'>
                             <h1>Files</h1>

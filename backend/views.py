@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status, generics
 import requests
 import time
+from .utils import send_centrifugo_data
 from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import (
@@ -19,20 +20,15 @@ from rest_framework.views import (
     exception_handler,
 )
 from django.core.files.storage import default_storage
-
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from .utils import SendNotificationThread
 from datetime import datetime
 import datetime as datetimemodule
-
-
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
-
 from .decorators import db_init_with_credentials
 
 
@@ -102,10 +98,10 @@ def side_bar(request):
         pass
     else:
         for room in user_rooms:
-            if "org_id" in room["serializer"]:
-                if org_id == room["serializer"]["org_id"]:
+            if "org_id" in room:
+                if org_id == room["org_id"]:
                     room_profile = {}
-                    for user_id in room["serializer"]["room_member_ids"]:
+                    for user_id in room["room_user_ids"]:
                         if user_id != user:
                             profile = get_user_profile(org_id, user_id)
                             if profile["status"] == 200:
@@ -253,7 +249,7 @@ def message_create_get(request, room_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def create_room(request, user_id):
+def create_room(request, member_id):
     """
     Creates a room between users.
     It takes the id of the users involved, sends a write request to the database .
@@ -264,19 +260,22 @@ def create_room(request, user_id):
         user_ids = serializer.data["room_member_ids"]
         user_rooms = get_rooms(user_ids[0], DB.organization_id)
         for room in user_rooms:
-            room_users = room["room_member_ids"]
+            room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
                 response_output = {
                                      "room_id": room["_id"]
                                     }
                 return Response(data=response_output, status=status.HTTP_200_OK)
 
-        fields = { "serializer": serializer.data,
-                        "bookmark": [],
-                         "pinned": [],
-                         "starred": False
-
-                        }
+        fields = {"org_id": serializer.data["org_id"],
+                  "room_user_ids": serializer.data["room_member_ids"],
+                  "room_name": serializer.data["room_name"],
+                  "private": serializer.data["private"],
+                  "created_at": serializer.data["created_at"],
+                  "bookmark": [],
+                  "pinned": [],
+                  "starred": [ ]
+                  }
 
         response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
@@ -293,15 +292,14 @@ def create_room(request, user_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=user_id)]
+                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
                     }
             }
 
             try:
                 centrifugo_data = centrifugo_client.publish (
-                    room=f"{DB.organization_id}_{user_id}_sidebar", data=response_output )  # publish data to centrifugo
+                    room=f"{DB.organization_id}_{member_id}_sidebar", data=response_output )  # publish data to centrifugo
                 if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
-                    print(centrifugo_data)
                     return Response ( data=response_output, status=status.HTTP_201_CREATED )
                 else:
                     return Response(
@@ -370,7 +368,7 @@ def room_info(request, room_id):
     current_room = DB.read(room_collection, {"_id": room_id})
     print(current_room)
     if current_room and current_room.get("status_code", None) == None:
-        
+
         if "room_user_ids" in current_room:
             room_user_ids = current_room["room_user_ids"]
         else:
@@ -381,7 +379,7 @@ def room_info(request, room_id):
             created_at = ""
         if "org_id" in current_room:
             org_id = current_room["org_id"]
-        
+
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
         elif len(room_user_ids) == 3:
@@ -393,7 +391,7 @@ def room_info(request, room_id):
             user_name_1 = user1["data"]["user_name"]
         else:
             user_name_1 = room_user_ids[0]
-        
+
         user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
         if user2["status"] == 200:
             user_name_2 = user2["data"]["user_name"]
@@ -409,13 +407,13 @@ def room_info(request, room_id):
         }
         return Response(data=room_data, status=status.HTTP_200_OK)
     return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
-    
+
 
 
 # /code for updating room
-@api_view(["GET", "POST"])
+@api_view(["GET", "PUT"])
 @db_init_with_credentials
-def edit_room(request, pk):
+def edit_message(request, message_id, room_id):
     """
     This is used to update message context using message id as identifier,
     first --> we check if this message exist, if it does not exist we raise message doesnot exist,
@@ -423,28 +421,41 @@ def edit_room(request, pk):
         pass GET request to view the message one whats to edit.
         or pass POST with data to update
 
-    """
-    try:
-        message = DB.read("dm_messages", {"id": pk})
-    except:
-        return JsonResponse(
-            {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
 
+    """
     if request.method == "GET":
-        singleRoom = DB.read("dm_messages", {"id": pk})
-        return JsonResponse(singleRoom)
+        try:
+            message = DB.read("dm_messages", {"id": message_id})
+            print(message)
+            return Response(message)
+        except:
+            return JsonResponse(
+                {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
+
     else:
+        message = DB.read("dm_messages", {"id": message_id})
         room_serializer = MessageSerializer(message, data=request.data, partial=True)
         if room_serializer.is_valid():
-            room_serializer.save()
             data = room_serializer.data
+            data = {"message":request.data["message"]}
             # print(data)
-            response = DB.update("dm_messages", pk, data)
-            return Response(room_serializer.data)
+            response = DB.update("dm_messages", message_id, data)
+            if response.get("status") == 200:
+                data = {
+                        "sender_id":request.data["sender_id"],
+                        "message_id":message_id,
+                        "room_id":room_id,
+                        "message":request.data["message"],
+                        "event":"edited_message"
+                        }
+                centrifugo_data = send_centrifugo_data(
+                    room=room_id, data=data
+                )
+                if centrifugo_data.get("error", None) == None:
+                    return Response(data=data, status=status.HTTP_201_CREATED)
+                return Response(data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
-
 
 @swagger_auto_schema(
     methods=["get"],
@@ -716,7 +727,7 @@ def pinned_message(request, message_id):
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     if message_id in pin:
         pin.remove(message_id)
-        data = {"message_id": message_id, "pinned": pin, "Event": "unpin_message"}
+        data = {"message_id": message_id, "pinned": pin, "Event": "unpin_message"} # this event key is in capslock
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         if response["status"] == 200:
@@ -818,26 +829,16 @@ def user_profile(request, org_id, member_id):
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
-        headers = {}
-        print(request.headers)
-        if "Authorization" in request.headers:
-            headers["Authorization"] = request.headers["Authorization"]
-        else:
-            headers["Cookie"] = request.headers["Cookie"]
-
-        response = requests.get(url, headers=headers)
+        header = {'Authorization': f'Bearer {login_user()}'}
+        # print(request.headers)
+        # if "Authorization" in request.headers:
+        #     headers["Authorization"] = request.headers["Authorization"]
+        # else:
+        #     headers["Cookie"] = request.headers["Cookie"]
+        response = requests.get(url, headers=header)
+        
     else:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    # elif request.method == "POST":
-    #     cookie_serializer = CookieSerializer(data=request.data)
-
-    #     if cookie_serializer.is_valid():
-    #         cookie = cookie_serializer.data["cookie"]
-    #         response = requests.get(url, headers={"Cookie": cookie})
-    #     else:
-    #         return Response(
-    #             cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-    #         )
 
     if response.status_code == 200:
         data = response.json()["data"]
@@ -864,28 +865,30 @@ def user_profile(request, org_id, member_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["POST"])
-@db_init_with_credentials
-def remind_message(request):
+def create_reminder(request):
     """
         This is used to remind a user about a  message
         Your body request should have the format
         {
-        "mesage_id": "33",
+        "message_id": "6146ea68845b436ea04d107d",
         "current_date": "Tue, 22 Nov 2011 06:00:00 GMT",
-        "scheduled_date":"Tue, 22 Nov 2011 06:00:00 GMT"
+        "scheduled_date":"Tue, 22 Nov 2011 06:10:00 GMT",
+        "notes": "fff"
     }
     """
     serializer = ReminderSerializer(data=request.data)
     if serializer.is_valid():
         serialized_data = serializer.data
-        message_id = serialized_data["message_id"]
-        current_date = serialized_data["current_date"]
-        scheduled_date = serialized_data["scheduled_date"]
-        notes_data = serialized_data["notes"]
-        # calculate duration and send notification
-        local_scheduled_date = datetime.strptime(
-            scheduled_date, "%a, %d %b %Y %H:%M:%S %Z"
-        )
+        print(serialized_data)
+        message_id = serialized_data['message_id']
+        current_date = serialized_data['current_date']
+        scheduled_date = serialized_data['scheduled_date']
+        try:
+            notes_data = serialized_data['notes']
+        except:
+            notes_data = ""
+        ##calculate duration and send notification
+        local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
         utc_scheduled_date = local_scheduled_date.replace(tzinfo=timezone.utc)
 
         local_current_date = datetime.strptime(current_date, "%a, %d %b %Y %H:%M:%S %Z")
@@ -899,15 +902,14 @@ def remind_message(request):
                 room_id = message["room_id"]
                 try:
                     room = DB.read("dm_rooms", {"_id": room_id})
-
+  
                 except Exception as e:
                     print(e)
-                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
-                users_in_a_room = room.get("room_user_ids", []).copy()
-                message_content = message["message"]
-                sender_id = message["sender_id"]
-                recipient_id = ""
+                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
+                users_in_a_room = room.get("room_user_ids",[]).copy()
+                message_content = message['message']
+                sender_id = message['sender_id']
+                recipient_id = ''
                 if sender_id in users_in_a_room:
                     users_in_a_room.remove(sender_id)
                     recipient_id = users_in_a_room[0]
@@ -917,7 +919,7 @@ def remind_message(request):
                     "message": message_content,
                     "scheduled_date": scheduled_date,
                 }
-                if notes_data is not None:
+                if len(notes_data) > 0:
                     try:
                         notes = message["notes"] or []
                         notes.append(notes_data)
@@ -932,15 +934,8 @@ def remind_message(request):
                         )
                     if response.get("status") == 200:
                         response_output["notes"] = notes
-                        return Response(
-                            data=response_output, status=status.HTTP_201_CREATED
-                        )
-                SendNotificationThread(
-                    duration,
-                    duration_sec,
-                    utc_scheduled_date,
-                    utc_current_date,
-                ).start()
+                        return Response(data = response_output,status=status.HTTP_201_CREATED)
+                # SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date).start()
                 return Response(data=response_output, status=status.HTTP_201_CREATED)
             return Response(data="No such message", status=status.HTTP_400_BAD_REQUEST)
         return Response(
@@ -949,6 +944,102 @@ def remind_message(request):
         )
     return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
 
+
+# def reminder(request):
+ 
+#     # posting data to zuri core after validation
+#     plugin_id = PLUGIN_ID
+#     org_id = ORGANIZATION_ID
+#     coll_name = "reminders"
+
+#     reminder = serializer.data
+#     reminder['event_id'] = event_id
+#     reminder['user_id'] = user_id
+
+#     reminder_payload = {
+#         "plugin_id": plugin_id,
+#         "organization_id": org_id,
+#         "collection_name": coll_name,
+#         "bulk_write": False,
+#         "object_id": "",
+#         "filter": {},
+#         "payload": reminder
+#     }
+#     url = 'https://api.zuri.chat/data/write'
+
+#     try:
+#         response = requests.post(url=url, json=reminder_payload)
+
+#         if response.status_code == 201:
+#             return Response(reminder, status=status.HTTP_201_CREATED)
+#         else:
+#             return Response({"error": response.json()['message']}, status=response.status_code)
+
+#     except exceptions.ConnectionError as e:
+#         return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+
+@api_view(['GET'])
+# @permission_classes((UserIsAuthenticated, ))
+def reminder_list(request):
+    """
+        This gets a list of reminders set by the user 
+        { 
+            "user_id":" "
+        }
+    """
+    if request.method == "GET":
+        # getting data from zuri core
+        DB.read("dm_messages",)
+
+        try:
+            response = requests.get(url=url)
+            if response.status_code == 200:
+                reminders_list = response.json()['data']
+                return Response(reminders_list, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": response.json()["message"]}, status=response.status_code)
+        except exceptions.ConnectionError as e:
+            return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(['DELETE'])
+# @permission_classes((UserIsAuthenticated, ))
+def delete_reminder(request, id):
+    DB.delete(collection_name, document_id)
+
+    plugin_id = PLUGIN_ID
+    org_id = ORGANIZATION_ID
+    coll_name = "reminders"
+    if request.method == 'DELETE':
+        url = 'https://api.zuri.chat/data/delete'
+
+        payload = {
+            "plugin_id": plugin_id,
+            "organization_id": org_id,
+            "collection_name": coll_name,
+            "bulk_delete": False,
+            "object_id": id,
+            "filter": {}
+        }
+    try:
+        response = requests.post(url=url, json=payload)
+
+        if response.status_code == 200:
+            return Response({"message": "reminder successfully deleted"},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({"error": response.json()['message']}, status=response.status_code)
+
+    except exceptions.ConnectionError as e:
+        return Response(str(e), status=status.HTTP_502_BAD_GATEWAY)
+
+
+
+class Files(APIView):
+    parser_classes = (MultiPartParser, FormParser)
 
 class SendFile(APIView):
     """
@@ -1272,19 +1363,19 @@ def delete_bookmark(request, room_id):
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    
+
     keyword = request.query_params.get('keyword',"")
     users = request.query_params.getlist('id',[])
     limit = request.query_params.get('limit',20)
-    
-    try: 
+
+    try:
         if type(limit) == str: limit = int(limit)
     except ValueError:
         limit=20
-    
+
     paginator = PageNumberPagination()
     paginator.page_size = limit
-      
+
     try:
         rooms = DB.read("dm_rooms") #get all rooms
         user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
@@ -1292,7 +1383,7 @@ def search_DM(request, member_id):
             if users != []:
                 rooms_checked = []
                 for user in users:
-                    rooms_checked += [room for room in user_rooms 
+                    rooms_checked += [room for room in user_rooms
                                 if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
                 user_rooms = rooms_checked
             all_messages = DB.read("dm_messages") #get all messages
@@ -1304,15 +1395,15 @@ def search_DM(request, member_id):
                     thread['message_id'] = message.get('_id')
                     thread['thread'] = True
                     thread_messages.append(thread)
-                
+
 
             room_ids = [room['_id'] for room in user_rooms]
-            
-            user_rooms_messages = [message for message in all_messages 
+
+            user_rooms_messages = [message for message in all_messages
                                     if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
-            user_rooms_threads = [message for message in thread_messages 
-                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1] 
-            
+            user_rooms_threads = [message for message in thread_messages
+                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1]
+
             user_rooms_messages.extend(user_rooms_threads)
             if user_rooms_messages != []:
                 for message in user_rooms_messages:
@@ -1322,7 +1413,7 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False
                 result_page = paginator.paginate_queryset(user_rooms_messages, request)
-                return paginator.get_paginated_response(result_page) 
+                return paginator.get_paginated_response(result_page)
         return Response([], status=status.HTTP_200_OK)
     except:
         return Response([], status=status.HTTP_200_OK)
@@ -1505,7 +1596,7 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ThreadSerializer
     queryset = ""
     lookup_field = "thread_message_id"
-    
+
 
     @swagger_auto_schema(
         operation_summary="Deletes a specifc thread message for a specific parent message",
@@ -1585,11 +1676,11 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
     def put(
-        self, 
-        request, 
+        self,
+        request,
         org_id: str,
-        room_id: str, 
-        message_id: str, 
+        room_id: str,
+        message_id: str,
         thread_message_id: str):
 
         data_storage = DataStorage()
@@ -1694,11 +1785,11 @@ class ThreadEmoji(APIView):
     List all Emoji reactions, or create a new Emoji reaction.
     """
     def get(
-        self, 
-        request, 
-        org_id: str, 
-        room_id: str, 
-        message_id: str, 
+        self,
+        request,
+        org_id: str,
+        room_id: str,
+        message_id: str,
         thread_message_id: str):
 
         data_storage = DataStorage()
@@ -1707,7 +1798,7 @@ class ThreadEmoji(APIView):
         if message:
             if "status_code" in message:
                 return Response(
-                    data="Unable to retrieve data from zc core", 
+                    data="Unable to retrieve data from zc core",
                     status=status.HTTP_424_FAILED_DEPENDENCY
                     )
             current_thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
@@ -1718,7 +1809,7 @@ class ThreadEmoji(APIView):
                         "event": "get_thread_message_reactions",
                         "room_id": message["room_id"],
                         "message_id": message["_id"],
-                        "thread_message_id": current_thread_message[0]["_id"], 
+                        "thread_message_id": current_thread_message[0]["_id"],
                         "data": {
                             "reactions": current_thread_message[0]["reactions"],
                         },
@@ -1734,7 +1825,7 @@ class ThreadEmoji(APIView):
 @db_init_with_credentials
 def send_reply(request, room_id, message_id):
     """
-    This endpoint is used to send a reply message 
+    This endpoint is used to send a reply message
     It takes in the a room_id and the message_id of the message being replied to
     Stores the data of the replied message in a field "replied message"
     """
@@ -1751,7 +1842,7 @@ def send_reply(request, room_id, message_id):
     if serializer.is_valid():
         data = serializer.data
         room_id = data["room_id"]  # room id gotten from client request
-        
+
         room = DB.read("dm_rooms", {"_id": room_id})
         if room and room.get("status_code", None) == None:
             if data["sender_id"] in room.get("room_user_ids", []):

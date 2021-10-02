@@ -1,9 +1,20 @@
 import React from 'react';
 import loading_gif from './loading.gif';
 
-const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading }) => {
+const SearchedUsersModal = ({
+    searchedUsers,
+    onSelectUser,
+    loading,
+    roomLoading,
+}) => {
     return (
         <div className='alldms-searchedusersmodal'>
+            {roomLoading && (
+                <p className='loading-text'>
+                    <img className='loading-gif' src={loading_gif} alt='' />
+                    Please wait, loading room...
+                </p>
+            )}
             {loading && (
                 <p className='loading-text'>
                     <img className='loading-gif' src={loading_gif} alt='' />
@@ -131,19 +142,19 @@ const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading }) => {
                 <div
                     className='user'
                     onClick={() => {
-                        onSelectUser(searchedUsers[4]);
+                        onSelectUser(searchedUsers[5]);
                     }}
                 >
                     <div
                         className='user-picture'
                         style={{
-                            backgroundImage: `url(${searchedUsers[4].image_url})`,
+                            backgroundImage: `url(${searchedUsers[5].image_url})`,
                         }}
                     ></div>
                     <p>
-                        <span>{searchedUsers[4].user_name} O </span>
-                        {searchedUsers[4].first_name}{' '}
-                        {searchedUsers[4].last_name}
+                        <span>{searchedUsers[5].user_name} O </span>
+                        {searchedUsers[5].first_name}{' '}
+                        {searchedUsers[5].last_name}
                     </p>
                 </div>
             )}
@@ -151,19 +162,19 @@ const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading }) => {
                 <div
                     className='user'
                     onClick={() => {
-                        onSelectUser(searchedUsers[4]);
+                        onSelectUser(searchedUsers[6]);
                     }}
                 >
                     <div
                         className='user-picture'
                         style={{
-                            backgroundImage: `url(${searchedUsers[4].image_url})`,
+                            backgroundImage: `url(${searchedUsers[6].image_url})`,
                         }}
                     ></div>
                     <p>
-                        <span>{searchedUsers[4].user_name} O </span>
-                        {searchedUsers[4].first_name}{' '}
-                        {searchedUsers[4].last_name}
+                        <span>{searchedUsers[6].user_name} O </span>
+                        {searchedUsers[6].first_name}{' '}
+                        {searchedUsers[6].last_name}
                     </p>
                 </div>
             )}
@@ -171,19 +182,19 @@ const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading }) => {
                 <div
                     className='user'
                     onClick={() => {
-                        onSelectUser(searchedUsers[4]);
+                        onSelectUser(searchedUsers[7]);
                     }}
                 >
                     <div
                         className='user-picture'
                         style={{
-                            backgroundImage: `url(${searchedUsers[4].image_url})`,
+                            backgroundImage: `url(${searchedUsers[7].image_url})`,
                         }}
                     ></div>
                     <p>
-                        <span>{searchedUsers[4].user_name} O </span>
-                        {searchedUsers[4].first_name}{' '}
-                        {searchedUsers[4].last_name}
+                        <span>{searchedUsers[7].user_name} O </span>
+                        {searchedUsers[7].first_name}{' '}
+                        {searchedUsers[7].last_name}
                     </p>
                 </div>
             )}
@@ -191,19 +202,59 @@ const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading }) => {
                 <div
                     className='user'
                     onClick={() => {
-                        onSelectUser(searchedUsers[4]);
+                        onSelectUser(searchedUsers[8]);
                     }}
                 >
                     <div
                         className='user-picture'
                         style={{
-                            backgroundImage: `url(${searchedUsers[4].image_url})`,
+                            backgroundImage: `url(${searchedUsers[8].image_url})`,
                         }}
                     ></div>
                     <p>
-                        <span>{searchedUsers[4].user_name} O </span>
-                        {searchedUsers[4].first_name}{' '}
-                        {searchedUsers[4].last_name}
+                        <span>{searchedUsers[8].user_name} O </span>
+                        {searchedUsers[8].first_name}{' '}
+                        {searchedUsers[8].last_name}
+                    </p>
+                </div>
+            )}
+            {searchedUsers[9] && (
+                <div
+                    className='user'
+                    onClick={() => {
+                        onSelectUser(searchedUsers[9]);
+                    }}
+                >
+                    <div
+                        className='user-picture'
+                        style={{
+                            backgroundImage: `url(${searchedUsers[9].image_url})`,
+                        }}
+                    ></div>
+                    <p>
+                        <span>{searchedUsers[9].user_name} O </span>
+                        {searchedUsers[9].first_name}{' '}
+                        {searchedUsers[9].last_name}
+                    </p>
+                </div>
+            )}
+            {searchedUsers[10] && (
+                <div
+                    className='user'
+                    onClick={() => {
+                        onSelectUser(searchedUsers[10]);
+                    }}
+                >
+                    <div
+                        className='user-picture'
+                        style={{
+                            backgroundImage: `url(${searchedUsers[10].image_url})`,
+                        }}
+                    ></div>
+                    <p>
+                        <span>{searchedUsers[10].user_name} O </span>
+                        {searchedUsers[10].first_name}{' '}
+                        {searchedUsers[10].last_name}
                     </p>
                 </div>
             )}

@@ -178,19 +178,6 @@ class DataStorage:
 
 
 
-def send_centrifugo_data(room, data):
-    url = "https://realtime.zuri.chat/api"
-    # url = "http://localhost:8000/api"
-    headers = {
-        "Content-type": "application/json",
-        "Authorization": "apikey " + CENTRIFUGO_TOKEN,
-    }
-    command = {"method": "publish", "params": {"channel": room, "data": data}}
-    try:
-        response = requests.post(url=url, headers=headers, json=command)
-        return {"status_code": response.status_code, "message": response.json()}
-    except Exception as e:
-        print(e)
 
 
 DB = DataStorage()
@@ -215,9 +202,9 @@ def get_rooms(user_id, org_id):
         if "status_code" in response:
             return response
         for room in response:
-            if "serializer" in room:
+            if "room_user_ids" in room:
                 try:
-                    users_room_list = room["serializer"]["room_member_ids"]
+                    users_room_list = room["room_user_ids"]
                     if user_id in users_room_list:
                         data.append(room)
                 except Exception:
@@ -274,27 +261,29 @@ def get_user_profile(org_id=None, user_id=None):
 
 
 def sidebar_emitter(org_id, member_id):
-    response = get_rooms(user_id=member_id, org_id=org_id)
-    user_rooms = response
+    user_rooms = get_rooms(user_id=member_id, org_id=org_id)
     rooms = []
     if user_rooms == None:
         pass
     else:
         for room in user_rooms:
-            if "org_id" in room["serializer"]:
-                if org_id == room["serializer"]["org_id"]:
-                    room_profile = {}
-                    for user_id in room["serializer"]["room_member_ids"]:
-                        if user_id != member_id:
-                            profile = get_user_profile(org_id, user_id)
-                            if profile["status"] == 200:
-                                room_profile["room_name"] = profile["data"]["user_name"]
-                                if profile["data"]["image_url"]:
-                                    room_profile["room_image"] = profile["data"]["image_url"]
-                                else:
-                                    room_profile[
-                                        "room_image"
-                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                                rooms.append(room_profile)
-                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
-                    return rooms[-1]
+            if org_id == room["org_id"]:
+                room_profile = {}
+                for user_id in room["room_user_ids"]:
+                    if user_id != member_id:
+                        print (user_id)
+                        profile = get_user_profile(org_id, user_id)
+                        if profile["status"] == 200:
+                            room_profile["room_name"] = profile["data"]["user_name"]
+                            if profile["data"]["image_url"]:
+                                room_profile["room_image"] = profile["data"]["image_url"]
+                            else:
+                                room_profile[
+                                    "room_image"
+                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            rooms.append(room_profile)
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
+    if len(rooms) > 1:
+        return rooms[-1]
+    else:
+        return rooms

@@ -1,13 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SelectedUsersTag from './SelectedUsersTag';
 import SearchedUsersModal from './SearchedUsersModal';
+import { useDispatch, useSelector } from 'react-redux';
+import { handleCreateDmRoom } from '../../Redux/Actions/dmActions';
+import { useHistory } from 'react-router';
 
-const SearchUsers = ({ orgUsers }) => {
+const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
     const [searchInputValue, setSearchInputValue] = useState('');
     const [fetchLoading, setFetchLoading] = useState(true);
+    const [roomLoading, setRoomLoading] = useState(false);
+
+    const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
+
+    const history = useHistory();
+
+    const searchInputRef = useRef(null);
+
+    const dispatch = useDispatch();
 
     const filterUser = (searchInput, allUsers) => {
         const newFilteredUsers = allUsers.filter(
@@ -48,6 +60,7 @@ const SearchUsers = ({ orgUsers }) => {
 
         setSearchInputValue('');
         setSearchModalOpen(false);
+        searchInputRef.current.focus();
     };
 
     const deselectUser = (user) => {
@@ -56,17 +69,47 @@ const SearchUsers = ({ orgUsers }) => {
         );
 
         setSelectedUsers(newSelectedUsers);
+        searchInputRef.current.focus();
     };
 
-    const clearTag = (e) => {
-        if (e.keyCode === 8 && !searchInputValue) {
-            const newSelectedUsers = selectedUsers.filter(
-                (selectedUser, i) => selectedUsers.length - 1 !== i
-            );
+    const onCreateRoom = () => {
+        setRoomLoading(true);
+        const room_name_list = selectedUsers.map((user) => user.user_name);
 
-            setSelectedUsers(newSelectedUsers);
+        const room_name = room_name_list.join(', ');
+
+        const selectedUsersIds = selectedUsers.map((user) => user._id);
+
+        if (selectedUsers.length) {
+            dispatch(
+                handleCreateDmRoom({
+                    org_id,
+                    member_id: loggedInUser_id,
+                    user_ids: selectedUsersIds,
+                    room_name,
+                })
+            );
         }
     };
+
+    const onKeyEvent = (e) => {
+        if (e.keyCode === 8 && !searchInputValue) {
+            deselectUser(selectedUsers[selectedUsers.length - 1]);
+        }
+
+        if (e.keyCode === 13) {
+            onCreateRoom();
+        }
+    };
+
+    useEffect(() => {
+        if (roomsReducer.room_id) {
+            setRoomLoading(false);
+            const redirectTo = `/${org_id}/${roomsReducer.room._id}/${loggedInUser_id}`;
+
+            history.push(redirectTo);
+        }
+    }, [roomsReducer]);
 
     useEffect(() => {
         filterUser(searchInputValue, orgUsers || []);
@@ -110,25 +153,31 @@ const SearchUsers = ({ orgUsers }) => {
                 )}
                 {selectedUsers[4] && (
                     <SelectedUsersTag
-                        selectedUser={selectedUsers[3]}
+                        selectedUser={selectedUsers[4]}
                         onClose={deselectUser}
                     />
                 )}
                 {selectedUsers[5] && (
                     <SelectedUsersTag
-                        selectedUser={selectedUsers[3]}
+                        selectedUser={selectedUsers[5]}
                         onClose={deselectUser}
                     />
                 )}
                 {selectedUsers[6] && (
                     <SelectedUsersTag
-                        selectedUser={selectedUsers[3]}
+                        selectedUser={selectedUsers[6]}
                         onClose={deselectUser}
                     />
                 )}
                 {selectedUsers[7] && (
                     <SelectedUsersTag
-                        selectedUser={selectedUsers[3]}
+                        selectedUser={selectedUsers[7]}
+                        onClose={deselectUser}
+                    />
+                )}
+                {selectedUsers[8] && (
+                    <SelectedUsersTag
+                        selectedUser={selectedUsers[8]}
                         onClose={deselectUser}
                     />
                 )}
@@ -150,6 +199,7 @@ const SearchUsers = ({ orgUsers }) => {
                             searchedUsers={filteredUsers}
                             onSelectUser={selectUser}
                             loading={fetchLoading}
+                            roomLoading={roomLoading}
                         />
                     )}
                 </div>

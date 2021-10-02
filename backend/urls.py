@@ -14,12 +14,12 @@ urlpatterns = [
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
 
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search", 
+        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
          views.search_DM,
          name="search DM"
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",  
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
          views.message_create_get,
          name="create_get_message"
     ),
@@ -29,13 +29,13 @@ urlpatterns = [
     #     name="update_thread_message",
     # ),
     path(
-        "api/v1/org/<str:org_id>/user/<str:user_id>/room",
+        "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         views.create_room,
         name="create_room"
     ),
     path(
-        "api/v1/org/<str:org_id>/updatemessage/<str:pk>",
-        views.edit_room,
+        "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
+        views.edit_message,
         name="updateroom",
     ),
     path(
@@ -48,10 +48,10 @@ urlpatterns = [
         views.user_rooms,
         name="get_user_rooms",
     ),
-    path(  # what is this endpoint doing?
+    path(  #it is creating a reminder for a message
         "api/v1/org/<str:org_id>/reminder",
-        views.remind_message,
-        name="reminder",
+        views.create_reminder,
+        name="create_reminder",
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
@@ -83,7 +83,7 @@ urlpatterns = [
         views.retrieve_bookmarks,
         name="get_bookmarks",
     ),
-    path( 
+    path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         views.mark_read,
         name="mark_read",
@@ -118,7 +118,7 @@ urlpatterns = [
         views.user_profile,
         name="user_profile",
     ),
-    path( 
+    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="media_files",
