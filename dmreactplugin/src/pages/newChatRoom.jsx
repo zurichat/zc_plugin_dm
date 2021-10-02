@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import DmProfileHeader from '../components/dmProfileHeader'
 import BookmarkHeader from '../components/common/addBookmarkKebab/dmBookMark'
 import DmChatContainerBox from '../components/ChatContainer/dmChatContainerBox'
@@ -34,6 +34,8 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
 
   const [grid, setGrid] = useState('')
   const [none, setNone] = useState('none')
+  const [focus, setFocus] = useState(false)
+  const refContainer = useRef(null)
 
   return (
     <div className='dm-plugin-full-page' style={{ display: grid }}>
@@ -58,7 +60,11 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
           <DmChatContainerBox user2_id={user2_id} actualUser={actualUser} />
         </div>
         <div className='dm-footer-input-field w-100 position-relative'>
-          <InputBoxField />
+          <InputBoxField
+            refContainer={refContainer}
+            focus={focus}
+            setFocus={setFocus}
+          />
         </div>
       </div>
       <div className='dm-plugin-right-sidebar' style={{ display: none }}>
@@ -68,6 +74,9 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
           grid={grid}
           setGrid={setGrid}
           actualUser={actualUser}
+          refContainer={refContainer}
+          focus={focus}
+          setFocus={setFocus}
         />
       </div>
     </div>

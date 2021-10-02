@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './profileSidebar.css'
 import message from './svg/message.svg'
 import mute from './svg/mute.svg'
@@ -7,7 +7,16 @@ import more2 from './svg/more2.svg'
 import copy from './svg/copy.svg'
 import { AiOutlineClose } from 'react-icons/ai'
 
-const ProfileSidebar = ({ none, grid, setNone, setGrid, actualUser }) => {
+const ProfileSidebar = ({
+  none,
+  grid,
+  setNone,
+  setGrid,
+  actualUser,
+  refContainer,
+  focus,
+  setFocus,
+}) => {
   const [moreOptionsOpen, setMoreOptionsOpen] = useState(false)
 
   const toggleMoreOptions = () => {
@@ -20,6 +29,7 @@ const ProfileSidebar = ({ none, grid, setNone, setGrid, actualUser }) => {
   const handleCloseProfile = () => {
     setGrid('')
     setNone('none')
+    setMoreOptionsOpen(false)
   }
   console.log(actualUser)
   const user = actualUser && actualUser
@@ -34,6 +44,7 @@ const ProfileSidebar = ({ none, grid, setNone, setGrid, actualUser }) => {
 
     return localTime
   }
+  console.log(refContainer)
 
   return (
     <div className='dm-plugin-full-profile'>
@@ -77,7 +88,11 @@ const ProfileSidebar = ({ none, grid, setNone, setGrid, actualUser }) => {
             </p>
             <div className='profile-buttons'>
               <div className='btn'>
-                <img className='btn-icon' src={message} />
+                <img
+                  className='btn-icon'
+                  src={message}
+                  onClick={() => setFocus(!focus)}
+                />
                 <p>Message</p>
               </div>
               <div className='btn'>
@@ -95,7 +110,7 @@ const ProfileSidebar = ({ none, grid, setNone, setGrid, actualUser }) => {
               {moreOptionsOpen && (
                 <div className='more-options-modal'>
                   <div className='top'>
-                    <p>View files</p>
+                    <p style={{ cursor: 'pointer' }}>View files</p>
                   </div>
                   <div className='bottom'>
                     <p>Copy Member ID</p>
