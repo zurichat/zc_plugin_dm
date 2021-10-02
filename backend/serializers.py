@@ -24,8 +24,9 @@ class ReminderSerializer(serializers.Serializer):
     message_id = serializers.CharField(max_length=500)
     current_date = serializers.CharField(max_length=500)
     scheduled_date = serializers.CharField(max_length=500)
-    notes = serializers.CharField(required=False,max_length=500, allow_blank=True)
-    class Meta: 
+    notes = serializers.CharField(required=False, max_length=500)
+
+    class Meta:
         fields = ['__all__']
 
 
