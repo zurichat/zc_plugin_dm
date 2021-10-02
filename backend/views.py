@@ -109,9 +109,7 @@ def side_bar(request):
                                 if profile["data"]["image_url"]:
                                     room_profile["room_image"] = profile["data"]["image_url"]
                                 else:
-                                    room_profile[
-                                        "room_image"
-                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                    room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                                 rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
@@ -122,7 +120,7 @@ def side_bar(request):
         "user_id": f"{user}",
         "group_name": "DM",
         "show_group": False,
-        "button_url":f"/dm/{org_id}/all-dms",
+        "button_url":f"/dm/{org_id}/{user}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
@@ -269,13 +267,16 @@ def create_room(request, member_id):
             # print("            --------FAE-------              \n\r")        
             user_ids = serializer.data["room_member_ids"]
             user_rooms = get_rooms(user_ids[0], DB.organization_id)
-            for room in user_rooms:
-                room_users = room["room_user_ids"]
-                if set(room_users) == set(user_ids):
-                    response_output = {
-                                         "room_id": room["_id"]
-                                        }
-                    return Response(data=response_output, status=status.HTTP_200_OK)
+            if "status_code" in user_rooms:
+                pass
+            else:
+                for room in user_rooms:
+                    room_users = room["room_user_ids"]
+                    if set(room_users) == set(user_ids):
+                        response_output = {
+                                                "room_id": room["_id"]
+                                            }
+                        return Response(data=response_output, status=status.HTTP_200_OK)
 			
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
@@ -292,9 +293,6 @@ def create_room(request, member_id):
 
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            # for user in user_ids:
-            #     if user is not user_id:
-            #         profile = get_user_profile (DB.organization_id, user)
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -1817,7 +1815,7 @@ class ThreadEmoji(APIView):
             if current_thread_message:
                 return Response(
                     data={
-                        "status": message["message"],
+                        "status": "200",
                         "event": "get_thread_message_reactions",
                         "room_id": message["room_id"],
                         "message_id": message["_id"],
@@ -1831,7 +1829,265 @@ class ThreadEmoji(APIView):
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
+    def post(self, request, org_id: str, room_id: str, message_id: str, thread_message_id: str):
+        request.data["message_id"] = thread_message_id
+        serializer = EmojiSerializer(data=request.data)
 
+        if serializer.is_valid():
+            data = serializer.data
+            thread_message_id = data["message_id"]
+            sender_id = data["sender_id"]
+            data_storage = DataStorage()
+            data_storage.organization_id = org_id
+            
+            # fetch message related to that reaction
+            message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+            if message:
+                if "status_code" in message:
+                    return Response(
+                    data="Unable to retrieve data from zc core", 
+                    status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                # get reactions
+                current_thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+                if current_thread_message:
+                    reactions = current_thread_message[0].get("reactions", [])
+                    data["_id"] = str(uuid.uuid1())
+                    reactions.append(data)
+                    # update reactions for a message
+                    response = data_storage.update("dm_messages", message_id, {"threads": message["threads"]})
+                    if response.get("status", None) == 200:
+                        response_output = {
+                            "status": response["message"],
+                            "event": "add_thread_message_reaction",
+                            "reaction_id": data["_id"],
+                            "parent_message_id": message["_id"],
+                            "thread_message_id": current_thread_message[0]["_id"],
+                            "data": {
+                                "sender_id": sender_id,
+                                "reaction": data["data"],
+                                "created_at": data["created_at"],
+                            },
+                        }
+                        centrifugo_data = centrifugo_client.publish(
+                            room=message["room_id"], data=response_output
+                        )  # publish data to centrifugo
+                        if centrifugo_data["message"].get("error", None) == None:
+                            return Response(
+                                data=response_output, status=status.HTTP_201_CREATED
+                            )
+                        return Response(
+                            data="Centrifugo server not available", 
+                            status=status.HTTP_424_FAILED_DEPENDENCY
+                            )
+                    return Response(
+                        "Data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                return Response(data="Not such thread message", status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                "Message or room not found", status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            data=serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )  
+
+
+@api_view(["DELETE"])
+@db_init_with_credentials
+def delete_thread_emoji_reaction(request, room_id, message_id, thread_message_id, reaction_id):
+    if request.method == "DELETE":
+        message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        if message:
+            if "status_code" in message:
+                return Response(
+                    data="Unable to retrieve data from zc core", 
+                    status=status.HTTP_424_FAILED_DEPENDENCY
+                )
+            thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                reactions = thread_message[0].get("reactions", [])
+                for reaction in reactions:
+                    try:
+                        if reaction["_id"] == reaction_id:
+                            emoji = reaction
+                            break
+                        emoji = None
+                    except Exception:
+                        pass
+                if emoji:
+                    reactions.remove(emoji)
+                    response = DB.update("dm_messages", message_id, {"threads": message["threads"]})
+                    if response.get("status", None) == 200:
+                        response_output = {
+                            "status": response["message"],
+                            "event": "delete_thread_message_reaction",
+                            "parent_message_id": message["_id"],
+                            "data": {
+                                "response": "Reaction successfully deleted"
+                            },
+                        }
+                        centrifugo_data = centrifugo_client.publish(
+                            room=message["room_id"], data=response_output
+                        )  # publish data to centrifugo
+                        if centrifugo_data["message"].get("error", None) == None:
+                            return Response(
+                                data=response_output, status=status.HTTP_201_CREATED
+                            )
+                        return Response(
+                            data="Centrifugo server not available", 
+                            status=status.HTTP_424_FAILED_DEPENDENCY
+                        )
+                    return Response(
+                        "Data not sent", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+                return Response(data="No such emoji reaction", status=status.HTTP_404_NOT_FOUND)
+            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="Message or room not found", status=status.HTTP_404_NOT_FOUND)
+    return Response(staus=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def update_thread_read_status(request, room_id, message_id, thread_message_id):
+    if request.method == "PUT":
+        message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        if message:
+            if "status_code" in message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            else:
+                thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+                if thread_message:
+                    thread_message[0]["read"] = not thread_message[0]["read"]
+                    data = {"read": thread_message[0]["read"]}
+                    response = DB.update("dm_messages", message_id, {"threads": message["threads"]})
+                    if response and response.get("status") == 200:
+                        return Response(data, status=status.HTTP_201_CREATED)
+                    return Response(data="Message status not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
+                return Response(data="Thread message not found", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+@db_init_with_credentials
+def send_thread_message_to_channel(request, room_id, message_id, thread_message_id):
+    if request.method == "POST":
+        parent_message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        if parent_message:
+            if "status_code" in parent_message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                sender_id = thread_message[0]["sender_id"]
+                message = thread_message[0]["message"]
+                url = f"https://dm.zuri.chat/api/v1/org/{DB.organization_id}/rooms/{room_id}/messages"
+                payload = json.dumps(
+                    {
+                    "sender_id": f"{sender_id}",
+                    "room_id": f"{room_id}",
+                    "message": f"{message}",
+                    }
+                )
+                headers = {"Content-Type": "application/json"}
+                send_message = requests.request("POST", url, headers=headers, data=payload)
+                if send_message.status_code == 201:
+                    return Response(send_message.json(), status=status.HTTP_201_CREATED)
+                return Response(send_message.json(), status=response.status_code)
+            return Response(data="No thread message found", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="No message or room found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["GET"])
+@db_init_with_credentials
+def copy_thread_message_link(request, room_id, message_id, thread_message_id):
+    """
+    Retrieves a single thread message using the thread_message_id as query params.
+    The message information returned is used to generate a link which contains 
+    a room_id, parent_message_id and a thread_message_id
+    """
+    if request.method == "GET":
+        parent_message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+        if parent_message:
+            if "status_code" in parent_message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                message_info = {
+                    "room_id": room_id,
+                    "parent_message_id": message_id,
+                    "thread_id": thread_message_id,
+                    "link": f"https://dm.zuri.chat/thread_message/{DB.organization_id}/{room_id}/{message_id}/{thread_message_id}",
+                }
+                return Response(data=message_info, status=status.HTTP_200_OK)
+            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="No parent message found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@db_init_with_credentials
+def read_thread_message_link(request, room_id, message_id, thread_message_id):
+    if request.method == "GET":
+        message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+        if message:
+            if "status_code" in message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                return JsonResponse({"message": thread_message[0]["message"]})
+            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def pinned_thread_message(request, room_id, message_id, thread_message_id):
+    message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    if message:
+        if "status_code" in message:
+            if "status_code" == 404:
+                return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+            return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+        room = DB.read("dm_rooms", {"id": room_id})
+        pin = room["pinned"] or []
+        thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+        if thread_message:
+            pinned_thread_list = [thread_pin for thread_pin in pin if isinstance(thread_pin, dict)]
+            pinned_thread_ids = [val.get("thread_message_id") for val in pinned_thread_list]
+            if thread_message_id in pinned_thread_ids:
+                current_pin = {key:value for (key,value) in pinned_thread_list.items() if value == thread_message_id}
+                pin.remove(current_pin)
+                data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "unpin_thread_message"}
+                response = DB.update("dm_rooms", room_id, {"pinned": pin})
+                if response["status"] == 200:
+                    centrifugo_data = send_centrifugo_data(
+                        room=room_id, data=data
+                    )  # publish data to centrifugo
+                    if centrifugo_data.get("error", None) == None:
+                        return Response(data=data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(status=response.status_code)
+            else:
+                current_pin = {"message_id": message_id, "thread_message_id": thread_message_id}
+                pin.append(current_pin)
+                data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "pin_thread_message"}
+                response = DB.update("dm_rooms", room_id, {"pinned": pin})
+                centrifugo_data = send_centrifugo_data(
+                    room=room_id, data=data
+                )  # publish data to centrifugo
+                if centrifugo_data.get("error", None) == None:
+                    return Response(data=data, status=status.HTTP_201_CREATED)
+        return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+    return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["POST"])
 @db_init_with_credentials
@@ -1952,4 +2208,29 @@ def group_room(request, member_id):
 			response = DB.write("dm_rooms", data=fields)
 			
 		return response
+
+@api_view(["PUT"])
+@db_init_with_credentials
+def star_room(request, room_id, member_id):
+    """
+    Endpoint for starring and unstarring a user, it moves the user from the dm list to a starred dm list
+    """
+    if request.method == "PUT":
+        room = DB.read("dm_rooms", {"_id": room_id})
+        if room:
+            if member_id in room.get("room_member_ids", []) or member_id in room.get("room_user_ids", []):
+                data =  room.get("starred",[])
+                if member_id in data:
+                    data.remove(member_id)
+                else:
+                    data.append(member_id)
+
+                response = DB.update("dm_rooms", room_id,{"starred":data})
+                print(response)
+                if response and response.get("status_code",None) == None:
+                    return Response("Sucess", status=status.HTTP_200_OK)
+                return Response(data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
+            return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)
+        return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
