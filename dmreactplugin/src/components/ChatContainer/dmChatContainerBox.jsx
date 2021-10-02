@@ -37,7 +37,7 @@ const DmChatContainerBox = ({ user2_id }) => {
                 })
                 .map((messages) => (
                   <div key={messages?.id}>
-                    <MessageWrapper handleOpenThread={handleOpenThread}>
+                    <MessageWrapper handleOpenThread={handleOpenThread} messages={messages}>
                       <DmSingleMessageContainer
                         messages={messages}
                         user2_id={user2_id}
