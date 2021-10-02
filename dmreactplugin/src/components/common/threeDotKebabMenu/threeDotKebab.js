@@ -6,10 +6,19 @@ import { RiParkingLine } from "react-icons/ri"
 import { BiEditAlt } from "react-icons/bi"
 import { HiOutlineExternalLink } from "react-icons/hi"
 import { MdPoll } from "react-icons/md"
+import { useDispatch } from 'react-redux';
+import { handleDeleteRoomMessage } from '../../../Redux/Actions/dmActions';
 // import { IoLogoMedium } from "react-icons/io"
 function ThreeDotKebab() {
   
-  const [secondPopupOpen,setSecondPopupOpen]=useState(false)
+  const [secondPopupOpen,setSecondPopupOpen]=useState(false);
+
+  const dispatch = useDispatch()
+
+  const onDelete = ()=>{
+    dispatch(handleDeleteRoomMessage(org_id, room_id, message_id))
+  }
+
   return ( <>
      <div className="Dm-ThreeDotKebab-Menu-FirstPopup">
       <div className="DmMenuListBorder">Turn off notififcations for replies

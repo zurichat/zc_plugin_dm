@@ -49,10 +49,11 @@ const App = () => {
                 />
                 <Route
                     exact
-                    path={`/${org_id}/all-dms`}
+                    path={`/${org_id}/${room_id}/all-dms`}
                     render={() => (
                         <AllDms
                             org_id={org_id}
+                            loggedInUser_id={room_id}
                         />
                     )}
                 />
