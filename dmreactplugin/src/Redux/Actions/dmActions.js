@@ -7,6 +7,7 @@ import {
   GET_ROOMS,
   GET_ROOM_INFO,
   GET_ROOM_MESSAGES,
+  CREATE_ROOM_MESSAGES,
   DELETE_ROOM_MESSAGE
 } from "./actionTypes";
 
@@ -79,6 +80,20 @@ export const handleGetRoomMessages = (org_id, room_id) => async (dispatch) => {
   }
 };
 
+//Create room messages
+const createRoomMessages = () =>({
+  type: CREATE_ROOM_MESSAGES,
+  payload:message,
+});
+
+export const handleCreateRoomMessages = (org_id, room_id, data) => async (dispatch) =>{
+  try{
+    const{res} = await APIService.createRoomMessage(org_id, room_id, data);
+    await dispatch(createRoomMessages(res));
+  }catch(error){
+    console.log(`Error from handleCreateRoomMessages: ${error}`);
+  }
+}
 
 // Delete room message
 
