@@ -271,6 +271,7 @@ def sidebar_emitter(org_id, member_id):
                 room_profile = {}
                 for user_id in room["room_user_ids"]:
                     if user_id != member_id:
+                        print (user_id)
                         profile = get_user_profile(org_id, user_id)
                         if profile["status"] == 200:
                             room_profile["room_name"] = profile["data"]["user_name"]
@@ -282,4 +283,7 @@ def sidebar_emitter(org_id, member_id):
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                             rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
-    return rooms
+    if len(rooms) > 1:
+        return rooms[-1]
+    else:
+        return rooms
