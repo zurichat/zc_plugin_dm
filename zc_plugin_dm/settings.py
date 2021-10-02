@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,7 +42,17 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         'rest_framework.parsers.JSONParser',
-    ]
+    ],
+
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework_simplejwt.authentication.JWTTokenUserAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    'TOKEN_LIFETIME': timedelta(hours=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # Application definition
@@ -55,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt',
     'webpack_loader',
     'backend',
     'drf_yasg',
@@ -78,7 +90,7 @@ ROOT_URLCONF = 'zc_plugin_dm.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "dmspa", "dist"),],
+        'DIRS': [os.path.join(BASE_DIR, "dmspa", "dist"), ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -151,7 +163,7 @@ STATICFILES_DIRS = [
     # os.path.join(BASE_DIR, "frontend", "dist", "static")
     os.path.join(BASE_DIR, "dmspa", "dist"),
     # os.path.join(BASE_DIR, "dmplugins", "dist"),
-    os.path.join(BASE_DIR,"dmreactplugin","dist")
+    os.path.join(BASE_DIR, "dmreactplugin", "dist")
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
