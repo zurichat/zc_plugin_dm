@@ -19,3 +19,22 @@
 .dropDown-zindex {
   z-index: 10;
 }
+.display-bookmark{
+  padding: 5px;
+}
+.display-bookmark:hover{
+  background-color: #e1fdf4;
+  /* rgb(13, 13, 92); */
+
+}
+.display-bookmark-link{
+  font-weight: bold;
+  font-size: 15px;
+  text-align: left;
+}
+.display-bookmark-name{
+font-size: 13px;
+text-align: left;
+letter-spacing: normal;
+word-spacing: normal;
+}
