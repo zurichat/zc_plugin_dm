@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import '../assets/css/dmProfileHeader.css'
 import Modal from 'react-modal'
+import Parcel from 'single-spa-react/parcel'
+import { pluginHeader } from '@zuri/plugin-header'
 import {
   FaAngleDown,
   FaRegBellSlash,
@@ -14,6 +16,15 @@ import { BsClock, BsX, BsEnvelope } from 'react-icons/bs'
 const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
   const user = actualUser && actualUser
   const [modalIsOpen, setModalIsOpen] = useState(false)
+  const headerConfig = {
+    name: `${user?.user_name}`, //Name on header
+    icon: `${user?.image_url}`, //Image on header
+   eventTitle: () => {
+       console.log(user)
+        setModalIsOpen(true)
+      //Block of code to be triggered on title click 
+    }
+  }
 
   const getLocalTime = () => {
     let date = new Date()
@@ -33,6 +44,12 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
   }
   return (
     <div>
+        <Parcel
+                config={pluginHeader}
+                wrapWith="div"
+                wrapStyle={{width: "100%" }}
+                headerConfig={headerConfig}
+            />
       <header className='dm-profileHeader d-flex align-items-center'>
         {/* Img to be placed here */}
         <div
@@ -77,7 +94,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
                 />
                 <div className='profilePop__details'>
                   <p className='profilePop__details__header'>
-                    {user?.first_name} {user?.last_name} 🦊 ⭐️{' '}
+                  {user?.user_name}{' '}
                   </p>
                   <p className='profilePop__details__para'>{user?.role}</p>
                   <p className='profilePop__details__para'>{user?.pronouns}</p>

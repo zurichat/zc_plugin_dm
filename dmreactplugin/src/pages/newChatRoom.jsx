@@ -58,7 +58,7 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
           <DmChatContainerBox user2_id={user2_id} actualUser={actualUser} />
         </div>
         <div className='dm-footer-input-field w-100 position-relative'>
-          <InputBoxField />
+          <InputBoxField org_id = {org_id} room_id={room_id} loggedInUser_id={loggedInUser_id}/>
         </div>
       </div>
       <div className='dm-plugin-right-sidebar' style={{ display: none }}>
