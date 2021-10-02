@@ -2064,7 +2064,10 @@ def pinned_thread_message(request, room_id, message_id, thread_message_id):
             pinned_thread_list = [thread_pin for thread_pin in pin if isinstance(thread_pin, dict)]
             pinned_thread_ids = [val.get("thread_message_id") for val in pinned_thread_list]
             if thread_message_id in pinned_thread_ids:
-                current_pin = {key:value for (key,value) in pinned_thread_list.items() if value == thread_message_id}
+                for val in pinned_thread_list:
+                    if val.get("thread_message_id") == thread_message_id:
+                        current_pin = val
+                        break
                 pin.remove(current_pin)
                 data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "unpin_thread_message"}
                 response = DB.update("dm_rooms", room_id, {"pinned": pin})
