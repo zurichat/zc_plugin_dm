@@ -31,14 +31,14 @@ urlpatterns = [
     #     name="update_thread_message",
     # ),
     path(
-        "api/v1/org/<str:org_id>/room",
+        "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         views.create_room,
         name="create_room"
     ),
     path(
-        "api/v1/org/<str:org_id>/updatemessage/<str:pk>",
-        views.edit_room,
-        name="updateroom"
+        "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
+        views.edit_message,
+        name="updateroom",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/info",
@@ -50,10 +50,10 @@ urlpatterns = [
         views.user_rooms,
         name="get_user_rooms"
     ),
-    path(  # what is this endpoint doing?
+    path(  # it is creating a reminder for a message
         "api/v1/org/<str:org_id>/reminder",
-        views.remind_message,
-        name="reminder",
+        views.create_reminder,
+        name="create_reminder",
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
@@ -126,6 +126,11 @@ urlpatterns = [
         name="media_files"
     ),
     path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reply",
+        views.send_reply,
+        name="reply",
+    ),
+    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reactions",
         views.Emoji.as_view(),
         name="message_reactions",
@@ -143,7 +148,42 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions",
         views.ThreadEmoji.as_view(),
-        name="message_thread_reaction",
+        name="thread_message_reaction",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions/<str:reaction_id>",
+        views.delete_thread_emoji_reaction,
+        name="delete_thread_message_reaction",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/read_status",
+        views.update_thread_read_status,
+        name="update_thread_read_status",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/channel_message",
+        views.send_thread_message_to_channel,
+        name="send_thread_messsage_to_channel",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/link",
+        views.copy_thread_message_link,
+        name="copy_thread_messsage_link",
+    ),
+    path(
+        "thread_message/<str:org_id>/<str:room_id>/<str:message_id>/<str:thread_message_id>",
+        views.read_thread_message_link,
+        name="read_thread_messsage_link",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/pinned",
+        views.pinned_thread_message,
+        name="pinned_thread_messsage",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
+        views.star_room,
+        name="star_room",
     ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
