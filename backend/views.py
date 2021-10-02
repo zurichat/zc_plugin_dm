@@ -2246,6 +2246,7 @@ def pinned_thread_message(request, room_id, message_id, thread_message_id):
                 val.get("thread_message_id") for val in pinned_thread_list
             ]
             if thread_message_id in pinned_thread_ids:
+
                 current_pin = {
                     key: value
                     for (key, value) in pinned_thread_list.items()
