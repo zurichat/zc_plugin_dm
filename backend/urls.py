@@ -12,6 +12,7 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
+
     path("api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
          views.create_jwt_token, name="jwt_token"),
 
@@ -19,11 +20,21 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
         views.search_DM,
         name="search DM"
+
+    path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        views.search_DM,
+        name="search DM",
+
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
         views.message_create_get,
+
         name="create_get_message"
+
+        name="create_get_message",
+
     ),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
@@ -33,7 +44,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         views.create_room,
-        name="create_room"
+        name="create_room",
     ),
     path(
         "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
@@ -181,10 +192,20 @@ urlpatterns = [
         name="pinned_thread_messsage",
     ),
     path(
+
+        "api/v1/org/<str:org_id>/users/<str:member_id>/threads",
+        views.get_all_threads,
+        name="get_all_threads",
+    ),
+    path(
+
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
         views.star_room,
         name="star_room",
     ),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
+        views.close_conversation, 
+        name="close_conversation"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
