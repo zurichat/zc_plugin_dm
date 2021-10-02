@@ -831,26 +831,16 @@ def user_profile(request, org_id, member_id):
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
     if request.method == "GET":
-        headers = {}
-        print(request.headers)
-        if "Authorization" in request.headers:
-            headers["Authorization"] = request.headers["Authorization"]
-        else:
-            headers["Cookie"] = request.headers["Cookie"]
-
-        response = requests.get(url, headers=headers)
+        header = {'Authorization': f'Bearer {login_user()}'}
+        # print(request.headers)
+        # if "Authorization" in request.headers:
+        #     headers["Authorization"] = request.headers["Authorization"]
+        # else:
+        #     headers["Cookie"] = request.headers["Cookie"]
+        response = requests.get(url, headers=header)
+        
     else:
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    # elif request.method == "POST":
-    #     cookie_serializer = CookieSerializer(data=request.data)
-
-    #     if cookie_serializer.is_valid():
-    #         cookie = cookie_serializer.data["cookie"]
-    #         response = requests.get(url, headers={"Cookie": cookie})
-    #     else:
-    #         return Response(
-    #             cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-    #         )
 
     if response.status_code == 200:
         data = response.json()["data"]
