@@ -296,7 +296,7 @@ def create_room(request, member_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
+                        "joined_rooms": sidebar_emitter(org_id=DB.organization_id, member_id=member_id)
                     }
             }
 
