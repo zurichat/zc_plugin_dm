@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useLocation } from "react-router";
 import style from "styled-components";
+import instance from "../utils/apiServices";
 
 const StyledStarInterior = style.div`
 clip-path: polygon(
@@ -70,14 +72,60 @@ background-color: transparent;
 `;
 
 export default function StarButtonButton() {
+    const location = useLocation();
+    let [org_id, room_id, loggedInUser_id] = location.pathname
+        .split("/")
+        .filter((string) => string.length > 11);
     const [isStared, setStared] = useState(false);
+    const [isDisabled, setDisabled] = useState(false);
+    const apiInstance = instance;
+
+    useEffect(() => {
+        async function initialData() {
+            try {
+                setDisabled(true);
+                const response = await apiInstance.getStarPersonInfo(
+                    org_id,
+                    room_id,
+                    loggedInUser_id
+                );
+                isDisabled.current = false;
+                const data = JSON.parse(response.data);
+                if (data) {
+                    if (data.status) {
+                        setStared(data.status);
+                    }
+                }
+                setDisabled(false);
+            } catch (e) {
+                setDisabled(false);
+            }
+        }
+        initialData();
+    }, []);
+
+    const starMessage = async () => {
+        try {
+            setDisabled(true);
+
+            const response = await apiInstance.starPerson(
+                org_id,
+                room_id,
+                loggedInUser_id
+            );
+            if (response.status === 200) {
+                setStared(!isStared);
+            }
+            setDisabled(false);
+        } catch (e) {
+            setDisabled(false);
+        }
+    };
 
     return (
         <StyledButton
             title={`${isStared ? "remove from starred" : "star person"}`}
-            onClick={() => {
-                setStared(!isStared);
-            }}
+            onClick={isDisabled ? () => {} : starMessage}
         >
             <StyledStar
                 style={{ backgroundColor: `${isStared ? "#00b87c" : ""}` }}
