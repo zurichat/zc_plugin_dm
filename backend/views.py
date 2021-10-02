@@ -1378,13 +1378,13 @@ def search_DM(request, member_id):
 
     try:
         rooms = DB.read("dm_rooms") #get all rooms
-        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
+        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]) or member_id in room.get('room_member_ids',[]), rooms)) #get all rooms with user
         if user_rooms != []:
             if users != []:
                 rooms_checked = []
                 for user in users:
                     rooms_checked += [room for room in user_rooms
-                                if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
+                                if set(room.get('room_user_ids',[])) == set([member_id,user]) or  set(room.get('room_member_ids',[])) == set([member_id,user])] #get rooms with other specified users
                 user_rooms = rooms_checked
             all_messages = DB.read("dm_messages") #get all messages
             thread_messages = [] # get all thread messages
