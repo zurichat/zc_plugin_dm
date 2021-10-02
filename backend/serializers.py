@@ -68,6 +68,9 @@ class MessageSerializer(serializers.Serializer):
     threads = serializers.ListField(
         required=False, default=[], child=ThreadSerializer()
     )
+    replied_message = serializers.ListField(
+        required=False, default=[]
+    )
     reactions = serializers.ListField(
         required=False, default=[], child=EmojiSerializer()
     )
