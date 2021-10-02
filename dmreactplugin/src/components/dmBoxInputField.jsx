@@ -16,19 +16,110 @@ import {
 } from 'react-icons/bs';
 import { FiAtSign, FiBold, FiPaperclip } from 'react-icons/fi';
 import { Button } from 'react-bootstrap';
+import ApiServices from '../utils/apiServices'
 
-const dmBoxInputField = () => {
-    // const { input } = useSelector((state) => state.);
+const dmBoxInputField = ({ org_id, room_id, user2_id }) => {
+    // controls inputfield text style e.g italic, bold, border
+    const [textStyle, setTextStyle] = useState({border:'1px solid #e3e3e3'})
 
-    const [messageInput, setMessageInput] = useState('');
+    // messageInput value from text-area
+    const [messageInput, setMessageInput] = useState();
+    
+    // save text-area value to messageInput state
+    const handleInput = (e) => {
+      // do something
+      setMessageInput(e.target.innerHTML)
+    }
 
+    // send message to backend
     const sendMessage = (e) => {
         e.preventDefault();
-
+        console.log('sending');
         if (!messageInput) return;
-        messageSend(messageInput);
+        let data = {
+          sender_id: user2_id,
+          message: messageInput
+        }
+        ApiServices.postMessageThread(org_id, room_id, "61584d6e87675da1c20179fa", data).then(response=>{
+          console.log(response);
+        })
+        // messageSend(messageInput);
         setMessageInput('');
+        inputRef.current.innerHTML = ''
     };
+
+    // checks and controls if italic/bold icon is clickee
+    const [clikedItalic, setClicked] = useState(false)
+    const [clikedBold, setClicked2] = useState(false)
+    
+    // change text-area element style
+    const changeStyle = (e) => {
+      switch (e) {
+        // change style to italic
+        case 1:
+          let style = {
+            fontStyle:clikedItalic ? 'normal' : 'italic',
+          }
+          setTextStyle({...style})
+          setClicked(!clikedItalic)
+          break;
+        // increase font-weight / change text style to bold
+        case 2:
+          setTextStyle({
+            fontStyle:!clikedItalic ? 'normal' : 'italic',
+            fontWeight:clikedBold ? 400 : 900
+          })
+          setClicked2(!clikedBold)
+          break;
+      }
+    }
+
+    // <input type='file'> -- controls render state for select attach elem
+    const [inputKey, setInputKey] = useState('some-key')
+    // state for attached file image url
+    const [attached, setAttached] = useState(null)
+    // ref to control attach input dom
+    const attachRef = React.createRef()
+    const toggleAttach = (e) => {
+      attachRef.current.click()
+    }
+    // save attach file url to 'attached' state
+    const attachFile = (e) => {
+      if(e.target.files && e.target.files[0]) {
+        setAttached(URL.createObjectURL(e.target.files[0]))
+      }
+    }
+    // on click clear attached file
+    const clearAttached = (e) => {
+      setInputKey('reset-attached')
+      setAttached('')
+    }
+
+    // pop-up random link
+    const alertRandomLink = (e) => {
+      let randString = window.location.href
+      alert(`copy ${randString}`)
+    }
+
+    // ref for text-area elem
+    const inputRef = React.createRef()
+    // control button clicked or not
+    const [clicked3, changeInputStyle] = useState(false)
+    // change message input text style to list 
+    const listStyle = (e) => {
+      let new_format = messageInput
+      new_format = messageInput.split(!clicked3 ? 'div' : 'li').join(!clicked3 ? 'li' : 'div')
+      setMessageInput(new_format)
+      inputRef.current.innerHTML = new_format
+      // console.log(new_format);
+      changeInputStyle(!clicked3)
+    }
+
+    // add @ to message Input string
+    const mention = (e) => {
+      setMessageInput(messageInput+'@')
+      inputRef.current.innerHTML += '@'
+    }
 
     //Resizeable contenteditable Input function
 
@@ -36,16 +127,26 @@ const dmBoxInputField = () => {
         <div className='dm-inputbox-container'>
             <Container>
                 <InputContainer>
+                    {/* preview uploaded file */}
+                    <img key={inputKey || ''} style={{display:!!attached == false ? 'none' : 'block'}} src={attached} alt="preview attached" />
+                    {/* clear uploaded file */}
+                    <button onClick={clearAttached} style={{display:!!attached == false ? 'none' : 'block'}}>clear attached</button>
                     <form>
-                        <textarea
+                        {/* hidden attach file */}
+                        <input key={inputKey || ''} onChange={attachFile} ref={attachRef} type="file" style={{visibility:'hidden',position:'absolute',zIndex:-9999}} name="" id="" />
+                        {/* text-area elem */}
+                        <div
+                          ref={inputRef}
+                            contentEditable={true}
+                            style={textStyle}
                             rows='2'
                             type='text'
-                            value={messageInput}
                             // textInputResize={textInputResize}
-                            onChange={(e) => setMessageInput(e.target.value)}
-                            placeholder='Send Message to '
-                            className='px-2'
-                        />
+                            onInput={handleInput}
+                            className='px-2 p-3'
+                        >
+                          <div>Send Message To</div>
+                        </div>
                         <ChatInputEditor>
                             <LeftChatEditor>
                                 <Button
@@ -55,24 +156,28 @@ const dmBoxInputField = () => {
                                     <BsLightning />
                                 </Button>
                                 <Button
+                                    onClick={(e)=>changeStyle(2)}
                                     variant='light'
                                     className='btn-inputfield-box'
                                 >
                                     <FiBold />
                                 </Button>
                                 <Button
+                                    onClick={(e)=>changeStyle(1)}
                                     variant='light'
                                     className='btn-inputfield-box'
                                 >
                                     <BsTypeItalic />
                                 </Button>
                                 <Button
+                                    onClick={alertRandomLink}
                                     variant='light'
                                     className='btn-inputfield-box'
                                 >
                                     <BsLink45Deg />
                                 </Button>
                                 <Button
+                                    onClick={listStyle}
                                     variant='light'
                                     className='btn-inputfield-box'
                                 >
@@ -82,12 +187,14 @@ const dmBoxInputField = () => {
 
                             <RightChatEditor>
                                 <Button
+                                    onClick={mention}
                                     variant='light'
                                     className='btn-inputfield-box'
                                 >
                                     <FiAtSign />
                                 </Button>
                                 <Button
+                                    onClick={toggleAttach}
                                     variant='light'
                                     className='btn-inputfield-box'
                                 >
@@ -98,7 +205,7 @@ const dmBoxInputField = () => {
                                     onClick={sendMessage}
                                     onKeyDown={sendMessage}
                                     className='send-btn-box btn-inputfield-box'
-                                    disabled={messageInput}
+                                    disabled={!messageInput}
                                 >
                                     <span className='sendMessage'>
                                         <IoMdSend />
