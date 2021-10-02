@@ -178,19 +178,6 @@ class DataStorage:
 
 
 
-def send_centrifugo_data(room, data):
-    url = "https://realtime.zuri.chat/api"
-    # url = "http://localhost:8000/api"
-    headers = {
-        "Content-type": "application/json",
-        "Authorization": "apikey " + CENTRIFUGO_TOKEN,
-    }
-    command = {"method": "publish", "params": {"channel": room, "data": data}}
-    try:
-        response = requests.post(url=url, headers=headers, json=command)
-        return {"status_code": response.status_code, "message": response.json()}
-    except Exception as e:
-        print(e)
 
 
 DB = DataStorage()
@@ -273,7 +260,7 @@ def get_user_profile(org_id=None, user_id=None):
     return profile.json()
 
 
-def sidebar_emitter(org_id, member_id):
+def sidebar_emitter(org_id, member_id, group_room_name=None):  # group_room_name = None or a String of Names
     user_rooms = get_rooms(user_id=member_id, org_id=org_id)
     rooms = []
     if user_rooms == None:
@@ -287,7 +274,14 @@ def sidebar_emitter(org_id, member_id):
                         print (user_id)
                         profile = get_user_profile(org_id, user_id)
                         if profile["status"] == 200:
-                            room_profile["room_name"] = profile["data"]["user_name"]
+                            
+                            
+                            if group_room_name and len(group_room_name.split(',')) > 2:  # if group_room_name != None && Len of List after split > 2
+                                room_profile["room_name"] = group_room_name  # overwrite room_name in profile to = String of Names
+                            else:
+                                room_profile["room_name"] = profile["data"]["user_name"]
+                                
+                            
                             if profile["data"]["image_url"]:
                                 room_profile["room_image"] = profile["data"]["image_url"]
                             else:
