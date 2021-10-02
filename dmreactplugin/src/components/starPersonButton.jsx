@@ -89,11 +89,13 @@ export default function StarButtonButton() {
                     room_id,
                     loggedInUser_id
                 );
-                isDisabled.current = false;
-                const data = JSON.parse(response.data);
-                if (data) {
-                    if (data.status) {
-                        setStared(data.status);
+                if (response.status == 200) {
+                    const data = JSON.parse(response.data);
+
+                    if (data) {
+                        if (data.status) {
+                            setStared(data.status);
+                        }
                     }
                 }
                 setDisabled(false);
