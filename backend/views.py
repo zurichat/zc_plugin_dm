@@ -105,19 +105,18 @@ def side_bar(request):
             if "org_id" in room:
                 if org_id == room["org_id"]:
                     room_profile = {}
-                    for user_id in room["room_member_ids"]:
-                        profile = get_user_profile(org_id, user_id)
-                        if profile["status"] == 200:
-                            room_profile["room_name"] = profile["data"]["user_name"]
-                            if profile["data"]["image_url"]:
-                                room_profile["room_image"] = profile["data"][
-                                    "image_url"
-                                ]
-                            else:
-                                room_profile[
-                                    "room_image"
-                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            rooms.append(room_profile)
+                    for user_id in room["room_user_ids"]:
+                        if user_id != user:
+                            profile = get_user_profile(org_id, user_id)
+                            if profile["status"] == 200:
+                                room_profile["room_name"] = profile["data"]["user_name"]
+                                if profile["data"]["image_url"]:
+                                    room_profile["room_image"] = profile["data"]["image_url"]
+                                else:
+                                    room_profile[
+                                        "room_image"
+                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                rooms.append(room_profile)
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
@@ -254,7 +253,7 @@ def message_create_get(request, room_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def create_room(request, user_id):
+def create_room(request, member_id):
     """
     Creates a room between users.
     It takes the id of the users involved, sends a write request to the database .
@@ -265,26 +264,29 @@ def create_room(request, user_id):
         user_ids = serializer.data["room_member_ids"]
         user_rooms = get_rooms(user_ids[0], DB.organization_id)
         for room in user_rooms:
-            room_users = room["room_member_ids"]
+            room_users = room["room_user_ids"]
             if set(room_users) == set(user_ids):
                 response_output = {
                                      "room_id": room["_id"]
                                     }
                 return Response(data=response_output, status=status.HTTP_200_OK)
 
-        fields = { "serializer": serializer.data,
-                        "bookmark": [],
-                         "pinned": [],
-                         "starred": False
-
-                        }
+        fields = {"org_id": serializer.data["org_id"],
+                  "room_user_ids": serializer.data["room_member_ids"],
+                  "room_name": serializer.data["room_name"],
+                  "private": serializer.data["private"],
+                  "created_at": serializer.data["created_at"],
+                  "bookmark": [],
+                  "pinned": [],
+                  "starred": [ ]
+                  }
 
         response = DB.write("dm_rooms", data=fields)
         data = response.get("data").get("object_id")
         if response.get("status") == 200:
-            for user in user_ids:
-                if user is not user_id:
-                    profile = get_user_profile (DB.organization_id, user)
+            # for user in user_ids:
+            #     if user is not user_id:
+            #         profile = get_user_profile (DB.organization_id, user)
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -294,17 +296,14 @@ def create_room(request, user_id):
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
-                        "joined_rooms": [{"room_image": profile["data"]["image_url"],
-                                            "room_name": serializer.data["room_name"],
-                                            "room_url": f"/dm/{DB.organization_id}/{data}"}]
-                                }
+                        "joined_rooms": [sidebar_emitter(org_id=DB.organization_id, member_id=member_id)]
+                    }
             }
 
             try:
                 centrifugo_data = centrifugo_client.publish (
-                    room="614679ee1a5607b13c00bcb7_6146f82c845b436ea04d10e1_sidebar", data=response_output )  # publish data to centrifugo
+                    room=f"{DB.organization_id}_{member_id}_sidebar", data=response_output )  # publish data to centrifugo
                 if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
-                    print(centrifugo_data)
                     return Response ( data=response_output, status=status.HTTP_201_CREATED )
                 else:
                     return Response(
@@ -373,7 +372,7 @@ def room_info(request, room_id):
     current_room = DB.read(room_collection, {"_id": room_id})
     print(current_room)
     if current_room and current_room.get("status_code", None) == None:
-        
+
         if "room_user_ids" in current_room:
             room_user_ids = current_room["room_user_ids"]
         else:
@@ -384,7 +383,7 @@ def room_info(request, room_id):
             created_at = ""
         if "org_id" in current_room:
             org_id = current_room["org_id"]
-        
+
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
         elif len(room_user_ids) == 3:
@@ -396,7 +395,7 @@ def room_info(request, room_id):
             user_name_1 = user1["data"]["user_name"]
         else:
             user_name_1 = room_user_ids[0]
-        
+
         user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
         if user2["status"] == 200:
             user_name_2 = user2["data"]["user_name"]
@@ -412,13 +411,13 @@ def room_info(request, room_id):
         }
         return Response(data=room_data, status=status.HTTP_200_OK)
     return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
-    
+
 
 
 # /code for updating room
-@api_view(["GET", "POST"])
+@api_view(["GET", "PUT"])
 @db_init_with_credentials
-def edit_room(request, pk):
+def edit_message(request, message_id, room_id):
     """
     This is used to update message context using message id as identifier,
     first --> we check if this message exist, if it does not exist we raise message doesnot exist,
@@ -426,28 +425,41 @@ def edit_room(request, pk):
         pass GET request to view the message one whats to edit.
         or pass POST with data to update
 
-    """
-    try:
-        message = DB.read("dm_messages", {"id": pk})
-    except:
-        return JsonResponse(
-            {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
-        )
 
+    """
     if request.method == "GET":
-        singleRoom = DB.read("dm_messages", {"id": pk})
-        return JsonResponse(singleRoom)
+        try:
+            message = DB.read("dm_messages", {"id": message_id})
+            print(message)
+            return Response(message)
+        except:
+            return JsonResponse(
+                {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
+
     else:
+        message = DB.read("dm_messages", {"id": message_id})
         room_serializer = MessageSerializer(message, data=request.data, partial=True)
         if room_serializer.is_valid():
-            room_serializer.save()
             data = room_serializer.data
+            data = {"message":request.data["message"]}
             # print(data)
-            response = DB.update("dm_messages", pk, data)
-            return Response(room_serializer.data)
+            response = DB.update("dm_messages", message_id, data)
+            if response.get("status") == 200:
+                data = {
+                        "sender_id":request.data["sender_id"],
+                        "message_id":message_id,
+                        "room_id":room_id,
+                        "message":request.data["message"],
+                        "event":"edited_message"
+                        }
+                centrifugo_data = send_centrifugo_data(
+                    room=room_id, data=data
+                )
+                if centrifugo_data.get("error", None) == None:
+                    return Response(data=data, status=status.HTTP_201_CREATED)
+                return Response(data)
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response(data="No Rooms", status=status.HTTP_400_BAD_REQUEST)
-
 
 @swagger_auto_schema(
     methods=["get"],
@@ -1275,19 +1287,19 @@ def delete_bookmark(request, room_id):
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    
+
     keyword = request.query_params.get('keyword',"")
     users = request.query_params.getlist('id',[])
     limit = request.query_params.get('limit',20)
-    
-    try: 
+
+    try:
         if type(limit) == str: limit = int(limit)
     except ValueError:
         limit=20
-    
+
     paginator = PageNumberPagination()
     paginator.page_size = limit
-      
+
     try:
         rooms = DB.read("dm_rooms") #get all rooms
         user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
@@ -1295,7 +1307,7 @@ def search_DM(request, member_id):
             if users != []:
                 rooms_checked = []
                 for user in users:
-                    rooms_checked += [room for room in user_rooms 
+                    rooms_checked += [room for room in user_rooms
                                 if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
                 user_rooms = rooms_checked
             all_messages = DB.read("dm_messages") #get all messages
@@ -1307,15 +1319,15 @@ def search_DM(request, member_id):
                     thread['message_id'] = message.get('_id')
                     thread['thread'] = True
                     thread_messages.append(thread)
-                
+
 
             room_ids = [room['_id'] for room in user_rooms]
-            
-            user_rooms_messages = [message for message in all_messages 
+
+            user_rooms_messages = [message for message in all_messages
                                     if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
-            user_rooms_threads = [message for message in thread_messages 
-                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1] 
-            
+            user_rooms_threads = [message for message in thread_messages
+                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1]
+
             user_rooms_messages.extend(user_rooms_threads)
             if user_rooms_messages != []:
                 for message in user_rooms_messages:
@@ -1325,7 +1337,7 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False
                 result_page = paginator.paginate_queryset(user_rooms_messages, request)
-                return paginator.get_paginated_response(result_page) 
+                return paginator.get_paginated_response(result_page)
         return Response([], status=status.HTTP_200_OK)
     except:
         return Response([], status=status.HTTP_200_OK)
@@ -1508,7 +1520,7 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ThreadSerializer
     queryset = ""
     lookup_field = "thread_message_id"
-    
+
 
     @swagger_auto_schema(
         operation_summary="Deletes a specifc thread message for a specific parent message",
@@ -1588,11 +1600,11 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
     def put(
-        self, 
-        request, 
+        self,
+        request,
         org_id: str,
-        room_id: str, 
-        message_id: str, 
+        room_id: str,
+        message_id: str,
         thread_message_id: str):
 
         data_storage = DataStorage()
@@ -1697,11 +1709,11 @@ class ThreadEmoji(APIView):
     List all Emoji reactions, or create a new Emoji reaction.
     """
     def get(
-        self, 
-        request, 
-        org_id: str, 
-        room_id: str, 
-        message_id: str, 
+        self,
+        request,
+        org_id: str,
+        room_id: str,
+        message_id: str,
         thread_message_id: str):
 
         data_storage = DataStorage()
@@ -1710,7 +1722,7 @@ class ThreadEmoji(APIView):
         if message:
             if "status_code" in message:
                 return Response(
-                    data="Unable to retrieve data from zc core", 
+                    data="Unable to retrieve data from zc core",
                     status=status.HTTP_424_FAILED_DEPENDENCY
                     )
             current_thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
@@ -1721,7 +1733,7 @@ class ThreadEmoji(APIView):
                         "event": "get_thread_message_reactions",
                         "room_id": message["room_id"],
                         "message_id": message["_id"],
-                        "thread_message_id": current_thread_message[0]["_id"], 
+                        "thread_message_id": current_thread_message[0]["_id"],
                         "data": {
                             "reactions": current_thread_message[0]["reactions"],
                         },
@@ -1737,7 +1749,7 @@ class ThreadEmoji(APIView):
 @db_init_with_credentials
 def send_reply(request, room_id, message_id):
     """
-    This endpoint is used to send a reply message 
+    This endpoint is used to send a reply message
     It takes in the a room_id and the message_id of the message being replied to
     Stores the data of the replied message in a field "replied message"
     """
@@ -1754,7 +1766,7 @@ def send_reply(request, room_id, message_id):
     if serializer.is_valid():
         data = serializer.data
         room_id = data["room_id"]  # room id gotten from client request
-        
+
         room = DB.read("dm_rooms", {"_id": room_id})
         if room and room.get("status_code", None) == None:
             if data["sender_id"] in room.get("room_user_ids", []):
