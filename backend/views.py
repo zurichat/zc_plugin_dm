@@ -278,7 +278,7 @@ def create_room(request, member_id):
                   "created_at": serializer.data["created_at"],
                   "bookmark": [],
                   "pinned": [],
-                  "starred": { }
+                  "starred": [ ]
                   }
 
         response = DB.write("dm_rooms", data=fields)
