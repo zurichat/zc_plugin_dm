@@ -197,14 +197,13 @@ def get_rooms(user_id, org_id):
     helper = DataStorage()
     helper.organization_id = org_id
     response = helper.read("dm_rooms")
-
-    data = []
+    data =  []
     if response != None:
         if "status_code" in response:
             return response
         for room in response:
             try:
-                users_room_list = room['room_member_ids']
+                users_room_list = room['room_user_ids']
                 if user_id in users_room_list:
                     data.append(room)
             except Exception:

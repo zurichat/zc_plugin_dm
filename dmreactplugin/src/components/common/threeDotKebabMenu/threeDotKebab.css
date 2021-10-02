@@ -2,7 +2,7 @@
   /* padding: 20px; */
   background: #f8f8ff;
   width: 306px;
-  height: 390px;
+  height: 378px;
   border-radius: 8px;
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.18);
   position: absolute;
@@ -10,7 +10,7 @@
   padding-bottom: 15px;
 }
 .Dm-ThreeDotKebab-Menu-FirstPopup div {
-  padding: 9px;
+  padding: 12px;
   border-bottom: solid 0.1px;
   font-family: "Lato", sans-serif;
   font-size: 14px;
@@ -48,7 +48,7 @@
   padding-top: 10px;
   position: absolute;
   top: 80px;
-  right: 410px;
+  right: 350px;
   font-family: "lato";
 }
 .Dm-ThreeDotKebab-Menu-SecondPopup div {
@@ -92,44 +92,5 @@ button {
 .Dm-ThreeDotKebab-Menu-FirstPopup {
   position: absolute;
   top: 0;
-  left: 900px;
-}
-/* .Dm-ThreeDotKebab-DeleteMessage {
-  border: 1px solid #c4c4c4;
-  width: 198px;
-  height: 184px;
-  background: #fefefe;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 5px;
-  padding-top: 10px;
-  position: absolute;
-  top: 80px;
-  right: 350px;
-  font-family: "lato";
-} */
-.Dm-ThreeDotKebab-DeleteMessage {
-  background-color: #fefefe;
-  border: 1px solid #c4c4c4;
-  width: 350px;
-  height: 120px;
-  padding: 15px;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 5px;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  margin-top: -60px;
-  margin-left: -175px;
-  font-family: "lato";
-  z-index: 1000;
-}
-.Dm-Delete-Confirm {
-  display: flex;
-  justify-content: space-around;
-}
-.Dm-Delete-Confirm button {
-  border: 1px solid #c4c4c4;
-  background-color: #fff;
-  padding: 5px 10px;
-  border-radius: 4px;
+  left: 70vw;
 }
