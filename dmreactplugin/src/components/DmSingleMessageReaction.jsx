@@ -8,9 +8,6 @@ const ReactionContainer = styled.div`
   margin-top: 0;
   font-size: 12px;
   display: flex;
-  :hover {
-    background: #efefef;
-  }
 
   > .replies-images > img {
     height: 18px;
