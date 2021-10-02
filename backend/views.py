@@ -1914,6 +1914,49 @@ def send_thread_message_to_channel(request, room_id, message_id, thread_message_
         return Response(data="No message or room found", status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["GET"])
+@db_init_with_credentials
+def copy_thread_message_link(request, room_id, message_id, thread_message_id):
+    """
+    Retrieves a single thread message using the thread_message_id as query params.
+    The message information returned is used to generate a link which contains 
+    a room_id, parent_message_id and a thread_message_id
+    """
+    if request.method == "GET":
+        parent_message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+        if parent_message:
+            if "status_code" in parent_message:
+                if "status_code" == 404:
+                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
+                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+            thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                message_info = {
+                    "room_id": room_id,
+                    "parent_message_id": message_id,
+                    "thread_id": thread_message_id,
+                    "link": f"https://dm.zuri.chat/thread_message/{DB.organization_id}/{room_id}/{message_id}/{thread_message_id}",
+                }
+                return Response(data=message_info, status=status.HTTP_200_OK)
+            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="No parent message found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@db_init_with_credentials
+def read_thread_message_link(request, room_id, message_id, thread_message_id):
+    if request.method == "GET":
+        message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+        if message:
+            thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                return JsonResponse({"message": thread_message[0]["message"]})
+            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
+        return Response(data="No parent message found", status=status.HTTP_404_NOT_FOUND)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(["POST"])
 @db_init_with_credentials

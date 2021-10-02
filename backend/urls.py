@@ -173,6 +173,16 @@ urlpatterns = [
         views.send_thread_message_to_channel,
         name="send_thread_messsage_to_channel",
     ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/link",
+        views.copy_thread_message_link,
+        name="copy_thread_messsage_link",
+    ),
+    path(
+        "thread_message/<str:org_id>/<str:room_id>/<str:message_id>/<str:thread_message_id>",
+        views.read_thread_message_link,
+        name="read_thread_messsage_link",
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
