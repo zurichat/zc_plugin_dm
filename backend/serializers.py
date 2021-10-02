@@ -44,6 +44,8 @@ class ThreadSerializer(serializers.Serializer):
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
     )
+    read = serializers.BooleanField(default=False, required=False)
+    pinned = serializers.BooleanField(default=False, required=False)
     reactions = serializers.ListField(
         required=False, default=[], child=EmojiSerializer()
     )
