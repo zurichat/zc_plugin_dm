@@ -12,16 +12,18 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
+    path("api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
+         views.create_jwt_token, name="jwt_token"),
 
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search", 
-         views.search_DM,
-         name="search DM"
+        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        views.search_DM,
+        name="search DM"
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",  
-         views.message_create_get,
-         name="create_get_message"
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
+        views.message_create_get,
+        name="create_get_message"
     ),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
@@ -83,7 +85,7 @@ urlpatterns = [
         views.retrieve_bookmarks,
         name="get_bookmarks",
     ),
-    path( 
+    path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         views.mark_read,
         name="mark_read"
@@ -118,7 +120,7 @@ urlpatterns = [
         views.user_profile,
         name="user_profile",
     ),
-    path( 
+    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
         name="media_files"

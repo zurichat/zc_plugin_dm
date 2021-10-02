@@ -5,7 +5,7 @@ from django.http import response
 from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from django.views import generic
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
@@ -15,6 +15,8 @@ from .db import *
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView, exception_handler
 from django.core.files.storage import default_storage
+from rest_framework_simplejwt.tokens import RefreshToken
+
 
 # Import Read Write function to Zuri Core
 from .resmodels import *
@@ -23,7 +25,6 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from .utils import SendNotificationThread
 from datetime import datetime
-import datetime as datetimemodule
 
 
 from .centrifugo_handler import centrifugo_client
@@ -125,16 +126,17 @@ def side_bar(request):
     }
     return JsonResponse(side_bar, safe=False)
 
+
 @swagger_auto_schema(
-    methods=["post","get"],
+    methods=["post", "get"],
     query_serializer=GetMessageSerializer,
     operation_summary="Creates and get messages",
-   responses={
-            201: MessageResponse,
-            400: "Error: Bad Request"
-        }
+    responses={
+        201: MessageResponse,
+        400: "Error: Bad Request"
+    }
 )
-@api_view(["GET","POST"])
+@api_view(["GET", "POST"])
 @db_init_with_credentials
 def message_create_get(request, room_id):
     if request.method == "GET":
@@ -212,7 +214,6 @@ def message_create_get(request, room_id):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @swagger_auto_schema(
     methods=["post"],
     request_body=RoomSerializer,
@@ -284,7 +285,6 @@ def user_rooms(request, user_id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @swagger_auto_schema(
     methods=["get"],
     operation_summary="Retrieves all the information about a room",
@@ -321,20 +321,22 @@ def room_info(request, room_id):
                     created_at = ""
                 if "org_id" in current_room:
                     org_id = current_room["org_id"]
-                
+
                 if len(room_user_ids) > 3:
                     text = f" and {len(room_user_ids)-2} others"
                 elif len(room_user_ids) == 3:
                     text = " and 1 other"
                 else:
                     text = " only"
-                user1 = get_user_profile(org_id=org_id, user_id=room_user_ids[0])
+                user1 = get_user_profile(
+                    org_id=org_id, user_id=room_user_ids[0])
                 if user1["status"] == 200:
                     user_name_1 = user1["data"]["user_name"]
                 else:
                     user_name_1 = room_user_ids[0]
-                
-                user2 = get_user_profile(org_id=org_id, user_id=room_user_ids[1])
+
+                user2 = get_user_profile(
+                    org_id=org_id, user_id=room_user_ids[1])
                 if user2["status"] == 200:
                     user_name_2 = user2["data"]["user_name"]
                 else:
@@ -1147,7 +1149,7 @@ def delete_message(request, message_id, room_id):
     if request.method == "DELETE":
         try:
             message = DB.read("dm_messages", {"_id": message_id})
-            room = DB.read("dm_rooms", {"_id":room_id})
+            room = DB.read("dm_rooms", {"_id": room_id})
 
             if room and message:
                 response = DB.delete("dm_messages", {"_id": message_id})
@@ -1193,6 +1195,7 @@ def delete_bookmark(request, room_id):
             return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
 @swagger_auto_schema(
     methods=["get"],
     operation_summary="searches for message by a user",
@@ -1203,48 +1206,52 @@ def delete_bookmark(request, room_id):
 def search_DM(request, member_id):
     paginator = PageNumberPagination()
     paginator.page_size = 30
-    
-    keyword = request.query_params.get('keyword',"")
-    users = request.query_params.getlist('id',[])
-    rooms = DB.read("dm_rooms") #get all rooms
-    user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]), rooms)) #get all rooms with user
+
+    keyword = request.query_params.get('keyword', "")
+    users = request.query_params.getlist('id', [])
+    rooms = DB.read("dm_rooms")  # get all rooms
+    user_rooms = list(filter(lambda room: member_id in room.get(
+        'room_user_ids', []), rooms))  # get all rooms with user
     if user_rooms != []:
         if users != []:
             rooms_checked = []
             for user in users:
-                rooms_checked += [room for room in user_rooms 
-                               if set(room.get('room_user_ids',[])) == set([member_id,user])] #get rooms with other specified users
+                rooms_checked += [room for room in user_rooms
+                                  if set(room.get('room_user_ids', [])) == set([member_id, user])]  # get rooms with other specified users
             user_rooms = rooms_checked
-        all_messages = DB.read("dm_messages") #get all messages
-        thread_messages = [] # get all thread messages
+        all_messages = DB.read("dm_messages")  # get all messages
+        thread_messages = []  # get all thread messages
         for message in all_messages:
-            threads  = message.get('threads',[])
+            threads = message.get('threads', [])
             for thread in threads:
                 thread['room_id'] = message.get('room_id')
                 thread['message_id'] = message.get('_id')
                 thread['thread'] = True
                 thread_messages.append(thread)
-            
 
         room_ids = [room['_id'] for room in user_rooms]
-        
-        user_rooms_messages = [message for message in all_messages 
-                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
-        user_rooms_threads = [message for message in thread_messages 
-                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1] 
-        
+
+        user_rooms_messages = [message for message in all_messages
+                               if message['room_id'] in room_ids and message['message'].find(keyword) != -1]  # get message in rooms
+        user_rooms_threads = [message for message in thread_messages
+                              if message['room_id'] in room_ids and message['message'].find(keyword) != -1]
+
         user_rooms_messages.extend(user_rooms_threads)
         for message in user_rooms_messages:
-            if 'read' in message.keys(): del message['read']
-            if 'pinned' in message.keys():del message['pinned']
-            if 'saved_by' in message.keys():del message['saved_by']
-            if 'threads' in message.keys(): del message['threads']
-            if 'thread' not in message.keys(): message['thread'] = False
+            if 'read' in message.keys():
+                del message['read']
+            if 'pinned' in message.keys():
+                del message['pinned']
+            if 'saved_by' in message.keys():
+                del message['saved_by']
+            if 'threads' in message.keys():
+                del message['threads']
+            if 'thread' not in message.keys():
+                message['thread'] = False
         result_page = paginator.paginate_queryset(user_rooms_messages, request)
         return paginator.get_paginated_response(result_page)
-        # return Response(user_rooms_messages, status=status.HTTP_200_OK)   
+        # return Response(user_rooms_messages, status=status.HTTP_200_OK)
     return Response("user not in any DM room", status=status.HTTP_404_NOT_FOUND)
-
 
 
 @api_view(["GET"])
@@ -1295,7 +1302,8 @@ class ThreadListView(generics.ListCreateAPIView):
         # fetch message parent of the thread
         data_storage = DataStorage()
         data_storage.organization_id = org_id
-        message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        message = data_storage.read(
+            "dm_messages", {"_id": message_id, "room_id": room_id})
         if message and message.get("status_code", None) == None:
             threads = message.get("threads")
             threads.reverse()
@@ -1349,7 +1357,8 @@ class ThreadListView(generics.ListCreateAPIView):
 
             if message and message.get("status_code", None) == None:
                 threads = message.get("threads", [])  # get threads
-                del data["message_id"]  # remove message id from request to zc core
+                # remove message id from request to zc core
+                del data["message_id"]
                 # assigns an id to each message in thread
                 data["_id"] = str(uuid.uuid1())
                 threads.append(data)  # append new message to list of thread
@@ -1415,7 +1424,6 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ThreadSerializer
     queryset = ""
     lookup_field = "thread_message_id"
-    
 
     @swagger_auto_schema(
         operation_summary="Deletes a specifc thread message for a specific parent message",
@@ -1446,7 +1454,8 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
         """
         data_storage = DataStorage()
         data_storage.organization_id = org_id
-        message = data_storage.read(MESSAGES, {"_id": message_id, "room_id": room_id})
+        message = data_storage.read(
+            MESSAGES, {"_id": message_id, "room_id": room_id})
         if message and message.get("status_code", None) == None:
             threads: List[Dict] = message.get("threads")
             if threads:
@@ -1493,14 +1502,13 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-
     def put(
-        self, 
-        request, 
-        org_id: str,
-        room_id: str, 
-        message_id: str, 
-        thread_message_id: str):
+            self,
+            request,
+            org_id: str,
+            room_id: str,
+            message_id: str,
+            thread_message_id: str):
 
         data_storage = DataStorage()
         data_storage.organization_id = org_id
@@ -1603,24 +1611,27 @@ class ThreadEmoji(APIView):
     """
     List all Emoji reactions, or create a new Emoji reaction.
     """
+
     def get(
-        self, 
-        request, 
-        org_id: str, 
-        room_id: str, 
-        message_id: str, 
-        thread_message_id: str):
+            self,
+            request,
+            org_id: str,
+            room_id: str,
+            message_id: str,
+            thread_message_id: str):
 
         data_storage = DataStorage()
         data_storage.organization_id = org_id
-        message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        message = data_storage.read(
+            "dm_messages", {"_id": message_id, "room_id": room_id})
         if message:
             if "status_code" in message:
                 return Response(
-                    data="Unable to retrieve data from zc core", 
+                    data="Unable to retrieve data from zc core",
                     status=status.HTTP_424_FAILED_DEPENDENCY
-                    )
-            current_thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+                )
+            current_thread_message = [
+                thread for thread in message["threads"] if thread["_id"] == thread_message_id]
             if current_thread_message:
                 return Response(
                     data={
@@ -1628,7 +1639,7 @@ class ThreadEmoji(APIView):
                         "event": "get_thread_message_reactions",
                         "room_id": message["room_id"],
                         "message_id": message["_id"],
-                        "thread_message_id": current_thread_message[0]["_id"], 
+                        "thread_message_id": current_thread_message[0]["_id"],
                         "data": {
                             "reactions": current_thread_message[0]["reactions"],
                         },
@@ -1638,4 +1649,28 @@ class ThreadEmoji(APIView):
             return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
         return Response("No such message or room", status=status.HTTP_404_NOT_FOUND)
 
-    
+
+@api_view(["GET"])
+def create_jwt_token(request, org_id, member_id):
+    """
+    This function creates takes a member id (member)id)
+    checks if such user is a member of the organization
+    if the user is an member, then a token would be generated with the user id
+    so as to be able to access any endpoint of the Dm plugin
+    """
+    if request.method == "GET":
+        org_id = request.query_params.get("org_id")
+        if org_id is not None:
+            print(org_id)
+            member_id = org_id["member_id"]
+            if member_id is not None:
+                print(member_id)
+                user_token = RefreshToken.for_user(member_id)
+                user_access = {
+                    "refresh": str(user_token),
+                    "access": str(user_token.access_token)
+                }
+                print(user_access)
+                return Response(data=user_access, status=status.HTTP_201_CREATED)
+            return Response({"message": "user not found in this organization"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"message": " This organization does not exist"}, status=status.HTTP_404_NOT_FOUND)
