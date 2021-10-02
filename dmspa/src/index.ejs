@@ -34,18 +34,17 @@
     "@zuri/zuri-plugin-dm": "https://dm.zuri.chat/static/zuri-zuri-plugin-dm.js",
   -->
 
-
-  <script type="systemjs-importmap">
-    {
-      "imports": { 
-        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
-        "@zuri/zuri-plugin-dm": "https://dm.zuri.chat/static/zuri-zuri-plugin-dm.js",
-        "@zuri/root-config": "https://dm.zuri.chat/static/zuri-root-config.js",
-		"@zuri/control": "https://zuri.chat/zuri-control.js",
-        "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
-        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"
-
-
+    <script type="systemjs-importmap">
+      {
+        "imports": {
+          "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
+          "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
+          "@zuri/root-config": "https://dm.zuri.chat/static/zuri-root-config.js",
+          "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+          "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
+          "@zuri/plugin-header": "https://zuri.chat/zuri-plugin-header.js",
+          "@zuri/control": "https://zuri.chat/zuri-control.js"
+        }
       }
     </script>
     <link
@@ -59,17 +58,19 @@
 
     <% if (isLocal) { %>
     <script type="systemjs-importmap">
-
-    {
-      "imports": {
-        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
-        "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
-        "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
-		"@zuri/control": "https://zuri.chat/zuri-control.js",
-        "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
-        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js"
-    }
-}
+      {
+        "imports": {
+          "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
+          "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
+          "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
+          "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+          "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
+          "react": "https://unpkg.com/react@17/umd/react.development.js",
+          "react-dom": "https://unpkg.com/react-dom@17/umd/react-dom.development.js",
+          "@zuri/plugin-header": "https://zuri.chat/zuri-plugin-header.js",
+          "@zuri/control": "https://zuri.chat/zuri-control.js"
+        }
+      }
     </script>
 
     <% } %>
@@ -94,7 +95,7 @@
     <noscript> You need to enable JavaScript to run this app. </noscript>
     <main></main>
     <script>
-      System.import('@zuri/root-config')
+      System.import("@zuri/root-config");
     </script>
     <import-map-overrides-full
       show-when-local-storage="devtools"
