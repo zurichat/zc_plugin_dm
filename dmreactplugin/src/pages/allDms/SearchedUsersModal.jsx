@@ -1,10 +1,14 @@
 import React from 'react';
 import loading_gif from './loading.gif';
 
-const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading })=>{
+const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading, roomLoading })=>{
 
     return(
         <div className="alldms-searchedusersmodal">
+        {
+            roomLoading &&
+            <p className="loading-text"><img className="loading-gif" src={loading_gif} alt=""/>Please wait, loading room...</p>
+        }
         {
             loading &&
             <p className="loading-text"><img className="loading-gif" src={loading_gif} alt=""/>Loading results...</p>
@@ -76,19 +80,6 @@ const SearchedUsersModal = ({ searchedUsers, onSelectUser, loading })=>{
                         }}
                     ></div>
                     <p><span>{searchedUsers[3].user_name} O </span>{searchedUsers[3].first_name} {searchedUsers[3].last_name}</p>
-                </div>
-        }
-        {
-            searchedUsers[4] &&
-                <div className="user" onClick = {()=>{onSelectUser(searchedUsers[4])}}>
-                    <div
-                        className="user-picture"
-                        style={{
-                        backgroundImage:
-                            `url(${searchedUsers[4].image_url})`,
-                        }}
-                    ></div>
-                    <p><span>{searchedUsers[4].user_name} O </span>{searchedUsers[4].first_name} {searchedUsers[4].last_name}</p>
                 </div>
         }
         </div>
