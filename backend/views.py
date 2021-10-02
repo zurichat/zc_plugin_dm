@@ -260,6 +260,7 @@ def create_room(request, member_id):
         user_ids = serializer.data["room_member_ids"]
         
         if len(user_ids) > 2:
+            # print("            --------MUKHTAR-------              \n\r")        
             response = group_room(request, member_id)
             if response.get('get_group_data'):
                 return Response(data=response['room_id'], status=response['status_code'])
@@ -1934,9 +1935,9 @@ def group_room(request, member_id):
 						return response
 				except KeyError:
 					pass
-					print("Object has no key of Serializer")
+					# print("Object has no key of Serializer")
 			
-			print("group rooms =", group_rooms)
+			# print("group rooms =", group_rooms)
 					
 			fields = {
 				"org_id": serializer.data["org_id"],
@@ -1952,10 +1953,3 @@ def group_room(request, member_id):
 			
 		return response
 
-
-
-@db_init_with_credentials
-def xxx(request, abc):
-	documentID = abc
-	r = DB.delete("dm_rooms", documentID)
-	return JsonResponse(r, safe=False)
