@@ -98,7 +98,7 @@ const dmBoxInputField = () => {
                                     onClick={sendMessage}
                                     onKeyDown={sendMessage}
                                     className='send-btn-box btn-inputfield-box'
-                                    disabled={messageInput}
+                                    //disabled={messageInput}
                                 >
                                     <span className='sendMessage'>
                                         <IoMdSend />

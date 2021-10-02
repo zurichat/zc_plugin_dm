@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import '../assets/css/dmProfileHeader.css';
 import Modal from 'react-modal';
+import Parcel from 'single-spa-react/parcel'
+import { pluginHeader } from '@zuri/plugin-header'
 import {
     FaAngleDown,
     FaRegBellSlash,
@@ -12,8 +14,19 @@ import { FiPhone } from 'react-icons/fi';
 import { BsClock, BsX, BsEnvelope } from 'react-icons/bs';
 
 const dmProfileHeader = ({ actualUser }) => {
+   
     const user = actualUser && actualUser;
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const headerConfig = {
+        name: `${user?.user_name}`, //Name on header
+        icon: `${user?.image_url}`, //Image on header
+       eventTitle: () => {
+           console.log(user)
+            setModalIsOpen(true)
+          //Block of code to be triggered on title click
+        }
+      }
+    
 
     const getLocalTime = () => {
         let date = new Date();
@@ -29,8 +42,8 @@ const dmProfileHeader = ({ actualUser }) => {
 
     return (
         <div>
-            <header className='dm-profileHeader d-flex align-items-center'>
-                {/* Img to be placed here */}
+           {/*  <header className='dm-profileHeader d-flex align-items-center'>
+                
                 <div
                     className='dm-profile-header-name-img d-flex align-items-center'
                     onClick={() => setModalIsOpen(true)}
@@ -44,7 +57,13 @@ const dmProfileHeader = ({ actualUser }) => {
 
                     <FaAngleDown className='profileHeader__icon' />
                 </div>
-            </header>
+            </header> */}
+            <Parcel
+                config={pluginHeader}
+                wrapWith="div"
+                wrapStyle={{width: "100%" }}
+                headerConfig={headerConfig}
+            />
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={() => setModalIsOpen(false)}
@@ -73,8 +92,7 @@ const dmProfileHeader = ({ actualUser }) => {
                                 />
                                 <div className='profilePop__details'>
                                     <p className='profilePop__details__header'>
-                                        {user?.first_name} {user?.last_name} 🦊
-                                        ⭐️{' '}
+                                    {user?.user_name}{' '}
                                     </p>
                                     <p className='profilePop__details__para'>
                                         {user?.role}
