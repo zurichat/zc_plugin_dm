@@ -165,19 +165,6 @@ class DataStorage:
 
 
 
-def send_centrifugo_data(room, data):
-    url = "https://realtime.zuri.chat/api"
-    # url = "http://localhost:8000/api"
-    headers = {
-        "Content-type": "application/json",
-        "Authorization": "apikey " + CENTRIFUGO_TOKEN,
-    }
-    command = {"method": "publish", "params": {"channel": room, "data": data}}
-    try:
-        response = requests.post(url=url, headers=headers, json=command)
-        return {"status_code": response.status_code, "message": response.json()}
-    except Exception as e:
-        print(e)
 
 
 DB = DataStorage()
