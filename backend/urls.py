@@ -29,7 +29,7 @@ urlpatterns = [
     #     name="update_thread_message",
     # ),
     path(
-        "api/v1/org/<str:org_id>/room",
+        "api/v1/org/<str:org_id>/user/<str:user_id>/room",
         views.create_room,
         name="create_room"
     ),
