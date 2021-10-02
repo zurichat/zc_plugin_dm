@@ -1,5 +1,7 @@
-import React, { useState, useRef } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {subscribetoChannel}  from '@zuri/control';
+import {handleCreateRoomMessages} from "../Redux/Actions/dmActions";
 
 // import styling
 import styled from 'styled-components';
@@ -16,17 +18,25 @@ import {
 } from 'react-icons/bs';
 import { FiAtSign, FiBold, FiPaperclip } from 'react-icons/fi';
 import { Button } from 'react-bootstrap';
+import axios from 'axios';
 
-const dmBoxInputField = () => {
+const dmBoxInputField = (org_id,room_id ,loggedInUser_id) => {
     // const { input } = useSelector((state) => state.);
 
+    const dispatch =useDispatch();
     const [messageInput, setMessageInput] = useState('');
 
     const sendMessage = (e) => {
         e.preventDefault();
-
+        //console.log(loggedInUser_id)
+        console.log(org_id,room_id)
         if (!messageInput) return;
-        messageSend(messageInput);
+        const data={
+            "sender_id":org_id.loggedInUser_id,
+            "message":messageInput
+        }
+
+        dispatch(handleCreateRoomMessages(org_id.org_id,org_id.room_id,data));
         setMessageInput('');
     };
 

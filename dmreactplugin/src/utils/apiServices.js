@@ -100,6 +100,10 @@ class APIServices {
     async postUpdateMesage(org_id, id, data) {
         return await $http.post(`/${org_id}/updatemessage/${id}`, data);
     }
+
+    async createRoomMessage(org_id, room_id, data){
+        return await $http.post(`/org/${org_id}/rooms/${room_id}/messages`,data)
+    }
 }
 
 const instance = new APIServices();

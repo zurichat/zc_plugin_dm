@@ -7,6 +7,7 @@
   font-weight: 400;
   color: var(--clr-text);
   background: var(--clr-background);
+  scroll-behavior: smooth;
 }
 .dm-plugin-thread-messages::-webkit-scrollbar {
   width: 7px;

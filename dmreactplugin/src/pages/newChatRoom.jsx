@@ -24,6 +24,7 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
 
     useEffect(() => {
         dispatch(handleGetRoomMessages(org_id, room_id));
+        console.log(loggedInUser_id)
         dispatch(handleGetRoomInfo(org_id, room_id));
     }, [dispatch, org_id, loggedInUser_id, room_id]);
 
@@ -49,7 +50,7 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
                 />
             </div>
             <div className="dm-footer-input-field w-100 position-relative">
-                <InputBoxField />
+                <InputBoxField org_id = {org_id} room_id={room_id} loggedInUser_id={loggedInUser_id} />
             </div>
         </div>
     );
