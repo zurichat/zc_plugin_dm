@@ -24,9 +24,8 @@ class ReminderSerializer(serializers.Serializer):
     message_id = serializers.CharField(max_length=500)
     current_date = serializers.CharField(max_length=500)
     scheduled_date = serializers.CharField(max_length=500)
-    notes = serializers.CharField(required=False, max_length=500)
-
-    class Meta:
+    notes = serializers.CharField(required=False,max_length=500, allow_blank=True)
+    class Meta: 
         fields = ['__all__']
 
 
@@ -44,6 +43,8 @@ class ThreadSerializer(serializers.Serializer):
     media = serializers.ListField(
         child=serializers.URLField(), allow_empty=True, required=False, default=[]
     )
+    read = serializers.BooleanField(default=False, required=False)
+    pinned = serializers.BooleanField(default=False, required=False)
     reactions = serializers.ListField(
         required=False, default=[], child=EmojiSerializer()
     )
