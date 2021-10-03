@@ -90,7 +90,7 @@ export default function StarButtonButton() {
                     loggedInUser_id
                 );
                 if (response.status == 200) {
-                    const data = JSON.parse(response.data);
+                    const data = response.data;
 
                     if (data) {
                         if (data.status) {
@@ -98,7 +98,6 @@ export default function StarButtonButton() {
                         }
                     }
                 }
-                setDisabled(false);
             } catch (e) {
                 setDisabled(false);
             }
