@@ -39,6 +39,7 @@
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  border: 1px solid #3a3a3a;
 }
 .dm-plugin-full-profile-full-profile-details {
   padding-top: 25px;
@@ -126,7 +127,7 @@
   background: #f8f8f8;
   box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
   border-radius: 8px;
-  width: 20rem;
+  width: 95%;
   padding: 1.5rem;
   font-weight: 500;
   font-size: 14px;

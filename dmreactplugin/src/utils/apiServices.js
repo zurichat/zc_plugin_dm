@@ -118,13 +118,13 @@ class APIServices {
     }
     async starPerson(org_id, room_id, message_id) {
         return await $http.put(
-            `${org_id}/rooms/${room_id}/members/${message_id}/star`
+            `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
         );
     }
 
     async getStarPersonInfo(org_id, room_id, message_id) {
         return await $http.get(
-            `${org_id}/rooms/${room_id}/members/${message_id}/star`
+            `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
         );
     }
 }
