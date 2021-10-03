@@ -1,11 +1,11 @@
-from . import views
+from .import views
 from .testingapi import Test
-
 # from .views import EditMessage
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
+
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -13,15 +13,28 @@ urlpatterns = [
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
 
+    path("api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
+         views.create_jwt_token, name="jwt_token"),
+
     path(
         "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
-         views.search_DM,
-         name="search DM"
+        views.search_DM,
+        name="search DM"
+
+    path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        views.search_DM,
+        name="search DM",
+
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-         views.message_create_get,
-         name="create_get_message"
+        views.message_create_get,
+
+        name="create_get_message"
+
+        name="create_get_message",
+
     ),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
@@ -31,7 +44,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         views.create_room,
-        name="create_room"
+        name="create_room",
     ),
     path(
         "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
@@ -41,14 +54,14 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/info",
         views.room_info,
-        name="room_info",
+        name="room_info"
     ),
     path(
         "api/v1/org/<str:org_id>/users/<str:user_id>/rooms",
         views.user_rooms,
-        name="get_user_rooms",
+        name="get_user_rooms"
     ),
-    path(  #it is creating a reminder for a message
+    path(  # it is creating a reminder for a message
         "api/v1/org/<str:org_id>/reminder",
         views.create_reminder,
         name="create_reminder",
@@ -66,12 +79,12 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/links",
         views.get_links,
-        name="get_links",
+        name="get_links"
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/new-bookmark",
         views.save_bookmark,
-        name="create_bookmark",
+        name="create_bookmark"
     ),
     path(
         "api/v1/org/<str:org_id>/members",
@@ -86,7 +99,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         views.mark_read,
-        name="mark_read",
+        name="mark_read"
     ),
     path(  # might require a room id
         "api/v1/org/<str:org_id>/messages/<str:message_id>/pin",
@@ -121,9 +134,9 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         views.SendFile.as_view(),
-        name="media_files",
+        name="media_files"
     ),
-    path( 
+    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reply",
         views.send_reply,
         name="reply",
@@ -136,22 +149,12 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/schedule-message",
         views.scheduled_messages,
-        name="scheduled_messages",
+        name="scheduled_messages"
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/bookmark",
         views.delete_bookmark,
-        name="delete_bookmark",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
-        views.ThreadListView.as_view(),
-        name="messages_thread_list",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>",
-        views.ThreadDetailView.as_view(),
-        name="messages_thread_detail",
+        name="delete_bookmark"
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions",
@@ -189,12 +192,23 @@ urlpatterns = [
         name="pinned_thread_messsage",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star", 
-        views.star_room, 
+
+        "api/v1/org/<str:org_id>/users/<str:member_id>/threads",
+        views.get_all_threads,
+        name="get_all_threads",
+    ),
+    path(
+
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
+        views.star_room,
         name="star_room",
     ),
+    path("api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
+        views.close_conversation, 
+        name="close_conversation"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

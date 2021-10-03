@@ -52,6 +52,7 @@ const DmChatContainerBox = ({ user2_id }) => {
                       <DmSingleMessageContainer
                         messages={messages}
                         user2_id={user2_id}
+                        handleOpenThread={handleOpenThread}
                       />
                     </MessageWrapper>
                   </div>
