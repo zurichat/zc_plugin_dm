@@ -187,6 +187,11 @@ urlpatterns = [
         name="get_all_threads",
     ),
     path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
+        views.SendFile.as_view(),
+        name="media_files"
+    ),
+    path(
 
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
         views.star_room,
