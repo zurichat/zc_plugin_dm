@@ -112,7 +112,7 @@ class APIServices {
 
     async deleteMessage(org_id, room_id, message_id, data) {
         return await $http.delete(
-            `/org/${org_id}/rooms/${room_id}/messages/${message_id}/message`,
+            `/${org_id}/rooms/${room_id}/messages/${message_id}/message`,
             data
         );
     }
@@ -124,7 +124,7 @@ class APIServices {
 
     async getStarPersonInfo(org_id, room_id, message_id) {
         return await $http.get(
-            `${org_id}/rooms/${room_id}/members/${message_id}/star`
+            `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
         );
     }
 }
