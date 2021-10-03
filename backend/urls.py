@@ -6,6 +6,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
+from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView, )
+
+
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -13,28 +16,19 @@ urlpatterns = [
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
 
-    path("api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
-         views.create_jwt_token, name="jwt_token"),
+    # path("api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
+    #      views.create_jwt_token, name="jwt_token"),
 
     path(
         "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
         views.search_DM,
         name="search DM"
-
-    path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
-        views.search_DM,
-        name="search DM",
-
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
         views.message_create_get,
 
         name="create_get_message"
-
-        name="create_get_message",
-
     ),
     # path(
     #     "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:message_uuid>",
@@ -206,6 +200,8 @@ urlpatterns = [
     path("api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
         views.close_conversation, 
         name="close_conversation"),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), 
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
