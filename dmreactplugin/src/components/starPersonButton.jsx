@@ -98,6 +98,7 @@ export default function StarButtonButton() {
                         }
                     }
                 }
+                setDisabled(false);
             } catch (e) {
                 setDisabled(false);
             }
