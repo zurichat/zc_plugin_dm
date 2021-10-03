@@ -112,7 +112,7 @@ class APIServices {
 
     async deleteMessage(org_id, room_id, message_id, data) {
         return await $http.delete(
-            `/${org_id}/rooms/${room_id}/messages/${message_id}/message`,
+            `/org/${org_id}/rooms/${room_id}/messages/${message_id}/message`,
             data
         );
     }
