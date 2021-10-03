@@ -1399,20 +1399,23 @@ class ThreadListView(generics.ListCreateAPIView):
         data_storage = DataStorage()
         data_storage.organization_id = org_id
         message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
         if message and message.get("status_code", None) == None:
             threads = message.get("threads")
             threads.reverse()
-            return Response(
-                data={
-                    "room_id": message["room_id"],
-                    "message_id": message["_id"],
-                    "data": {
-                        "threads": threads,
-                    },
-                },
-                status=status.HTTP_200_OK,
-            )
-
+            response = paginator.paginate_queryset(threads, request)
+            return paginator.get_paginated_response(response)
+            # #     data={
+            # #         "room_id": message["room_id"],
+            # #         "message_id": message["_id"],
+            # #         "data": {
+            # #             "threads": threads,
+            # #         },
+            #     },
+            #     
+            #  )
+        
         return Response("No such message", status=status.HTTP_404_NOT_FOUND)
 
     @swagger_auto_schema(
