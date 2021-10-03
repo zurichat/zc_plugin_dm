@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import './threeDotKebab.css';
 import { FaUniregistry } from 'react-icons/fa';
@@ -10,11 +9,13 @@ import { MdPoll } from 'react-icons/md';
 import { FaTrashAlt } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { handleDeleteRoomMessage } from '../../../Redux/Actions/dmActions';
+import DmEditMessage from '../dmEditMessage/dmEditMessage';
 // import { IoLogoMedium } from "react-icons/io"
 
 function ThreeDotKebab({ messages }) {
     const [secondPopupOpen, setSecondPopupOpen] = useState(false);
     const [dmdeletepopup, setdmdeletepopup] = useState(false);
+    const [dmEditMessage, setDmEditMessage] = useState(false);
     // const [secondPopupOpen,setSecondPopupOpen]=useState(false);
 
     const dispatch = useDispatch();
@@ -41,7 +42,7 @@ function ThreeDotKebab({ messages }) {
                 <div>
                     Pin to this conversation <RiParkingLine />{' '}
                 </div>
-                <div>
+                <div onClick={() => setDmEditMessage(!dmEditMessage)}>
                     Edit Message <BiEditAlt />
                 </div>
                 <div onClick={() => setdmdeletepopup(!dmdeletepopup)}>
@@ -81,6 +82,11 @@ function ThreeDotKebab({ messages }) {
                     </div>
                 </div>
             )}
+            {
+              dmEditMessage && <div className='Dm-ThreeDotKebab-DeleteMessage'>
+                <DmEditMessage/>
+              </div>
+            }
         </>
     );
 }
