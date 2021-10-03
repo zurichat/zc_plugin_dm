@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { subscribetoChannel } from '@zuri/control';
 import { handleCreateRoomMessages } from '../Redux/Actions/dmActions';
@@ -63,9 +63,9 @@ const dmBoxInputField = ({
     // inputRef.current.innerHTML = ''
 
     //Resizeable contenteditable Input function
-    useEffect(() => {
-        refContainer.current.focus();
-    }, [focus]);
+//     useEffect(() => {
+//         refContainer.current.focus();
+//     }, [focus]);
 
     // change text-area element style
     const changeStyle = (e) => {
