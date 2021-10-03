@@ -63,9 +63,9 @@ const dmBoxInputField = ({
     // inputRef.current.innerHTML = ''
 
     //Resizeable contenteditable Input function
-    useEffect(() => {
-        refContainer.current.focus();
-    }, [focus]);
+//     useEffect(() => {
+//         refContainer.current.focus();
+//     }, [focus]);
 
     // change text-area element style
     const changeStyle = (e) => {
