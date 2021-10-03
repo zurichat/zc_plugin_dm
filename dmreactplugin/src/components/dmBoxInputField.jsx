@@ -1,4 +1,4 @@
-import React, { useState, useRef, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { subscribetoChannel } from '@zuri/control';
 import { handleCreateRoomMessages } from '../Redux/Actions/dmActions';
