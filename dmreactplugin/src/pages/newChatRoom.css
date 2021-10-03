@@ -3,3 +3,8 @@
   grid-column-gap: 5px;
   background: #f6f6f6;
 }
+@media only screen and (max-width: 425px) {
+  .dm-plugin-full-page {
+    grid-template-columns: 0.0000000001fr 1fr;
+  }
+}
