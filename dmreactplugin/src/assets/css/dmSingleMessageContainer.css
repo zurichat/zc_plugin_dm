@@ -7,6 +7,7 @@
   font-weight: 400;
   color: var(--clr-text);
   background: var(--clr-background);
+  scroll-behavior: smooth;
 }
 .dm-plugin-thread-messages::-webkit-scrollbar {
   width: 7px;
@@ -40,7 +41,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  width: calc(100% - calc(100% - 45px));
+  width: calc(100% - calc(100% - 36px));
 }
 
 .dm-plugin-thread-message-image {
@@ -50,9 +51,11 @@
 }
 .dm-plugin-thread-message-body {
   width: 100%;
+  margin-left: calc(45px - 36px);
 }
 .dm-plugin-thread-message-name {
   font-weight: 900;
+  font-size: 15px;
 }
 .dm-plugin-thread-message-time {
   font-size: 12px;
@@ -66,6 +69,7 @@
   display: flex;
   text-align: center;
   margin-bottom: 0;
+  font-size: 15px;
 }
 .dm-plugin-thread-message-image:hover {
   cursor: pointer;
@@ -76,6 +80,13 @@
 }
 .dm-plugin-thread-message-body .dm-plugin-thread-message-text {
   margin-bottom: 0;
+  font-size: 15px;
+}
+.dm-time-toolTip-custom-class {
+  padding: 5px 8px !important;
+  opacity: 1 !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
 }
 
 /*** DM PLUGIN THREAD MESSAGES STYLE END ***/

@@ -3,17 +3,18 @@ import SearchUsers from './SearchUsers';
 import { useSelector } from 'react-redux';
 import './AllDms.css'
 
-const AllDms = ()=>{
+const AllDms = ({org_id, loggedInUser_id})=>{
     const membersReducer = useSelector(({ membersReducer }) => membersReducer);
 
-    console.log(membersReducer)
-    const orgUsers = membersReducer && membersReducer;
+    const orgUsers = membersReducer;
+
     // const orgUsers = [
     //     {
     //         _id: "6145f987285e4a18402074eb",
     //         user_name: "seunpaul",
     //         first_name: "Seun",
     //         last_name: "Oluwafemi",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -21,6 +22,7 @@ const AllDms = ()=>{
     //         user_name: "casper",
     //         first_name: "Tobi",
     //         last_name: "Amasa",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -28,6 +30,7 @@ const AllDms = ()=>{
     //         user_name: "andy",
     //         first_name: "Anu",
     //         last_name: "Adewale",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -35,6 +38,7 @@ const AllDms = ()=>{
     //         user_name: "fado",
     //         first_name: "Fuad",
     //         last_name: "Agboola",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -42,6 +46,7 @@ const AllDms = ()=>{
     //         user_name: "richycool",
     //         first_name: "Richard",
     //         last_name: "Olufarati",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -49,6 +54,7 @@ const AllDms = ()=>{
     //         user_name: "damiDev",
     //         first_name: "Dami",
     //         last_name: "Smith",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -56,6 +62,7 @@ const AllDms = ()=>{
     //         user_name: "Haywhy._Online",
     //         first_name: "Ayo",
     //         last_name: "Amoo",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -63,6 +70,7 @@ const AllDms = ()=>{
     //         user_name: "wallyStrinGs",
     //         first_name: "Wale",
     //         last_name: "Ademilola",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -70,6 +78,7 @@ const AllDms = ()=>{
     //         user_name: "LaCasera",
     //         first_name: "David",
     //         last_name: "Adeoye",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     },
     //     {
@@ -77,6 +86,7 @@ const AllDms = ()=>{
     //         user_name: "INEC",
     //         first_name: "Damilare",
     //         last_name: "Atanda",
+    //         email: "seunpaul148@gmail.com",
     //         image_url: "https://res.cloudinary.com/ds5l1k3bl/image/upload/v1629593472/user_scepnk.jpg"
     //     }
     // ]
@@ -85,11 +95,11 @@ const AllDms = ()=>{
         <div className='alldms'>
             <header className='alldms-header d-flex align-items-center'>
                 <div className='alldms-header-text d-flex align-items-center'>
-                    <h5>#</h5>
+                    <p>#</p>
                     <p>All direct messages</p>
                 </div>
             </header>
-            <SearchUsers orgUsers = {orgUsers}/>
+            <SearchUsers orgUsers = {orgUsers} org_id={org_id} loggedInUser_id={loggedInUser_id}/>
         </div>
     )
 };
