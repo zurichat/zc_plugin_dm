@@ -29,27 +29,6 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
     }
   );
 
-  // const dates = new Set();
-
-  // const renderDate = (chat, dateNum) => {
-  //   const timestampDate = new Date(chat.created_at).toDateString();
-
-  //   // Add to Set so it does not render again
-  //   dates.add(dateNum);
-  //   const todayDate = new Date().toDateString();
-
-  //   let prev_date = new Date();
-  //   prev_date.setDate(prev_date.getDate() - 1);
-
-  //   if (timestampDate === todayDate) {
-  //     return "Today";
-  //   } else if (new Date(prev_date).toDateString() == timestampDate) {
-  //     return "Yesterday";
-  //   }
-  //   return <>{timestampDate}</>;
-  // };
-
-  // const dateNum = new Date(messages.created_at).toDateString();
   return (
     <>
       <div className="dm-plugin-thread-messages">
