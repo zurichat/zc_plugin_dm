@@ -1,0 +1,16 @@
+.__date_tag p {
+  text-align: center;
+  color: black;
+  border-radius: 72px;
+  background: white;
+  padding: 2px 4px;
+}
+
+.__date_tags {
+  text-align: center;
+  display: flex;
+  grid-area: 3px;
+  align-items: center;
+  width: 15%;
+  margin: 0px auto;
+}

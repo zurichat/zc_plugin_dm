@@ -21,3 +21,28 @@
   display: flex;
   flex-direction: column-reverse;
 }
+
+.__date_tag {
+  position: sticky;
+  top: 0px;
+  background: white;
+  width: 120px;
+  margin: 0px auto;
+  border-radius: 25px;
+  padding: 7px 9px;
+  display: flex;
+  gap: 5px;
+  color: gray;
+  font-family: Lato;
+  font-size: 15px;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  box-shadow: 1px 1px 3px gainsboro;
+  cursor: pointer;
+  transition: 1s ease-in-out;
+}
+
+.__date_tag:hover {
+  color: black;
+}
