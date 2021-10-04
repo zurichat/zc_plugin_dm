@@ -905,6 +905,7 @@ def user_profile(request, org_id, member_id):
     responses={400: "Error: Bad Request"},
 )
 @api_view(["POST"])
+@db_init_with_credentials
 def create_reminder(request):
     """
         This is used to remind a user about a  message
