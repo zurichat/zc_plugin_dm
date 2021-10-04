@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
-const baseURL = 'https://dm.zuri.chat/api/v1';
+const baseURL = "https://dm.zuri.chat/api/v1";
 
 const apiConfig = {
     baseURL,
     timeout: 30000,
     headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
     },
 };
 
@@ -20,7 +20,7 @@ class APIServices {
     }
 
     async createChatRoom(org_id, member_id, data) {
-        console.log('here');
+        console.log("here");
         console.log(data);
         return await $http.post(`/org/${org_id}/users/${member_id}/room`, data);
     }
@@ -103,14 +103,28 @@ class APIServices {
         return await $http.post(`/${org_id}/updatemessage/${id}`, data);
     }
 
-    async createRoomMessage(org_id, room_id, data){
-        return await $http.post(`/org/${org_id}/rooms/${room_id}/messages`, data)
+    async createRoomMessage(org_id, room_id, data) {
+        return await $http.post(
+            `/org/${org_id}/rooms/${room_id}/messages`,
+            data
+        );
     }
-  
+
     async deleteMessage(org_id, room_id, message_id, data) {
         return await $http.delete(
             `/${org_id}/rooms/${room_id}/messages/${message_id}/message`,
             data
+        );
+    }
+    async starPerson(org_id, room_id, message_id) {
+        return await $http.put(
+            `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
+        );
+    }
+
+    async getStarPersonInfo(org_id, room_id, message_id) {
+        return await $http.get(
+            `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
         );
     }
 }
