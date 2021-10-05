@@ -1,98 +1,98 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap");
 
 img {
-    vertical-align: middle;
+  vertical-align: middle;
 }
 
-.dm-plugin-thread-Time{
-    min-height: 75px;
-    margin-left: 20%;
-    
-    margin-top: 2%;
-    margin-bottom: auto;
-    text-align: center;
+.dm-plugin-thread-Time {
+  min-height: 75px;
+  margin-left: 20%;
+
+  margin-top: 2%;
+  margin-bottom: auto;
+  text-align: center;
 }
 .dm-plugin-thread-messages {
-    --clr-text: hsla(0, 0%, 11%, 1);
-    --clr-time: hsla(300, 1%, 38%, 1);
-    --clr-hover: hsla(161, 88%, 94%, 1);
-    --clr-background: hsla(0, 0%, 100%, 1);
-    width: auto;
-    margin: auto;
-    max-width: auto;
-    height: auto;
-    max-height: calc(75px * 8);
-    font-family: 'Lato', sans-serif;
-    font-size: 15px;
-    font-weight: 400;
-    color: var(--clr-text);
-    overflow-y: scroll;
-    background: var(--clr-background);
+  --clr-text: hsla(0, 0%, 11%, 1);
+  --clr-time: hsla(300, 1%, 38%, 1);
+  --clr-hover: hsla(161, 88%, 94%, 1);
+  --clr-background: hsla(0, 0%, 100%, 1);
+  width: auto;
+  margin: auto;
+  max-width: auto;
+  height: auto;
+  max-height: calc(75px * 8);
+  font-family: "Lato", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--clr-text);
+  overflow-y: scroll;
+  background: var(--clr-background);
 }
 .dm-plugin-thread-messages::-webkit-scrollbar {
-    width: 7px;
-    background: var(--clr-background);
+  width: 7px;
+  background: var(--clr-background);
 }
 .dm-plugin-thread-messages::-webkit-scrollbar-thumb {
-    width: 7px;
-    background: var(--clr-time);
-    border-radius: 8px;
+  width: 7px;
+  background: var(--clr-time);
+  border-radius: 8px;
 }
 .dm-plugin-thread-message-group {
-    display: flex;
-    width: 100%;
-    max-width: 1124px;
-    height: auto;
-    min-height: 75px;
-    margin: 0 auto;
-    padding: 10px;
+  display: flex;
+  width: 100%;
+  max-width: 1124px;
+  height: auto;
+  min-height: 75px;
+  margin: 0 auto;
+  padding: 10px;
 }
 .dm-plugin-thread-message-group:hover {
-    background: var(--clr-hover);
+  background: var(--clr-hover);
 }
 .dm-plugin-thread-message-image-container {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: calc(100% - calc(100% - 45px));
-    height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: calc(100% - calc(100% - 45px));
+  height: 100%;
 }
 .dm-plugin-thread-message-image {
-    width: 36px;
-    height: 36px;
-    border-radius: 10%;
+  width: 36px;
+  height: 36px;
+  border-radius: 10%;
 }
-.dm-plugin-thread-Time{
-    min-height: 75px;
-    margin-left: 20%;
-    padding: 5px;
+.dm-plugin-thread-Time {
+  min-height: 75px;
+  margin-left: 20%;
+  padding: 5px;
 }
 .dm-plugin-thread-message-body {
-    width: 100%;
+  width: 100%;
 }
 .dm-plugin-thread-message-username {
-    font-weight: 900;
+  font-weight: 900;
 }
-.dm-plugin-thread-message-date-time{
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--clr-time);
-    margin-left: 10px;
-    margin-top: auto;
-    margin-bottom: auto;
+.dm-plugin-thread-message-date-time {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--clr-time);
+  margin-left: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 .dm-plugin-thread-message-header {
-    display: flex;
-    text-align: center;
-    margin-bottom: 0;
+  display: flex;
+  text-align: center;
+  margin-bottom: 0;
 }
 .dm-plugin-thread-message-image:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 :is(.dm-plugin-thread-message-name, .dm-plugin-thread-message-time):hover {
-    cursor: pointer;
-    text-decoration: underline;
+  cursor: pointer;
+  text-decoration: underline;
 }
 .dm-plugin-thread-message-text {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }

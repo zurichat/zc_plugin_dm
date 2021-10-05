@@ -31,10 +31,7 @@
     3. Global variable
 
     More information about shared dependencies can be found at https://single-spa.js.org/docs/recommended-setup#sharing-with-import-maps.
-    "@zuri/zuri-plugin-dm": "https://dm.zuri.chat/static/zuri-zuri-plugin-dm.js",
   -->
-
-
     <script type="systemjs-importmap">
       {
         "imports": {
@@ -90,10 +87,12 @@
   </head>
 
   <body>
-    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
     <main></main>
     <script>
-      System.import('@zuri/root-config')
+      System.import("@zuri/root-config");
     </script>
     <import-map-overrides-full
       show-when-local-storage="devtools"
