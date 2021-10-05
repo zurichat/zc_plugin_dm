@@ -61,6 +61,8 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
               />
             </p>
             <p className="dm-plugin-thread-message-text">{messages?.message}</p>
+            {/* 
+              // Had to comment it out because It wasnt allowing the code to run... No vess
             <span>
               {messages?.media?.map((media) => (
                 <img
@@ -70,7 +72,7 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
                   width="15px"
                 />
               ))}
-            </span>
+            </span> */}
             <span>
               {messages?.reactions?.map((reaction) => (
                 <span>{reaction?.data}</span>
