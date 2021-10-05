@@ -1,20 +1,8 @@
-import json
 from typing import Dict, List
-import uuid
-import re
-from django.http import response
-from django.utils.decorators import method_decorator
-from django.http.response import JsonResponse
-from django.shortcuts import render
-from django.views import generic
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, parser_classes
-from rest_framework import status, generics
-import requests
-import time
-from .utils import send_centrifugo_data
+from rest_framework.decorators import api_view
+from rest_framework import status
 from .db import *
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import (
     APIView,
     exception_handler,
@@ -23,14 +11,10 @@ from django.core.files.storage import default_storage
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from datetime import datetime
-import datetime as datetimemodule
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
-from queue import LifoQueue
 
 
 @swagger_auto_schema(
@@ -375,10 +359,21 @@ def star_room(request, room_id, member_id):
                 response = DB.update("dm_rooms", room_id,{"starred":data})
                 print(response)
                 if response and response.get("status_code",None) == None:
-                    return Response("Success", status=status.HTTP_200_OK)
-                return Response(data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
-            return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)
-        return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
+                    return Response(
+                        "Success", status=status.HTTP_200_OK
+                        )
+                return Response(
+                    data="Room not updated", 
+                    status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+            return Response(
+                data="User not in room", 
+                status=status.HTTP_404_NOT_FOUND
+                )
+        return Response(
+            "Invalid room", 
+            status=status.HTTP_400_BAD_REQUEST
+            )
 
     
     elif request.method == "GET":
@@ -387,10 +382,22 @@ def star_room(request, room_id, member_id):
             if member_id in room.get("room_member_ids", []) or member_id in room.get("room_user_ids", []):
                 data =  room.get("starred",[])
                 if member_id in data:
-                   return Response({"status":True}, status=status.HTTP_200_OK)
-                return Response({"status":False}, status=status.HTTP_200_OK)
-            return Response(data="User not in room", status=status.HTTP_404_NOT_FOUND)                     
-        return Response("Invalid room", status=status.HTTP_400_BAD_REQUEST)
+                   return Response(
+                       {"status":True}, 
+                       status=status.HTTP_200_OK
+                       )
+                return Response(
+                    {"status":False}, 
+                    status=status.HTTP_200_OK
+                    )
+            return Response(
+                data="User not in room", 
+                status=status.HTTP_404_NOT_FOUND
+                )                     
+        return Response(
+            "Invalid room", 
+            status=status.HTTP_400_BAD_REQUEST
+            )
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

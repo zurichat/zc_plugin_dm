@@ -1,32 +1,22 @@
 import json
 from typing import Dict, List
 import uuid
-import re
 from django.http import response
-from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
-from django.shortcuts import render
-from django.views import generic
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view
 from rest_framework import status, generics
 import requests
-import time
 from .utils import send_centrifugo_data
 from .db import *
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import (
     APIView,
     exception_handler,
 )
-from django.core.files.storage import default_storage
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from datetime import datetime
-import datetime as datetimemodule
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
@@ -370,6 +360,9 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
 @api_view(["PUT"])
 @db_init_with_credentials
 def update_thread_read_status(request, room_id, message_id, thread_message_id):
+    """
+    Retrieves a thread message and update the read status
+    """
     message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
     if message:
         if "status_code" in message:
@@ -410,6 +403,9 @@ def update_thread_read_status(request, room_id, message_id, thread_message_id):
 @api_view(["POST"])
 @db_init_with_credentials
 def send_thread_message_to_channel(request, room_id, message_id, thread_message_id):
+    """
+    Retrives a thread message and sends it to the main chat content/log.
+    """
     parent_message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
     if parent_message:
         if "status_code" in parent_message:
@@ -499,6 +495,9 @@ def copy_thread_message_link(request, room_id, message_id, thread_message_id):
 @api_view(["GET"])
 @db_init_with_credentials
 def read_thread_message_link(request, room_id, message_id, thread_message_id):
+    """
+    This helps us to retrieve the thread message from a thread message link
+    """
     message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
     if message:
         if "status_code" in message:
@@ -527,6 +526,9 @@ def read_thread_message_link(request, room_id, message_id, thread_message_id):
 @api_view(["PUT"])
 @db_init_with_credentials
 def pinned_thread_message(request, room_id, message_id, thread_message_id):
+    """
+    Pin and unpin a thread message
+    """
     message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
     if message:
         if "status_code" in message:
@@ -605,36 +607,33 @@ def get_all_threads(request, member_id: str):
     threads_list = LifoQueue()
     # org_id = request.GET.get("")
 
-    if request.method == "GET":
-        rooms = get_rooms(user_id=member_id, org_id=DB.organization_id)
-        if rooms:
-            # print(f"the room ", rooms)
-            for room in rooms:
-                # print(f"the room ", room)
-                data = {}
-                data["room_id"] = room.get("_id")
-                data["room_name"] = room.get("room_name")
-                messages = DB.read(MESSAGES, {"room_id": room.get("_id")})
-                if messages:
-                    if messages.get("status_code") == 404:
-                        return Response(
-                            data="No message in this room",
-                            status=status.HTTP_404_NOT_FOUND,
-                        )
-                    # print(f"mrssages ", messages)
-                    for message in messages:
-                        threads = message.get("threads")
-                        if threads:
-                            print(threads)
-                        return Response(
-                            data="No threads found", status=status.HTTP_204_NO_CONTENT
-                        )
-                threads_list.put(data)
-                print(f"lst qur", threads_list)
-                return Response(
-                    data="No messages found", status=status.HTTP_204_NO_CONTENT
-                )
+    rooms = get_rooms(user_id=member_id, org_id=DB.organization_id)
+    if rooms:
+        # print(f"the room ", rooms)
+        for room in rooms:
+            # print(f"the room ", room)
+            data = {}
+            data["room_id"] = room.get("_id")
+            data["room_name"] = room.get("room_name")
+            messages = DB.read(MESSAGES, {"room_id": room.get("_id")})
+            if messages:
+                if messages.get("status_code") == 404:
+                    return Response(
+                        data="No message in this room",
+                        status=status.HTTP_404_NOT_FOUND,
+                    )
+                # print(f"mrssages ", messages)
+                for message in messages:
+                    threads = message.get("threads")
+                    if threads:
+                        print(threads)
+                    return Response(
+                        data="No threads found", status=status.HTTP_204_NO_CONTENT
+                    )
+            threads_list.put(data)
+            print(f"lst qur", threads_list)
+            return Response(
+                data="No messages found", status=status.HTTP_204_NO_CONTENT
+            )
 
-        return Response(data="No rooms created yet", status=status.HTTP_204_NO_CONTENT)
-
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(data="No rooms created yet", status=status.HTTP_204_NO_CONTENT)
