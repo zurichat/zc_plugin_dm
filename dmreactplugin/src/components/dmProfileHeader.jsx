@@ -50,8 +50,8 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
           wrapStyle={{ width: '100%' }}
           headerConfig={headerConfig}
         />
-        <header className='dm-profileHeader d-flex align-items-center'>
-          {/* Img to be placed here */}
+        {/* <header className='dm-profileHeader d-flex align-items-center'>
+          
           <div
             className='dm-profile-header-name-img d-flex align-items-center'
             onClick={() => setModalIsOpen(true)}
@@ -65,7 +65,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
 
             <FaAngleDown className='profileHeader__icon' />
           </div>
-        </header>
+        </header> */}
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={() => setModalIsOpen(false)}
