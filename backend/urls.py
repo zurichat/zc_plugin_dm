@@ -7,22 +7,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 
 urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
-    path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
-        views.create_jwt_token,
-        name="jwt_token",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
-        views.search_DM,
-        name="search DM",
-    ),
+    # path("api/v1/org/<str:org_id>/members/<str:member_id>/create_token",
+    #      views.create_jwt_token, name="jwt_token"),
     path(
         "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
         views.search_DM,
@@ -203,6 +200,8 @@ urlpatterns = [
         views.close_conversation,
         name="close_conversation",
     ),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
