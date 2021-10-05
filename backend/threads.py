@@ -370,57 +370,89 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
 @api_view(["PUT"])
 @db_init_with_credentials
 def update_thread_read_status(request, room_id, message_id, thread_message_id):
-    if request.method == "PUT":
-        message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
-        if message:
-            if "status_code" in message:
-                if "status_code" == 404:
-                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
-                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
-            else:
-                thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
-                if thread_message:
-                    thread_message[0]["read"] = not thread_message[0]["read"]
-                    data = {"read": thread_message[0]["read"]}
-                    response = DB.update("dm_messages", message_id, {"threads": message["threads"]})
-                    if response and response.get("status") == 200:
-                        return Response(data, status=status.HTTP_201_CREATED)
-                    return Response(data="Message status not updated", status=status.HTTP_424_FAILED_DEPENDENCY)
-                return Response(data="Thread message not found", status=status.HTTP_404_NOT_FOUND)
-        return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+    if message:
+        if "status_code" in message:
+            if "status_code" == 404:
+                return Response(
+                    data="No data on zc core", 
+                    status=status.HTTP_404_NOT_FOUND
+                    )
+            return Response(
+                data="Problem with zc core", 
+                status=status.HTTP_424_FAILED_DEPENDENCY
+                )
+        else:
+            thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+            if thread_message:
+                thread_message[0]["read"] = not thread_message[0]["read"]
+                data = {"read": thread_message[0]["read"]}
+                response = DB.update("dm_messages", message_id, {"threads": message["threads"]})
+                if response and response.get("status") == 200:
+                    return Response(
+                        data, 
+                        status=status.HTTP_201_CREATED
+                        )
+                return Response(
+                    data="Message status not updated", 
+                    status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+            return Response(
+                data="Thread message not found", 
+                status=status.HTTP_404_NOT_FOUND
+                )
+    return Response(
+        data="Parent message not found", 
+        status=status.HTTP_404_NOT_FOUND
+        )
 
 
 @api_view(["POST"])
 @db_init_with_credentials
 def send_thread_message_to_channel(request, room_id, message_id, thread_message_id):
-    if request.method == "POST":
-        parent_message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
-        if parent_message:
-            if "status_code" in parent_message:
-                if "status_code" == 404:
-                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
-                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
-            thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
-            if thread_message:
-                sender_id = thread_message[0]["sender_id"]
-                message = thread_message[0]["message"]
-                url = f"https://dm.zuri.chat/api/v1/org/{DB.organization_id}/rooms/{room_id}/messages"
-                payload = json.dumps(
-                    {
-                    "sender_id": f"{sender_id}",
-                    "room_id": f"{room_id}",
-                    "message": f"{message}",
-                    }
+    parent_message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+    if parent_message:
+        if "status_code" in parent_message:
+            if "status_code" == 404:
+                return Response(
+                    data="No data on zc core", 
+                    status=status.HTTP_404_NOT_FOUND
+                    )
+            return Response(
+                data="Problem with zc core", 
+                status=status.HTTP_424_FAILED_DEPENDENCY
                 )
-                headers = {"Content-Type": "application/json"}
-                send_message = requests.request("POST", url, headers=headers, data=payload)
-                if send_message.status_code == 201:
-                    return Response(send_message.json(), status=status.HTTP_201_CREATED)
-                return Response(send_message.json(), status=response.status_code)
-            return Response(data="No thread message found", status=status.HTTP_404_NOT_FOUND)
-        return Response(data="No message or room found", status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+        thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+        if thread_message:
+            sender_id = thread_message[0]["sender_id"]
+            message = thread_message[0]["message"]
+            url = f"https://dm.zuri.chat/api/v1/org/{DB.organization_id}/rooms/{room_id}/messages"
+            payload = json.dumps(
+                {
+                "sender_id": f"{sender_id}",
+                "room_id": f"{room_id}",
+                "message": f"{message}",
+                }
+            )
+            headers = {"Content-Type": "application/json"}
+            send_message = requests.request("POST", url, headers=headers, data=payload)
+            if send_message.status_code == 201:
+                return Response(
+                    send_message.json(), 
+                    status=status.HTTP_201_CREATED
+                    )
+            return Response(
+                send_message.json(), 
+                status=response.status_code
+                )
+        return Response(
+            data="No thread message found", 
+            status=status.HTTP_404_NOT_FOUND
+            )
+    return Response(
+        data="No message or room found", 
+        status=status.HTTP_404_NOT_FOUND
+        )
 
 @api_view(["GET"])
 @db_init_with_credentials
@@ -430,43 +462,67 @@ def copy_thread_message_link(request, room_id, message_id, thread_message_id):
     The message information returned is used to generate a link which contains 
     a room_id, parent_message_id and a thread_message_id
     """
-    if request.method == "GET":
-        parent_message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
-        if parent_message:
-            if "status_code" in parent_message:
-                if "status_code" == 404:
-                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
-                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
-            thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
-            if thread_message:
-                message_info = {
-                    "room_id": room_id,
-                    "parent_message_id": message_id,
-                    "thread_id": thread_message_id,
-                    "link": f"https://dm.zuri.chat/thread_message/{DB.organization_id}/{room_id}/{message_id}/{thread_message_id}",
-                }
-                return Response(data=message_info, status=status.HTTP_200_OK)
-            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
-        return Response(data="No parent message found", status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    parent_message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    if parent_message:
+        if "status_code" in parent_message:
+            if "status_code" == 404:
+                return Response(
+                    data="No data on zc core", 
+                    status=status.HTTP_404_NOT_FOUND
+                    )
+            return Response(
+                data="Problem with zc core", 
+                status=status.HTTP_424_FAILED_DEPENDENCY
+                )
+        thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+        if thread_message:
+            message_info = {
+                "room_id": room_id,
+                "parent_message_id": message_id,
+                "thread_id": thread_message_id,
+                "link": f"https://dm.zuri.chat/thread_message/{DB.organization_id}/{room_id}/{message_id}/{thread_message_id}",
+            }
+            return Response(
+                data=message_info, 
+                status=status.HTTP_200_OK
+                )
+        return Response(
+            data="No such thread message", 
+            status=status.HTTP_404_NOT_FOUND
+            )
+    return Response(
+        data="No parent message found", 
+        status=status.HTTP_404_NOT_FOUND
+        )
 
 
 @api_view(["GET"])
 @db_init_with_credentials
 def read_thread_message_link(request, room_id, message_id, thread_message_id):
-    if request.method == "GET":
-        message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
-        if message:
-            if "status_code" in message:
-                if "status_code" == 404:
-                    return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
-                return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
-            thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
-            if thread_message:
-                return JsonResponse({"message": thread_message[0]["message"]})
-            return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
-        return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    if message:
+        if "status_code" in message:
+            if "status_code" == 404:
+                return Response(
+                    data="No data on zc core", 
+                    status=status.HTTP_404_NOT_FOUND
+                    )
+            return Response(
+                data="Problem with zc core", 
+                status=status.HTTP_424_FAILED_DEPENDENCY
+                )
+        thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+        if thread_message:
+            return JsonResponse({"message": thread_message[0]["message"]})
+        return Response(
+            data="No such thread message", 
+            status=status.HTTP_404_NOT_FOUND
+            )
+    return Response(
+        data="Parent message not found", 
+        status=status.HTTP_404_NOT_FOUND
+        )
+
 
 @api_view(["PUT"])
 @db_init_with_credentials
@@ -475,8 +531,14 @@ def pinned_thread_message(request, room_id, message_id, thread_message_id):
     if message:
         if "status_code" in message:
             if "status_code" == 404:
-                return Response(data="No data on zc core", status=status.HTTP_404_NOT_FOUND)
-            return Response(data="Problem with zc core", status=status.HTTP_424_FAILED_DEPENDENCY)
+                return Response(
+                    data="No data on zc core", 
+                    status=status.HTTP_404_NOT_FOUND
+                    )
+            return Response(
+                data="Problem with zc core", 
+                status=status.HTTP_424_FAILED_DEPENDENCY
+                )
         room = DB.read("dm_rooms", {"id": room_id})
         pin = room["pinned"] or []
         thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
@@ -486,28 +548,54 @@ def pinned_thread_message(request, room_id, message_id, thread_message_id):
             if thread_message_id in pinned_thread_ids:
                 current_pin = {key:value for (key,value) in pinned_thread_list.items() if value == thread_message_id}
                 pin.remove(current_pin)
-                data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "unpin_thread_message"}
+                data = {
+                    "message_id": message_id, 
+                    "thread_id": thread_message_id, 
+                    "pinned": pin, 
+                    "Event": "unpin_thread_message"
+                }
                 response = DB.update("dm_rooms", room_id, {"pinned": pin})
                 if response["status"] == 200:
                     centrifugo_data = send_centrifugo_data(
                         room=room_id, data=data
                     )  # publish data to centrifugo
                     if centrifugo_data.get("error", None) == None:
-                        return Response(data=data, status=status.HTTP_201_CREATED)
+                        return Response(
+                            data=data, status=status.HTTP_201_CREATED
+                            )
                 else:
-                    return Response(status=response.status_code)
+                    return Response(
+                        status=response.status_code
+                        )
             else:
-                current_pin = {"message_id": message_id, "thread_message_id": thread_message_id}
+                current_pin = {
+                    "message_id": message_id, 
+                    "thread_message_id": thread_message_id
+                }
                 pin.append(current_pin)
-                data = {"message_id": message_id, "thread_id": thread_message_id, "pinned": pin, "Event": "pin_thread_message"}
+                data = {
+                    "message_id": message_id, 
+                    "thread_id": thread_message_id, 
+                    "pinned": pin, 
+                    "Event": "pin_thread_message"
+                }
                 response = DB.update("dm_rooms", room_id, {"pinned": pin})
                 centrifugo_data = send_centrifugo_data(
                     room=room_id, data=data
                 )  # publish data to centrifugo
                 if centrifugo_data.get("error", None) == None:
-                    return Response(data=data, status=status.HTTP_201_CREATED)
-        return Response(data="No such thread message", status=status.HTTP_404_NOT_FOUND)
-    return Response(data="Parent message not found", status=status.HTTP_404_NOT_FOUND)
+                    return Response(
+                        data=data, 
+                        status=status.HTTP_201_CREATED
+                        )
+        return Response(
+            data="No such thread message", 
+            status=status.HTTP_404_NOT_FOUND
+            )
+    return Response(
+        data="Parent message not found", 
+        status=status.HTTP_404_NOT_FOUND
+        )
 
 
 
