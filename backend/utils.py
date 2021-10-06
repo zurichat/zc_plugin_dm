@@ -76,6 +76,7 @@ class CentrifugoHandler:
             "Content-type": "application/json",
             "Authorization": "apikey " + self.api_key,
         }
+        
 
     def _send_command(self, command: Dict[int, Any]) -> Dict[int, Any]:
         """Connects to the Centrifugo server and sends command to execute via Centrifugo Server API.
@@ -144,4 +145,3 @@ class CentrifugoHandler:
 # An instance of CentrifugoHandler
 # This will be used when importing the class
 centrifugo_client = CentrifugoHandler()
-
