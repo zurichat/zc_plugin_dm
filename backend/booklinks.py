@@ -135,7 +135,18 @@ def delete_bookmark(request, room_id):
         data = {"bookmarks": bookmarks}
         response = DB.update("dm_rooms", room_id, data=data)
         if response.get("status") == 200:
-            return Response(status=status.HTTP_200_OK)
+
+            centrifuge_data ={
+                "room_id" : room_id,
+                "bookmark_name" : name,
+                "event" : "bookmark_delete"
+            }
+
+            centrifugo_response = centrifugo_client.publish(room=room_id, data=centrifuge_data)
+
+            if centrifugo_response and centrifugo_response.get("status_code") == 200:
+                return Response(status=status.HTTP_200_OK)
+            return Response("Centrifugo failed", status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
