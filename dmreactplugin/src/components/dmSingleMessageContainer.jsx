@@ -2,16 +2,19 @@ import React from "react";
 import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 import DmSingleMessageReaction from "./DmSingleMessageReaction";
-
+import {SubscribeToChannel} from '@zuri/control'
+import { useState, useEffect } from "react";
 import ReactTooltip from "react-tooltip";
 
-function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
+function DmSingleMessageContainer({ messages, user2_id, handleOpenThread,room_id }) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
-
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
+  //const [newMessages ,setNewMessages] = useState(messages.message)
+   //newMessages = [...messages]
 
+  
   //Changing the message time to 12hour UTC time
   const messageTime = messages?.created_at;
   const localeTime = new Date(messageTime).toLocaleTimeString(
@@ -28,7 +31,8 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
       second: "2-digit",
     }
   );
-
+  //Recieving from Centrifugo
+  console.log("Messages:", messages)
   return (
     <>
       <div className="dm-plugin-thread-messages">
