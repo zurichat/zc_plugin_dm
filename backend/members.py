@@ -118,6 +118,22 @@ def user_profile(request, org_id, member_id):
 
     if response.status_code == 200:
         data = response.json()["data"]
+        if data["image_url"] == "":
+            data["image_url"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+        if data["first_name"] == "":
+            data["first_name"] = None
+        if data["last_name"] == "":
+            data["last_name"] = None
+        if data["display_name"] == "":
+            data["display_name"] = data["user_name"]
+        if data["bio"] == "":
+            data["bio"] = "Add Bio"
+        if data["pronouns"] == "":
+            data["pronouns"] = "Add Pronouns"
+        if data["phone"] == "":
+            data["phone"] = None
+        if data["status"] == "":
+            data["status"] = "Available"
         output = {
             "first_name": data["first_name"],
             "last_name": data["last_name"],
