@@ -38,7 +38,7 @@ const dmBoxInputField = ({ org_id, room_id, loggedInUser_id }) => {
   // send message to backend
   const sendMessage = (e) => {
     e.preventDefault()
-    console.log(org_id,room_id)
+    //console.log("param",org_id,room_id)
     if (!messageInput) return;
         const data={
             "sender_id":loggedInUser_id,
