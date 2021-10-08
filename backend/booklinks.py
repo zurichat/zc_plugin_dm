@@ -218,7 +218,7 @@ def get_links(request, room_id):
     Accepts room id as a param and queries the dm_messages collection for links attached to that id
     If no links were found, a 404 is returned
     """
-    url_pattern = r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+    url_pattern = r"(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})"
     regex = re.compile(url_pattern)
     matches = []
     messages = DB.read("dm_messages", filter={"room_id": room_id})
