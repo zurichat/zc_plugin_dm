@@ -105,17 +105,14 @@ def user_profile(request, org_id, member_id):
 
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
-    if request.method == "GET":
-        header = {'Authorization': f'Bearer {login_user()}'}
-        # if "Authorization" in request.headers:
-        #     headers["Authorization"] = request.headers["Authorization"]
-        # else:
-        #     headers["Cookie"] = request.headers["Cookie"]
-        response = requests.get(url, headers=header)
-        
+    headers = {}
+    if "Authorization" in request.headers:
+        headers["Authorization"] = request.headers["Authorization"]
     else:
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        headers = {"Authorization": f"Bearer {login_user()}"}
 
+    response = requests.get(url, headers=headers)
+    
     if response.status_code == 200:
         data = response.json()["data"]
         if data["image_url"] == "":
@@ -132,7 +129,16 @@ def user_profile(request, org_id, member_id):
             data["pronouns"] = "Add Pronouns"
         if data["phone"] == "":
             data["phone"] = None
-        if data["status"] == "":
+        if data["status"]:
+            datum = data["status"]
+            if datum["expiry_time"] == "":
+                datum["expiry_time"] = "Not Set"
+            if datum["tag"] == "":
+                datum["tag"] = None
+            if datum["text"] == "":
+                datum["text"] = "Available"
+            data["status"] = datum
+        elif data["status"] == "":
             data["status"] = "Available"
         output = {
             "first_name": data["first_name"],

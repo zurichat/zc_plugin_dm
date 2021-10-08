@@ -174,7 +174,7 @@ def room_info(request, room_id):
     org_id = DB.organization_id
     room_collection = "dm_rooms"
     current_room = DB.read(room_collection, {"_id": room_id})
-    print(current_room)
+
     if current_room and current_room.get("status_code", None) == None:
 
         if "room_user_ids" in current_room:
@@ -205,6 +205,10 @@ def room_info(request, room_id):
             created_at = ""
         if "org_id" in current_room:
             org_id = current_room["org_id"]
+        if "room_name" in current_room:
+            room_name = current_room["room_name"]
+        else:
+            room_name = ""
 
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
@@ -231,9 +235,10 @@ def room_info(request, room_id):
         room_data = {
             "room_id": room_id,
             "org_id": org_id,
+            "room_name": room_name,
             "room_user_ids": room_user_ids,
             "created_at": created_at,
-            "description": f"This room contains the coversation between {user_name_1} and {user_name_2}{text}",
+            "description": f"This room contains the coversation between You and {user_name_2}{text}",
             "starred": starred,
             "pinned": pinned,
             "private": private,
