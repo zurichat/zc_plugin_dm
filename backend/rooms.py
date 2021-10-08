@@ -141,6 +141,7 @@ def user_rooms(request, user_id):
     if there is no room for the user_id it returns a 204 status response.
     """
     if request.method == "GET":
+        print(DB.organization_id)
         res = get_rooms(user_id, DB.organization_id)
         if res == None:
             return Response(
@@ -310,7 +311,7 @@ def search_DM(request, member_id):
         result_page = paginator.paginate_queryset(user_rooms_messages, request)
         return paginator.get_paginated_response(result_page)   
     except:
-        return Response([], status=status.HTTP_200_OK)
+        return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
 
 def group_room(request, member_id):
