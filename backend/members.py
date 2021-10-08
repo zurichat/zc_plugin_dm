@@ -56,26 +56,13 @@ def organization_members(request):
 
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
 
-    if request.method == "GET":
-        headers = {}
+    headers = {}
+    if "Authorization" in request.headers:
+        headers["Authorization"] = request.headers["Authorization"]
+    else:
+        headers = {"Authorization": f"Bearer {login_user()}"}
 
-        if "Authorization" in request.headers:
-            headers["Authorization"] = request.headers["Authorization"]
-        else:
-            headers["Cookie"] = request.headers["Cookie"]
-
-        response = requests.get(url, headers=headers)
-
-    elif request.method == "POST":
-        cookie_serializer = CookieSerializer(data=request.data)
-
-        if cookie_serializer.is_valid():
-            cookie = cookie_serializer.data["cookie"]
-            response = requests.get(url, headers={"Cookie": cookie})
-        else:
-            return Response(
-                cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         response = response.json()["data"]

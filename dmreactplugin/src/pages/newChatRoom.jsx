@@ -17,17 +17,19 @@ import ProfileSidebar from '../components/profileSidebar/profileSidebar'
 const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
   const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer)
   const membersReducer = useSelector(({ membersReducer }) => membersReducer)
+  const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer)
 
   const user2_id =
     roomsReducer?.room_info?.room_user_ids !== undefined &&
     roomsReducer?.room_info?.room_user_ids[1]
-
+  const messages = room_messages?.results
+  
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(handleGetRoomMessages(org_id, room_id))
     dispatch(handleGetRoomInfo(org_id, room_id))
-  }, [dispatch, org_id, loggedInUser_id, room_id])
+  }, [dispatch, org_id, loggedInUser_id, room_id, messages])
 
   const actualUser = membersReducer?.find((member) => member._id === user2_id)
 
@@ -54,7 +56,7 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
           </div>
         </div>
         <div className='dm-message-in-out-box w-100 position-relative row align-items-end'>
-          <DmChatContainerBox user2_id={user2_id} actualUser={actualUser} />
+          <DmChatContainerBox user2_id={user2_id} room_id={room_id} actualUser={actualUser} />
         </div>
         <div className='dm-footer-input-field w-100 position-relative'>
           <InputBoxField
