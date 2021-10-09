@@ -200,7 +200,7 @@ def get_rooms(user_id, org_id):
     data =  []
     if response != None:
         if "status_code" in response:
-            return response
+            return None
         for room in response:
             if "room_user_ids" in room:
                 try:
