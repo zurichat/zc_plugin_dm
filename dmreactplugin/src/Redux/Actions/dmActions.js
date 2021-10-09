@@ -28,7 +28,7 @@ export const handleCreateDmRoom =
           room_name: room_name
         }
       );
-      console.log(data)
+      //console.log(data)
       await dispatch(createRoom(data.room_id));
     } catch (error) {
       console.log(`Error from handleCreateDmRoom: ${error}`);

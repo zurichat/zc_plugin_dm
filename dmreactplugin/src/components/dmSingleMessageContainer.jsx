@@ -32,7 +32,7 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread,room_id
     }
   );
   //Recieving from Centrifugo
-  console.log("Messages:", messages)
+  //console.log("Messages:", messages)
   return (
     <>
       <div className="dm-plugin-thread-messages">

@@ -38,6 +38,7 @@ const DmChatContainerBox = ({ user2_id, room_id }) => {
     console.log("Websocket", websocket);
     //console.log("This is centrifigo " + ctx);
   });
+  
   const dates = new Set();
   const renderDate = (chat, dateNum) => {
     const timestampDate = new Date(chat.created_at).toDateString();
