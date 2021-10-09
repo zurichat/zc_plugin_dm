@@ -71,8 +71,20 @@ def save_bookmark(request, room_id):
 
         data = {"bookmarks": bookmarks}
         response = DB.update("dm_rooms", room_id, data=data)
+
         if response.get("status") == 200:
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
+            centrifuge_data ={
+                "room_id" : room_id,
+                "event" : "bookmark_create",
+                "data": serializer.data
+            }
+
+            centrifugo_response = centrifugo_client.publish(room=room_id, data=centrifuge_data)
+
+            if centrifugo_response and centrifugo_response.get("status_code") == 200:
+                return Response(data=centrifuge_data, status=status.HTTP_200_OK)
+            return Response("Centrifugo failed", status=status.HTTP_424_FAILED_DEPENDENCY)
+        return Response(status=response.get("status"))
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -218,7 +230,7 @@ def get_links(request, room_id):
     Accepts room id as a param and queries the dm_messages collection for links attached to that id
     If no links were found, a 404 is returned
     """
-    url_pattern = r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+    url_pattern = r"(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})"
     regex = re.compile(url_pattern)
     matches = []
     messages = DB.read("dm_messages", filter={"room_id": room_id})
