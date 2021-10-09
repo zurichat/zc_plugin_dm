@@ -65,17 +65,18 @@ def create_room(request, member_id):
             # print("            --------FAE-------              \n\r")        
             user_ids = serializer.data["room_member_ids"]
             user_rooms = get_rooms(user_ids[0], DB.organization_id)
-            if "status_code" in user_rooms:
+            if "status_code" in user_rooms or user_rooms == None:
                 pass
             else:
-                for room in user_rooms:
-                    room_users = room["room_user_ids"]
-                    if set(room_users) == set(user_ids):
-                        response_output = {
-                                                "room_id": room["_id"]
-                                            }
-                        return Response(data=response_output, status=status.HTTP_200_OK)
-			
+                if user_rooms is list:
+                    for room in user_rooms:
+                        room_users = room["room_user_ids"]
+                        if set(room_users) == set(user_ids):
+                            response_output = {
+                                                    "room_id": room["_id"]
+                                                }
+                            return Response(data=response_output, status=status.HTTP_200_OK)
+                
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
                       "room_name": serializer.data["room_name"],

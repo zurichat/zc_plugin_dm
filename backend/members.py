@@ -34,13 +34,11 @@ from queue import LifoQueue
 
 
 @swagger_auto_schema(
-    methods=["post"],
+    methods=["get"],
     operation_summary="Retrieves all the members in an organization",
-    request_body=CookieSerializer,
     responses={400: "Error: Bad Request"},
 )
-@api_view(["GET", "POST"])
-@db_init_with_credentials
+@api_view(["GET"])
 def organization_members(request):
     """
     Retrieves a list of all members in an organization.
