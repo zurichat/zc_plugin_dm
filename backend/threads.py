@@ -58,7 +58,7 @@ class ThreadListView(generics.ListCreateAPIView):
         # fetch message parent of the thread
         data_storage = DataStorage()
         data_storage.organization_id = org_id
-        message = data_storage.read("dm_messages", {"_id": message_id, "room_id": room_id})
+        message = data_storage.read(MESSAGES, {"_id": message_id, "room_id": room_id})
         paginator = PageNumberPagination()
         paginator.page_size = 20
         if message and message.get("status_code", None) == None:
@@ -266,7 +266,7 @@ class ThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
             thread_data = thread_serializer.data
             sender_id = thread_data["sender_id"]
             message_id = thread_data["message_id"]
-            messages = data_storage.read("dm_messages", {"room_id": room_id})
+            messages = data_storage.read(MESSAGES, {"room_id": room_id})
             if messages:
                 if "status_code" in messages:
                     if messages.get("status_code") == 404:
@@ -363,7 +363,7 @@ def update_thread_read_status(request, room_id, message_id, thread_message_id):
     """
     Retrieves a thread message and update the read status
     """
-    message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+    message = DB.read(MESSAGES, {"_id": message_id, "room_id": room_id})
     if message:
         if "status_code" in message:
             if "status_code" == 404:
@@ -380,7 +380,7 @@ def update_thread_read_status(request, room_id, message_id, thread_message_id):
             if thread_message:
                 thread_message[0]["read"] = not thread_message[0]["read"]
                 data = {"read": thread_message[0]["read"]}
-                response = DB.update("dm_messages", message_id, {"threads": message["threads"]})
+                response = DB.update(MESSAGES, message_id, {"threads": message["threads"]})
                 if response and response.get("status") == 200:
                     return Response(
                         data, 
@@ -406,7 +406,7 @@ def send_thread_message_to_channel(request, room_id, message_id, thread_message_
     """
     Retrives a thread message and sends it to the main chat content/log.
     """
-    parent_message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
+    parent_message = DB.read(MESSAGES, {"_id": message_id, "room_id": room_id})
     if parent_message:
         if "status_code" in parent_message:
             if "status_code" == 404:
@@ -458,7 +458,7 @@ def copy_thread_message_link(request, room_id, message_id, thread_message_id):
     The message information returned is used to generate a link which contains 
     a room_id, parent_message_id and a thread_message_id
     """
-    parent_message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    parent_message = DB.read(MESSAGES, {"id": message_id, "room_id": room_id})
     if parent_message:
         if "status_code" in parent_message:
             if "status_code" == 404:
@@ -498,7 +498,7 @@ def read_thread_message_link(request, room_id, message_id, thread_message_id):
     """
     This helps us to retrieve the thread message from a thread message link
     """
-    message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    message = DB.read(MESSAGES, {"id": message_id, "room_id": room_id})
     if message:
         if "status_code" in message:
             if "status_code" == 404:
@@ -529,7 +529,7 @@ def pinned_thread_message(request, room_id, message_id, thread_message_id):
     """
     Pin and unpin a thread message
     """
-    message = DB.read("dm_messages", {"id": message_id, "room_id": room_id})
+    message = DB.read(MESSAGES, {"id": message_id, "room_id": room_id})
     if message:
         if "status_code" in message:
             if "status_code" == 404:
@@ -541,22 +541,25 @@ def pinned_thread_message(request, room_id, message_id, thread_message_id):
                 data="Problem with zc core", 
                 status=status.HTTP_424_FAILED_DEPENDENCY
                 )
-        room = DB.read("dm_rooms", {"id": room_id})
+        room = DB.read(ROOMS, {"id": room_id})
         pin = room["pinned"] or []
-        thread_message = [thread for thread in message["threads"] if thread["_id"] == thread_message_id]
+        for thread in message["threads"]:
+            if thread["_id"] == thread_message_id:
+                thread_message = thread
+                break
+            thread_message = None
         if thread_message:
-            pinned_thread_list = [thread_pin for thread_pin in pin if isinstance(thread_pin, dict)]
-            pinned_thread_ids = [val.get("thread_message_id") for val in pinned_thread_list]
-            if thread_message_id in pinned_thread_ids:
-                current_pin = {key:value for (key,value) in pinned_thread_list.items() if value == thread_message_id}
-                pin.remove(current_pin)
+            pinned_thread_list = list(filter(lambda val: isinstance(val, dict), pin))
+            pinned_thread = list(filter(lambda var: var.get("thread_message_id") == thread_message_id, pinned_thread_list))
+            if len(pinned_thread) != 0:
+                pin.remove(pinned_thread[0])
                 data = {
                     "message_id": message_id, 
                     "thread_id": thread_message_id, 
                     "pinned": pin, 
                     "Event": "unpin_thread_message"
                 }
-                response = DB.update("dm_rooms", room_id, {"pinned": pin})
+                response = DB.update(ROOMS, room_id, {"pinned": pin})
                 if response["status"] == 200:
                     centrifugo_data = send_centrifugo_data(
                         room=room_id, data=data
