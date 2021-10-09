@@ -75,6 +75,7 @@ class MessageSerializer(serializers.Serializer):
     reactions = serializers.ListField(
         required=False, default=[], child=EmojiSerializer()
     )
+    sent_from_thread = serializers.BooleanField(default=False, required=False)
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def __str__(self):

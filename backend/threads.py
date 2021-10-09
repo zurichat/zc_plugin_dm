@@ -418,16 +418,21 @@ def send_thread_message_to_channel(request, room_id, message_id, thread_message_
                 data="Problem with zc core", 
                 status=status.HTTP_424_FAILED_DEPENDENCY
                 )
-        thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+        for thread in parent_message["threads"]:
+            if thread["_id"] == thread_message_id:
+                thread_message = thread
+                break
+            thread_message = None
         if thread_message:
-            sender_id = thread_message[0]["sender_id"]
-            message = thread_message[0]["message"]
+            sender_id = thread_message["sender_id"]
+            message = thread_message["message"]
             url = f"https://dm.zuri.chat/api/v1/org/{DB.organization_id}/rooms/{room_id}/messages"
             payload = json.dumps(
                 {
                 "sender_id": f"{sender_id}",
                 "room_id": f"{room_id}",
                 "message": f"{message}",
+                "sent_from_thread": True
                 }
             )
             headers = {"Content-Type": "application/json"}
@@ -470,7 +475,11 @@ def copy_thread_message_link(request, room_id, message_id, thread_message_id):
                 data="Problem with zc core", 
                 status=status.HTTP_424_FAILED_DEPENDENCY
                 )
-        thread_message = [thread for thread in parent_message["threads"] if thread["_id"] == thread_message_id]
+        for thread in parent_message["threads"]:
+            if thread["_id"] == thread_message_id:
+                thread_message = thread
+                break
+            thread_message = None
         if thread_message:
             message_info = {
                 "room_id": room_id,
