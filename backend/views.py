@@ -1,36 +1,21 @@
-import json
-from typing import Dict, List
-import uuid
-import re
-from django.http import response
-from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
 from django.shortcuts import render
-from django.views import generic
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, parser_classes
-from rest_framework import status, generics
+from rest_framework.decorators import api_view
+from rest_framework import status
 import requests
-import time
-from .utils import send_centrifugo_data
 from .db import *
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import (
     APIView,
     exception_handler,
 )
-from django.core.files.storage import default_storage
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from datetime import datetime
-import datetime as datetimemodule
 from .centrifugo_handler import centrifugo_client
-from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
-from queue import LifoQueue
 
 
 def index(request):
