@@ -2,6 +2,12 @@ import React from "react";
 import "../assets/css/dmPopupProfile.css";
 
 const DmpopupProfile = ({ handleViewProfile, user }) => {
+  const handleScroll = (e) => {
+    console.log(e);
+
+    e.target.input;
+  };
+
   return (
     <div className="dmUserContainer">
       <div className="dmPopupImg">
@@ -35,7 +41,9 @@ const DmpopupProfile = ({ handleViewProfile, user }) => {
           <p>{new Date().toLocaleTimeString()}</p>
         </div>
         <div className=" dmPopupFooter popup_footer">
-          <button className="dm_button">Message</button>
+          <button onClick={handleScroll} className="dm_button">
+            Message
+          </button>
           <button className="dm_button">Mute</button>
         </div>
       </div>

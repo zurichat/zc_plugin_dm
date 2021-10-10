@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import EmojiPicker from "../dmEmojiComp/dmEmojiComp";
 
-function DmInputTextField(ref) {
+function DmInputTextField() {
   const [inputValue, setInputValue] = useState("");
   return (
     <div className="position-relative d-flex align-items-center">
@@ -11,13 +11,10 @@ function DmInputTextField(ref) {
         id="TestInput"
         type="text"
         placeholder="Enter Text Here"
-        ref={ref}
       />
       <EmojiPicker inputValue={inputValue} setInputValue={setInputValue} />
     </div>
   );
 }
 
-const forwardedRef = React.forwardRef(DmInputTextField);
-
-export default forwardedRef;
+export default DmInputTextField;
