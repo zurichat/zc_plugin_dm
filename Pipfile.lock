@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "143ee86c10d2025a774b661ba55698b498bfd1675894c5baa79a19b4918ab1f9"
+            "sha256": "eb8e4227fe4105f3db6b4468e802c9e28278fcbb0483a7b9bb84ad85566532f3"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -135,11 +135,11 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:1f06f2da51e7b56b8f238affdd6b4e2c61e39598a378cc49345bc1bd42a978a4",
-                "sha256:703f484b47a6af502e743c9122595cc812b0271f661722403114f71a79d0f5a4"
+                "sha256:827a0e32839ab1600d4eb1c4c33ec5a8edfbc5cb42dafa13b81f182f97784b45",
+                "sha256:8569982d3f0889eed11dd620c706d39b60c36d6d25843961f33f77fb6bc6b20c"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==3.0.1"
+            "version": "==3.0.2"
         },
         "markupsafe": {
             "hashes": [
@@ -325,6 +325,14 @@
             ],
             "markers": "python_version >= '3.6'",
             "version": "==8.0.1"
+        },
+        "colorama": {
+            "hashes": [
+                "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b",
+                "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"
+            ],
+            "markers": "platform_system == 'Windows'",
+            "version": "==0.4.4"
         },
         "mypy-extensions": {
             "hashes": [

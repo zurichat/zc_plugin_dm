@@ -65,17 +65,18 @@ def create_room(request, member_id):
             # print("            --------FAE-------              \n\r")        
             user_ids = serializer.data["room_member_ids"]
             user_rooms = get_rooms(user_ids[0], DB.organization_id)
-            if "status_code" in user_rooms:
+            if "status_code" in user_rooms or user_rooms == None:
                 pass
             else:
-                for room in user_rooms:
-                    room_users = room["room_user_ids"]
-                    if set(room_users) == set(user_ids):
-                        response_output = {
-                                                "room_id": room["_id"]
-                                            }
-                        return Response(data=response_output, status=status.HTTP_200_OK)
-			
+                if user_rooms is list:
+                    for room in user_rooms:
+                        room_users = room["room_user_ids"]
+                        if set(room_users) == set(user_ids):
+                            response_output = {
+                                                    "room_id": room["_id"]
+                                                }
+                            return Response(data=response_output, status=status.HTTP_200_OK)
+                
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
                       "room_name": serializer.data["room_name"],
@@ -141,6 +142,7 @@ def user_rooms(request, user_id):
     if there is no room for the user_id it returns a 204 status response.
     """
     if request.method == "GET":
+        print(DB.organization_id)
         res = get_rooms(user_id, DB.organization_id)
         if res == None:
             return Response(
@@ -174,7 +176,7 @@ def room_info(request, room_id):
     org_id = DB.organization_id
     room_collection = "dm_rooms"
     current_room = DB.read(room_collection, {"_id": room_id})
-    print(current_room)
+
     if current_room and current_room.get("status_code", None) == None:
 
         if "room_user_ids" in current_room:
@@ -205,6 +207,10 @@ def room_info(request, room_id):
             created_at = ""
         if "org_id" in current_room:
             org_id = current_room["org_id"]
+        if "room_name" in current_room:
+            room_name = current_room["room_name"]
+        else:
+            room_name = ""
 
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
@@ -231,9 +237,10 @@ def room_info(request, room_id):
         room_data = {
             "room_id": room_id,
             "org_id": org_id,
+            "room_name": room_name,
             "room_user_ids": room_user_ids,
             "created_at": created_at,
-            "description": f"This room contains the coversation between {user_name_1} and {user_name_2}{text}",
+            "description": f"This room contains the coversation between You and {user_name_2}{text}",
             "starred": starred,
             "pinned": pinned,
             "private": private,
@@ -269,45 +276,43 @@ def search_DM(request, member_id):
 
     try:
         rooms = DB.read("dm_rooms") #get all rooms
-        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]) or member_id in room.get('room_member_ids',[]), rooms)) #get all rooms with user
-        if user_rooms != []:
-            if users != []:
-                rooms_checked = []
-                for user in users:
-                    rooms_checked += [room for room in user_rooms
-                                if set(room.get('room_user_ids',[])) == set([member_id,user]) or  set(room.get('room_member_ids',[])) == set([member_id,user])] #get rooms with other specified users
-                user_rooms = rooms_checked
-            all_messages = DB.read("dm_messages") #get all messages
-            thread_messages = [] # get all thread messages
-            for message in all_messages:
-                threads  = message.get('threads',[])
-                for thread in threads:
-                    thread['room_id'] = message.get('room_id')
-                    thread['message_id'] = message.get('_id')
-                    thread['thread'] = True
-                    thread_messages.append(thread)
+        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]) or member_id in room.get('room_member_ids',[]), rooms)) #get all rooms with user        
+        if users != []:
+            rooms_checked = []
+            for user in users:
+                rooms_checked += [room for room in user_rooms
+                            if set(room.get('room_user_ids',[])) == set([member_id,user]) or  set(room.get('room_member_ids',[])) == set([member_id,user])] #get rooms with other specified users
+            user_rooms = rooms_checked
+        all_messages = DB.read("dm_messages") #get all messages
+        thread_messages = [] # get all thread messages
+        for message in all_messages:
+            threads  = message.get('threads',[])
+            for thread in threads:
+                thread['room_id'] = message.get('room_id')
+                thread['message_id'] = message.get('_id')
+                thread['thread'] = True
+                thread_messages.append(thread)
 
 
-            room_ids = [room['_id'] for room in user_rooms]
+        room_ids = [room['_id'] for room in user_rooms]
 
-            user_rooms_messages = [message for message in all_messages
-                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
-            user_rooms_threads = [message for message in thread_messages
-                                    if message['room_id'] in room_ids and message['message'].find(keyword) != -1]
+        user_rooms_messages = [message for message in all_messages
+                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
+        user_rooms_threads = [message for message in thread_messages
+                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1]
 
-            user_rooms_messages.extend(user_rooms_threads)
-            if user_rooms_messages != []:
-                for message in user_rooms_messages:
-                    if 'read' in message.keys(): del message['read']
-                    if 'pinned' in message.keys():del message['pinned']
-                    if 'saved_by' in message.keys():del message['saved_by']
-                    if 'threads' in message.keys(): del message['threads']
-                    if 'thread' not in message.keys(): message['thread'] = False
-                result_page = paginator.paginate_queryset(user_rooms_messages, request)
-                return paginator.get_paginated_response(result_page)
-        return Response([], status=status.HTTP_200_OK)
+        user_rooms_messages.extend(user_rooms_threads)
+
+        for message in user_rooms_messages:
+            if 'read' in message.keys(): del message['read']
+            if 'pinned' in message.keys():del message['pinned']
+            if 'saved_by' in message.keys():del message['saved_by']
+            if 'threads' in message.keys(): del message['threads']
+            if 'thread' not in message.keys(): message['thread'] = False
+        result_page = paginator.paginate_queryset(user_rooms_messages, request)
+        return paginator.get_paginated_response(result_page)   
     except:
-        return Response([], status=status.HTTP_200_OK)
+        return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
 
 def group_room(request, member_id):
