@@ -13,7 +13,7 @@ class EmojiSerializer(serializers.Serializer):
     aliases = serializers.ListField(
         child=serializers.CharField(max_length=128), required=False, default=[]
     )
-    count = serializers.IntegerField()
+    count = serializers.IntegerField(default=0, required=False)
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -75,6 +75,7 @@ class MessageSerializer(serializers.Serializer):
     reactions = serializers.ListField(
         required=False, default=[], child=EmojiSerializer()
     )
+    sent_from_thread = serializers.BooleanField(default=False, required=False)
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -123,12 +124,12 @@ class UserRoomsSerializer(serializers.Serializer):
 
 
 class BookmarkSerializer(serializers.Serializer):
-    link = serializers.URLField()
+    link = serializers.CharField()
     name = serializers.CharField()
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def validate_link(self, value):
-        pattern = r"^(?:ht|f)tp[s]?://(?:www.)?.*$"
+        pattern = r"(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})"
         if not re.match(pattern, value):
             raise serializers.ValidationError("Invalid link for bookmark")
         return value
