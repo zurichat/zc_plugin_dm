@@ -69,7 +69,6 @@ const DmChatContainerBox = ({ user2_id, room_id }) => {
                   // console.log(messages);
                   //const [message, setMessage] = useState(messages)
                   const dateNum = new Date(messages.created_at).toDateString();
-                  
                   return (
                     <div key={messages?.id}>
                       <div className="__date_tags">

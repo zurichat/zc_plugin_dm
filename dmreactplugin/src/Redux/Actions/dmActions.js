@@ -83,7 +83,7 @@ export const handleGetRoomMessages = (org_id, room_id) => async (dispatch) => {
 //Create room messages
 const createRoomMessages = () =>({
   type: CREATE_ROOM_MESSAGES,
-  payload:message,
+  //payload:message,
 });
 
 export const handleCreateRoomMessages = (org_id, room_id, data) => async (dispatch) =>{
