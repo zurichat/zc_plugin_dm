@@ -9,8 +9,10 @@ import centrifugeClient from "../../utils/centrifugoClient";
 
 import "./chatContainerBox.css";
 import { FaAngleDown } from "react-icons/fa";
+import { SubscribeToChannel } from "@zuri/control";
+import DmpopupProfile from "../DmPopupProfile";
 
-const DmChatContainerBox = ({ user2_id }) => {
+const DmChatContainerBox = ({ user2_id, none, grid, setNone, setGrid }) => {
   const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
   const [openThread, setOpenThread] = useState(false);
 
@@ -72,7 +74,9 @@ const DmChatContainerBox = ({ user2_id }) => {
     return <>{new Date(chat).toUTCString().slice(0, 11)}</>;
   };
 
-  centrifugeClient("6150e69005c9716b90f33f3a", (ctx) => {
+  SubscribeToChannel("6150e69005c9716b90f33f3a", (ctx) => {
+    const websocket = ctx.data;
+    console.log("Websocket", websocket);
     console.log("This is centrifigo " + ctx);
   });
 
@@ -93,6 +97,10 @@ const DmChatContainerBox = ({ user2_id }) => {
                           key={mIndex}
                           messages={message}
                           user2_id={user2_id}
+                          none={none}
+                          setNone={setNone}
+                          grid={grid}
+                          setGrid={setGrid}
                         />
                       </MessageWrapper>
                     </p>

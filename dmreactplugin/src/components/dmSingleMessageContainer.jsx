@@ -1,17 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 import DmSingleMessageReaction from "./DmSingleMessageReaction";
 
 import ReactTooltip from "react-tooltip";
 
-function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
+import DmpopupProfile from "./DmPopupProfile";
+
+function DmSingleMessageContainer({
+  messages,
+  user2_id,
+  handleOpenThread,
+  setNone,
+  setGrid,
+}) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
 
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
 
+  const [showPopup, setShowPopup] = useState(false);
+
+  console.log("USER", user);
   //Changing the message time to 12hour UTC time
   const messageTime = messages?.created_at;
   const localeTime = new Date(messageTime).toLocaleTimeString(
@@ -29,6 +40,12 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
     }
   );
 
+  const handleViewProfile = () => {
+    setNone("block");
+    setGrid("grid");
+    setShowPopup(false);
+  };
+
   return (
     <>
       <div className="dm-plugin-thread-messages">
@@ -40,6 +57,7 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
               width="36"
               height="36"
               className="dm-plugin-thread-message-image"
+              onClick={() => setShowPopup(!showPopup)}
             />
           </div>
           <div className="dm-plugin-thread-message-body">
@@ -83,6 +101,13 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread }) {
           user={user}
         />
       </div>
+
+      {showPopup ? (
+        <DmpopupProfile handleViewProfile={handleViewProfile} user={user} />
+      ) : null}
+      {showPopup ? (
+        <div onClick={() => setShowPopup(false)} className="dm__overlay"></div>
+      ) : null}
     </>
   );
 }
