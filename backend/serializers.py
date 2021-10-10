@@ -123,7 +123,7 @@ class UserRoomsSerializer(serializers.Serializer):
 
 
 class BookmarkSerializer(serializers.Serializer):
-    link = serializers.URLField()
+    link = serializers.CharField()
     name = serializers.CharField()
     created_at = serializers.DateTimeField(default=timezone.now)
 
