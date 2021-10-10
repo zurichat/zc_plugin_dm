@@ -20,7 +20,7 @@ import { FiAtSign, FiBold, FiPaperclip } from "react-icons/fi";
 import { Button } from "react-bootstrap";
 // import ApiServices from '../utils/apiServices';
 
-const dmBoxInputField = ({ org_id, room_id, user2_id }) => {
+const dmBoxInputField = ({ org_id, room_id, loggedInUser_id }) => {
   // controls inputfield text style e.g italic, bold, border
   const [textStyle, setTextStyle] = useState({ border: "1px solid #e3e3e3" });
 
@@ -38,18 +38,17 @@ const dmBoxInputField = ({ org_id, room_id, user2_id }) => {
   // send message to backend
   const sendMessage = (e) => {
     e.preventDefault();
-    console.log("sending");
+    //console.log("param",org_id,room_id)
     if (!messageInput) return;
-    let data = {
-      sender_id: user2_id,
+    const data = {
+      sender_id: loggedInUser_id,
       message: messageInput,
     };
     // ApiServices.postMessageThread(org_id, room_id, "61584d6e87675da1c20179fa", data).then(response=>{
     //   console.log(response);
-    dispatch(handleCreateRoomMessages(org_id.org_id, org_id.room_id, data));
+    dispatch(handleCreateRoomMessages(org_id, room_id, data));
 
     setMessageInput("");
-    inputRef.current.innerHTML = "";
   };
   // messageSend(messageInput);
   // setMessageInput('');
@@ -168,7 +167,7 @@ const dmBoxInputField = ({ org_id, room_id, user2_id }) => {
               name=""
               id=""
             />
-            <div
+            {/* <div
               ref={inputRef}
               contentEditable={true}
               style={textStyle}
@@ -179,7 +178,16 @@ const dmBoxInputField = ({ org_id, room_id, user2_id }) => {
               className="px-2 p-3"
             >
               <div>Send Message To</div>
-            </div>
+            </div> */}
+            <textarea
+              rows="2"
+              type="text"
+              value={messageInput}
+              // textInputResize={textInputResize}
+              onChange={(e) => setMessageInput(e.target.value)}
+              placeholder="Send Message to "
+              className="px-2"
+            />
             <ChatInputEditor>
               <LeftChatEditor>
                 <Button
@@ -238,7 +246,7 @@ const dmBoxInputField = ({ org_id, room_id, user2_id }) => {
                   onClick={sendMessage}
                   onKeyDown={sendMessage}
                   className="send-btn-box btn-inputfield-box"
-                  disabled={!messageInput}
+                  //disabled={!messageInput}
                 >
                   <span className="sendMessage">
                     <IoMdSend />

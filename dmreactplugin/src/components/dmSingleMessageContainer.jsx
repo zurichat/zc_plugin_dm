@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 import DmSingleMessageReaction from "./DmSingleMessageReaction";
-
+import { SubscribeToChannel } from "@zuri/control";
+import { useState, useEffect } from "react";
 import ReactTooltip from "react-tooltip";
 
 import DmpopupProfile from "./DmPopupProfile";
@@ -13,12 +14,14 @@ function DmSingleMessageContainer({
   handleOpenThread,
   setNone,
   setGrid,
+  room_id,
 }) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
-
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
+  //const [newMessages ,setNewMessages] = useState(messages.message)
+  //newMessages = [...messages]
 
   const [showPopup, setShowPopup] = useState(false);
 
@@ -46,6 +49,8 @@ function DmSingleMessageContainer({
     setShowPopup(false);
   };
 
+  //Recieving from Centrifugo
+  console.log("Messages:", messages);
   return (
     <>
       <div className="dm-plugin-thread-messages">
@@ -79,6 +84,8 @@ function DmSingleMessageContainer({
               />
             </p>
             <p className="dm-plugin-thread-message-text">{messages?.message}</p>
+            {/* 
+              // Had to comment it out because It wasnt allowing the code to run... No vess
             <span>
               {messages?.media?.map((media) => (
                 <img
@@ -88,7 +95,7 @@ function DmSingleMessageContainer({
                   width="15px"
                 />
               ))}
-            </span>
+            </span> */}
             <span>
               {messages?.reactions?.map((reaction) => (
                 <span>{reaction?.data}</span>
