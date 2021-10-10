@@ -2,7 +2,7 @@
 
 .dm-plugin-thread-messages {
   max-height: calc(75px * 8);
-  font-family: 'Lato', sans-serif;
+  font-family: "Lato", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: var(--clr-text);

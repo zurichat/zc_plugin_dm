@@ -8,6 +8,7 @@
   position: absolute;
   left: 1000px;
   padding-bottom: 15px;
+  z-index: 100;
 }
 .Dm-ThreeDotKebab-Menu-FirstPopup div {
   padding: 9px;
