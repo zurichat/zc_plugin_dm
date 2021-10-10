@@ -13,7 +13,7 @@ class EmojiSerializer(serializers.Serializer):
     aliases = serializers.ListField(
         child=serializers.CharField(max_length=128), required=False, default=[]
     )
-    count = serializers.IntegerField()
+    count = serializers.IntegerField(default=0, required=False)
     created_at = serializers.DateTimeField(default=timezone.now)
 
     def __str__(self):
