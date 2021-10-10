@@ -66,16 +66,6 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
             <FaAngleDown className='profileHeader__icon' />
           </div>
         </header> */}
-
-      <img
-        className="profileHeader__img"
-        src={user?.image_url}
-        alt="Profile Pic"
-      />
-      <p className="profileHeader__name">{user?.user_name}</p>
-
-      <FaAngleDown className="profileHeader__icon" />
-
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={() => setModalIsOpen(false)}

@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import "../assets/css/dmSingleMessageContainer.css";
 import DmSingleMessageReaction from "./DmSingleMessageReaction";
 import { SubscribeToChannel } from "@zuri/control";
-import { useState, useEffect } from "react";
 import ReactTooltip from "react-tooltip";
 
 import DmpopupProfile from "./DmPopupProfile";

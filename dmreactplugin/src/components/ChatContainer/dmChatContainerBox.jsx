@@ -11,7 +11,14 @@ import DmpopupProfile from "../DmPopupProfile";
 import { useDispatch } from "react-redux";
 import { handleGetRoomMessages } from "../../Redux/Actions/dmActions";
 
-const DmChatContainerBox = ({ user2_id, none, grid, setNone, setGrid }) => {
+const DmChatContainerBox = ({
+  user2_id,
+  none,
+  grid,
+  setNone,
+  room_id,
+  setGrid,
+}) => {
   const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
   const [openThread, setOpenThread] = useState(false);
   const handleOpenThread = () => {
@@ -35,65 +42,91 @@ const DmChatContainerBox = ({ user2_id, none, grid, setNone, setGrid }) => {
     console.log("Websocket", websocket);
     //console.log("This is centrifigo " + ctx);
   });
-  const dates = new Set();
-  const renderDate = (chat, dateNum) => {
-    const timestampDate = new Date(chat.created_at).toDateString();
-    // Add to Set so it does not render again
-    dates.add(dateNum);
+
+  const messages =
+    room_messages?.results.length > 0
+      ? room_messages.results.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        )
+      : [];
+
+  const groups = messages.reduce((groups, message) => {
+    const date = message.created_at.split("T")[0];
+    if (!groups[date]) {
+      groups[date] = [];
+    }
+    groups[date].push(message);
+
+    return groups;
+  }, {});
+
+  const groupedMessages = Object.keys(groups).map((date) => {
+    return {
+      date,
+      messages: groups[date],
+    };
+  });
+
+  console.log(groupedMessages);
+
+  //This function below helps group messages (Today, Yesterday etc)
+
+  const renderDate = (chat) => {
+    const timestampDate = new Date(chat).toDateString();
+
     const todayDate = new Date().toDateString();
+
     let prev_date = new Date();
     prev_date.setDate(prev_date.getDate() - 1);
+
     if (timestampDate === todayDate) {
       return "Today";
     } else if (new Date(prev_date).toDateString() == timestampDate) {
       return "Yesterday";
     }
-    return <>{timestampDate}</>;
+    return <>{new Date(chat).toUTCString().slice(0, 11)}</>;
   };
+
   return (
     <>
       <div className="dm-chatContainerBox w-100 d-flex align-items-end">
         <main className="dm-chat-main-container">
-          {room_messages?.results
-            ? room_messages?.results
-                ?.sort((first, second) => {
-                  const firstDate = new Date(first.created_at);
-                  const secondDate = new Date(second.created_at);
-                  return Date - secondDate;
-                })
-                .map((messages) => {
-                  // console.log(messages);
-                  //const [message, setMessage] = useState(messages)
-                  const dateNum = new Date(messages.created_at).toDateString();
-
-                  return (
-                    <div key={messages?.id}>
-                      <div className="__date_tags">
-                        {dates.has(dateNum) ? (
-                          ""
-                        ) : (
-                          <div className="__date_tag">
-                            <p> {renderDate(messages, dateNum)}</p>
-                            <small>
-                              <FaAngleDown />
-                            </small>
-                          </div>
-                        )}
-                      </div>
-                      <MessageWrapper handleOpenThread={handleOpenThread}>
-                        <DmSingleMessageContainer
-                          messages={messages}
-                          user2_id={user2_id}
-                          none={none}
-                          setNone={setNone}
-                          grid={grid}
-                          setGrid={setGrid}
-                        />
-                      </MessageWrapper>
-                    </div>
-                  );
-                })
-            : null}
+          <div key={messages?.id}>
+            <div className="__date_tags">
+              {groupedMessages.length > 0
+                ? groupedMessages.map((group, index) => (
+                    <span key={index}>
+                      <p className="__date_tag">
+                        {renderDate(group.date)} <FaAngleDown />
+                      </p>
+                      {group.messages.map((message, mIndex) => (
+                        <p key={mIndex}>
+                          <MessageWrapper handleOpenThread={handleOpenThread}>
+                            <DmSingleMessageContainer
+                              key={mIndex}
+                              messages={message}
+                              user2_id={user2_id}
+                            />
+                          </MessageWrapper>
+                        </p>
+                      ))}
+                    </span>
+                  ))
+                : ""}
+            </div>
+            <MessageWrapper handleOpenThread={handleOpenThread}>
+              <DmSingleMessageContainer
+                messages={messages}
+                user2_id={user2_id}
+                none={none}
+                setNone={setNone}
+                grid={grid}
+                setGrid={setGrid}
+                room_id={room_id}
+              />
+            </MessageWrapper>
+          </div>
+          )
           <DmInitMessageBox secondUser={user} />
         </main>
         <aside className={`asideContent ${openThread ? "active" : ""}`}>
