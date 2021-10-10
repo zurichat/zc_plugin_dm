@@ -129,8 +129,6 @@ def side_bar(request):
     }
     return JsonResponse(side_bar, safe=False)
 
-
-
 @swagger_auto_schema(
     methods=["get"],
     operation_summary="Retreives messages in a room using a filter",
