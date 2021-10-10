@@ -34,13 +34,11 @@ from queue import LifoQueue
 
 
 @swagger_auto_schema(
-    methods=["post"],
+    methods=["get"],
     operation_summary="Retrieves all the members in an organization",
-    request_body=CookieSerializer,
     responses={400: "Error: Bad Request"},
 )
-@api_view(["GET", "POST"])
-@db_init_with_credentials
+@api_view(["GET"])
 def organization_members(request):
     """
     Retrieves a list of all members in an organization.
@@ -56,26 +54,13 @@ def organization_members(request):
 
     url = f"https://api.zuri.chat/organizations/{ORG_ID}/members"
 
-    if request.method == "GET":
-        headers = {}
+    headers = {}
+    if "Authorization" in request.headers:
+        headers["Authorization"] = request.headers["Authorization"]
+    else:
+        headers = {"Authorization": f"Bearer {login_user()}"}
 
-        if "Authorization" in request.headers:
-            headers["Authorization"] = request.headers["Authorization"]
-        else:
-            headers["Cookie"] = request.headers["Cookie"]
-
-        response = requests.get(url, headers=headers)
-
-    elif request.method == "POST":
-        cookie_serializer = CookieSerializer(data=request.data)
-
-        if cookie_serializer.is_valid():
-            cookie = cookie_serializer.data["cookie"]
-            response = requests.get(url, headers={"Cookie": cookie})
-        else:
-            return Response(
-                cookie_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         response = response.json()["data"]
@@ -105,19 +90,41 @@ def user_profile(request, org_id, member_id):
 
     url = f"https://api.zuri.chat/organizations/{org_id}/members/{member_id}"
 
-    if request.method == "GET":
-        header = {'Authorization': f'Bearer {login_user()}'}
-        # if "Authorization" in request.headers:
-        #     headers["Authorization"] = request.headers["Authorization"]
-        # else:
-        #     headers["Cookie"] = request.headers["Cookie"]
-        response = requests.get(url, headers=header)
-        
+    headers = {}
+    if "Authorization" in request.headers:
+        headers["Authorization"] = request.headers["Authorization"]
     else:
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        headers = {"Authorization": f"Bearer {login_user()}"}
 
+    response = requests.get(url, headers=headers)
+    
     if response.status_code == 200:
         data = response.json()["data"]
+        if data["image_url"] == "":
+            data["image_url"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+        if data["first_name"] == "":
+            data["first_name"] = None
+        if data["last_name"] == "":
+            data["last_name"] = None
+        if data["display_name"] == "":
+            data["display_name"] = data["user_name"]
+        if data["bio"] == "":
+            data["bio"] = "Add Bio"
+        if data["pronouns"] == "":
+            data["pronouns"] = "Add Pronouns"
+        if data["phone"] == "":
+            data["phone"] = None
+        if data["status"]:
+            datum = data["status"]
+            if datum["expiry_time"] == "":
+                datum["expiry_time"] = "Not Set"
+            if datum["tag"] == "":
+                datum["tag"] = None
+            if datum["text"] == "":
+                datum["text"] = "Available"
+            data["status"] = datum
+        elif data["status"] == "":
+            data["status"] = "Available"
         output = {
             "first_name": data["first_name"],
             "last_name": data["last_name"],
