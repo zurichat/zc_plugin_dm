@@ -34,14 +34,19 @@ urlpatterns = [
         name="search DM",
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
-        rooms.close_conversation,
-        name="close_conversation",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>",
+        rooms.add_member,
+        name="add-user",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation",
         rooms.close_conversation,
         name="close_conversation",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
+        rooms.star_room,
+        name="star_room",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
@@ -134,11 +139,6 @@ urlpatterns = [
         name="thread_message_reaction",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions/<str:reaction_id>",
-        reactions.delete_thread_emoji_reaction,
-        name="delete_thread_message_reaction",
-    ),
-    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/read_status",
         threads.update_thread_read_status,
         name="update_thread_read_status",
@@ -162,6 +162,16 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/pinned",
         threads.pinned_thread_message,
         name="pinned_thread_messsage",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads",
+        threads.ThreadListView.as_view(),
+        name="thread_messsage_create_get",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>",
+        threads.ThreadDetailView.as_view(),
+        name="thread_messsage_update_delete",
     ),
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/threads",
