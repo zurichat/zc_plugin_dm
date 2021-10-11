@@ -439,6 +439,7 @@ def add_member(request, room_id, member_id):
 def close_conversation(request, room_id, member_id):
     """
     Closes a dm conversation
+    params: room_id, member_id
     """
     if request.method == "PUT":
         room = DB.read("dm_rooms", {"_id":room_id})
