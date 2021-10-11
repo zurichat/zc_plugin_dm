@@ -1,70 +1,86 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import "../assets/css/dmSingleMessageContainer.css";
-import DmSingleMessageReaction from "./DmSingleMessageReaction";
-import {SubscribeToChannel} from '@zuri/control'
-import { useState, useEffect } from "react";
-import ReactTooltip from "react-tooltip";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import '../assets/css/dmSingleMessageContainer.css';
+import DmSingleMessageReaction from './DmSingleMessageReaction';
+import { SubscribeToChannel } from '@zuri/control';
+import { useState, useEffect } from 'react';
+import ReactTooltip from 'react-tooltip';
+import PopupProfile from './DmPopupProfile/PopupProfile';
 
-function DmSingleMessageContainer({ messages, user2_id, handleOpenThread,room_id }) {
+function DmSingleMessageContainer({
+  messages,
+  user2_id,
+  handleOpenThread,
+  setNone,
+  setGrid,
+  room_id,
+}) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
+
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
   //const [newMessages ,setNewMessages] = useState(messages.message)
-   //newMessages = [...messages]
+  //newMessages = [...messages]
 
-  
+  const [showPopup, setShowPopup] = useState(false);
   //Changing the message time to 12hour UTC time
   const messageTime = messages?.created_at;
   const localeTime = new Date(messageTime).toLocaleTimeString(
     {},
-    { hour: "2-digit", minute: "2-digit" }
+    { hour: '2-digit', minute: '2-digit' }
   );
   const fullLocaleTime = new Date(messageTime).toLocaleTimeString(
     {},
     {
-      formatMatcher: "basic",
-      weekday: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      formatMatcher: 'basic',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     }
   );
   //Recieving from Centrifugo
-  console.log("Messages:", messages)
+  console.log('Messages:', messages);
+
+  const handleViewProfile = () => {
+    setNone('block');
+    setGrid('grid');
+    setShowPopup(false);
+  };
   return (
     <>
-      <div className="dm-plugin-thread-messages">
-        <div className="dm-plugin-thread-message-group px-3 py-3">
-          <div className="dm-plugin-thread-message-image-container">
+      <div className='dm-plugin-thread-messages'>
+        <div className='dm-plugin-thread-message-group px-3 py-3'>
+          <div className='dm-plugin-thread-message-image-container'>
             <img
               src={user?.image_url}
-              alt="user image"
-              width="36"
-              height="36"
-              className="dm-plugin-thread-message-image"
+              alt='user image'
+              width='36'
+              height='36'
+              className='dm-plugin-thread-message-image'
+              onClick={() => setShowPopup(!showPopup)}
             />
           </div>
-          <div className="dm-plugin-thread-message-body">
-            <p className="dm-plugin-thread-message-header">
-              <span className="dm-plugin-thread-message-name">
+          <div className='dm-plugin-thread-message-body'>
+            <p className='dm-plugin-thread-message-header'>
+              <span className='dm-plugin-thread-message-name'>
                 {user?.user_name}
               </span>
               <span
-                className="dm-plugin-thread-message-time"
+                className='dm-plugin-thread-message-time'
                 data-tip={fullLocaleTime}
-                data-for="dm-time-tool-tip"
+                data-for='dm-time-tool-tip'
               >
                 {localeTime}
               </span>
               <ReactTooltip
-                effect="solid"
-                className="dm-time-toolTip-custom-class"
-                id="dm-time-tool-tip"
+                effect='solid'
+                className='dm-time-toolTip-custom-class'
+                id='dm-time-tool-tip'
               />
             </p>
-            <p className="dm-plugin-thread-message-text">{messages?.message}</p>
+            <p className='dm-plugin-thread-message-text'>{messages?.message}</p>
             {/* 
               // Had to comment it out because It wasnt allowing the code to run... No vess
             <span>
@@ -89,6 +105,12 @@ function DmSingleMessageContainer({ messages, user2_id, handleOpenThread,room_id
           user={user}
         />
       </div>
+      {showPopup ? (
+        <PopupProfile handleViewProfile={handleViewProfile} user={user} />
+      ) : null}
+      {showPopup ? (
+        <div onClick={() => setShowPopup(false)} className='dm__overlay'></div>
+      ) : null}
     </>
   );
 }
