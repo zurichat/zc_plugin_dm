@@ -1,14 +1,11 @@
-from unittest import mock
+
 from unittest.mock import patch
-from datetime import datetime
 
 from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework.test import APIClient
 from rest_framework import status
-
-from backend.db import DataStorage
 
 
 class BookmarkEndpointTestCase(TestCase):
@@ -65,4 +62,3 @@ class BookmarkEndpointTestCase(TestCase):
         
         self.assertEqual(response.status_code, 503)
         self.assertTrue(response.data == None)
-    
