@@ -35,15 +35,21 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM"
     ),
+
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
-        rooms.star_room,
-        name="star_room",
-    ),
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>", 
+        rooms.add_user, 
+        name="add-user"
+        ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
         rooms.close_conversation, 
         name="close_conversation"
+        ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
+        rooms.star_room,
+        name="star_room",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
