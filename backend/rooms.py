@@ -407,7 +407,7 @@ def star_room(request, room_id, member_id):
 
 @api_view(["PUT"])
 @db_init_with_credentials
-def add_user(request, room_id, member_id):
+def add_member(request, room_id, member_id):
     if request.method == "PUT":
         room = DB.read("dm_rooms", {"_id":room_id})
         if room or room is not None :
