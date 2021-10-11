@@ -138,29 +138,35 @@ def delete_bookmark(request, room_id):
     except Exception as e:
         print(e)
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
     if bookmarks is not None:
         name = request.query_params.get("name", "")
+        is_found = False # Boolean to check if bookmark exists
         for bookmark in bookmarks:
             if name == bookmark.get("name", ""):
                 bookmarks.remove(bookmark)
+                is_found = True
                 break
-        data = {"bookmarks": bookmarks}
-        response = DB.update("dm_rooms", room_id, data=data)
-        if response.get("status") == 200:
+        
+        if is_found:
+            data = {"bookmarks": bookmarks}
+            response = DB.update("dm_rooms", room_id, data=data)
+            if response.get("status") == 200:
 
-            centrifuge_data ={
-                "room_id" : room_id,
-                "bookmark_name" : name,
-                "event" : "bookmark_delete"
-            }
+                centrifuge_data ={
+                    "room_id" : room_id,
+                    "bookmark_name" : name,
+                    "event" : "bookmark_delete"
+                }
 
-            centrifugo_response = centrifugo_client.publish(room=room_id, data=centrifuge_data)
+                centrifugo_response = centrifugo_client.publish(room=room_id, data=centrifuge_data)
 
-            if centrifugo_response and centrifugo_response.get("status_code") == 200:
-                return Response(status=status.HTTP_200_OK)
-            return Response("Centrifugo failed", status=status.HTTP_424_FAILED_DEPENDENCY)
+                if centrifugo_response and centrifugo_response.get("status_code") == 200:
+                    return Response(status=status.HTTP_200_OK)
+                return Response("Centrifugo failed", status=status.HTTP_424_FAILED_DEPENDENCY)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @swagger_auto_schema(
