@@ -39,11 +39,12 @@ const DmChatContainerBox = ({
 
   const user = actualUser ? actualUser : null;
 
-  const messages = room_messages
-    ? room_messages.results.sort(
-        (a, b) => new Date(b.created_at) - new Date(a.created_at)
-      )
-    : [];
+  const messages =
+    room_messages?.results.length > 0
+      ? room_messages.results.sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        )
+      : [];
 
   const groups = messages.reduce((groups, message) => {
     const date = message.created_at.split("T")[0];
