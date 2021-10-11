@@ -425,10 +425,7 @@ It then returns a json response containing a 200 status code, a "success" messag
             room_users=room['room_user_ids']
             if member_id not in room_users:  
                 room_users.append(member_id)
-                print(room_users)
                 data = {'room_user_ids':room_users}
-                print(data)
-                print(room)
                 response = DB.update("dm_rooms", room_id, data=data)
                 return Response(response, status=status.HTTP_200_OK)
             return Response("Not Acceptable, You can't join a room twice", status=status.HTTP_406_NOT_ACCEPTABLE)
