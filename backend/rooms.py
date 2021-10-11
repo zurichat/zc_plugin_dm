@@ -405,6 +405,24 @@ def star_room(request, room_id, member_id):
             )
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(["PUT"])
+@db_init_with_credentials
+def add_member(request, room_id, member_id):
+    if request.method == "PUT":
+        room = DB.read("dm_rooms", {"_id":room_id})
+        if room or room is not None :
+            room_users=room['room_user_ids']
+            if member_id not in room_users:  
+                room_users.append(member_id)
+                print(room_users)
+                data = {'room_user_ids':room_users}
+                print(data)
+                print(room)
+                response = DB.update("dm_rooms", room_id, data=data)
+                return Response(response, status=status.HTTP_200_OK)
+            return Response("Not Acceptable, You can't join a room twice", status=status.HTTP_406_NOT_ACCEPTABLE)
+        return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
+    return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 @api_view(["PUT"])
@@ -424,3 +442,4 @@ def close_conversation(request, room_id, member_id):
             return Response("You are not authorized", status=status.HTTP_401_UNAUTHORIZED)
         return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
     return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
