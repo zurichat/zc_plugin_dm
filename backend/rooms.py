@@ -425,7 +425,6 @@ def add_member(request, room_id, member_id):
     return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-
 @api_view(["PUT"])
 @db_init_with_credentials
 def close_conversation(request, room_id, member_id):
