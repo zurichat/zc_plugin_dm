@@ -1,21 +1,17 @@
-from . import views, rooms, messaging, members, media, threads, booklinks, reactions
+from .import views, rooms, messaging, members, media, threads, booklinks, reactions
 from .testingapi import Test
-
 # from .views import EditMessage
 from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView, )
+
 
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path('test', views.test_search, name='test-search'),
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
@@ -27,29 +23,29 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/info",
         rooms.room_info,
-        name="room_info",
+        name="room_info"
     ),
     path(
         "api/v1/org/<str:org_id>/users/<str:user_id>/rooms",
-        rooms.search_DM,
-        name="search DM",
+        rooms.user_rooms,
+        name="get_user_rooms"
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
-        rooms.query_dm,
-        name="Query Dm"
+        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        rooms.search_DM,
+        name="search DM"
     ),
 
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>",
-        rooms.add_member,
-        name="add-user",
-    ),
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>", 
+        rooms.add_member, 
+        name="add-user"
+        ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation",
-        rooms.close_conversation,
-        name="close_conversation",
-    ),
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
+        rooms.close_conversation, 
+        name="close_conversation"
+        ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
         rooms.star_room,
@@ -58,7 +54,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
         messaging.message_create_get,
-        name="create_get_message",
+        name="create_get_message"
     ),
     path(
         "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
@@ -66,19 +62,19 @@ urlpatterns = [
         name="updateroom",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/message",
         messaging.delete_message,
         name="delete_message",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/schedule-message",
         messaging.scheduled_messages,
-        name="scheduled_messages",
+        name="scheduled_messages"
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/read",
         messaging.mark_read,
-        name="mark_read",
+        name="mark_read"
     ),
     path(  # might require a room id
         "api/v1/org/<str:org_id>/messages/<str:message_id>/pin",
@@ -103,7 +99,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/links",
         booklinks.get_links,
-        name="get_links",
+        name="get_links"
     ),
     path(
         "api/v1/org/<str:org_id>/messages/<str:message_id>/link",
@@ -123,7 +119,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/new-bookmark",
         booklinks.save_bookmark,
-        name="create_bookmark",
+        name="create_bookmark"
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/bookmarks",
@@ -133,7 +129,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/bookmark",
         booklinks.delete_bookmark,
-        name="delete_bookmark",
+        name="delete_bookmark"
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/reactions",
@@ -181,6 +177,7 @@ urlpatterns = [
         name="thread_messsage_update_delete",
     ),
     path(
+
         "api/v1/org/<str:org_id>/users/<str:member_id>/threads",
         threads.get_all_threads,
         name="get_all_threads",
@@ -188,7 +185,7 @@ urlpatterns = [
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messagemedia",
         media.SendFile.as_view(),
-        name="media_files",
+        name="media_files"
     ),
     path(
         "api/v1/org/<str:org_id>/members",
@@ -200,10 +197,16 @@ urlpatterns = [
         members.user_profile,
         name="user_profile",
     ),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
+        rooms.query_dm,
+        name="Query Dm"
+    ),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), 
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
