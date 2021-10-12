@@ -20,6 +20,7 @@ requests = "==2.26.0"
 urllib3 = "==1.26.6"
 drf-yasg = "==1.20.0"
 django = "==3.2.6"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 black = "*"
