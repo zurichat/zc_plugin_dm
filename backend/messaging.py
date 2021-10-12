@@ -20,6 +20,7 @@ from rest_framework.views import (
     exception_handler,
 )
 from django.core.files.storage import default_storage
+
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
@@ -34,15 +35,12 @@ from queue import LifoQueue
 
 
 @swagger_auto_schema(
-    methods=["post","get"],
+    methods=["post", "get"],
     query_serializer=GetMessageSerializer,
     operation_summary="Creates and get messages",
-   responses={
-            201: MessageResponse,
-            400: "Error: Bad Request"
-        }
+    responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
-@api_view(["GET","POST"])
+@api_view(["GET", "POST"])
 @db_init_with_credentials
 def message_create_get(request, room_id):
     if request.method == "GET":
@@ -77,7 +75,9 @@ def message_create_get(request, room_id):
             else:
                 return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response(params_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                params_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+            )
 
     elif request.method == "POST":
         request.data["room_id"] = room_id
@@ -139,7 +139,6 @@ def message_create_get(request, room_id):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
 @api_view(["GET", "PUT"])
 @db_init_with_credentials
 def edit_message(request, message_id, room_id):
@@ -167,20 +166,18 @@ def edit_message(request, message_id, room_id):
         room_serializer = MessageSerializer(message, data=request.data, partial=True)
         if room_serializer.is_valid():
             data = room_serializer.data
-            data = {"message":request.data["message"]}
+            data = {"message": request.data["message"]}
             # print(data)
             response = DB.update("dm_messages", message_id, data)
             if response.get("status") == 200:
                 data = {
-                        "sender_id":request.data["sender_id"],
-                        "message_id":message_id,
-                        "room_id":room_id,
-                        "message":request.data["message"],
-                        "event":"edited_message"
-                        }
-                centrifugo_data = send_centrifugo_data(
-                    room=room_id, data=data
-                )
+                    "sender_id": request.data["sender_id"],
+                    "message_id": message_id,
+                    "room_id": room_id,
+                    "message": request.data["message"],
+                    "event": "edited_message",
+                }
+                centrifugo_data = send_centrifugo_data(room=room_id, data=data)
                 if centrifugo_data.get("error", None) == None:
                     return Response(data=data, status=status.HTTP_201_CREATED)
                 return Response(data)
@@ -190,7 +187,6 @@ def edit_message(request, message_id, room_id):
 @swagger_auto_schema(
     methods=["delete"],
     operation_summary="Deletes messages from rooms",
-    request_body=DeleteMessageSerializer,
     responses={400: "Error: Bad Request"},
 )
 @api_view(["DELETE"])
@@ -200,24 +196,33 @@ def delete_message(request, message_id, room_id):
     This function deletes message in rooms using message
     organization id (org_id), room id (room_id) and the message id (message_id).
     """
-    message_id = request.GET.get("message_id")
-    room_id = request.GET.get("room_id")
+
     if request.method == "DELETE":
         try:
             message = DB.read("dm_messages", {"_id": message_id})
             room = DB.read("dm_rooms", {"_id": room_id})
 
             if room and message:
-                response = DB.delete("dm_messages", {"_id": message_id})
-                centrifugo_data = centrifugo_client.publish(
-                    message=message_id, data=response
-                )
-                if centrifugo_data and centrifugo_data.status_code == 200:
-                    return Response(response, status=status.HTTP_200_OK)
+                response = DB.delete("dm_messages", message_id)
+                if response.get("status") == 200:
+                    response_output = {
+                        "status": response["message"],
+                        "event": "message_delete",
+                        "room_id": room_id,
+                        "message_id": message_id,
+                    }
+                    centrifugo_data = centrifugo_client.publish(
+                        room=room_id, data=response
+                    )
+                    if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                        return Response(response_output, status=status.HTTP_200_OK)
+                    return Response(
+                        data="message not sent",
+                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                    )
             return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-        except exception_handler as e:
+        except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @swagger_auto_schema(
@@ -267,7 +272,6 @@ def scheduled_messages(request, room_id):
     return Response(response.json(), status=response.status_code)
 
 
-
 @swagger_auto_schema(
     methods=["put"],
     operation_summary="Marks a message as read or unread",
@@ -298,7 +302,6 @@ def mark_read(request, message_id):
     if response.get("status") == 200:
         return Response(data=data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @swagger_auto_schema(
@@ -334,7 +337,11 @@ def pinned_message(request, message_id):
         return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     if message_id in pin:
         pin.remove(message_id)
-        data = {"message_id": message_id, "pinned": pin, "Event": "unpin_message"} # this event key is in capslock
+        data = {
+            "message_id": message_id,
+            "pinned": pin,
+            "Event": "unpin_message",
+        }  # this event key is in capslock
         response = DB.update("dm_rooms", room_id, {"pinned": pin})
         # room = DB.read("dm_rooms", {"id": room_id})
         if response["status"] == 200:

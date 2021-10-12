@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>search endpoint</title>
+    <style>
+      h1,
+      h4 {
+        text-align: center;
+      }
+    
+      .message_container {
+        width: 90%;
+        margin: 2rem auto;
+      }
+      .message_list {
+        width: 100%;
+        margin: 0 auto 1rem;
+        padding: 0.5rem;
+        border-radius: 1rem;
+      }
+      .message_list:nth-child(even) {
+        background-color:  grey;
+      }
+      form {
+        width: 90%;
+        /* margin: 1rem auto; */
+        display: flex;
+        justify-content: center;
+      }
+      .form__control {
+        width: 80%;
+        padding: 0.5rem;
+        border-radius:  0.5rem 0 0  0.5rem;
+        border-right: none;
+      }
+      .btn {
+        border-left: none;
+        padding: 0.5rem;
+        border-radius: 0 0.5rem 0.5rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test page for Query DM endpoint</h1>
+    <form>
+      <input type="text" class="form__control" placeholder=" Search for messages" />
+      <button class="btn"> search </button>
+    </form>
+    <div class="message_container">
+      <h4>This show  messages pertaining to the search in DM plugin</h4>
+      <div class="message_list_container">
+
+      </div>
+    </div>
+  </body>
+  <script type="text/javascript">
+    // DOM
+    const searchTerm = document.querySelector('.form__control');
+    const btn = document.querySelector('.btn');
+    const body = document.querySelector('.message_list_container');
+    const child = document.querySelector('.message_list');
+
+    // Network request to list all the goals
+    fetch(`/api/v1/org/614679ee1a5607b13c00bcb7/members/6145ea22285e4a18402074b3/search?keyword`)
+      .then((res) => res.json())
+      .then((data) => {
+          body.removeChild(body.lastChild);
+          const results = data.results;
+        //   // Rendering the newly searchd goals
+          results.forEach((result) => {
+            const html = `
+            <div class='message_list'>
+                <p><b>message id: </b>${result._id}</p>
+                <p><b>message: </b>${result.message}</p>
+                <p><b>user: </b>${result.sender_id}</p>
+            </div>`;
+            body.insertAdjacentHTML('beforeend', html);
+          });
+
+      });
+
+    // Setup a click event handler
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // First remove all the node we have in the dom
+      while (body.firstChild) {
+        body.removeChild(body.lastChild);
+      }
+
+      // Simulate the loading state for fetching of Messages
+      body.insertAdjacentHTML('beforeend', '<h4>loading....</h4>');
+    let search = searchTerm.value.split(" ").join(",")
+      // Network request to search for message
+      let url =`/api/v1/org/614679ee1a5607b13c00bcb7/members/6145ea22285e4a18402074b3/search?keyword=${search}`
+      console.log(url)
+      fetch(url)
+        .then((res) => res.json())
+        .then((data) => {
+        //   // Removing the laoding state form the DOM before rendering the newly fetched Message
+          body.removeChild(body.lastChild);
+          const results = data.results;
+          console.log(results.length)
+          if (results.length > 0 ){
+        //   // Rendering the newly searchd messages
+          results.forEach((result) => {
+            const html = `
+            <div class='message_list'>
+                <p><b>message id: </b>${result._id}</p>
+                <p><b>message: </b>${result.message}</p>
+                <p><b>user: </b>${result.sender_id}</p>
+            
+                </div>`;
+            body.insertAdjacentHTML('beforeend', html);
+          });
+        }
+        else {
+            const html = `
+            <div> No result found </div>
+            `;
+            body.insertAdjacentHTML('beforeend', html);
+        }
+        });
+    });
+  </script>
+</html> 
