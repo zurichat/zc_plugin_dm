@@ -59,7 +59,7 @@ urlpatterns = [
         name="updateroom",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/message",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>",
         messaging.delete_message,
         name="delete_message",
     ),
