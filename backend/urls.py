@@ -15,6 +15,7 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path('test', views.test_search, name='test-search'),
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
@@ -33,6 +34,12 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM",
     ),
+    path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
+        rooms.query_dm,
+        name="Query Dm"
+    ),
+
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>",
         rooms.add_member,
