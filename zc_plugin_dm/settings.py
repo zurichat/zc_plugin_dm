@@ -47,6 +47,8 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTTokenUserAuthentication',
     ],
+
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
 SIMPLE_JWT = {
@@ -86,6 +88,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'zc_plugin_dm.urls'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'database.sqlite'
+    }
+}
 
 TEMPLATES = [
     {
