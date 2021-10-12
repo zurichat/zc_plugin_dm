@@ -405,20 +405,31 @@ def star_room(request, room_id, member_id):
             )
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
+
+@swagger_auto_schema(
+    methods=["put"],
+    operation_summary="Adds a member to a room",
+    responses={
+        200: "Success",
+        404: "Error: Not Found",
+        405: "Method not allowed",
+        406: "Not Acceptable, You can't join a room twice"
+    },
+)
 @api_view(["PUT"])
 @db_init_with_credentials
 def add_member(request, room_id, member_id):
-"""
-This endpoint adds a user to an existing room.
-The query params taken are the organization ID, room ID and the ID of the member to be added
-The HTTPS method is PUT
-First the endpoint queries the DB via the DB.read utility function using the query params inputed
-It first checks if the room exists in the DB using the ID and if not found, returns a 404 status code and a "No Room / Invalid Room" response as json
-If the user is already in the room a 406 status code is returned and a "Not Acceptable, You can't join a room twice" response as json
-If the room is found, the function appends the ID of the member to be added to the room_user_ids list of that given room
-It then uses the DB.update utility function to update that given room document in the database
-It then returns a json response containing a 200 status code, a "success" message and the number of documents modified in the DB
-"""
+    """
+    This endpoint adds a user to an existing room.
+    The query params taken are the organization ID, room ID and the ID of the member to be added
+    The HTTPS method is PUT
+    First the endpoint queries the DB via the DB.read utility function using the query params inputed
+    It first checks if the room exists in the DB using the ID and if not found, returns a 404 status code and a "No Room / Invalid Room" response as json
+    If the user is already in the room a 406 status code is returned and a "Not Acceptable, You can't join a room twice" response as json
+    If the room is found, the function appends the ID of the member to be added to the room_user_ids list of that given room
+    It then uses the DB.update utility function to update that given room document in the database
+    It then returns a json response containing a 200 status code, a "success" message and the number of documents modified in the DB
+    """
     if request.method == "PUT":
         room = DB.read("dm_rooms", {"_id":room_id})
         if room or room is not None :
