@@ -335,3 +335,8 @@ def send_reply(request, room_id, message_id):
             )
         return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def test_search(request):
+
+    return render(request, 'test.html')
