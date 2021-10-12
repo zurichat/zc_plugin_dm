@@ -97,6 +97,7 @@ def side_bar(request):
                                 else:
                                     room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                                 rooms.append(room_profile)
+                    room_profile["room_id"] = room["_id"]
                     room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
     side_bar = {
         "name": "DM Plugin",
@@ -105,6 +106,7 @@ def side_bar(request):
         "organisation_id": f"{org_id}",
         "user_id": f"{user}",
         "group_name": "DM",
+        "category":"direct messages",
         "show_group": False,
         "button_url":f"/dm/{org_id}/{user}/all-dms",
         "public_rooms": [],
