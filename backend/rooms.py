@@ -15,6 +15,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
+# from django.http.response import JsonResponse
 
 
 @swagger_auto_schema(
@@ -74,13 +75,14 @@ def create_room(request, member_id):
             response = DB.write("dm_rooms", data=fields)
             # ===============================
 
-        data = response.get("data").get("object_id")
+        data_ID = response.get("data").get("object_id")
         if response.get("status") == 200:
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
                     "data": {
                         "group_name": "DM",
+                        "ID": f"{data_ID}",
                         "name": "DM Plugin",
                         "show_group": False,
                         "button_url": "/dm",
@@ -299,51 +301,50 @@ def search_DM(request, member_id):
         return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
 
+@db_init_with_credentials
 def group_room(request, member_id):
-	serializer = RoomSerializer(data=request.data)
-	if serializer.is_valid():
-		user_ids = serializer.data["room_member_ids"]
-		
-		if len(user_ids) > 9:
-			response = {
-				"get_group_data": True,
-				"status_code": 400,
-				"room_id": "Group cannot have over 9 total users"
-			}
-			return response
-		else:
-			all_rooms = DB.read("dm_rooms")
-			group_rooms = []
-			for room_obj in all_rooms:
-				try:
-					room_members = room_obj['room_user_ids']
-					if len(room_members) > 2 and set(room_members) == set(user_ids):
-						group_rooms.append(room_obj['_id'])
-						response = {
-							"get_group_data": True,
-							"status_code": 200,
-							"room_id": room_obj["_id"]
-						}
-						return response
-				except KeyError:
-					pass
-					# print("Object has no key of Serializer")
-			
-			# print("group rooms =", group_rooms)
-					
-			fields = {
-				"org_id": serializer.data["org_id"],
-				"room_user_ids": serializer.data["room_member_ids"],
-				"room_name": serializer.data["room_name"],
-				"private": serializer.data["private"],
-				"created_at": serializer.data["created_at"],
-				"bookmark": [],
-				"pinned": [],
-				"starred": [ ]
-			}
-			response = DB.write("dm_rooms", data=fields)
-			
-		return response
+    serializer = RoomSerializer(data=request.data)
+    if serializer.is_valid():
+        user_ids = serializer.data["room_member_ids"]
+
+        if len(user_ids) > 9:
+            response = {
+                "get_group_data": True,
+                "status_code": 400,
+                "room_id": "Group cannot have over 9 total users"
+            }
+            return response
+        else:
+            all_rooms = DB.read("dm_rooms")
+            if all_rooms:
+                for room_obj in all_rooms:
+                    try:
+                        room_members = room_obj['room_user_ids']
+                        if len(room_members) > 2 and set(room_members) == set(user_ids):
+                            response = {
+                                "get_group_data": True,
+                                "status_code": 200,
+                                "room_id": room_obj["_id"]
+                            }
+                            return response
+                    except KeyError:
+                        pass
+                # print("Object has no key of Serializer")
+
+            fields = {
+                "org_id": serializer.data["org_id"],
+                "room_user_ids": serializer.data["room_member_ids"],
+                "room_name": serializer.data["room_name"],
+                "private": serializer.data["private"],
+                "created_at": serializer.data["created_at"],
+                "bookmark": [],
+                "pinned": [],
+                "starred": []
+            }
+            response = DB.write("dm_rooms", data=fields)
+
+        return response
+
 
 @api_view(["PUT","GET"])
 @db_init_with_credentials
@@ -439,6 +440,7 @@ def add_member(request, room_id, member_id):
 def close_conversation(request, room_id, member_id):
     """
     Closes a dm conversation
+    params: room_id, member_id
     """
     if request.method == "PUT":
         room = DB.read("dm_rooms", {"_id":room_id})
@@ -454,4 +456,5 @@ def close_conversation(request, room_id, member_id):
             return Response("You are not authorized", status=status.HTTP_401_UNAUTHORIZED)
         return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
     return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
