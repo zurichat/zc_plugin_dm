@@ -171,7 +171,6 @@ def create_reminder(request):
     serializer = ReminderSerializer(data=request.data)
     if serializer.is_valid():
         serialized_data = serializer.data
-        print(serialized_data)
         message_id = serialized_data['message_id']
         current_date = serialized_data['current_date']
         scheduled_date = serialized_data['scheduled_date']

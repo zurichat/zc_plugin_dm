@@ -76,14 +76,14 @@ def create_room(request, member_id):
             response = DB.write("dm_rooms", data=fields)
             # ===============================
 
-        data_ID = response.get("data").get("object_id")
+        room_id = response.get("data").get("object_id")
         if response.get("status") == 200:
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
                     "data": {
                         "group_name": "DM",
-                        "ID": f"{data_ID}",
+                        "room_id": f"{room_id}",
                         "name": "DM Plugin",
                         "category": "direct messages",
                         "show_group": False,
