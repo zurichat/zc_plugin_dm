@@ -1,5 +1,3 @@
-from datetime import date
-# from plugin.backend.db import DB, get_room_messages, get_messages
 from typing import Dict, List
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -537,6 +535,8 @@ def query_dm(request, member_id):
         return paginator.get_paginated_response(result_page)   
     except:
         return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
+
+
 
 
 @api_view(["GET"])
