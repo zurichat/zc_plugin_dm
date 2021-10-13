@@ -452,10 +452,8 @@ def group_member_add(request, room_id):
                 # print("ROOM MEMBERS", room_members)
                 room_creator = room_members[0]
                 # print("ROOM CREATOR", room_creator)
-
-                # =====================================================
-                # =====================================================
-
+                
+                
                 # url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
                 # payload = json.dumps({
                 # "org_id": f"{ORG_ID}",
@@ -466,8 +464,11 @@ def group_member_add(request, room_id):
                 # headers = {"Content-Type": "application/json"}
 
                 # response = requests.request("POST", url, headers=headers, data=payload)
+                
+                
+                # =====================================================
+                # =====================================================
 
-                # user_ids = serializer.data["room_member_ids"]
                 user_rooms = get_rooms(room_members[0], DB.organization_id)
                 if user_rooms and isinstance(user_rooms, list):
                     for room in user_rooms:
@@ -484,7 +485,6 @@ def group_member_add(request, room_id):
 
                 fields = {
                     "org_id": f"{ORG_ID}",
-                    # "room_user_ids": serializer.data["room_member_ids"],
                     "room_user_ids": room_members,
                     "room_name": serializer.data["room_name"],
                     "private": serializer.data["private"],
@@ -531,11 +531,6 @@ def group_member_add(request, room_id):
                             status=status.HTTP_424_FAILED_DEPENDENCY,
                         )
                 return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
-            # return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
 
 
                 # =====================================================
@@ -758,15 +753,4 @@ def all_dms(request, member_id):
 
         else:
             return Response("No user rooms", status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-# @db_init_with_credentials
-# def ddd(request, abc):
-	# documentID = abc
-	# r = DB.delete("dm_rooms", documentID)
-	# return JsonResponse(r, safe=False)
-
 
