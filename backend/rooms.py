@@ -1,5 +1,4 @@
-from datetime import date
-# from plugin.backend.db import DB, get_room_messages, get_messages
+import requests
 from typing import Dict, List
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -47,11 +46,9 @@ def create_room(request, member_id):
         if len(user_ids) > 2:
             # print("            --------MUKHTAR-------              \n\r")
             response = group_room(request, member_id)
-            if response.get("get_group_data"):
-                return Response(
-                    data=response["room_id"], status=response["status_code"]
-                )
-
+            if response.get('get_group_data'):
+                return Response(data={"room_id" : response['room_id']}, status=response['status_code'])
+        
         else:
             # print("            --------FAE-------              \n\r")
             user_ids = serializer.data["room_member_ids"]
@@ -89,7 +86,6 @@ def create_room(request, member_id):
                     "plugin_id": "dm.zuri.chat",
                     "data": {
                         "group_name": "DM",
-                        "ID": f"{data_ID}",
                         "name": "DM Plugin",
                         "category": "direct messages",
                         "show_group": False,
@@ -308,7 +304,7 @@ def group_room(request, member_id):
             return response
         else:
             all_rooms = DB.read("dm_rooms")
-            if all_rooms:
+            if all_rooms and isinstance(all_rooms, list):
                 for room_obj in all_rooms:
                     try:
                         room_members = room_obj['room_user_ids']
@@ -382,41 +378,63 @@ def star_room(request, room_id, member_id):
 
 
 @swagger_auto_schema(
-    methods=["put"],
+    methods=["post"],
     operation_summary="Adds a member to a room",
     responses={
-        200: "Success",
-        404: "Error: Not Found",
-        405: "Method not allowed",
-        406: "Not Acceptable, You can't join a room twice"
+        201: "Created",
+        406: "Not Acceptable, You can only add users to a group dm",
+        400: "Bad Request",
+        424: "Failed Dependency",
     },
 )
-@api_view(["PUT"])
+@api_view(["POST"])
 @db_init_with_credentials
-def add_member(request, room_id, member_id):
+def group_member_add(request, room_id):
     """
-    This endpoint adds a user to an existing room.
-    The query params taken are the organization ID, room ID and the ID of the member to be added
-    The HTTPS method is PUT
-    First the endpoint queries the DB via the DB.read utility function using the query params inputed
-    It first checks if the room exists in the DB using the ID and if not found, returns a 404 status code and a "No Room / Invalid Room" response as json
-    If the user is already in the room a 406 status code is returned and a "Not Acceptable, You can't join a room twice" response as json
-    If the room is found, the function appends the ID of the member to be added to the room_user_ids list of that given room
-    It then uses the DB.update utility function to update that given room document in the database
-    It then returns a json response containing a 200 status code, a "success" message and the number of documents modified in the DB
+    Adds a user to a group dm
+    returns 201 response if succesful or the appropriate response otherwise
+
+    :params: org id and room_id
+    :payload: room_id and member_id
     """
-    if request.method == "PUT":
-        room = DB.read("dm_rooms", {"_id":room_id})
-        if room or room is not None :
-            room_users=room['room_user_ids']
-            if member_id not in room_users:  
-                room_users.append(member_id)
-                data = {'room_user_ids':room_users}
-                response = DB.update("dm_rooms", room_id, data=data)
-                return Response(response, status=status.HTTP_200_OK)
-            return Response("Not Acceptable, You can't join a room twice", status=status.HTTP_406_NOT_ACCEPTABLE)
-        return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
-    return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    ORG_ID = DB.organization_id
+    serializer = AddMemberSerializer(data=request.data)
+    if serializer.is_valid():
+
+        member_id = serializer.data['member_id']
+        room_id = serializer.data['room_id']
+
+        room = DB.read('dm_rooms', {"_id": room_id})
+        if room and isinstance(room, dict):
+            room_members = room['room_user_ids']
+            # print("ROOM MEMBERS", room_members)
+
+            if len(room_members) > 2:
+                if member_id not in room_members:
+                    room_members.append(member_id)
+                # print("ROOM MEMBERS", room_members)
+                room_creator = room_members[0]
+                # print("ROOM CREATOR", room_creator)
+
+                url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
+                payload = json.dumps({
+                    "org_id": f"{ORG_ID}",
+                    "private": True,
+                    "room_member_ids": room_members,
+                    "room_name": "Sarah"
+                })
+                headers = {"Content-Type": "application/json"}
+                
+                response = requests.request("POST", url, headers=headers, data=payload)
+                return Response(response.json(), status=response.status_code)
+            else:
+                err_response = {"error": "Room is not a group room, Can only add users to group dm"}
+                return Response(err_response, status=status.HTTP_406_NOT_ACCEPTABLE)
+        else:
+            return Response({"error": "Unable to read DB"}, status=status.HTTP_424_FAILED_DEPENDENCY)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @swagger_auto_schema(
     methods=["put"],
