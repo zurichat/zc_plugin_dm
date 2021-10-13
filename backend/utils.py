@@ -3,8 +3,10 @@ import requests
 from datetime import datetime
 from datetime import timezone
 from threading import Thread
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, OrderedDict
 from requests.exceptions import RequestException
+from rest_framework import pagination
+from rest_framework.response import Response
 
 CENTRIFUGO_HOST = "https://realtime.zuri.chat/api"
 CENTRIFUGO_API_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
@@ -23,11 +25,11 @@ def send_centrifugo_data(room, data):
     except Exception as e:
         print(e)
 
- 
+
 class SendNotificationThread(Thread):
     # def __init__(self, duration, room_id, response_output,scheduled_date):
     def __init__(self, duration, duration_sec, utc_scheduled_date, utc_current_date):
-    
+
         self.duration = duration
         self.duration_sec = duration_sec
         self.utc_scheduled_date = utc_scheduled_date
@@ -39,14 +41,15 @@ class SendNotificationThread(Thread):
             print(self.utc_scheduled_date)
             time.sleep(self.duration_sec)
             current_date = self.utc_current_date + self.duration
-            #notification sent to user
+            # notification sent to user
             # centrifugo_data = send_centrifugo_data(room=room_id, data=response_output)  # publish data to centrifugo
             if self.utc_scheduled_date == current_date:
-                print('notification sent')
+                print("notification sent")
                 break
-        
+
         # for conn in connections:
         #     conn.close()
+
 
 # create new thread to call api
 
@@ -56,12 +59,24 @@ class SendNotificationThread(Thread):
 # argument to enable multi threading.
 
 
-
 # CENTRIFUGO settings
 
 # CENTRIFUGO_HOST = "http://localhost:8000/api"
 # CENTRIFUGO_API_TOKEN = "my_api_key"
 
+class SearchPagination(pagination.PageNumberPagination):
+
+    def get_paginated_response(self, data):
+        return Response(OrderedDict([
+            ('plugin', "DM"),
+            ('status', "Success"),
+            ('count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),    
+            ('results', data),            
+        ]))
+        
+        
 class CentrifugoHandler:
     """A helper class to handle communication with the Centrifugo server."""
 
@@ -76,7 +91,6 @@ class CentrifugoHandler:
             "Content-type": "application/json",
             "Authorization": "apikey " + self.api_key,
         }
-        
 
     def _send_command(self, command: Dict[int, Any]) -> Dict[int, Any]:
         """Connects to the Centrifugo server and sends command to execute via Centrifugo Server API.
