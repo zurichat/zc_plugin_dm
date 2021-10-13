@@ -31,7 +31,7 @@ urlpatterns = [
         name="get_user_rooms"
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
         rooms.search_DM,
         name="search DM"
     ),
