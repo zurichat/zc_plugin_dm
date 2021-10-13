@@ -37,6 +37,7 @@ class DataStorage:
         self.upload_api = "https://api.zuri.chat/upload/file/{pgn_id}"
         self.upload_multiple_api = "https://api.zuri.chat/upload/files/{pgn_id}"
         self.delete_file_api = "https://api.zuri.chat/delete/file/{pgn_id}"
+        self.read_query_api = "https://api.zuri.chat/data/read"
 
         if request is None:
             self.plugin_id = PLUGIN_ID
@@ -96,6 +97,32 @@ class DataStorage:
 
         try:
             response = requests.get(url=url)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json().get("data")
+        else:
+            return {"status_code": response.status_code, "message": response.reason}
+
+    def read_query(
+        self,
+        collection_name: str,
+        resource_id: str = None,
+        query: dict = {},
+        options: dict = {},
+    ):
+        request_body = {
+            "collection_name": collection_name,
+            "filter": query,
+            "object_id": resource_id,
+            "organization_id": self.organization_id,
+            "plugin_id": self.plugin_id,
+            "options": options,
+        }
+
+        try:
+            response = requests.post(url=self.read_query_api, json=request_body)
         except requests.exceptions.RequestException as e:
             print(e)
             return None
@@ -248,6 +275,20 @@ def get_user_profile(org_id=None, user_id=None):
     return profile.json()
 
 
+def get_all_organization_members(org_id: str):
+    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
+    if response.status_code == 200:
+        return response.json()['data']
+    return None
+
+
+def get_member(members:list, member_id:str):
+    for member in members:
+        if member['_id'] == member_id:
+            return member
+    return None
+            
+    
 def sidebar_emitter(
     org_id, member_id, group_room_name=None
 ):  # group_room_name = None or a String of Names
