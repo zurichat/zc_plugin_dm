@@ -50,18 +50,19 @@ def create_room(request, member_id):
             # print("            --------FAE-------              \n\r")        
             user_ids = serializer.data["room_member_ids"]
             user_rooms = get_rooms(user_ids[0], DB.organization_id)
-            if "status_code" in user_rooms or user_rooms == None:
-                pass
-            else:
-                if user_rooms is list:
-                    for room in user_rooms:
-                        room_users = room["room_user_ids"]
-                        if set(room_users) == set(user_ids):
-                            response_output = {
-                                                    "room_id": room["_id"]
-                                                }
-                            return Response(data=response_output, status=status.HTTP_200_OK)
-                
+            if isinstance(user_rooms, list):
+                for room in user_rooms:
+                    room_users = room["room_user_ids"]
+                    if set(room_users) == set(user_ids):
+                        response_output = {
+                                                "room_id": room["_id"]
+                                            }
+                        return Response(data=response_output, status=status.HTTP_200_OK)
+
+            elif user_rooms.get("status_code") != 404:
+                if user_rooms is None or user_rooms.get("status_code") != 200:
+                    return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+        
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
                       "room_name": serializer.data["room_name"],
@@ -84,6 +85,7 @@ def create_room(request, member_id):
                         "group_name": "DM",
                         "ID": f"{data_ID}",
                         "name": "DM Plugin",
+                        "category": "direct messages",
                         "show_group": False,
                         "button_url": "/dm",
                         "public_rooms": [],
@@ -128,7 +130,6 @@ def user_rooms(request, user_id):
     if there is no room for the user_id it returns a 204 status response.
     """
     if request.method == "GET":
-        print(DB.organization_id)
         res = get_rooms(user_id, DB.organization_id)
         if res == None:
             return Response(
@@ -329,7 +330,6 @@ def group_room(request, member_id):
                             return response
                     except KeyError:
                         pass
-                # print("Object has no key of Serializer")
 
             fields = {
                 "org_id": serializer.data["org_id"],
@@ -363,7 +363,6 @@ def star_room(request, room_id, member_id):
                     data.append(member_id)
 
                 response = DB.update("dm_rooms", room_id,{"starred":data})
-                print(response)
                 if response and response.get("status_code",None) == None:
                     return Response(
                         "Success", status=status.HTTP_200_OK
@@ -467,9 +466,7 @@ def close_conversation(request, room_id, member_id):
             room_users=room['room_user_ids']
             if member_id in room_users:
                 room_users.remove(member_id)
-                # print(room_users)
                 data = {'room_user_ids':room_users}
-                # print(data)
                 response = DB.update("dm_rooms", room_id, data=data)
                 return Response(response, status=status.HTTP_200_OK)
             return Response("You are not authorized", status=status.HTTP_401_UNAUTHORIZED)
@@ -488,7 +485,6 @@ def close_conversation(request, room_id, member_id):
 @db_init_with_credentials
 def query_dm(request, member_id):
     keyword = request.query_params.get('keyword',"")
-    print(keyword)
     users = request.query_params.getlist('id',[])
     limit = request.query_params.get('limit',20)
 
