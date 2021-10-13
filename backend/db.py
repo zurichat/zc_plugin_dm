@@ -165,7 +165,8 @@ class DataStorage:
 
 
 DB = DataStorage()
-
+# seye = DB.read("dm_rooms", filter={'_id': "615d9d52c31065b1bd7975c4"})
+# print(seye)
 
 # get rooms for a particular user
 def get_rooms(user_id, org_id):
