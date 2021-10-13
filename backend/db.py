@@ -298,6 +298,7 @@ def sidebar_emitter(
         for room in user_rooms:
             if org_id == room["org_id"]:
                 room_profile = {}
+                room_profile["room_id"] = room["_id"]
                 room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
                 for user_id in room["room_user_ids"]:
                     if user_id != member_id:
