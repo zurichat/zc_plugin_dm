@@ -51,6 +51,11 @@ urlpatterns = [
         rooms.star_room,
         name="star_room",
     ),
+     path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/all_dms",
+        rooms.all_dms,
+        name="all_dms",
+    ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
         messaging.message_create_get,
