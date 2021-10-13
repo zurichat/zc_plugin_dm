@@ -136,7 +136,6 @@ class DataStorage:
 
     def upload_more(self, files, token):
         url = self.upload_multiple_api.format(pgn_id=self.plugin_id)
-        print(files)  # Just testing shii
         try:
             response = requests.post(
                 url=url, files=files, headers={"Authorization": f"{token}"}
@@ -185,7 +184,7 @@ def get_rooms(user_id, org_id):
     data = []
     if response != None:
         if "status_code" in response:
-            return None
+            return response
         for room in response:
             if "room_user_ids" in room:
                 try:
@@ -252,22 +251,19 @@ def sidebar_emitter(
 ):  # group_room_name = None or a String of Names
     user_rooms = get_rooms(user_id=member_id, org_id=org_id)
     rooms = []
-    if user_rooms == None:
-        pass
-    else:
+    if user_rooms != None:
         for room in user_rooms:
             if org_id == room["org_id"]:
                 room_profile = {}
+                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
                 for user_id in room["room_user_ids"]:
                     if user_id != member_id:
                         profile = get_user_profile(org_id, user_id)
                         if profile["status"] == 200:
-                            if (
-                                group_room_name and len(group_room_name.split(",")) > 2
-                            ):  # if group_room_name != None && Len of List after split > 2
-                                room_profile[
-                                    "room_name"
-                                ] = group_room_name  # overwrite room_name in profile to = String of Names
+                             # if group_room_name != None && Len of List after split > 2
+                            if group_room_name and len(group_room_name.split(",")) > 2:
+                                # overwrite room_name in profile to = String of Names
+                                room_profile["room_name"] = group_room_name 
                             else:
                                 room_profile["room_name"] = profile["data"]["user_name"]
                             if profile["data"]["image_url"]:
@@ -278,7 +274,5 @@ def sidebar_emitter(
                                 room_profile[
                                     "room_image"
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            print(room_profile)
-                            rooms.append(room_profile)
-                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
+                rooms.append(room_profile)   
     return rooms
