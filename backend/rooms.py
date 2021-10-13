@@ -18,6 +18,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
+from .utils import SearchPagination
 # from django.http.response import JsonResponse
 
 
@@ -468,7 +469,7 @@ def search_DM(request, member_id):
     except ValueError:
         limit = 20
 
-    paginator = PageNumberPagination()
+    paginator = SearchPagination()
     paginator.page_size = limit
 
     try:
@@ -500,8 +501,10 @@ def search_DM(request, member_id):
             messages = DB.read_query("dm_messages", query = messages_query)
             if messages:
                 members = get_all_organization_members(org_id)
+                members_found = {}
                 for message in messages:
-                    member = get_member(members,message.get('sender_id')) #get profile
+                    if message['sender_id'] not in members_found:
+                        members_found[message['sender_id']] = get_member(members,message.get('sender_id')) #get profile
                     
                     if 'read' in message.keys(): del message['read']
                     if 'pinned' in message.keys():del message['pinned']
@@ -510,9 +513,9 @@ def search_DM(request, member_id):
                     if 'thread' not in message.keys(): message['thread'] = False 
                     if 'notes' in  message.keys(): del message['notes']
                     message['url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
-                    message['email'] =  member['email'] if member else None
-                    message['title'] = member['user_name'] if member else None
-                    message['image_url'] = member['image_url'] if member else None
+                    message['email'] =  members_found[message['sender_id']]['email'] if members_found[message['sender_id']] else None
+                    message['title'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['image_url'] = members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None
                     message['description'] = message['message']
                     
                 result = paginator.paginate_queryset(messages, request)
