@@ -31,7 +31,7 @@ urlpatterns = [
         name="get_user_rooms"
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
+        "api/v1/search/<str:org_id>/<str:member_id>",
         rooms.search_DM,
         name="search DM"
     ),
@@ -201,11 +201,6 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/members/<str:member_id>/profile",
         members.user_profile,
         name="user_profile",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
-        rooms.query_dm,
-        name="Query Dm"
     ),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), 
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
