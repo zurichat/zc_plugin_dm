@@ -31,19 +31,17 @@
     3. Global variable
 
     More information about shared dependencies can be found at https://single-spa.js.org/docs/recommended-setup#sharing-with-import-maps.
-    "@zuri/zuri-plugin-dm": "https://dm.zuri.chat/static/zuri-zuri-plugin-dm.js",
   -->
-
     <script type="systemjs-importmap">
       {
         "imports": {
           "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
-          "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
-          "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
-          "@zuri/control": "https://zuri.chat/zuri-control.js",
-          "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
-          "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
-          "@zuri/plugin-header": "https://zuri.chat/zuri-plugin-header.js"
+        "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
+        "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
+		    "@zuri/control": "https://zuri.chat/zuri-control.js",
+        "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
+        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
+        "@zuri/plugin-header": "https://zuri.chat/zuri-plugin-header.js"
         }
       }
     </script>
@@ -63,7 +61,7 @@
           "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.9.0/lib/system/single-spa.min.js",
           "@zuri/zuri-plugin-dm": "//localhost:8080/zuri-zuri-plugin-dm.js",
           "@zuri/root-config": "//localhost:9000/zuri-root-config.js",
-          "@zuri/control": "https://zuri.chat/zuri-control.js",
+		      "@zuri/control": "https://zuri.chat/zuri-control.js",
           "react": "https://cdn.jsdelivr.net/npm/react@16.13.1/umd/react.production.min.js",
           "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@16.13.1/umd/react-dom.production.min.js",
           "@zuri/plugin-header": "https://zuri.chat/zuri-plugin-header.js"
@@ -89,10 +87,12 @@
   </head>
 
   <body>
-    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
     <main></main>
     <script>
-      System.import('@zuri/root-config');
+      System.import("@zuri/root-config");
     </script>
     <import-map-overrides-full
       show-when-local-storage="devtools"

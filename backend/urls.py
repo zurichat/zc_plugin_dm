@@ -7,7 +7,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 
 urlpatterns = [
@@ -33,14 +36,14 @@ urlpatterns = [
         name="get_user_rooms",
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        "api/v1/search/<str:org_id>/<str:member_id>",
         rooms.search_DM,
         name="search DM",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>",
-        rooms.add_member,
-        name="add-user",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/member",
+        rooms.group_member_add,
+        name="group_user_add",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation",
