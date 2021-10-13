@@ -37,9 +37,9 @@ urlpatterns = [
     ),
 
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>", 
-        rooms.add_member, 
-        name="add-user"
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/member", 
+        rooms.group_member_add, 
+        name="group_user_add"
         ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
