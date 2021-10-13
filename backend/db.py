@@ -3,6 +3,8 @@ from urllib.parse import urlencode
 from django.http import response
 import requests, json
 
+from requests import exceptions
+
 
 def login_user():
     data = {"email": "sam@gmail.com", "password": "Owhondah"}
@@ -276,3 +278,21 @@ def sidebar_emitter(
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                 rooms.append(room_profile)   
     return rooms
+
+# gets starred rooms
+def get_starred_rooms(member_id, org_id):
+    """ goes through database and returns starred rooms """
+    response = get_rooms(member_id, org_id)
+    if response:
+        data = []
+        for room in response:
+            try:
+                star = room["starred"]
+                if member_id in star:
+                    data.append(room)
+            except Exception:
+                pass
+        return data
+    else: 
+        if response == [] or isinstance(response, dict):
+            return []
