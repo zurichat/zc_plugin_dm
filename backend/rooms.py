@@ -353,9 +353,46 @@ def star_room(request, room_id, member_id):
 
                 response = DB.update("dm_rooms", room_id,{"starred":data})
                 if response and response.get("status_code",None) == None:
-                    return Response(
-                        "Success", status=status.HTTP_200_OK
+
+                    response_output = {
+                            "event": "sidebar_update",
+                            "plugin_id": "dm.zuri.chat",
+                            "data": {
+                                "name": "DM Plugin",
+                                "description": "Updating starred status of a room",
+                                "group_name": "DM",
+                                "category": "direct messages",
+                                "show_group": False,
+                                "button_url": "/dm/614679ee1a5607b13c00bcb7/614e36e1f31a74e068e4d491/all-dms",
+                                "public_rooms": [],
+                                "joined_rooms": sidebar_emitter(org_id=DB.organization_id, member_id=member_id), #group_room_name=serializer.data["room_name"]),  # added extra param
+                                "starred_rooms": get_starred_rooms(member_id, DB.organization_id),
+                            }
+                    }
+
+
+                    
+                    try:
+                        centrifugo_data = centrifugo_client.publish (
+                            room=f"{DB.organization_id}_{member_id}_sidebar", data=response_output )  # publish data to centrifugo
+                        if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
+                            return Response ( data=response_output, status=status.HTTP_201_CREATED )
+                        else:
+                            return Response(
+                                data="starred status updated centrifugo unavailable",
+                                status=status.HTTP_424_FAILED_DEPENDENCY,
+                            )
+                    except:
+                        return Response(
+                            data="centrifugo server not available",
+                            status=status.HTTP_424_FAILED_DEPENDENCY,
                         )
+
+
+
+                    # return Response(
+                    #     "Success", status=status.HTTP_200_OK
+                    #     )
                 return Response(
                     data="Room not updated", status=status.HTTP_424_FAILED_DEPENDENCY
                 )
