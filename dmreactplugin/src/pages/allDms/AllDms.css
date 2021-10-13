@@ -1,150 +1,201 @@
-.alldms{
-    background: #F9F9F9;
-    min-height: 100vh;
+.alldms {
+  background: #f9f9f9;
+  min-height: 100vh;
 }
-.alldms-header{
-    height: 42px;
-    background: #00B87C;
-    color: #fff;
-    padding: 0 16px;
-}
-
-.alldms-header-text h5{
-    margin: 0;
-    padding: 0;
+.alldms-header {
+  height: 42px;
+  background: #00b87c;
+  color: #fff;
+  padding: 0 16px;
 }
 
-.alldms-header-text p{
-    font-size: 18px;
-    font-weight: 700;
-    margin: 0;
-    padding-left: 13px;
+.alldms-header-text h5 {
+  margin: 0;
+  padding: 0;
 }
 
-.alldms-searchusers{
-    min-height: 56px;
-    padding: 10px 16px;
-    background: #FFF;
-    display: flex;
-    align-items: center;
+.alldms-header-text p {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+  padding-left: 13px;
 }
 
-.alldms-searchusers p{
-    margin: 0 10px 0 0;
-    font-size: 13px;
+.alldms-searchusers {
+  min-height: 56px;
+  padding: 10px 16px;
+  background: #fff;
+  display: flex;
+  align-items: center;
 }
 
-.alldms-searchusers-content{
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    width: 100%;
+.alldms-searchusers p {
+  margin: 0 10px 0 0;
+  font-size: 13px;
 }
 
-.alldms-seleteduserstag{
-    display: flex;
-    align-items: center;
-    border-radius: 3px;
-    padding-right: 3px;
-    margin-right: 8px;
-    margin-bottom: 5px;
-    background: #E1FDF4;
+.alldms-searchusers-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
 }
 
-.alldms-seleteduserstag .user-picture{
-    height: 30px;
-    width: 30px;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+.alldms-seleteduserstag {
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  padding-right: 3px;
+  margin-right: 8px;
+  margin-bottom: 5px;
+  background: #e1fdf4;
 }
 
-.alldms-seleteduserstag p{
-    margin: 0 8px;
-    font-weight: 500;
+.alldms-seleteduserstag .user-picture {
+  height: 30px;
+  width: 30px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
-.alldms-seleteduserstag .remove-selecteduser-btn{
-    cursor: pointer;
-    border-radius: 3px;
+.alldms-seleteduserstag p {
+  margin: 0 8px;
+  font-weight: 500;
 }
 
-.alldms-seleteduserstag .remove-selecteduser-btn:hover{
-    background: rgb(172, 241, 219);
+.alldms-seleteduserstag .remove-selecteduser-btn {
+  cursor: pointer;
+  border-radius: 3px;
 }
 
-.alldms-searchusers-content input{
-    width: 19rem;
-    outline: none;
-    border: none;
+.alldms-seleteduserstag .remove-selecteduser-btn:hover {
+  background: rgb(172, 241, 219);
 }
 
-.alldms-searchusers-warning{
-    width: 100%;
-    background: #FDF5EA;
-    border: 1px solid #F4CC9E;
-    border-radius: 5px;
-    padding: 5px 16px;
-    font-size: 14px;
+.alldms-searchusers-content input {
+  width: 19rem;
+  outline: none;
+  border: none;
 }
 
-.alldms-searchedusersmodal-wrapper{
-    position: relative;
-    width: 100%;
+.alldms-searchusers-warning {
+  width: 100%;
+  background: #fdf5ea;
+  border: 1px solid #f4cc9e;
+  border-radius: 5px;
+  padding: 5px 16px;
+  font-size: 14px;
 }
 
-.alldms-searchedusersmodal{
-    position: absolute;
-    left: -25px;
-    right: 0;
-    max-height: 260px;
-    padding: 15px 0;
-    background: #FFF;
-    border-radius: 5px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.14);
-    overflow-y: scroll;
+.alldms-searchedusersmodal-wrapper {
+  position: relative;
+  width: 100%;
 }
 
-.alldms-searchedusersmodal .loading-text{
-    display: flex;
-    align-items: center;
+.alldms-searchedusersmodal {
+  position: absolute;
+  left: -25px;
+  right: 0;
+  max-height: 260px;
+  padding: 15px 0;
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.14);
+  overflow-y: scroll;
 }
 
-.alldms-searchedusersmodal .loading-gif{
-    width: 20px;
-    margin-left: 20px;
-    margin-right: 10px;
-
-}
-.alldms-searchedusersmodal .notFound-text{
-    margin-left: 20px;
+.alldms-searchedusersmodal .loading-text {
+  display: flex;
+  align-items: center;
 }
 
-.alldms-searchedusersmodal .user{
-    display: flex;
-    align-items: center;
-    padding: 5px 20px;
+.alldms-searchedusersmodal .loading-gif {
+  width: 20px;
+  margin-left: 20px;
+  margin-right: 10px;
+}
+.alldms-searchedusersmodal .notFound-text {
+  margin-left: 20px;
 }
 
-.alldms-searchedusersmodal .user:hover{
-    background: #00B87C;
-    color: #FFF;
+.alldms-searchedusersmodal .user {
+  display: flex;
+  align-items: center;
+  padding: 5px 20px;
 }
 
-.alldms-searchedusersmodal .user .user-picture{
-    height: 25px;
-    width: 25px;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border-radius: 3px;
-}   
-
-.alldms-searchedusersmodal .user p{
-    margin: 0 8px;
+.alldms-searchedusersmodal .user:hover {
+  background: #00b87c;
+  color: #fff;
 }
 
-.alldms-searchedusersmodal .user p span{
-    padding: 0;
-    font-weight: 500;
+.alldms-searchedusersmodal .user .user-picture {
+  height: 25px;
+  width: 25px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 3px;
+}
+
+.alldms-searchedusersmodal .user p {
+  margin: 0 8px;
+}
+
+.alldms-searchedusersmodal .user p span {
+  padding: 0;
+  font-weight: 500;
+}
+
+.DM-AllDMs-Message {
+  border: 0.1px solid rgb(230, 230, 230);
+  border-radius: 15px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  background-color: white;
+  cursor: pointer;
+}
+.DM-AllDMs-Message:hover {
+  background-color: rgb(247, 247, 247);
+}
+.DM-AllDMs-MessageDetail-Left {
+  display: flex;
+}
+.DM-AllDMs-MessageDetail-Left img {
+  height: 50px;
+  width: 50px;
+  border-radius: 3px;
+  margin-right: 15px;
+}
+.DM-AllDMs-MessageSender,
+.DM-AllDMs-MessageText {
+  margin: 0px;
+  padding: 0px;
+  font-size: 15px;
+}
+.DM-AllDMs-MessageContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.DM-AllDMs-MessageTime {
+  margin: 0px;
+  font-size: 15px;
+}
+.DM-AllDMs {
+  background-color: rgb(247, 247, 247);
+  padding: 10px;
+}
+.DM-AllDMs-MessageDate {
+  font-size: 13px;
+  font-weight: 600;
+  padding-top: 20px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+}
+.DM-AllDMs-MessageSender {
+  font-weight: bold;
 }
