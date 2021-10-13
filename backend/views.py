@@ -90,11 +90,18 @@ def side_bar(request):
                         if id != user_id:
                             profile = get_user_profile(org_id, id)
                             if profile["status"] == 200:
-                                room_profile["room_name"] = profile["data"]["user_name"]
+                                if room_profile["room_name"]:
+                                    room_profile["room_name"] = profile["data"]["user_name"]
+                                else:
+                                    room_profile["room_name"] = "no user name"
                                 if profile["data"]["image_url"]:
                                     room_profile["room_image"] = profile["data"]["image_url"]
                                 else:
                                     room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            else:
+                                room_profile["room_name"] = "no user name"
+                                room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+
                     rooms.append(room_profile)
                     
     side_bar = {
