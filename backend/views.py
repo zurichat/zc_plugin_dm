@@ -89,8 +89,9 @@ def side_bar(request):
                     for id in room["room_user_ids"]:
                         if id != user_id:
                             profile = get_user_profile(org_id, id)
+                            print(profile)
                             if profile["status"] == 200:
-                                if room_profile["room_name"]:
+                                if profile["data"]["user_name"]:
                                     room_profile["room_name"] = profile["data"]["user_name"]
                                 else:
                                     room_profile["room_name"] = "no user name"
