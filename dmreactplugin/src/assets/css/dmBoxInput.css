@@ -8,15 +8,9 @@
     border: none;
     margin-right: 4px;
 }
-@media screen and (max-width: 560px){
-    .btn-inputfield-box {
-        margin-right: 0px;
-        color:aqua;
-    }
-}
+
 .btn-inputfield-box:hover {
-    /* background-color: var(--clr-hover); */
-    background-color: transparent;
+    background-color: var(--clr-hover);
 }
 
 .send-btn-box.btn-inputfield-box {
@@ -39,6 +33,5 @@
 }
 
 .send-btn-box.btn-inputfield-box:disabled {
-    color: #1D1C1D;    
-    background-color: transparent;
+    color: #fff;
 }

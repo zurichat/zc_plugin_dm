@@ -6,8 +6,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
 
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
-
+from rest_framework_simplejwt.views import ( TokenObtainPairView, TokenRefreshView, )
 
 
 
@@ -51,11 +50,6 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
         rooms.star_room,
         name="star_room",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/all_dms",
-        rooms.all_dms,
-        name="all_dms",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
