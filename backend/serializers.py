@@ -162,4 +162,8 @@ class ScheduleMessageSerializer(serializers.Serializer):
 class AddMemberSerializer(serializers.Serializer):
     member_id = serializers.CharField(max_length=128)
     room_id = serializers.CharField(max_length=128)
+    room_name = serializers.CharField(max_length=128, required=True)
+    private = serializers.BooleanField(default=True, read_only=True)
+    created_at = serializers.DateTimeField(
+        default=timezone.now, read_only=True)
     
