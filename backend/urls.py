@@ -31,15 +31,15 @@ urlpatterns = [
         name="get_user_rooms"
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/messages/search",
+        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
         rooms.search_DM,
         name="search DM"
     ),
 
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>", 
-        rooms.add_member, 
-        name="add-user"
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/member", 
+        rooms.group_member_add, 
+        name="group_user_add"
         ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
@@ -50,6 +50,11 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
         rooms.star_room,
         name="star_room",
+    ),
+     path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/all_dms",
+        rooms.all_dms,
+        name="all_dms",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
