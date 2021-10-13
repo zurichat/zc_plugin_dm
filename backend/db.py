@@ -267,7 +267,10 @@ def sidebar_emitter(
                                 # overwrite room_name in profile to = String of Names
                                 room_profile["room_name"] = group_room_name 
                             else:
-                                room_profile["room_name"] = profile["data"]["user_name"]
+                                if profile["data"]["user_name"]:
+                                    room_profile["room_name"] = profile["data"]["user_name"]
+                                else:
+                                    room_profile["room_name"] = "no user name"
                             if profile["data"]["image_url"]:
                                 room_profile["room_image"] = profile["data"][
                                     "image_url"
@@ -276,6 +279,10 @@ def sidebar_emitter(
                                 room_profile[
                                     "room_image"
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                        else:
+                            room_profile["room_name"] = "no user name"
+                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+
                 rooms.append(room_profile)   
     return rooms
 
