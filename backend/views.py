@@ -9,6 +9,7 @@ from rest_framework.views import (
     APIView,
     exception_handler,
 )
+
 # Import Read Write function to Zuri Core
 from .resmodels import *
 from .serializers import *
@@ -21,6 +22,68 @@ from .decorators import db_init_with_credentials
 def index(request):
     context = {}
     return render(request, "index.html", context)
+
+
+@api_view(["POST"])
+def dm_install(
+    request,
+):
+    org_id = request.data["org_id"]
+    user_id = request.data["user_id"]
+    url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
+    payload = {
+        "user_id": user_id,
+        "plugin_id": "6135f65de2358b02686503a7",
+    }
+    # headers = {
+    #     "Authorization": f"Bearer {login_user()}",
+    #     "Content-Type": "Application/json",
+    # }
+
+    headers = {
+        "Content-Type": "application/json",
+        "Cookie": "f6822af94e29ba112be310d3af45d5c7=MTYzNDE0OTkzNnxHd3dBR0RZeE5qY3hOVFE1T1dZM1lUYzVNR013T0dReU1qSm1NUT09fLxiYT50kNCayZQN_E_MlGlI3lbTETEX07XZYa-tcttk",
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    print(response.json())
+    if response == "200":
+        data = {
+            "message": "successfully installed!",
+            "success": True,
+            "data": {"redirect_url": "/dm"},
+        }
+        return Response(data=data, status=status.HTTP_201_CREATED)
+
+    elif response.json()["status"] == 400:
+        data = {
+            "message": "It has been installed!",
+            "success": False,
+            "data": {"redirect_url": "/dm"},
+        }
+        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        data = {
+            "message": "There is an Error with this installation. Please contact admin",
+            "success": False,
+            "data": {"redirect_url": "/dm"},
+        }
+        return Response(data=data, status=status.HTTP_424_FAILED_DEPENDENCY)
+
+
+# def dm_uninstall(request):
+#     org_id = request.data["org_id"]
+#     user_id = request.data["user_id"]
+#     url = (
+# f"https://api.zuri.chat/organizations/{org_id}/plugins/6135f65de2358b02686503a7"
+#     )
+#     payload = {"user_id": user_id}
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Cookie": "f6822af94e29ba112be310d3af45d5c7=MTYzNDE0OTkzNnxHd3dBR0RZeE5qY3hOVFE1T1dZM1lUYzVNR013T0dReU1qSm1NUT09fLxiYT50kNCayZQN_E_MlGlI3lbTETEX07XZYa-tcttk",
+#     }
+#     Response = request.delete(url, headers=headers, json=payload)
+#     return Response(response.json())
 
 
 # Shows basic information about the DM plugin
@@ -92,11 +155,15 @@ def side_bar(request):
                             if profile["status"] == 200:
                                 room_profile["room_name"] = profile["data"]["user_name"]
                                 if profile["data"]["image_url"]:
-                                    room_profile["room_image"] = profile["data"]["image_url"]
+                                    room_profile["room_image"] = profile["data"][
+                                        "image_url"
+                                    ]
                                 else:
-                                    room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                                    room_profile[
+                                        "room_image"
+                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                     rooms.append(room_profile)
-                    
+
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
@@ -104,15 +171,16 @@ def side_bar(request):
         "organisation_id": f"{org_id}",
         "user_id": f"{user_id}",
         "group_name": "DM",
-        "category":"direct messages",
+        "category": "direct messages",
         "show_group": False,
-        "button_url":f"/dm/{org_id}/{user_id}/all-dms",
+        "button_url": f"/dm/{org_id}/{user_id}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
     }
     return JsonResponse(side_bar, safe=False)
+
 
 @swagger_auto_schema(
     methods=["get"],
@@ -148,7 +216,6 @@ def message_filter(request, room_id):
         )
 
 
-
 @swagger_auto_schema(
     methods=["post"],
     operation_summary="Creates message reminders in rooms",
@@ -172,15 +239,17 @@ def create_reminder(request):
     if serializer.is_valid():
         serialized_data = serializer.data
         print(serialized_data)
-        message_id = serialized_data['message_id']
-        current_date = serialized_data['current_date']
-        scheduled_date = serialized_data['scheduled_date']
+        message_id = serialized_data["message_id"]
+        current_date = serialized_data["current_date"]
+        scheduled_date = serialized_data["scheduled_date"]
         try:
-            notes_data = serialized_data['notes']
+            notes_data = serialized_data["notes"]
         except:
             notes_data = ""
         ##calculate duration and send notification
-        local_scheduled_date = datetime.strptime(scheduled_date,'%a, %d %b %Y %H:%M:%S %Z')
+        local_scheduled_date = datetime.strptime(
+            scheduled_date, "%a, %d %b %Y %H:%M:%S %Z"
+        )
         utc_scheduled_date = local_scheduled_date.replace(tzinfo=timezone.utc)
 
         local_current_date = datetime.strptime(current_date, "%a, %d %b %Y %H:%M:%S %Z")
@@ -194,14 +263,14 @@ def create_reminder(request):
                 room_id = message["room_id"]
                 try:
                     room = DB.read("dm_rooms", {"_id": room_id})
-  
+
                 except Exception as e:
                     print(e)
-                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE) 
-                users_in_a_room = room.get("room_user_ids",[]).copy()
-                message_content = message['message']
-                sender_id = message['sender_id']
-                recipient_id = ''
+                    return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
+                users_in_a_room = room.get("room_user_ids", []).copy()
+                message_content = message["message"]
+                sender_id = message["sender_id"]
+                recipient_id = ""
                 if sender_id in users_in_a_room:
                     users_in_a_room.remove(sender_id)
                     recipient_id = users_in_a_room[0]
@@ -226,7 +295,9 @@ def create_reminder(request):
                         )
                     if response.get("status") == 200:
                         response_output["notes"] = notes
-                        return Response(data = response_output,status=status.HTTP_201_CREATED)
+                        return Response(
+                            data=response_output, status=status.HTTP_201_CREATED
+                        )
                 # SendNotificationThread(duration,duration_sec,utc_scheduled_date, utc_current_date).start()
                 return Response(data=response_output, status=status.HTTP_201_CREATED)
             return Response(data="No such message", status=status.HTTP_400_BAD_REQUEST)
@@ -235,7 +306,6 @@ def create_reminder(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
     return Response(data="Bad Format ", status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @api_view(["GET"])
@@ -259,8 +329,6 @@ def PING(request):
         return JsonResponse(data=server)
 
 
-
-
 @api_view(["POST"])
 @db_init_with_credentials
 def send_reply(request, room_id, message_id):
@@ -276,7 +344,10 @@ def send_reply(request, room_id, message_id):
     if reply_response and reply_response.get("status_code", None) == None:
         replied_message = reply_response
     else:
-        return Response("Message being replied to doesn't exist, FE pass in correct message id", status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            "Message being replied to doesn't exist, FE pass in correct message id",
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     print(reply_response)
 
     if serializer.is_valid():
@@ -300,7 +371,7 @@ def send_reply(request, room_id, message_id):
                             "sender_id": data["sender_id"],
                             "message": data["message"],
                             "created_at": data["created_at"],
-                            "replied_message": data["replied_message"]
+                            "replied_message": data["replied_message"],
                         },
                     }
                     try:
@@ -328,13 +399,11 @@ def send_reply(request, room_id, message_id):
                     data="message not saved and not sent",
                     status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
-            return Response(
-                "sender not in room", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("sender not in room", status=status.HTTP_400_BAD_REQUEST)
         return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 def test_search(request):
 
-    return render(request, 'test.html')
+    return render(request, "test.html")
