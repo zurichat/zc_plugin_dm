@@ -28,7 +28,7 @@ export const handleCreateDmRoom =
           room_name: room_name
         }
       );
-      console.log(data)
+      //console.log(data)
       await dispatch(createRoom(data.room_id));
     } catch (error) {
       console.log(`Error from handleCreateDmRoom: ${error}`);
@@ -83,7 +83,7 @@ export const handleGetRoomMessages = (org_id, room_id) => async (dispatch) => {
 //Create room messages
 const createRoomMessages = () =>({
   type: CREATE_ROOM_MESSAGES,
-  payload:message,
+  //payload:message,
 });
 
 export const handleCreateRoomMessages = (org_id, room_id, data) => async (dispatch) =>{

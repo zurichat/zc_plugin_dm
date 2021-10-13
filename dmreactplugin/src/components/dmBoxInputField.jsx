@@ -187,6 +187,11 @@ const dmBoxInputField = ({ org_id, room_id, loggedInUser_id }) => {
                 onChange={(e) => setMessageInput(e.target.value)}
                 placeholder='Send Message to '
                 className='px-2'
+                onKeyDown={event => {
+                  if (event.key === 'Enter') {
+                    sendMessage(event)
+                  }
+                }}
               />
             <ChatInputEditor>
               <LeftChatEditor>
@@ -244,9 +249,9 @@ const dmBoxInputField = ({ org_id, room_id, loggedInUser_id }) => {
                 <Button
                   type='submit'
                   onClick={sendMessage}
-                  onKeyDown={sendMessage}
+                  //onKeyDown={sendMessage}
                   className='send-btn-box btn-inputfield-box'
-                  //disabled={!messageInput}
+                  disabled={!messageInput}
                 >
                   <span className='sendMessage'>
                     <IoMdSend />
