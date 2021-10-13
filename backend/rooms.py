@@ -573,3 +573,40 @@ def query_dm(request, member_id):
     except:
         return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
+
+
+
+@api_view(["GET"])
+@db_init_with_credentials
+def all_dms(request, member_id):
+    """
+    Retrieves the all latest dm in a room that the user had been active and
+    also retrives the latest messages in the displayed dms.
+    """
+    if request.method =="GET":
+        paginator = PageNumberPagination()
+        paginator.page_size = 20
+        rooms=get_rooms(member_id, DB.organization_id)
+    
+        if rooms:
+            all_messages=[] #new code added
+
+            room_ids = [room['_id'] for room in rooms ]
+
+            for room in room_ids:
+                messages=get_room_messages(room, DB.organization_id)
+                try:
+                    current_message=messages[0]
+                    all_messages.append(current_message)
+                except TypeError:
+                    pass
+            
+            if all_messages:
+                all_messages = all_messages[::-1]
+                response = paginator.paginate_queryset(all_messages, request)
+
+                return paginator.get_paginated_response(response)
+            return Response("No messages in user rooms", status=status.HTTP_404_NOT_FOUND) 
+
+        else:
+            return Response("No user rooms", status=status.HTTP_404_NOT_FOUND)
