@@ -84,7 +84,6 @@ def create_room(request, member_id):
                     "plugin_id": "dm.zuri.chat",
                     "data": {
                         "group_name": "DM",
-                        "ID": f"{data_ID}",
                         "name": "DM Plugin",
                         "category": "direct messages",
                         "show_group": False,
