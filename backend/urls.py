@@ -36,15 +36,21 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM"
     ),
+
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
-        rooms.star_room,
-        name="star_room",
-    ),
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>", 
+        rooms.add_member, 
+        name="add-user"
+        ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation", 
         rooms.close_conversation, 
         name="close_conversation"
+        ),
+    path(
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/star",
+        rooms.star_room,
+        name="star_room",
     ),
     path(
         "api/v1/org/<str:org_id>/members/<str:member_id>/all_dms",
@@ -196,6 +202,11 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/members/<str:member_id>/profile",
         members.user_profile,
         name="user_profile",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
+        rooms.query_dm,
+        name="Query Dm"
     ),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), 
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

@@ -76,45 +76,43 @@ def verify_user(token):
 
 def side_bar(request):
     org_id = request.GET.get("org", None)
-    user = request.GET.get("user", None)
-    response = get_rooms(user_id=user, org_id=org_id)
-    user_rooms = response
+    user_id = request.GET.get("user", None)
+    user_rooms = get_rooms(user_id, org_id)
     rooms = []
-    if user_rooms == None:
-        pass
-    else:
+    if user_rooms != None:
         for room in user_rooms:
             if "org_id" in room:
                 if org_id == room["org_id"]:
                     room_profile = {}
-                    for user_id in room["room_user_ids"]:
-                        if user_id != user:
-                            profile = get_user_profile(org_id, user_id)
+                    room_profile["room_id"] = room["_id"]
+                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
+                    for id in room["room_user_ids"]:
+                        if id != user_id:
+                            profile = get_user_profile(org_id, id)
                             if profile["status"] == 200:
                                 room_profile["room_name"] = profile["data"]["user_name"]
                                 if profile["data"]["image_url"]:
                                     room_profile["room_image"] = profile["data"]["image_url"]
                                 else:
                                     room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                                rooms.append(room_profile)
-                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user}"
+                    rooms.append(room_profile)
+                    
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
         "plugin_id": "6135f65de2358b02686503a7",
         "organisation_id": f"{org_id}",
-        "user_id": f"{user}",
+        "user_id": f"{user_id}",
         "group_name": "DM",
+        "category":"direct messages",
         "show_group": False,
-        "button_url":f"/dm/{org_id}/{user}/all-dms",
+        "button_url":f"/dm/{org_id}/{user_id}/all-dms",
         "public_rooms": [],
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
     }
     return JsonResponse(side_bar, safe=False)
-
-
 
 @swagger_auto_schema(
     methods=["get"],
@@ -335,3 +333,8 @@ def send_reply(request, room_id, message_id):
             )
         return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+def test_search(request):
+
+    return render(request, 'test.html')
