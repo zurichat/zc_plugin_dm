@@ -33,7 +33,7 @@ const roomsReducer = (state = initialState, action) => {
     case CREATE_ROOM_MESSAGES:
       return{
         ...state,
-        room_message:action.payload
+        //room_message:action.payload
       }
 
     default:

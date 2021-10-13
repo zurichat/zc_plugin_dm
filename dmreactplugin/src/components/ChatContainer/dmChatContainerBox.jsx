@@ -60,13 +60,16 @@ const DmChatContainerBox = ({
     };
   });
 
+  const dates = new Set();
+  const renderDate = (chat, dateNum) => {
+    const timestampDate = new Date(chat.created_at).toDateString();
+    // Add to Set so it does not render again
+    dates.add(dateNum);
+
+
   console.log(groupedMessages);
 
   //This function below helps group messages (Today, Yesterday etc)
-
-  const renderDate = (chat) => {
-    const timestampDate = new Date(chat).toDateString();
-
     const todayDate = new Date().toDateString();
 
     let prev_date = new Date();
@@ -87,8 +90,35 @@ const DmChatContainerBox = ({
   });
   return (
     <>
-      <div className='dm-chatContainerBox w-100 d-flex align-items-end'>
-        <main className='dm-chat-main-container'>
+
+      <div className="dm-chatContainerBox w-100 d-flex align-items-end">
+        <main className="dm-chat-main-container">
+          {room_messages?.results
+            ? room_messages?.results
+                ?.sort((first, second) => {
+                  const firstDate = new Date(first.created_at);
+                  const secondDate = new Date(second.created_at);
+                  return Date - secondDate;
+                })
+                .map((messages) => {
+                  // console.log(messages);
+                  //const [message, setMessage] = useState(messages)
+                  const dateNum = new Date(messages.created_at).toDateString();
+                  return (
+                    <div key={messages?.id}>
+                      <div className="__date_tags">
+                        {dates.has(dateNum) ? (
+                          ""
+                        ) : (
+                          <div className="__date_tag">
+                            <p> {renderDate(messages, dateNum)}</p>
+                            <small>
+                              <FaAngleDown />
+                            </small>
+                          </div>
+                        )}
+                      </div>
+
           {groupedMessages.length > 0
             ? groupedMessages.map((group, index) => (
                 <span key={index}>
@@ -97,7 +127,7 @@ const DmChatContainerBox = ({
                   </p>
                   {group.messages.map((message, mIndex) => (
                     <p key={mIndex}>
-                      <MessageWrapper handleOpenThread={handleOpenThread}>
+        <MessageWrapper handleOpenThread={handleOpenThread}>
                         <DmSingleMessageContainer
                           key={mIndex}
                           messages={message}

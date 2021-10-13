@@ -41,6 +41,7 @@ function DmSingleMessageContainer({
     }
   );
   //Recieving from Centrifugo
+
   console.log('Messages:', messages);
 
   const handleViewProfile = () => {
