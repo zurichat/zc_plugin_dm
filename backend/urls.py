@@ -205,11 +205,6 @@ urlpatterns = [
         members.user_profile,
         name="user_profile",
     ),
-    path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
-        rooms.query_dm,
-        name="Query Dm",
-    ),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
