@@ -278,17 +278,17 @@ def get_user_profile(org_id=None, user_id=None):
 def get_all_organization_members(org_id: str):
     response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
     if response.status_code == 200:
-        return response.json()['data']
+        return response.json()["data"]
     return None
 
 
-def get_member(members:list, member_id:str):
+def get_member(members: list, member_id: str):
     for member in members:
-        if member['_id'] == member_id:
+        if member["_id"] == member_id:
             return member
     return None
-            
-    
+
+
 def sidebar_emitter(
     org_id, member_id, group_room_name=None
 ):  # group_room_name = None or a String of Names
@@ -304,13 +304,15 @@ def sidebar_emitter(
                     if user_id != member_id:
                         profile = get_user_profile(org_id, user_id)
                         if profile["status"] == 200:
-                             # if group_room_name != None && Len of List after split > 2
+                            # if group_room_name != None && Len of List after split > 2
                             if group_room_name and len(group_room_name.split(",")) > 2:
                                 # overwrite room_name in profile to = String of Names
-                                room_profile["room_name"] = group_room_name 
+                                room_profile["room_name"] = group_room_name
                             else:
                                 if profile["data"]["user_name"]:
-                                    room_profile["room_name"] = profile["data"]["user_name"]
+                                    room_profile["room_name"] = profile["data"][
+                                        "user_name"
+                                    ]
                                 else:
                                     room_profile["room_name"] = "no user name"
                             if profile["data"]["image_url"]:
@@ -323,14 +325,17 @@ def sidebar_emitter(
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                         else:
                             room_profile["room_name"] = "no user name"
-                            room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            room_profile[
+                                "room_image"
+                            ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
 
-                rooms.append(room_profile)   
+                rooms.append(room_profile)
     return rooms
+
 
 # gets starred rooms
 def get_starred_rooms(member_id, org_id):
-    """ goes through database and returns starred rooms """
+    """goes through database and returns starred rooms"""
     response = get_rooms(member_id, org_id)
     if response:
         data = []
@@ -342,6 +347,23 @@ def get_starred_rooms(member_id, org_id):
             except Exception:
                 pass
         return data
-    else: 
+    else:
         if response == [] or isinstance(response, dict):
             return []
+
+
+def getQueue():
+    """Get queue data from the plugin information
+
+    Returns:
+        [type]: [description]
+    """
+    dm_plugin_url = "https://api.zuri.chat/marketplace/plugins/613ec51c15fb2424261b6658"
+    try:
+        response = requests.get(url=dm_plugin_url)
+    except requests.exceptions.RequestException as e:
+        return e
+    if response.status_code == 200:
+        return response.json()["data"]["queue"]
+    else:
+        return None
