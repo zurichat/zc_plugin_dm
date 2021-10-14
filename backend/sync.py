@@ -7,9 +7,27 @@ from .db import *
 from drf_yasg.utils import swagger_auto_schema
 from .decorators import db_init_with_credentials
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 @api_view(["GET", "POST"])
 def sync_notifier(request):
+    try:
+        # scheduler = BackgroundScheduler()
+        # scheduler.start()
+        return Response({"status": True, "message": "OK"}, status=status.HTTP_200_OK)
+    except:
+        return Response(
+            {
+                "status": False,
+            },
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    return Response(data=request.data, status=status.HTTP_200_OK)
+
+
+def job():
     # Retrieve the queue for synchronization
     queue = getQueue()
     if not queue:
@@ -24,5 +42,4 @@ def sync_notifier(request):
 
         if data["event"] == "leave_organization":
             pass
-
-    return Response(data=request.data, status=status.HTTP_200_OK)
+    return Response(data="ok", status=status.HTTP_200_OK)
