@@ -1,38 +1,42 @@
-import React from "react";
-import { useSelector } from "react-redux";
-import "../assets/css/dmSingleMessageContainer.css";
-import DmSingleMessageReaction from "./DmSingleMessageReaction";
-import {SubscribeToChannel} from '@zuri/control'
-import { useState, useEffect } from "react";
-import ReactTooltip from "react-tooltip";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import '../assets/css/dmSingleMessageContainer.css';
+import DmSingleMessageReaction from './DmSingleMessageReaction';
+// import {SubscribeToChannel} from '@zuri/control'
+import { useState, useEffect } from 'react';
+import ReactTooltip from 'react-tooltip';
 
-function DmSingleMessageContainer({ messages, user2_id, handleOpenThread,room_id }) {
+function DmSingleMessageContainer({
+  messages,
+  user2_id,
+  handleOpenThread,
+  room_id,
+}) {
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
   //const [newMessages ,setNewMessages] = useState(messages.message)
-   //newMessages = [...messages]
+  //newMessages = [...messages]
 
-  
   //Changing the message time to 12hour UTC time
   const messageTime = messages?.created_at;
   const localeTime = new Date(messageTime).toLocaleTimeString(
     {},
-    { hour: "2-digit", minute: "2-digit" }
+    { hour: '2-digit', minute: '2-digit' }
   );
   const fullLocaleTime = new Date(messageTime).toLocaleTimeString(
     {},
     {
-      formatMatcher: "basic",
-      weekday: "long",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      formatMatcher: 'basic',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
     }
   );
   //Recieving from Centrifugo
-  console.log("Messages:", messages)
+  console.log('Messages:', messages);
   return (
     <>
       <div className="dm-plugin-thread-messages">
