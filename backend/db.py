@@ -367,3 +367,24 @@ def getQueue():
         return response.json()["data"]["queue"]
     else:
         return None
+
+
+def updateQueueSync(queue_id: int):
+    """Patch with the last queue id
+
+    Args:
+        queue_id (int): The last queue id that has been updated
+
+    Returns:
+        [type]: [description]
+    """
+    patch_queue_url = "https://api.zuri.chat/plugins/613ec51c15fb2424261b6658/sync"
+    body = {"id": queue_id}
+    try:
+        response = requests.patch(url=patch_queue_url, json=body)
+    except requests.exceptions.RequestException as e:
+        return e
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None
