@@ -3,6 +3,8 @@ from urllib.parse import urlencode
 from django.http import response
 import requests, json
 
+from requests import exceptions
+
 
 def login_user():
     data = {"email": "sam@gmail.com", "password": "Owhondah"}
@@ -35,6 +37,7 @@ class DataStorage:
         self.upload_api = "https://api.zuri.chat/upload/file/{pgn_id}"
         self.upload_multiple_api = "https://api.zuri.chat/upload/files/{pgn_id}"
         self.delete_file_api = "https://api.zuri.chat/delete/file/{pgn_id}"
+        self.read_query_api = "https://api.zuri.chat/data/read"
 
         if request is None:
             self.plugin_id = PLUGIN_ID
@@ -94,6 +97,32 @@ class DataStorage:
 
         try:
             response = requests.get(url=url)
+        except requests.exceptions.RequestException as e:
+            print(e)
+            return None
+        if response.status_code == 200:
+            return response.json().get("data")
+        else:
+            return {"status_code": response.status_code, "message": response.reason}
+
+    def read_query(
+        self,
+        collection_name: str,
+        resource_id: str = None,
+        query: dict = {},
+        options: dict = {},
+    ):
+        request_body = {
+            "collection_name": collection_name,
+            "filter": query,
+            "object_id": resource_id,
+            "organization_id": self.organization_id,
+            "plugin_id": self.plugin_id,
+            "options": options,
+        }
+
+        try:
+            response = requests.post(url=self.read_query_api, json=request_body)
         except requests.exceptions.RequestException as e:
             print(e)
             return None
@@ -246,6 +275,20 @@ def get_user_profile(org_id=None, user_id=None):
     return profile.json()
 
 
+def get_all_organization_members(org_id: str):
+    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
+    if response.status_code == 200:
+        return response.json()["data"]
+    return None
+
+
+def get_member(members: list, member_id: str):
+    for member in members:
+        if member["_id"] == member_id:
+            return member
+    return None
+
+
 def sidebar_emitter(
     org_id, member_id, group_room_name=None
 ):  # group_room_name = None or a String of Names
@@ -255,17 +298,23 @@ def sidebar_emitter(
         for room in user_rooms:
             if org_id == room["org_id"]:
                 room_profile = {}
+                room_profile["room_id"] = room["_id"]
                 room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
                 for user_id in room["room_user_ids"]:
                     if user_id != member_id:
                         profile = get_user_profile(org_id, user_id)
                         if profile["status"] == 200:
-                             # if group_room_name != None && Len of List after split > 2
+                            # if group_room_name != None && Len of List after split > 2
                             if group_room_name and len(group_room_name.split(",")) > 2:
                                 # overwrite room_name in profile to = String of Names
-                                room_profile["room_name"] = group_room_name 
+                                room_profile["room_name"] = group_room_name
                             else:
-                                room_profile["room_name"] = profile["data"]["user_name"]
+                                if profile["data"]["user_name"]:
+                                    room_profile["room_name"] = profile["data"][
+                                        "user_name"
+                                    ]
+                                else:
+                                    room_profile["room_name"] = "no user name"
                             if profile["data"]["image_url"]:
                                 room_profile["room_image"] = profile["data"][
                                     "image_url"
@@ -274,5 +323,68 @@ def sidebar_emitter(
                                 room_profile[
                                     "room_image"
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                rooms.append(room_profile)   
+                        else:
+                            room_profile["room_name"] = "no user name"
+                            room_profile[
+                                "room_image"
+                            ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+
+                rooms.append(room_profile)
     return rooms
+
+
+# gets starred rooms
+def get_starred_rooms(member_id, org_id):
+    """goes through database and returns starred rooms"""
+    response = get_rooms(member_id, org_id)
+    if response:
+        data = []
+        for room in response:
+            try:
+                star = room["starred"]
+                if member_id in star:
+                    data.append(room)
+            except Exception:
+                pass
+        return data
+    else:
+        if response == [] or isinstance(response, dict):
+            return []
+
+
+def getQueue():
+    """Get queue data from the plugin information
+
+    Returns:
+        [type]: [description]
+    """
+    dm_plugin_url = "https://api.zuri.chat/marketplace/plugins/613ec51c15fb2424261b6658"
+    try:
+        response = requests.get(url=dm_plugin_url)
+    except requests.exceptions.RequestException as e:
+        return e
+    if response.status_code == 200:
+        return response.json()["data"]["queue"]
+    else:
+        return None
+
+
+def update_queue_sync(queue_id: int):
+    """Patch with the last queue id
+
+    Args:
+        queue_id (int): The last queue id that has been updated
+
+    Returns:
+        [type]: [description]
+    """
+    patch_queue_url = "https://api.zuri.chat/plugins/613ec51c15fb2424261b6658/sync"
+    body = {"id": queue_id}
+    try:
+        response = requests.patch(url=patch_queue_url, json=body)
+    except requests.exceptions.RequestException as e:
+        return e
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return None

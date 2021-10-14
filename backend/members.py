@@ -39,6 +39,7 @@ from queue import LifoQueue
     responses={400: "Error: Bad Request"},
 )
 @api_view(["GET"])
+@db_init_with_credentials
 def organization_members(request):
     """
     Retrieves a list of all members in an organization.
