@@ -15,9 +15,10 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path('test', views.test_search, name='test-search'),
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
+    path("dm/install", views.dm_install, name="install"),
+    # path("dm/uninstall", views.dm_uninstall, name="uninstall"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/room",
@@ -31,19 +32,18 @@ urlpatterns = [
     ),
     path(
         "api/v1/org/<str:org_id>/users/<str:user_id>/rooms",
+        rooms.user_rooms,
+        name="get_user_rooms",
+    ),
+    path(
+        "api/v1/search/<str:org_id>/<str:member_id>",
         rooms.search_DM,
         name="search DM",
     ),
     path(
-        "api/v1/org/<str:org_id>/members/<str:member_id>/search",
-        rooms.query_dm,
-        name="Query Dm"
-    ),
-
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/add-member/<str:member_id>",
-        rooms.add_member,
-        name="add-user",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/member",
+        rooms.group_member_add,
+        name="group_user_add",
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/members/<str:member_id>/close_conversation",
@@ -56,6 +56,11 @@ urlpatterns = [
         name="star_room",
     ),
     path(
+        "api/v1/org/<str:org_id>/members/<str:member_id>/all_dms",
+        rooms.all_dms,
+        name="all_dms",
+    ),
+    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
         messaging.message_create_get,
         name="create_get_message",
@@ -66,7 +71,7 @@ urlpatterns = [
         name="updateroom",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/message",
         messaging.delete_message,
         name="delete_message",
     ),
