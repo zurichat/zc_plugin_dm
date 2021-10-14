@@ -15,7 +15,6 @@ import { FiPhone } from "react-icons/fi";
 import { BsClock, BsX, BsEnvelope,BsPersonPlusFill } from "react-icons/bs";
 import StarButtonButton from "./starPersonButton";
 import AddPeopleModal from "./AddPeopleModal"
-import AddPeopleToDmModal from "./AddPeopletoDmModal";
 import Tabs from "react-bootstrap/Tabs"
 import Tab from "react-bootstrap/Tab"
 import { useDispatch } from "react-redux";
@@ -136,7 +135,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
               </div>
             </div>
             */}
-          <Tabs defaultActiveKey="about" id="Member-tabs" className="mb-3">
+          <Tabs backgroundColor="white" defaultActiveKey="about" id="Member-tabs" className="mb-3">
             <Tab eventKey="about" title="About">
             <div className='profilePop__body'>
               <div className='profilePop__body__card1'>
@@ -196,7 +195,6 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
         </Modal>
       </div>
       <AddPeopleModal showModal={showModal} room_id={room_id} org_id={org_id}/>
-      {/* <AddPeopleToDmModal/> */}
       </>
     )
 };

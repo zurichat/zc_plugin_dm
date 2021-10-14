@@ -42,12 +42,12 @@ const AddPeopleModal = ({showModal, org_id, room_id}) =>{
         title: "Add users",
         type: "addmodal",
         userList: [
-          { value: "chocolate", label: "Chocolate" },
+          { value: "Workspace User 1", label: "Workspace User 1" },
           
         ],
         addMembersEvent: users => {
           // console.warn(users)
-          const member_id = userList.value
+          const member_id = users
           const data={
             room_id: room_id,
             member_id: member_id,
