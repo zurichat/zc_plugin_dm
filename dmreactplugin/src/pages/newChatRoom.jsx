@@ -47,6 +47,8 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
             setNone={setNone}
             grid={grid}
             setGrid={setGrid}
+            room_id = {room_id}
+            org_id = {org_id}
           />
           <div className='dm-bookmark-head'>
             <div className='add-bookmark gap-2 d-flex flex-direction-column flex-flow align-items-center px-3 py-1'>

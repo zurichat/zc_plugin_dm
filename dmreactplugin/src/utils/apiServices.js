@@ -127,6 +127,13 @@ class APIServices {
             `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
         );
     }
+    async addPeopleToRoom(org_id, room_id, data) {
+        return await $http.post(
+            `/org/${org_id}/rooms/${room_id}/member`,
+            data
+            // https://dm.zuri.chat/api/v1/org/6162210d8e856323d6f12110/rooms/6166f774bcade4cd25f4e459/member
+        );
+    }
 }
 
 const instance = new APIServices();
