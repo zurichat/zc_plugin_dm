@@ -369,7 +369,7 @@ def getQueue():
         return None
 
 
-def updateQueueSync(queue_id: int):
+def update_queue_sync(queue_id: int):
     """Patch with the last queue id
 
     Args:
