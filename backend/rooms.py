@@ -58,13 +58,14 @@ def create_room(request, member_id):
                                                 "room_id": room["_id"]
                                             }
                         return Response(data=response_output, status=status.HTTP_200_OK)
+            elif user_rooms is None:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
 
-            elif user_rooms.get("status_code") != 404:
-                if user_rooms is None or user_rooms.get("status_code") != 200:
-                    return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+            elif user_rooms.get("status_code") != 404 or user_rooms.get("status_code") != 200:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
         
             fields = {"org_id": serializer.data["org_id"],
-                      "room_user_ids": serializer.data["room_member_ids"],
+                      "room_user_ids": serializer.data["room_members_id"],
                       "room_name": serializer.data["room_name"],
                       "private": serializer.data["private"],
                       "created_at": serializer.data["created_at"],

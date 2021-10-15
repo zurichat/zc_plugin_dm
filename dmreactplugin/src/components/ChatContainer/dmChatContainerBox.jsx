@@ -1,15 +1,14 @@
-import React, { useState,useEffect } from "react";
-import { useSelector } from "react-redux";
-import MessageWrapper from "../common/dmHoverState/dmHoverstate";
-import DmInitMessageBox from "../dmInitMessagebox";
-import DmSingleMessageContainer from "../dmSingleMessageContainer";
-import DmReplyInThread from "../ReplyInThread/replyInThread";
-import "./chatContainerBox.css";
-import { FaAngleDown } from "react-icons/fa";
-import {SubscribeToChannel} from '@zuri/control';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import MessageWrapper from '../common/dmHoverState/dmHoverstate';
+import DmInitMessageBox from '../dmInitMessagebox';
+import DmSingleMessageContainer from '../dmSingleMessageContainer';
+import DmReplyInThread from '../ReplyInThread/replyInThread';
+import './chatContainerBox.css';
+import { FaAngleDown } from 'react-icons/fa';
+import { SubscribeToChannel } from '@zuri/utilities';
 import { useDispatch } from 'react-redux';
-import { handleGetRoomMessages } from "../../Redux/Actions/dmActions";
-
+import { handleGetRoomMessages } from '../../Redux/Actions/dmActions';
 
 const DmChatContainerBox = ({ user2_id, room_id }) => {
   const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
@@ -25,17 +24,14 @@ const DmChatContainerBox = ({ user2_id, room_id }) => {
     dispatch(handleGetRoomInfo(org_id, room_id))
    }, [messages]) */
 
-  
-
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
   const actualUser =
     membersReducer && membersReducer.find((member) => member._id === user2_id);
   const user = actualUser ? actualUser : null;
-  
-  
+
   SubscribeToChannel(`${room_id}`, (ctx) => {
-    const websocket = ctx.data
-    console.log("Websocket", websocket);
+    const websocket = ctx.data;
+    console.log('Websocket', websocket);
     //console.log("This is centrifigo " + ctx);
   });
   const dates = new Set();
@@ -47,9 +43,9 @@ const DmChatContainerBox = ({ user2_id, room_id }) => {
     let prev_date = new Date();
     prev_date.setDate(prev_date.getDate() - 1);
     if (timestampDate === todayDate) {
-      return "Today";
+      return 'Today';
     } else if (new Date(prev_date).toDateString() == timestampDate) {
-      return "Yesterday";
+      return 'Yesterday';
     }
     return <>{timestampDate}</>;
   };
@@ -68,12 +64,12 @@ const DmChatContainerBox = ({ user2_id, room_id }) => {
                   // console.log(messages);
                   //const [message, setMessage] = useState(messages)
                   const dateNum = new Date(messages.created_at).toDateString();
-                  
+
                   return (
                     <div key={messages?.id}>
                       <div className="__date_tags">
                         {dates.has(dateNum) ? (
-                          ""
+                          ''
                         ) : (
                           <div className="__date_tag">
                             <p> {renderDate(messages, dateNum)}</p>
@@ -96,7 +92,7 @@ const DmChatContainerBox = ({ user2_id, room_id }) => {
             : null}
           <DmInitMessageBox secondUser={user} />
         </main>
-        <aside className={`asideContent ${openThread ? "active" : ""}`}>
+        <aside className={`asideContent ${openThread ? 'active' : ''}`}>
           <DmReplyInThread handleCloseThread={handleCloseThread} />
         </aside>
       </div>
