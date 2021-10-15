@@ -1,9 +1,12 @@
-from django.http.response import JsonResponse
+from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,renderer_classes
 from rest_framework import status
 import requests
+
+from zc_plugin_dm.settings import SWAGGER_SETTINGS
 from .db import *
 from rest_framework.views import (
     APIView,
@@ -17,73 +20,50 @@ from drf_yasg.utils import swagger_auto_schema
 from datetime import datetime
 from .centrifugo_handler import centrifugo_client
 from .decorators import db_init_with_credentials
-
+import json
 
 def index(request):
     context = {}
     return render(request, "index.html", context)
 
 
-@api_view(["POST"])
-def dm_install(
-    request,
-):
-    org_id = request.data["org_id"]
-    user_id = request.data["user_id"]
+@csrf_exempt
+def dm_install(request):
+    """This endpoint is called when an organisation wants to install the
+    DM plugin for their workspace."""
+    if request.method=="POST":
+        token=request.headers["Authorization"]
+        print(token)
+        data=json.loads((request.body))
+        print(data)
+        org_id = data["organisation_id"]
+        user_id = data["user_id"]
+        
     url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
-    payload = {
-        "user_id": user_id,
-        "plugin_id": "6135f65de2358b02686503a7",
-    }
-    # headers = {
-    #     "Authorization": f"Bearer {login_user()}",
-    #     "Content-Type": "Application/json",
-    # }
+    payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
+    print(payload)
+    
+    headers = {"Authorization": token, "Content-Type":"application/json"}
 
-    headers = {
-        "Content-Type": "application/json",
-        "Cookie": "f6822af94e29ba112be310d3af45d5c7=MTYzNDE0OTkzNnxHd3dBR0RZeE5qY3hOVFE1T1dZM1lUYzVNR013T0dReU1qSm1NUT09fLxiYT50kNCayZQN_E_MlGlI3lbTETEX07XZYa-tcttk",
-    }
+    response = requests.post(url=url, headers=headers, data=payload)
+    print(response)
+    installed = response.json()
 
-    response = requests.post(url, headers=headers, json=payload)
-    print(response.json())
-    if response == "200":
-        data = {
-            "message": "successfully installed!",
-            "success": True,
-            "data": {"redirect_url": "/dm"},
-        }
-        return Response(data=data, status=status.HTTP_201_CREATED)
-
-    elif response.json()["status"] == 400:
-        data = {
-            "message": "It has been installed!",
-            "success": False,
-            "data": {"redirect_url": "/dm"},
-        }
-        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+    if installed["status"]==200:
+        return JsonResponse(
+                    {
+                        "success": True,
+                        "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
+                        "message": "sucessfully retrieved",
+                    },
+                    safe=False,
+                )
     else:
-        data = {
-            "message": "There is an Error with this installation. Please contact admin",
-            "success": False,
-            "data": {"redirect_url": "/dm"},
-        }
-        return Response(data=data, status=status.HTTP_424_FAILED_DEPENDENCY)
+        return JsonResponse(
+                    {"sucess":False,"data":None,"status":200},
+                    safe=False,
+                )
 
-
-# def dm_uninstall(request):
-#     org_id = request.data["org_id"]
-#     user_id = request.data["user_id"]
-#     url = (
-# f"https://api.zuri.chat/organizations/{org_id}/plugins/6135f65de2358b02686503a7"
-#     )
-#     payload = {"user_id": user_id}
-#     headers = {
-#         "Content-Type": "application/json",
-#         "Cookie": "f6822af94e29ba112be310d3af45d5c7=MTYzNDE0OTkzNnxHd3dBR0RZeE5qY3hOVFE1T1dZM1lUYzVNR013T0dReU1qSm1NUT09fLxiYT50kNCayZQN_E_MlGlI3lbTETEX07XZYa-tcttk",
-#     }
-#     Response = request.delete(url, headers=headers, json=payload)
-#     return Response(response.json())
 
 
 # Shows basic information about the DM plugin
@@ -142,7 +122,7 @@ def side_bar(request):
     user_id = request.GET.get("user", None)
     user_rooms = get_rooms(user_id, org_id)
     rooms = []
-    starred_rooms = []
+    starred_rooms=[]
     if user_rooms != None:
         for room in user_rooms:
             if "org_id" in room:
@@ -170,12 +150,10 @@ def side_bar(request):
                                     ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                             else:
                                 room_profile["room_name"] = "no user name"
-                                room_profile[
-                                    "room_image"
-                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            star = requests.get(f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star") 
+                                room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            star = requests.get(url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star")
                             if "status" in star.json():
-                                if star.json()["status"] == True:
+                                if star.json()["status"]==True:
                                     starred_rooms.append(room_profile)
                     rooms.append(room_profile)
 
@@ -190,7 +168,7 @@ def side_bar(request):
         "show_group": False,
         "button_url": f"/dm/{org_id}/{user_id}/all-dms",
         "public_rooms": [],
-        "starred": starred_rooms,
+        "starred":starred_rooms,
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
