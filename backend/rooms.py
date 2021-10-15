@@ -569,7 +569,6 @@ def search_DM(request, member_id):
             rooms_query = {"room_user_ids": member_id}
             
         options = {"sort": {"created_at": -1},}
-
         rooms = DB.read_query("dm_rooms", query=rooms_query, options=options)
         
         org_id = DB.organization_id
@@ -621,8 +620,8 @@ def search_DM(request, member_id):
     operation_summary="searches for message by a user",
     responses={404: "Error: Not Found"},
 )
-@api_view(["GET"])
 @sync_to_async
+@api_view(["GET"])
 @db_init_with_credentials
 def search_suggestions(request, member_id):
     query = {"room_user_ids":member_id}
@@ -630,21 +629,37 @@ def search_suggestions(request, member_id):
         "sort":{"created_at": -1},
         "projection":{"room_user_ids":1, "_id":0}
     }
-    data = []
-    rooms = DB.read_query("dm_rooms",query=query,options=options)
-    if rooms:
-        user_ids = []
-        for room in rooms:
-            room['room_user_ids'].remove(member_id)
-            if None in room['room_user_ids']:
-                room['room_user_ids'].remove(None)
-            user_ids.extend(room['room_user_ids'])
-           
-    response = {
-        "status":"ok",
-	    "type":"suggestions",
-        "data":data
-    }
+    data = {}
+    org_id = DB.organization_id
+    try:
+        members = get_all_organization_members(org_id)
+        rooms = DB.read_query("dm_rooms",query=query,options=options)
+        member_ids = []
+        if rooms:    
+            for room in rooms:
+                room['room_user_ids'].remove(member_id)
+                if None in room['room_user_ids']:
+                    room['room_user_ids'].remove(None)
+                member_ids.extend(room['room_user_ids'])
+                
+        for member in members:
+            if member['_id'] in member_ids:
+                username = member.get('user_name')
+                data[member['_id']] = username
+                
+        response = {
+            "status":"ok",
+            "type":"suggestions",
+            "data":data
+        }
+                   
+    except Exception as e:
+        print(e)     
+        response = {
+            "status":"ok",
+            "type":"suggestions",
+            "data":data
+        }
     return Response(response, status=status.HTTP_200_OK)
 
 
