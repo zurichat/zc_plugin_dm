@@ -37,11 +37,11 @@ def dm_install(request):
         data = json.loads((request.body))
         org_id = data["org_id"]
         user_id = data["user_id"]
-    url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
-    payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
-    headers = {"Authorization": token, "Content-Type": "application/json"}
-    response = requests.post(url=url, headers=headers, data=payload)
-    installed = response.json()
+        url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
+        payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
+        headers = {"Authorization": token, "Content-Type": "application/json"}
+        response = requests.post(url=url, headers=headers, data=payload)
+        installed = response.json()
 
     if installed["status"] == 200:
         return JsonResponse(
