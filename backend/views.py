@@ -177,7 +177,6 @@ def side_bar(request):
                             if "status" in star.json():
                                 if star.json()["status"] == True:
                                     starred_rooms.append(room_profile)
-                                    print(room_profile)
                     rooms.append(room_profile)
 
     side_bar = {
