@@ -18,7 +18,7 @@ def login_user():
         return None
 
 
-PLUGIN_ID = "6135f65de2358b02686503a7"
+PLUGIN_ID = "61696380b2cc8a9af4833d80"
 ORG_ID = "614679ee1a5607b13c00bcb7"
 CENTRIFUGO_TOKEN = "58c2400b-831d-411d-8fe8-31b6e337738b"
 ROOMS = "dm_rooms"

@@ -1,0 +1,9 @@
+import requests
+token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb29raWUiOiJNVFl6TkRNd016a3hNSHhIZDNkQlIwUlplRTVxYXpOYWJVVXlXbTFLYWs1WFNYbFBSMUV3VFdwRk0wMUhUWGRhUVQwOWZOdmVhUEZsXy05TXpSR3JETUFVVkRfUVBjX09DR3V6aVhEc0VlcTNHb0hvIiwiZW1haWwiOiJkZmVsYXN0ZXZldGVzdEBnbWFpbC5jb20iLCJpZCI6IjYxNjk3ZmE2ZmJjNWIyOGQ0MjE3MGMwZCIsIm9wdGlvbnMiOnsiUGF0aCI6Ii8iLCJEb21haW4iOiIiLCJNYXhBZ2UiOjc5NDE1MDI3NjQsIlNlY3VyZSI6ZmFsc2UsIkh0dHBPbmx5IjpmYWxzZSwiU2FtZVNpdGUiOjB9LCJzZXNzaW9uX25hbWUiOiJmNjgyMmFmOTRlMjliYTExMmJlMzEwZDNhZjQ1ZDVjNyJ9.S4qx2U02mOZxNuWkP2-UBI2wrYWqgUNpEiH5nk0dH04"
+
+
+headers = {"Authorization": f"Bearer {token}"}
+
+data = {"organization_id":"123654383","user_id":"shewqhowe23"}
+response = requests.post(url="http://127.0.0.1:8000/api/v1/install", json=data, headers=headers)
+print(response.json())
