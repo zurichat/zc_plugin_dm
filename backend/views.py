@@ -43,25 +43,25 @@ def dm_install(request):
         response = requests.post(url=url, headers=headers, data=payload)
         installed = response.json()
 
-    if installed["status"] == 200:
-        return JsonResponse(
-            {
-                "success": True,
-                "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
-                "message": "sucessfully retrieved",
-            },
-            safe=False,
-        )
-    elif installed["status"] == 400:
-        return JsonResponse(
-            {"sucess": True, "message": installed["message"], "status": 200},
-            safe=False,
-        )
-    else:
-        return JsonResponse(
-            {"sucess": False, "data": "faulty", "status": 200},
-            safe=False,
-        )
+        if installed["status"] == 200:
+            return JsonResponse(
+                {
+                    "success": True,
+                    "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
+                    "message": "sucessfully retrieved",
+                },
+                safe=False,
+            )
+        elif installed["status"] == 400:
+            return JsonResponse(
+                {"sucess": True, "message": installed["message"], "status": 200},
+                safe=False,
+            )
+        else:
+            return JsonResponse(
+                {"sucess": False, "data": "faulty", "status": 200},
+                safe=False,
+            )
 
 
 # Shows basic information about the DM plugin
