@@ -2,7 +2,7 @@ from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
-from rest_framework.decorators import api_view,renderer_classes
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework import status
 import requests
 
@@ -22,6 +22,7 @@ from .centrifugo_handler import centrifugo_client
 from .decorators import db_init_with_credentials
 import json
 
+
 def index(request):
     context = {}
     return render(request, "index.html", context)
@@ -31,39 +32,35 @@ def index(request):
 def dm_install(request):
     """This endpoint is called when an organisation wants to install the
     DM plugin for their workspace."""
-    if request.method=="POST":
-        token=request.headers["Authorization"]
-        print(token)
-        data=json.loads((request.body))
-        print(data)
-        org_id = data["organisation_id"]
+    if request.method == "POST":
+        token = request.headers["Authorization"]
+        data = json.loads((request.body))
+        org_id = data["org_id"]
         user_id = data["user_id"]
-        
+
     url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
     payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
     print(payload)
-    
-    headers = {"Authorization": token, "Content-Type":"application/json"}
+
+    headers = {"Authorization": token, "Content-Type": "application/json"}
 
     response = requests.post(url=url, headers=headers, data=payload)
-    print(response)
     installed = response.json()
 
-    if installed["status"]==200:
+    if installed["status"] == 200:
         return JsonResponse(
-                    {
-                        "success": True,
-                        "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
-                        "message": "sucessfully retrieved",
-                    },
-                    safe=False,
-                )
+            {
+                "success": True,
+                "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
+                "message": "sucessfully retrieved",
+            },
+            safe=False,
+        )
     else:
         return JsonResponse(
-                    {"sucess":False,"data":None,"status":200},
-                    safe=False,
-                )
-
+            {"sucess": False, "data": None, "status": 200},
+            safe=False,
+        )
 
 
 # Shows basic information about the DM plugin
@@ -122,7 +119,7 @@ def side_bar(request):
     user_id = request.GET.get("user", None)
     user_rooms = get_rooms(user_id, org_id)
     rooms = []
-    starred_rooms=[]
+    starred_rooms = []
     if user_rooms != None:
         for room in user_rooms:
             if "org_id" in room:
@@ -150,10 +147,14 @@ def side_bar(request):
                                     ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
                             else:
                                 room_profile["room_name"] = "no user name"
-                                room_profile["room_image"] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            star = requests.get(url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star")
+                                room_profile[
+                                    "room_image"
+                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                            star = requests.get(
+                                url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star"
+                            )
                             if "status" in star.json():
-                                if star.json()["status"]==True:
+                                if star.json()["status"] == True:
                                     starred_rooms.append(room_profile)
                     rooms.append(room_profile)
 
@@ -168,7 +169,7 @@ def side_bar(request):
         "show_group": False,
         "button_url": f"/dm/{org_id}/{user_id}/all-dms",
         "public_rooms": [],
-        "starred":starred_rooms,
+        "starred": starred_rooms,
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
