@@ -168,7 +168,7 @@ def side_bar(request):
         "show_group": False,
         "button_url": f"/dm/{org_id}/{user_id}/all-dms",
         "public_rooms": [],
-        "starred_rooms":starred_rooms,
+        "starred":starred_rooms,
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
