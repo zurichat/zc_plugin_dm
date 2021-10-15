@@ -9,6 +9,8 @@ from .decorators import db_init_with_credentials
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
+EVENTS: Dict[str, str] = {"enter": "enter_organization", "leave": "leave_organization"}
+
 
 @api_view(["GET", "POST"])
 def sync_notifier(request):
@@ -37,9 +39,9 @@ def job():
     last_queue_id = queue[len(queue) - 1]("id")
 
     for data in queue:
-        if data["event"] == "enter_organization":
+        if data["event"] == EVENTS.get("enter"):
             pass
 
-        if data["event"] == "leave_organization":
+        if data["event"] == EVENTS.get("leave"):
             pass
     return Response(data="ok", status=status.HTTP_200_OK)
