@@ -76,7 +76,7 @@ def create_room(request, member_id):
                       "bookmark": [],
                       "pinned": [],
                       "starred": [],
-                      "closed":[],
+                      "closed": False
                           }
 
             response = DB.write("dm_rooms", data=fields)
