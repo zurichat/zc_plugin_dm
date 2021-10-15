@@ -358,7 +358,7 @@ def getQueue():
     Returns:
         [type]: [description]
     """
-    dm_plugin_url = "https://api.zuri.chat/marketplace/plugins/613ec51c15fb2424261b6658"
+    dm_plugin_url = f"https://api.zuri.chat/marketplace/plugins/{PLUGIN_ID}"
     try:
         response = requests.get(url=dm_plugin_url)
     except requests.exceptions.RequestException as e:
@@ -378,7 +378,7 @@ def update_queue_sync(queue_id: int):
     Returns:
         [type]: [description]
     """
-    patch_queue_url = "https://api.zuri.chat/plugins/613ec51c15fb2424261b6658/sync"
+    patch_queue_url = f"https://api.zuri.chat/plugins/{PLUGIN_ID}/sync"
     body = {"id": queue_id}
     try:
         response = requests.patch(url=patch_queue_url, json=body)
