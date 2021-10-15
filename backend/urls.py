@@ -41,6 +41,13 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM",
     ),
+    
+    path(
+        "api/v1/search-suggestions/<str:org_id>/<str:member_id>",
+        rooms.search_suggestions,
+        name="search suggestions"
+    ),
+    
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/member",
         rooms.group_member_add,
