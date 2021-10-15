@@ -80,8 +80,10 @@ def create_room(request, member_id):
                           }
 
             response = DB.write("dm_rooms", data=fields)
+            print(response)
             # ===============================
 
+        # data_ID = response.get("data").get("object_id")
         if response.get("status") == 200:
             room_id = response.get("data").get("object_id")
             response_output = {
