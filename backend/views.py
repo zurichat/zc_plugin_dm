@@ -34,12 +34,10 @@ def dm_install(request):
     DM plugin for their workspace."""
     if request.method == "POST":
         token = request.headers["Authorization"]
-        print(token)
         data = json.loads((request.body))
-        print(data)
         org_id = data["org_id"]
         user_id = data["user_id"]
-    print(org_id)
+
     url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
     payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
     print(payload)
@@ -47,7 +45,6 @@ def dm_install(request):
     headers = {"Authorization": token, "Content-Type": "application/json"}
 
     response = requests.post(url=url, headers=headers, data=payload)
-    print(response)
     installed = response.json()
 
     if installed["status"] == 200:
