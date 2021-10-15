@@ -142,6 +142,7 @@ def side_bar(request):
     user_id = request.GET.get("user", None)
     user_rooms = get_rooms(user_id, org_id)
     rooms = []
+    starred_rooms = []
     if user_rooms != None:
         for room in user_rooms:
             if "org_id" in room:
@@ -172,7 +173,10 @@ def side_bar(request):
                                 room_profile[
                                     "room_image"
                                 ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-
+                            star = requests.get(f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star") 
+                            if "status" in star.json():
+                                if star.json()["status"] == True:
+                                    starred_rooms.append(room_profile)
                     rooms.append(room_profile)
 
     side_bar = {
@@ -186,6 +190,7 @@ def side_bar(request):
         "show_group": False,
         "button_url": f"/dm/{org_id}/{user_id}/all-dms",
         "public_rooms": [],
+        "starred": starred_rooms,
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main

@@ -1,3 +1,4 @@
+from backend import sync
 from . import views, rooms, messaging, members, media, threads, booklinks, reactions
 from .testingapi import Test
 
@@ -205,6 +206,7 @@ urlpatterns = [
         members.user_profile,
         name="user_profile",
     ),
+    path("api/v1/sync", sync.sync_notifier, name="sync_notifier"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

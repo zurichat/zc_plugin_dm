@@ -1,5 +1,5 @@
 // Import all API endpoints
-import APIService from "../../utils/apiServices";
+import APIService from '../../utils/apiServices';
 
 // import all action types
 import {
@@ -20,16 +20,15 @@ const createRoom = (room_id) => ({
 });
 
 export const handleCreateDmRoom =
-  ({org_id, member_id, user_ids, room_name}) =>
+  ({ org_id, member_id, user_ids, room_name }) =>
   async (dispatch) => {
     try {
       const { data } = await APIService.createChatRoom(org_id, member_id, {
-          org_id: org_id,
-          room_member_ids: user_ids,
-          room_name: room_name
-        }
-      );
-      console.log(data)
+        org_id: org_id,
+        room_member_ids: user_ids,
+        room_name: room_name,
+      });
+      console.log(data);
       await dispatch(createRoom(data.room_id));
     } catch (error) {
       console.log(`Error from handleCreateDmRoom: ${error}`);
@@ -82,35 +81,45 @@ export const handleGetRoomMessages = (org_id, room_id) => async (dispatch) => {
 };
 
 //Create room messages
-const createRoomMessages = () =>({
+const createRoomMessages = (message) => ({
   type: CREATE_ROOM_MESSAGES,
-  payload:message,
+  payload: message,
 });
 
-export const handleCreateRoomMessages = (org_id, room_id, data) => async (dispatch) =>{
-  try{
-    const{res} = await APIService.createRoomMessage(org_id, room_id, data);
-    await dispatch(createRoomMessages(res));
-  }catch(error){
-    console.log(`Error from handleCreateRoomMessages: ${error}`);
-  }
-}
+export const handleCreateRoomMessages =
+  (org_id, room_id, messageData) => async (dispatch) => {
+    try {
+      const { data } = await APIService.createRoomMessage(
+        org_id,
+        room_id,
+        messageData
+      );
+      await dispatch(createRoomMessages(data));
+    } catch (error) {
+      console.log(`Error from handleCreateRoomMessages: ${error}`);
+    }
+  };
 
 // Delete room message
 
-const deleteRoomMessage = (response)=>({
+const deleteRoomMessage = (response) => ({
   type: DELETE_ROOM_MESSAGE,
-  payload: response
-})
+  payload: response,
+});
 
-export const handleDeleteRoomMessage = (org_id, room_id, message_id) => async (dispatch) => {
-  try {
-    const { data } = await APIService.deleteMessage(org_id, room_id, message_id);
-    await dispatch(deleteRoomMessage(data));
-  } catch (error) {
-    console.log(`Error from handleDeleteRoomMessage: ${error}`);
-  }
-};
+export const handleDeleteRoomMessage =
+  (org_id, room_id, message_id) => async (dispatch) => {
+    try {
+      const { data } = await APIService.deleteMessage(
+        org_id,
+        room_id,
+        message_id
+      );
+      await dispatch(deleteRoomMessage(data));
+    } catch (error) {
+      console.log(`Error from handleDeleteRoomMessage: ${error}`);
+    }
+  };
 // Add People to Room
 
 const addPeopleToRoom = (member_id, room_id) => ({
@@ -146,3 +155,4 @@ export const handleGetAllUserDms = (org_id, member_id) => async (dispatch) => {
     console.log(`Error from handleGetAllUserDms: ${error}`);
   }
 };
+

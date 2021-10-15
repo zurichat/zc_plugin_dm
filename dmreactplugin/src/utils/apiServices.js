@@ -1,13 +1,13 @@
-import axios from "axios";
+import axios from 'axios';
 
-const baseURL = "https://dm.zuri.chat/api/v1";
+const baseURL = 'https://dm.zuri.chat/api/v1';
 
 const apiConfig = {
-    baseURL,
-    timeout: 30000,
-    headers: {
-        "Content-Type": "application/json",
-    },
+  baseURL,
+  timeout: 30000000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 };
 
 const $http = axios.create({ ...apiConfig });
