@@ -132,3 +132,7 @@ h2.profilePop__blue {
 .profilePop__body__card2 p {
     color: #616061;
 }
+.nav-tabs .nav-item.nav-link.active{
+    background-color: white;
+    color: white;
+}

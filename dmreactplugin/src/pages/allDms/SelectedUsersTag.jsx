@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes} from 'react-icons/fa';
+import { VscChromeClose} from 'react-icons/vsc';
 
 
 const SelectedUsersTag = ({ selectedUser, onClose })=>{
@@ -13,7 +13,9 @@ const SelectedUsersTag = ({ selectedUser, onClose })=>{
                 }}
             ></div>
             <p>{selectedUser.user_name}</p>
-            <div className="remove-selecteduser-btn" onClick={()=>{onClose(selectedUser)}}><FaTimes/></div>
+            <div className="remove-selecteduser-btn" onClick={()=>{onClose(selectedUser)}}>
+                <VscChromeClose/>
+            </div>
         </div>
     )
 }

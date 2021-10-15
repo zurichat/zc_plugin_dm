@@ -131,3 +131,18 @@ export const handleAddPeopleToRoom =({org_id, room_id}) => async (dispatch) => {
       console.log(`Error from handleAddPeopleToRoom: ${error}`);
     }
   };
+
+// Get all user's dms
+const getUserDms = (alldms) => ({
+  type: GET_ROOM_MESSAGES,
+  payload: alldms
+});
+
+export const handleGetAllUserDms = (org_id, member_id) => async (dispatch) => {
+  try {
+    const { data } = await APIService.getRoomMessages(org_id, member_id);
+    await dispatch(getUserDms(data));
+  } catch (error) {
+    console.log(`Error from handleGetAllUserDms: ${error}`);
+  }
+};

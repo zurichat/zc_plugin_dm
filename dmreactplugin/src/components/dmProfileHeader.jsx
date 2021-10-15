@@ -17,7 +17,6 @@ import StarButtonButton from "./starPersonButton";
 import AddPeopleModal from "./AddPeopleModal"
 import Tabs from "react-bootstrap/Tabs"
 import Tab from "react-bootstrap/Tab"
-import { useDispatch } from "react-redux";
 
 const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room_id }) => {
     const user = actualUser && actualUser;
@@ -135,7 +134,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
               </div>
             </div>
             */}
-          <Tabs backgroundColor="white" defaultActiveKey="about" id="Member-tabs" className="mb-3">
+          <Tabs className=".nav-tabs .nav-item.nav-link.active" defaultActiveKey="about" id="Member-tabs" className="mb-3">
             <Tab eventKey="about" title="About">
             <div className='profilePop__body'>
               <div className='profilePop__body__card1'>
@@ -174,11 +173,9 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
             <Tab eventKey="members" title="Members">
               <div className='profilePop__body'>
                 <div className='profilePop__body__card1'>
-                  <div className="d-grid gap-2">
                     <Button variant="primary" size="lg" onClick={handleShowAddModal}>
                       Add People
                     </Button>
-                  </div>
                 </div>
                 <div className='profilePop__body__card1'>
                   <div className='d-flex align-items-center'>
@@ -194,7 +191,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
           </div>
         </Modal>
       </div>
-      <AddPeopleModal showModal={showModal} room_id={room_id} org_id={org_id}/>
+      <AddPeopleModal setShowModal={setShowModal} showModal={showModal} room_id={room_id} org_id={org_id}/>
       </>
     )
 };
