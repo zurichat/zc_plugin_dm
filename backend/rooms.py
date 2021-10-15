@@ -18,6 +18,8 @@ from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
 from .utils import SearchPagination
+from asgiref.sync import sync_to_async
+from django.views.decorators.cache import cache_page
 # from django.http.response import JsonResponse
 
 
@@ -540,10 +542,11 @@ def close_conversation(request, room_id, member_id):
     operation_summary="searches for message by a user",
     responses={404: "Error: Not Found"},
 )
+@sync_to_async
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    key = request.query_params.get("key", "")
+    key = request.query_params.get("q", "")
     users = request.query_params.getlist("filter", [])
     limit = request.query_params.get("limit", 20)
 
@@ -567,14 +570,14 @@ def search_DM(request, member_id):
         else:
             rooms_query = {"room_user_ids": member_id}
             
-        options = {"sort": {"created_at": -1}}
-
+        options = {"sort": {"created_at": -1},}
         rooms = DB.read_query("dm_rooms", query=rooms_query, options=options)
         
         org_id = DB.organization_id
         room_ids = list(map(lambda room: room["_id"], rooms)) if rooms else []
         
         if rooms:
+            members = get_all_organization_members(org_id)
             messages_query = {
                 "$and":[
                     {"message":{"$regex":key}},
@@ -584,7 +587,7 @@ def search_DM(request, member_id):
             
             messages = DB.read_query("dm_messages", query = messages_query)
             if messages:
-                members = get_all_organization_members(org_id)
+            
                 members_found = {}
                 for message in messages:
                     if message['sender_id'] not in members_found:
@@ -596,16 +599,16 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False 
                     if 'notes' in  message.keys(): del message['notes']
-                    message['url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
-                    message['email'] =  members_found[message['sender_id']]['email'] if members_found[message['sender_id']] else None
-                    message['title'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['image_url'] = members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None
+                    message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
+                    message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)
-          
-                 
+        
+                
         result = paginator.paginate_queryset([], request)
         return paginator.get_paginated_response(result,key,users,request)
         
@@ -614,6 +617,54 @@ def search_DM(request, member_id):
         result = paginator.paginate_queryset([], request)
         return paginator.get_paginated_response(result,key,users,request)
     
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="searches for message by a user",
+    responses={404: "Error: Not Found"},
+)
+@sync_to_async
+@api_view(["GET"])
+@db_init_with_credentials
+def search_suggestions(request, member_id):
+    query = {"room_user_ids":member_id}
+    options = {
+        "sort":{"created_at": -1},
+        "projection":{"room_user_ids":1, "_id":0}
+    }
+    data = {}
+    org_id = DB.organization_id
+    try:
+        members = get_all_organization_members(org_id)
+        rooms = DB.read_query("dm_rooms",query=query,options=options)
+        member_ids = []
+        if rooms:    
+            for room in rooms:
+                room['room_user_ids'].remove(member_id)
+                if None in room['room_user_ids']:
+                    room['room_user_ids'].remove(None)
+                member_ids.extend(room['room_user_ids'])
+                
+        for member in members:
+            if member['_id'] in member_ids:
+                username = member.get('user_name')
+                data[member['_id']] = username
+                
+        response = {
+            "status":"ok",
+            "type":"suggestions",
+            "data":data
+        }
+                   
+    except Exception as e:
+        print(e)     
+        response = {
+            "status":"ok",
+            "type":"suggestions",
+            "data":data
+        }
+    return Response(response, status=status.HTTP_200_OK)
+
+
 
 @api_view(["GET"])
 @db_init_with_credentials
