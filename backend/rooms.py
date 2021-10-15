@@ -18,6 +18,8 @@ from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
 from .utils import SearchPagination
+from asgiref.sync import sync_to_async
+from django.views.decorators.cache import cache_page
 # from django.http.response import JsonResponse
 
 
@@ -73,7 +75,8 @@ def create_room(request, member_id):
                       "created_at": serializer.data["created_at"],
                       "bookmark": [],
                       "pinned": [],
-                      "starred": [ ]
+                      "starred": [],
+                      "closed": False
                           }
 
             response = DB.write("dm_rooms", data=fields)
@@ -503,35 +506,79 @@ def group_member_add(request, room_id):
 
 @swagger_auto_schema(
     methods=["put"],
-    operation_summary="Closes DM Conversation",
+    operation_summary="Closes DM on the sidebar",
     responses={
-        200: "OK: Success",
-        401: "Unauthorized Access",
-        404: "Room Not Found",
+        200: "success",
+        404: "room not found",
         405: "Method Not Allowed",
+        424: "failed",
     },
 )
 @api_view(["PUT"])
-@db_init_with_credentials
-def close_conversation(request, room_id, member_id):
+#@db_init_with_credentials
+def close_conversation(request, org_id, room_id, member_id):
     """
-    Closes a dm conversation
-    params: room_id, member_id
+    This function allows for the Closing of a DM room on the sidebar
+    The params taken are the organization ID, room ID and the ID of the member initiating the command
+    The HTTPS method is PUT
+    A request to this function matches a valid room to a user in the room users list
+    It then removes the room from the sidebar in realtime by toggling the closed status of the room from False to True
     """
-    if request.method == "PUT":
+    data = {}
+
+    try:
         room = DB.read("dm_rooms", {"_id": room_id})
-        if room or room is not None:
-            room_users = room["room_user_ids"]
-            if member_id in room_users:
-                room_users.remove(member_id)
-                data = {'room_user_ids':room_users}
-                response = DB.update("dm_rooms", room_id, data=data)
-                return Response(response, status=status.HTTP_200_OK)
-            return Response(
-                "You are not authorized", status=status.HTTP_401_UNAUTHORIZED
-            )
-        return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
-    return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    except Exception:
+        return None
+    if room:
+        if member_id in room["room_user_ids"]:
+            if room["closed"] == False:
+                data = {
+                    "closed": True
+                }                                           
+            else:
+                data = {
+                    "closed": False
+                }
+            response = DB.update("dm_rooms", room_id, data) 
+            if response:
+                output_data = {
+                            "event": "sidebar_update",
+                            "plugin_id": "dm.zuri.chat",
+                            "data": {
+                                "name": "DM Plugin",
+                                "description": "closes a DM conversation",
+                                "group_name": "DM",
+                                "category": "direct messages",
+                                "show_group": False,
+                                "button_url": "/dm",
+                                "public_rooms": [],
+                                "joined_rooms": sidebar_emitter(org_id=org_id, member_id=member_id),
+                                "starred_rooms": []
+                            }
+                }                    
+                try:
+                    centrifugo_data = centrifugo_client.publish (
+                        room=f"{org_id}_{member_id}_sidebar", data=output_data )
+                    if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
+                        return Response ( data=output_data, status=status.HTTP_200_OK )
+                    else:
+                        return Response(
+                            data="conversation closed but centrifugo unavailable",
+                            status=status.HTTP_424_FAILED_DEPENDENCY,
+                        )
+                except:
+                    return Response(
+                        data="centrifugo server not available",
+                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                    )
+            else:
+                return Response(
+                        "failed, conversation not closed", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+        return Response("member not in room", status=status.HTTP_403_FORBIDDEN)
+    return Response("room not found or not in users list", status=status.HTTP_404_NOT_FOUND)
+
 
 
 @swagger_auto_schema(
@@ -539,10 +586,11 @@ def close_conversation(request, room_id, member_id):
     operation_summary="searches for message by a user",
     responses={404: "Error: Not Found"},
 )
+@sync_to_async
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    key = request.query_params.get("key", "")
+    key = request.query_params.get("q", "")
     users = request.query_params.getlist("filter", [])
     limit = request.query_params.get("limit", 20)
 
@@ -566,14 +614,14 @@ def search_DM(request, member_id):
         else:
             rooms_query = {"room_user_ids": member_id}
             
-        options = {"sort": {"created_at": -1}}
-
+        options = {"sort": {"created_at": -1},}
         rooms = DB.read_query("dm_rooms", query=rooms_query, options=options)
         
         org_id = DB.organization_id
         room_ids = list(map(lambda room: room["_id"], rooms)) if rooms else []
         
         if rooms:
+            members = get_all_organization_members(org_id)
             messages_query = {
                 "$and":[
                     {"message":{"$regex":key}},
@@ -583,7 +631,7 @@ def search_DM(request, member_id):
             
             messages = DB.read_query("dm_messages", query = messages_query)
             if messages:
-                members = get_all_organization_members(org_id)
+            
                 members_found = {}
                 for message in messages:
                     if message['sender_id'] not in members_found:
@@ -595,16 +643,16 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False 
                     if 'notes' in  message.keys(): del message['notes']
-                    message['url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
-                    message['email'] =  members_found[message['sender_id']]['email'] if members_found[message['sender_id']] else None
-                    message['title'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['image_url'] = members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None
+                    message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
+                    message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)
-          
-                 
+        
+                
         result = paginator.paginate_queryset([], request)
         return paginator.get_paginated_response(result,key,users,request)
         
@@ -613,6 +661,54 @@ def search_DM(request, member_id):
         result = paginator.paginate_queryset([], request)
         return paginator.get_paginated_response(result,key,users,request)
     
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="searches for message by a user",
+    responses={404: "Error: Not Found"},
+)
+@sync_to_async
+@api_view(["GET"])
+@db_init_with_credentials
+def search_suggestions(request, member_id):
+    query = {"room_user_ids":member_id}
+    options = {
+        "sort":{"created_at": -1},
+        "projection":{"room_user_ids":1, "_id":0}
+    }
+    data = {}
+    org_id = DB.organization_id
+    try:
+        members = get_all_organization_members(org_id)
+        rooms = DB.read_query("dm_rooms",query=query,options=options)
+        member_ids = []
+        if rooms:    
+            for room in rooms:
+                room['room_user_ids'].remove(member_id)
+                if None in room['room_user_ids']:
+                    room['room_user_ids'].remove(None)
+                member_ids.extend(room['room_user_ids'])
+                
+        for member in members:
+            if member['_id'] in member_ids:
+                username = member.get('user_name')
+                data[member['_id']] = username
+                
+        response = {
+            "status":"ok",
+            "type":"suggestions",
+            "data":data
+        }
+                   
+    except Exception as e:
+        print(e)     
+        response = {
+            "status":"ok",
+            "type":"suggestions",
+            "data":data
+        }
+    return Response(response, status=status.HTTP_200_OK)
+
+
 
 @api_view(["GET"])
 @db_init_with_credentials
