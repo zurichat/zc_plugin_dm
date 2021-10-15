@@ -73,8 +73,8 @@ class SearchPagination(pagination.PageNumberPagination):
     
     def get_paginated_response(self, data, query, filters, request):
         pagination_dict = OrderedDict([
-            ('total_count', self.page.paginator.count),
-            ('per_page', self.get_page_size(request)),
+            ('total_results', self.page.paginator.count),
+            ('page_size', self.get_page_size(request)),
             ('current_page', self.get_page_number(request, self.page.paginator)),
             ('first_page', 1),
             ('last_page',self.get_last_page(self.page.paginator.count, self.get_page_size(request))),
@@ -82,13 +82,24 @@ class SearchPagination(pagination.PageNumberPagination):
             ('previous', self.get_previous_link()), 
         ])
         
+        search_parameters = OrderedDict([
+            ('query', query),
+            ('filters',filters),
+            ('plugin',"DM")
+        ])
+        
+        results = OrderedDict([
+            ("entity","message"),
+            ("data",(data))
+        ])
+        
         return Response(OrderedDict([
             ('status', "ok"),
-            ('plugin', "DM"),
-            ('query',query),
-            ('filter', filters),
-            ('pagination',pagination_dict),   
-            ('data', data),            
+            ('title',"DM Search"),
+            ('description','Results for direct message'),
+            ('pagination',pagination_dict), 
+            ('search_parameters',search_parameters),
+            ('results', results),            
         ]))
         
         

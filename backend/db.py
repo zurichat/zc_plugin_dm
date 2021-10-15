@@ -276,7 +276,8 @@ def get_user_profile(org_id=None, user_id=None):
 
 
 def get_all_organization_members(org_id: str):
-    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
+    headers = {"Authorization": header}
+    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/", headers=header)
     if response.status_code == 200:
         return response.json()["data"]
     return None

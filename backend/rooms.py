@@ -541,11 +541,10 @@ def close_conversation(request, room_id, member_id):
     responses={404: "Error: Not Found"},
 )
 @sync_to_async
-@cache_page(120)
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
-    key = request.query_params.get("key", "")
+    key = request.query_params.get("q", "")
     users = request.query_params.getlist("filter", [])
     limit = request.query_params.get("limit", 20)
 
@@ -569,7 +568,7 @@ def search_DM(request, member_id):
         else:
             rooms_query = {"room_user_ids": member_id}
             
-        options = {"sort": {"created_at": -1}}
+        options = {"sort": {"created_at": -1},}
 
         rooms = DB.read_query("dm_rooms", query=rooms_query, options=options)
         
@@ -577,7 +576,6 @@ def search_DM(request, member_id):
         room_ids = list(map(lambda room: room["_id"], rooms)) if rooms else []
         
         if rooms:
-            
             members = get_all_organization_members(org_id)
             messages_query = {
                 "$and":[
@@ -588,7 +586,7 @@ def search_DM(request, member_id):
             
             messages = DB.read_query("dm_messages", query = messages_query)
             if messages:
-               
+            
                 members_found = {}
                 for message in messages:
                     if message['sender_id'] not in members_found:
@@ -600,16 +598,16 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False 
                     if 'notes' in  message.keys(): del message['notes']
-                    message['url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
-                    message['email'] =  members_found[message['sender_id']]['email'] if members_found[message['sender_id']] else None
-                    message['title'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['image_url'] = members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None
+                    message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
+                    message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)
-          
-                 
+        
+                
         result = paginator.paginate_queryset([], request)
         return paginator.get_paginated_response(result,key,users,request)
         
@@ -632,7 +630,7 @@ def search_suggestions(request, member_id):
         "sort":{"created_at": -1},
         "projection":{"room_user_ids":1, "_id":0}
     }
-
+    data = []
     rooms = DB.read_query("dm_rooms",query=query,options=options)
     if rooms:
         user_ids = []
@@ -641,7 +639,13 @@ def search_suggestions(request, member_id):
             if None in room['room_user_ids']:
                 room['room_user_ids'].remove(None)
             user_ids.extend(room['room_user_ids'])
-    return Response()
+           
+    response = {
+        "status":"ok",
+	    "type":"suggestions",
+        "data":data
+    }
+    return Response(response, status=status.HTTP_200_OK)
 
 
 
