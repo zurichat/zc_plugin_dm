@@ -453,18 +453,91 @@ def group_member_add(request, room_id):
                 # print("ROOM MEMBERS", room_members)
                 room_creator = room_members[0]
                 # print("ROOM CREATOR", room_creator)
-
-                url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
-                payload = json.dumps({
-                    "org_id": f"{ORG_ID}",
-                    "private": True,
-                    "room_member_ids": room_members,
-                    "room_name": "Sarah"
-                })
-                headers = {"Content-Type": "application/json"}
                 
-                response = requests.request("POST", url, headers=headers, data=payload)
-                return Response(response.json(), status=response.status_code)
+                
+                # url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
+                # payload = json.dumps({
+                # "org_id": f"{ORG_ID}",
+                # "private": True,
+                # "room_member_ids": room_members,
+                # "room_name": "Sarah"
+                # })
+                # headers = {"Content-Type": "application/json"}
+
+                # response = requests.request("POST", url, headers=headers, data=payload)
+                
+                
+                # =====================================================
+                # =====================================================
+
+                user_rooms = get_rooms(room_members[0], DB.organization_id)
+                if user_rooms and isinstance(user_rooms, list):
+                    for room in user_rooms:
+                        room_users = room["room_user_ids"]
+                        if set(room_users) == set(room_members):
+                            response_output = {
+                                "room_id": room["_id"]
+                            }
+                            return Response(data=response_output, status=status.HTTP_200_OK)
+
+                elif user_rooms.get("status_code") != 404:
+                    if user_rooms is None or user_rooms.get("status_code") != 200:
+                        return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+
+                fields = {
+                    "org_id": f"{ORG_ID}",
+                    "room_user_ids": room_members,
+                    "room_name": serializer.data["room_name"],
+                    "private": serializer.data["private"],
+                    "created_at": serializer.data["created_at"],
+                    "bookmark": [],
+                    "pinned": [],
+                    "starred": []
+                }
+
+                response = DB.write("dm_rooms", data=fields)
+                # ===============================
+
+                data_ID = response.get("data").get("object_id")
+                if response.get("status") == 200:
+                    response_output = {
+                        "event": "sidebar_update",
+                        "plugin_id": "dm.zuri.chat",
+                        "data": {
+                            "group_name": "DM",
+                            # "ID": f"{data_ID}",
+                            "name": "DM Plugin",
+                            "category": "direct messages",
+                            "show_group": False,
+                            "button_url": "/dm",
+                            "public_rooms": [],
+                            "joined_rooms": sidebar_emitter(org_id=DB.organization_id, member_id=room_creator, group_room_name=serializer.data["room_name"])
+                        }
+                    }
+
+                    try:
+                        centrifugo_data = centrifugo_client.publish(
+                            room=f"{DB.organization_id}_{room_creator}_sidebar",
+                            data=response_output)  # publish data to centrifugo
+                        if centrifugo_data and centrifugo_data.get("status_code") == 200:
+                            return Response(data=response_output, status=status.HTTP_201_CREATED)
+                        else:
+                            return Response(
+                                data="room created but centrifugo failed",
+                                status=status.HTTP_424_FAILED_DEPENDENCY,
+                            )
+                    except:
+                        return Response(
+                            data="centrifugo server not available",
+                            status=status.HTTP_424_FAILED_DEPENDENCY,
+                        )
+                return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+
+
+                # =====================================================
+                # =====================================================
+
+                # return Response(response.json(), status=response.status_code)
             else:
                 err_response = {"error": "Room is not a group room, Can only add users to group dm"}
                 return Response(err_response, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -516,7 +589,7 @@ def close_conversation(request, room_id, member_id):
 @db_init_with_credentials
 def search_DM(request, member_id):
     key = request.query_params.get("key", "")
-    users = request.query_params.getlist("id", [])
+    users = request.query_params.getlist("filter", [])
     limit = request.query_params.get("limit", 20)
 
     try:
@@ -572,80 +645,20 @@ def search_DM(request, member_id):
                     message['email'] =  members_found[message['sender_id']]['email'] if members_found[message['sender_id']] else None
                     message['title'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['image_url'] = members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None
-                    message['description'] = message['message']
+                    message['content'] = message['message']
                     
                 result = paginator.paginate_queryset(messages, request)
-                return paginator.get_paginated_response(result)
+                return paginator.get_paginated_response(result,key,users,request)
           
                  
         result = paginator.paginate_queryset([], request)
-        return paginator.get_paginated_response(result)
+        return paginator.get_paginated_response(result,key,users,request)
         
     except Exception as e:
         print(e)
         result = paginator.paginate_queryset([], request)
-        return paginator.get_paginated_response(result)
+        return paginator.get_paginated_response(result,key,users,request)
     
-
-@swagger_auto_schema(
-    methods=["get"],
-    operation_summarypyth="searches for message by a user",
-    responses={404: "Error: Not Found"},
-)
-@api_view(["GET"])
-@db_init_with_credentials
-def query_dm(request, member_id):
-    keyword = request.query_params.get('keyword',"")
-    users = request.query_params.getlist('id',[])
-    limit = request.query_params.get('limit',20)
-
-    try:
-        if type(limit) == str: limit = int(limit)
-    except ValueError:
-        limit=20
-
-    paginator = PageNumberPagination()
-    paginator.page_size = limit
-
-    try:
-        rooms = DB.read("dm_rooms") #get all rooms
-        user_rooms = list(filter(lambda room: member_id in room.get('room_user_ids',[]) or member_id in room.get('room_member_ids',[]), rooms)) #get all rooms with user        
-        if users != []:
-            rooms_checked = []
-            for user in users:
-                rooms_checked += [room for room in user_rooms
-                            if set(room.get('room_user_ids',[])) == set([member_id,user]) or  set(room.get('room_member_ids',[])) == set([member_id,user])] #get rooms with other specified users
-            user_rooms = rooms_checked
-        all_messages = DB.read("dm_messages") #get all messages
-        thread_messages = [] # get all thread messages
-        for message in all_messages:
-            threads  = message.get('threads',[])
-            for thread in threads:
-                thread['room_id'] = message.get('room_id')
-                thread['message_id'] = message.get('_id')
-                thread['thread'] = True
-                thread_messages.append(thread)
-
-
-        room_ids = [room['_id'] for room in user_rooms]
-
-        user_rooms_messages = [message for message in all_messages
-                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1] #get message in rooms
-        user_rooms_threads = [message for message in thread_messages
-                                if message['room_id'] in room_ids and message['message'].find(keyword) != -1]
-
-        user_rooms_messages.extend(user_rooms_threads)
-
-        for message in user_rooms_messages:
-            if 'read' in message.keys(): del message['read']
-            if 'pinned' in message.keys():del message['pinned']
-            if 'saved_by' in message.keys():del message['saved_by']
-            if 'threads' in message.keys(): del message['threads']
-            if 'thread' not in message.keys(): message['thread'] = False
-        result_page = paginator.paginate_queryset(user_rooms_messages, request)
-        return paginator.get_paginated_response(result_page)   
-    except:
-        return Response("Not Found", status=status.HTTP_404_NOT_FOUND)
 
 @api_view(["GET"])
 @db_init_with_credentials
@@ -681,3 +694,4 @@ def all_dms(request, member_id):
 
         else:
             return Response("No user rooms", status=status.HTTP_404_NOT_FOUND)
+
