@@ -506,35 +506,79 @@ def group_member_add(request, room_id):
 
 @swagger_auto_schema(
     methods=["put"],
-    operation_summary="Closes DM Conversation",
+    operation_summary="Closes DM on the sidebar",
     responses={
-        200: "OK: Success",
-        401: "Unauthorized Access",
-        404: "Room Not Found",
+        200: "success",
+        404: "room not found",
         405: "Method Not Allowed",
+        424: "failed",
     },
 )
 @api_view(["PUT"])
-@db_init_with_credentials
-def close_conversation(request, room_id, member_id):
+#@db_init_with_credentials
+def close_conversation(request, org_id, room_id, member_id):
     """
-    Closes a dm conversation
-    params: room_id, member_id
+    This function allows for the Closing of a DM room on the sidebar
+    The params taken are the organization ID, room ID and the ID of the member initiating the command
+    The HTTPS method is PUT
+    A request to this function matches a valid room to a user in the room users list
+    It then removes the room from the sidebar in realtime by toggling the closed status of the room from False to True
     """
-    if request.method == "PUT":
+    data = {}
+
+    try:
         room = DB.read("dm_rooms", {"_id": room_id})
-        if room or room is not None:
-            room_users = room["room_user_ids"]
-            if member_id in room_users:
-                room_users.remove(member_id)
-                data = {'room_user_ids':room_users}
-                response = DB.update("dm_rooms", room_id, data=data)
-                return Response(response, status=status.HTTP_200_OK)
-            return Response(
-                "You are not authorized", status=status.HTTP_401_UNAUTHORIZED
-            )
-        return Response("No Room / Invalid Room", status=status.HTTP_404_NOT_FOUND)
-    return Response("Method Not Allowed", status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    except Exception:
+        return None
+    if room:
+        if member_id in room["room_user_ids"]:
+            if room["closed"] == False:
+                data = {
+                    "closed": True
+                }                                           
+            else:
+                data = {
+                    "closed": False
+                }
+            response = DB.update("dm_rooms", room_id, data) 
+            if response:
+                output_data = {
+                            "event": "sidebar_update",
+                            "plugin_id": "dm.zuri.chat",
+                            "data": {
+                                "name": "DM Plugin",
+                                "description": "closes a DM conversation",
+                                "group_name": "DM",
+                                "category": "direct messages",
+                                "show_group": False,
+                                "button_url": "/dm",
+                                "public_rooms": [],
+                                "joined_rooms": sidebar_emitter(org_id=org_id, member_id=member_id),
+                                "starred_rooms": []
+                            }
+                }                    
+                try:
+                    centrifugo_data = centrifugo_client.publish (
+                        room=f"{org_id}_{member_id}_sidebar", data=output_data )
+                    if centrifugo_data and centrifugo_data.get ( "status_code" ) == 200:
+                        return Response ( data=output_data, status=status.HTTP_200_OK )
+                    else:
+                        return Response(
+                            data="conversation closed but centrifugo unavailable",
+                            status=status.HTTP_424_FAILED_DEPENDENCY,
+                        )
+                except:
+                    return Response(
+                        data="centrifugo server not available",
+                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                    )
+            else:
+                return Response(
+                        "failed, conversation not closed", status=status.HTTP_424_FAILED_DEPENDENCY
+                    )
+        return Response("member not in room", status=status.HTTP_403_FORBIDDEN)
+    return Response("room not found or not in users list", status=status.HTTP_404_NOT_FOUND)
+
 
 
 @swagger_auto_schema(
