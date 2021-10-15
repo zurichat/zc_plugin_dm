@@ -41,13 +41,14 @@ const AddPeopleModal = ({showModal, setShowModal, org_id, room_id}) =>{
     console.log("work ijn",workspaceUsers)
     console.log("let me see the data",options)
     let show = showModal
-    let setShow = setShowModal
+    // let setShow = setShowModal
     const defaultConfig = {
         title: "Add users",
-        type: "addmodal",
+        type: "inputbox",
         userList: userList,
         addMembersEvent: users => {
           const member_id = users
+          
           const data={
             room_id: room_id,
             member_id: member_id,
