@@ -28,6 +28,44 @@ def index(request):
     return render(request, "index.html", context)
 
 
+@csrf_exempt
+def dm_install(request):
+    """This endpoint is called when an organisation wants to install the
+    DM plugin for their workspace."""
+    if request.method == "POST":
+        token = request.headers["Authorization"]
+        print(token)
+        data = json.loads((request.body))
+        print(data)
+        org_id = data["org_id"]
+        user_id = data["user_id"]
+    print(org_id)
+    url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
+    payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
+    print(payload)
+
+    headers = {"Authorization": token, "Content-Type": "application/json"}
+
+    response = requests.post(url=url, headers=headers, data=payload)
+    print(response)
+    installed = response.json()
+
+    if installed["status"] == 200:
+        return JsonResponse(
+            {
+                "success": True,
+                "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
+                "message": "sucessfully retrieved",
+            },
+            safe=False,
+        )
+    else:
+        return JsonResponse(
+            {"sucess": False, "data": None, "status": 200},
+            safe=False,
+        )
+
+
 # Shows basic information about the DM plugin
 def info(request):
     info = {
