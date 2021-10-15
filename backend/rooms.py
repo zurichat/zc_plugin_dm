@@ -242,52 +242,6 @@ def room_info(request, room_id):
         return Response(data=room_data, status=status.HTTP_200_OK)
     return Response(data="Room not found", status=status.HTTP_404_NOT_FOUND)
 
-def group_room(request, member_id):
-    serializer = RoomSerializer(data=request.data)
-    if serializer.is_valid():
-        user_ids = serializer.data["room_member_ids"]
-
-        if len(user_ids) > 9:
-            response = {
-                "get_group_data": True,
-                "status_code": 400,
-                "room_id": "Group cannot have over 9 total users",
-            }
-            return response
-        else:
-            all_rooms = DB.read("dm_rooms")
-            group_rooms = []
-            for room_obj in all_rooms:
-                try:
-                    room_members = room_obj["room_user_ids"]
-                    if len(room_members) > 2 and set(room_members) == set(user_ids):
-                        group_rooms.append(room_obj["_id"])
-                        response = {
-                            "get_group_data": True,
-                            "status_code": 200,
-                            "room_id": room_obj["_id"],
-                        }
-                        return response
-                except KeyError:
-                    pass
-                    # print("Object has no key of Serializer")
-
-            # print("group rooms =", group_rooms)
-
-            fields = {
-                "org_id": serializer.data["org_id"],
-                "room_user_ids": serializer.data["room_member_ids"],
-                "room_name": serializer.data["room_name"],
-                "private": serializer.data["private"],
-                "created_at": serializer.data["created_at"],
-                "bookmark": [],
-                "pinned": [],
-                "starred": [],
-            }
-            response = DB.write("dm_rooms", data=fields)
-
-        return response
-
 
 @db_init_with_credentials
 def group_room(request, member_id):
