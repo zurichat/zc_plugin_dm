@@ -18,7 +18,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
-    path("dm/install", views.dm_install, name="install"),
+    path("api/v1/install", views.dm_install, name="install"),
     # path("dm/uninstall", views.dm_uninstall, name="uninstall"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
     path(
@@ -41,6 +41,13 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM",
     ),
+    
+    path(
+        "api/v1/search-suggestions/<str:org_id>/<str:member_id>",
+        rooms.search_suggestions,
+        name="search suggestions"
+    ),
+    
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/member",
         rooms.group_member_add,
