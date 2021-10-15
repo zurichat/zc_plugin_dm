@@ -58,6 +58,7 @@ def create_room(request, member_id):
                                                 "room_id": room["_id"]
                                             }
                         return Response(data=response_output, status=status.HTTP_200_OK)
+
             elif user_rooms is None:
                 return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
 
@@ -65,7 +66,7 @@ def create_room(request, member_id):
                 return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
         
             fields = {"org_id": serializer.data["org_id"],
-                      "room_user_ids": serializer.data["room_members_id"],
+                      "room_user_ids": serializer.data["room_member_ids"],
                       "room_name": serializer.data["room_name"],
                       "private": serializer.data["private"],
                       "created_at": serializer.data["created_at"],
@@ -73,12 +74,11 @@ def create_room(request, member_id):
                       "pinned": [],
                       "starred": [ ]
                           }
-
             response = DB.write("dm_rooms", data=fields)
             # ===============================
-
-        room_id = response.get("data").get("object_id")
+            
         if response.get("status") == 200:
+            room_id = response.get("data").get("object_id")
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -109,7 +109,7 @@ def create_room(request, member_id):
                     data="centrifugo server not available",
                     status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
-        return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+        return Response(f"unable to create room. Reason: {response}", status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
 
 
