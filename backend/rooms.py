@@ -18,6 +18,8 @@ from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
 from .utils import SearchPagination
+from asgiref.sync import sync_to_async
+from django.views.decorators.cache import cache_page
 # from django.http.response import JsonResponse
 
 
@@ -584,6 +586,8 @@ def close_conversation(request, room_id, member_id):
     operation_summary="searches for message by a user",
     responses={404: "Error: Not Found"},
 )
+@sync_to_async
+@cache_page(120)
 @api_view(["GET"])
 @db_init_with_credentials
 def search_DM(request, member_id):
@@ -619,6 +623,8 @@ def search_DM(request, member_id):
         room_ids = list(map(lambda room: room["_id"], rooms)) if rooms else []
         
         if rooms:
+            
+            members = get_all_organization_members(org_id)
             messages_query = {
                 "$and":[
                     {"message":{"$regex":key}},
@@ -628,7 +634,7 @@ def search_DM(request, member_id):
             
             messages = DB.read_query("dm_messages", query = messages_query)
             if messages:
-                members = get_all_organization_members(org_id)
+               
                 members_found = {}
                 for message in messages:
                     if message['sender_id'] not in members_found:
@@ -658,6 +664,32 @@ def search_DM(request, member_id):
         result = paginator.paginate_queryset([], request)
         return paginator.get_paginated_response(result,key,users,request)
     
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="searches for message by a user",
+    responses={404: "Error: Not Found"},
+)
+@api_view(["GET"])
+@sync_to_async
+@db_init_with_credentials
+def search_suggestions(request, member_id):
+    query = {"room_user_ids":member_id}
+    options = {
+        "sort":{"created_at": -1},
+        "projection":{"room_user_ids":1, "_id":0}
+    }
+
+    rooms = DB.read_query("dm_rooms",query=query,options=options)
+    if rooms:
+        user_ids = []
+        for room in rooms:
+            room['room_user_ids'].remove(member_id)
+            if None in room['room_user_ids']:
+                room['room_user_ids'].remove(None)
+            user_ids.extend(room['room_user_ids'])
+    return Response()
+
+
 
 @api_view(["GET"])
 @db_init_with_credentials
