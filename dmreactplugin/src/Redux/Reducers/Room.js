@@ -6,6 +6,7 @@ import {
   GET_ROOM_INFO,
   GET_ROOM_MESSAGES,
   CREATE_ROOM_MESSAGES,
+  ADD_PEOPLE_TO_ROOM
 } from "../Actions/actionTypes";
 
 const initialState = {
@@ -15,6 +16,7 @@ const initialState = {
   room_messages: null,
   room_message: '',
   all_dms: null,
+  addMember:null,
 };
 
 const roomsReducer = (state = initialState, action) => {
@@ -44,7 +46,12 @@ const roomsReducer = (state = initialState, action) => {
         ...state,
         room_message: action.payload
       }
-
+    case ADD_PEOPLE_TO_ROOM:
+      return{
+        ...state,
+        addMember:action.payload
+      }
+    
     default:
       return state;
   }

@@ -11,6 +11,7 @@ import {
   GET_ROOM_MESSAGES,
   CREATE_ROOM_MESSAGES,
   DELETE_ROOM_MESSAGE,
+  ADD_PEOPLE_TO_ROOM,
 } from './actionTypes';
 
 // Create Room
@@ -150,3 +151,26 @@ export const handleDeleteRoomMessage =
       console.log(`Error from handleDeleteRoomMessage: ${error}`);
     }
   };
+
+  // Add People to Room
+
+const addPeopleToRoom = (member_id, room_id, room_name) => ({
+  type: ADD_PEOPLE_TO_ROOM,
+  payload: room_id, member_id, room_name
+});
+
+export const handleAddPeopleToRoom =({org_id, room_id}) => async (dispatch) => {
+    try {
+      const { data } = await APIService.addPeopleToRoom(org_id, room_id, {
+          member_id: member_id,
+          room_id: room_id,
+          room_name: room_name
+        }
+      );
+      console.log("add people to room",data)
+      await dispatch(addPeopleToRoom(data));
+    } catch (error) {
+      console.log(`Error from handleAddPeopleToRoom: ${error}`);
+    }
+  };
+

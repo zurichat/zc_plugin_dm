@@ -64,9 +64,11 @@ def create_room(request, member_id):
                                             }
                         return Response(data=response_output, status=status.HTTP_200_OK)
 
-            elif user_rooms.get("status_code") != 404:
-                if user_rooms is None or user_rooms.get("status_code") != 200:
-                    return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+            elif user_rooms is None:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+
+            elif user_rooms.get("status_code") != 404 or user_rooms.get("status_code") != 200:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
         
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
@@ -83,8 +85,8 @@ def create_room(request, member_id):
             print(response)
             # ===============================
 
-        # data_ID = response.get("data").get("object_id")
         if response.get("status") == 200:
+            room_id = response.get("data").get("object_id")
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -118,7 +120,7 @@ def create_room(request, member_id):
                     data="centrifugo server not available",
                     status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
-        return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+        return Response(f"unable to create room. Reason: {response}", status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -284,7 +286,8 @@ def group_room(request, member_id):
                 "created_at": serializer.data["created_at"],
                 "bookmark": [],
                 "pinned": [],
-                "starred": []
+                "starred": [],
+                "closed": False
             }
             response = DB.write("dm_rooms", data=fields)
 
@@ -384,50 +387,45 @@ def star_room(request, room_id, member_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def group_member_add(request, room_id):
+def group_member_add(request, room_id, member_id):
     """
     Adds a user to a group dm
     returns 201 response if succesful or the appropriate response otherwise
 
     :params: org id and room_id
-    :payload: room_id and member_id
+    :payload: room_id: str, members_id: list & room_name: str
     """
     ORG_ID = DB.organization_id
     serializer = AddMemberSerializer(data=request.data)
     if serializer.is_valid():
 
-        member_id = serializer.data['member_id']
+        members_id = serializer.data['members_id']
         room_id = serializer.data['room_id']
 
         room = DB.read('dm_rooms', {"_id": room_id})
         if room and isinstance(room, dict):
             room_members = room['room_user_ids']
-            # print("ROOM MEMBERS", room_members)
+            
+            room_creator = room_members[0]
+            # print("ROOM CREATOR", room_creator)
+            # print("ROOM MEMBERS BEFORE", room_members)
 
             if len(room_members) > 2:
-                if member_id not in room_members:
-                    room_members.append(member_id)
-                # print("ROOM MEMBERS", room_members)
-                room_creator = room_members[0]
-                # print("ROOM CREATOR", room_creator)
                 
+                # if member_id not in room_members:
+                    # room_members.append(member_id)
+                    
+                room_members.extend(members_id)
+                room_members = list(set(room_members))
                 
-                # url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
-                # payload = json.dumps({
-                # "org_id": f"{ORG_ID}",
-                # "private": True,
-                # "room_member_ids": room_members,
-                # "room_name": "Sarah"
-                # })
-                # headers = {"Content-Type": "application/json"}
-
-                # response = requests.request("POST", url, headers=headers, data=payload)
-                
+                if len(room_members) > 9:
+                    return Response("Max Number For Members In a Group is 9", status=status.HTTP_400_BAD_REQUEST)
+                # print("ROOM MEMBERS AFTER", room_members)                
                 
                 # =====================================================
                 # =====================================================
 
-                user_rooms = get_rooms(room_members[0], DB.organization_id)
+                user_rooms = get_rooms(room_creator, DB.organization_id)
                 if user_rooms and isinstance(user_rooms, list):
                     for room in user_rooms:
                         room_users = room["room_user_ids"]
@@ -449,7 +447,8 @@ def group_member_add(request, room_id):
                     "created_at": serializer.data["created_at"],
                     "bookmark": [],
                     "pinned": [],
-                    "starred": []
+                    "starred": [],
+                    "closed": False
                 }
 
                 response = DB.write("dm_rooms", data=fields)
@@ -462,7 +461,6 @@ def group_member_add(request, room_id):
                         "plugin_id": "dm.zuri.chat",
                         "data": {
                             "group_name": "DM",
-                            # "ID": f"{data_ID}",
                             "name": "DM Plugin",
                             "category": "direct messages",
                             "show_group": False,
@@ -494,7 +492,6 @@ def group_member_add(request, room_id):
                 # =====================================================
                 # =====================================================
 
-                # return Response(response.json(), status=response.status_code)
             else:
                 err_response = {"error": "Room is not a group room, Can only add users to group dm"}
                 return Response(err_response, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -648,13 +645,11 @@ def search_DM(request, member_id):
                     if 'reactions' in message.keys(): del message['reactions']
                     if 'thread' in message.keys(): del message['thread']
                     
-                    message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
+                    message['destination_url'] = f"/dm/{message['room_id']}"
                     message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['title'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
-                    if 'sender_id' in message.keys(): del message['sender_id']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)
@@ -670,7 +665,7 @@ def search_DM(request, member_id):
     
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="searches for message by a user",
+    operation_summary="gets search suggestion for a user",
     responses={404: "Error: Not Found"},
 )
 @sync_to_async
@@ -716,7 +711,7 @@ def search_suggestions(request, member_id):
     return Response(response, status=status.HTTP_200_OK)
 
 
-
+@sync_to_async
 @api_view(["GET"])
 @db_init_with_credentials
 def all_dms(request, member_id):
@@ -727,28 +722,31 @@ def all_dms(request, member_id):
     if request.method =="GET":
         paginator = PageNumberPagination()
         paginator.page_size = 20
-        rooms=get_rooms(member_id, DB.organization_id)
+        rooms=DB.read_query("dm_rooms", query = {"room_user_ids":member_id} )
     
-        if rooms:
-            all_messages=[] #new code added
-
+        all_messages=[] #holds data to render
+        try:
             room_ids = [room['_id'] for room in rooms ]
-
-            for room in room_ids:
-                messages=get_room_messages(room, DB.organization_id)
-                try:
-                    current_message=messages[0]
-                    all_messages.append(current_message)
-                except TypeError:
-                    pass
             
-            if all_messages:
-                all_messages = all_messages[::-1]
-                response = paginator.paginate_queryset(all_messages, request)
+            query = {
+                "room_id":{"$in":room_ids}
+            }
+            
+            options = {
+                "sort":{'created_at': -1}
+            }
+            
+            messages=DB.read_query("dm_messages", query=query, options = options)
 
-                return paginator.get_paginated_response(response)
-            return Response("No messages in user rooms", status=status.HTTP_404_NOT_FOUND) 
-
-        else:
-            return Response("No user rooms", status=status.HTTP_404_NOT_FOUND)
+            for message in messages:
+                if message['room_id'] in room_ids:
+                    all_messages.append(message)
+                    room_ids.remove(message['room_id'])
+                        
+            response = paginator.paginate_queryset(all_messages, request)
+            return paginator.get_paginated_response(response)
+        
+        except:
+            response = paginator.paginate_queryset(all_messages, request)
+            return paginator.get_paginated_response(response)
 

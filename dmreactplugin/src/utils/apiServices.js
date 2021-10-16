@@ -136,6 +136,13 @@ class APIServices {
       `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
     );
   }
+
+  async addPeopleToRoom(org_id, room_id, data) {
+    return await $http.post(
+        `/org/${org_id}/rooms/${room_id}/member`,
+        data
+    );
+  }
 }
 
 const instance = new APIServices();

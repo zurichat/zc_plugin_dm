@@ -2,6 +2,8 @@ import re
 from urllib.parse import urlencode
 from django.http import response
 import requests, json
+from datetime import datetime, timedelta
+
 
 from requests import exceptions
 
@@ -209,62 +211,48 @@ def get_rooms(user_id, org_id):
 
     helper = DataStorage()
     helper.organization_id = org_id
-    response = helper.read("dm_rooms")
-    data = []
-    if response != None:
-        if "status_code" in response:
-            return response
-        for room in response:
-            if "room_user_ids" in room:
-                try:
-                    users_room_list = room["room_user_ids"]
-                    if user_id in users_room_list:
-                        data.append(room)
-                except Exception:
-                    pass
-        if len(data) == 0:
-            data = []
-            return data
-        return data
-    return data
+    query = {"room_user_ids":user_id}
+    options = {"sort":{"created_at":-1}}
+    response = helper.read_query("dm_rooms", query=query, options=options)
+
+    if response and "status_code" not in response:
+        return response
+    return []
 
 
 # get all the messages in a particular room
 def get_room_messages(room_id, org_id):
     helper = DataStorage()
     helper.organization_id = org_id
-    response = helper.read("dm_messages", {"room_id": room_id})
-    if response != None:
-        if "status_code" in response:
-            return response
-        if len(response) == 0:
-            response = None
-            return response
-        for message in response:
-            message["id"] = message.pop("_id")
-        response.reverse()
+    options = {"sort":{"created_at":-1}}
+    response = helper.read_query("dm_messages", query={"room_id": room_id}, options=options)
+    if response and "status_code" not in response:
         return response
-    return response
+    return []
 
 
 # get all the messages in a particular room filtered by date
-def get_messages(response, date):
-    res = []
-    if response != None:
-        if "status_code" in response:
-            return response
-        for message in response:
-            try:
-                query_date = message["created_at"].split("T")[0]
-                if query_date == date:
-                    res.append(message)
-            except Exception:
-                pass
-        if len(res) == 0:
-            res = None
-            return res
-        return res
-    return response
+def get_messages(room_id,org_id, date):
+    helper = DataStorage()
+    helper.organization_id = org_id
+    req_date = datetime.strptime(date, '%d-%m-%Y')
+    next_day = req_date + timedelta(days=1)
+    options = {"sort":{"created_at":-1}}
+    query = {
+        "$and":[
+        {"room_id":room_id},
+        {"created_at":{
+            "$gte":str(req_date),
+            "$lt": str(next_day)
+        }}
+        ]
+    }
+    
+    response = helper.read_query("dm_messages", query=query, options=options)
+    if response and "status_code" not in response:
+        return response
+    return []
+    
 
 
 def get_user_profile(org_id=None, user_id=None):
@@ -276,8 +264,9 @@ def get_user_profile(org_id=None, user_id=None):
 
 
 def get_all_organization_members(org_id: str):
-    headers = {"Authorization": header}
-    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/", headers=header)
+    response = requests.get(
+        f"https://api.zuri.chat/organizations/{org_id}/members/"
+    )
     if response.status_code == 200:
         return response.json()["data"]
     return None
@@ -287,7 +276,7 @@ def get_member(members: list, member_id: str):
     for member in members:
         if member["_id"] == member_id:
             return member
-    return None
+    return {}
 
 
 def sidebar_emitter(
@@ -389,3 +378,10 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
+
+
+
+def get_user_rooms(user_id):
+    response=DB.read_query(collection_name="dm_rooms",query={"room_user_ids":f"{user_id}"},options={"projection":{"room_user_ids":1,"_id":1}})
+    return response
+
