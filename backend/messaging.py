@@ -368,9 +368,8 @@ def pinned_message(request, message_id):
     methods=["get"],
     operation_summary="Returns all messages in the dm collection",
     responses={
-        200: PinMessageResponse,
-        400: "Error: Bad Request",
-        503: "Server Error: Service Unavailable",
+        200: "success",
+        424: "Failed Dependency"
     },
 )
 @api_view(["GET"])
