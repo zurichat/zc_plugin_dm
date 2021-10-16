@@ -391,13 +391,13 @@ def group_member_add(request, room_id, member_id):
     returns 201 response if succesful or the appropriate response otherwise
 
     :params: org id and room_id
-    :payload: room_id: str, member_id: list & room_name: str
+    :payload: room_id: str, members_id: list & room_name: str
     """
     ORG_ID = DB.organization_id
     serializer = AddMemberSerializer(data=request.data)
     if serializer.is_valid():
 
-        member_id = serializer.data['member_id']
+        members_id = serializer.data['members_id']
         room_id = serializer.data['room_id']
 
         room = DB.read('dm_rooms', {"_id": room_id})
@@ -413,7 +413,7 @@ def group_member_add(request, room_id, member_id):
                 # if member_id not in room_members:
                     # room_members.append(member_id)
                     
-                room_members.extend(member_id)
+                room_members.extend(members_id)
                 room_members = list(set(room_members))
                 
                 if len(room_members) > 9:
