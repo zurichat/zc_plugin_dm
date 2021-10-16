@@ -391,3 +391,10 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
+
+
+
+def get_user_rooms(user_id):
+    response=DB.read_query(collection_name="dm_rooms",query={"room_user_ids":f"{user_id}"},options={"projection":{"room_user_ids":1,"_id":1}})
+    return response
+
