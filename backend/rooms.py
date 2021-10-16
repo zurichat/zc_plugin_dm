@@ -284,7 +284,8 @@ def group_room(request, member_id):
                 "created_at": serializer.data["created_at"],
                 "bookmark": [],
                 "pinned": [],
-                "starred": []
+                "starred": [],
+                "closed": False
             }
             response = DB.write("dm_rooms", data=fields)
 
@@ -449,7 +450,8 @@ def group_member_add(request, room_id):
                     "created_at": serializer.data["created_at"],
                     "bookmark": [],
                     "pinned": [],
-                    "starred": []
+                    "starred": [],
+                    "closed": False
                 }
 
                 response = DB.write("dm_rooms", data=fields)
