@@ -124,9 +124,9 @@ const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
             <p>To:</p>
             <div className='alldms-searchusers-content'>
                 {
-                    // selectedUsers.map((selectedUser)=>(
-                    //     <SelectedUsersTag selectedUser={selectedUser}/>
-                    // ))
+                     selectedUsers.map((selectedUser)=>(
+                         <SelectedUsersTag selectedUser={selectedUser}/>
+                    ))
                 }
                 {selectedUsers[0] && (
                     <SelectedUsersTag
