@@ -64,9 +64,11 @@ def create_room(request, member_id):
                                             }
                         return Response(data=response_output, status=status.HTTP_200_OK)
 
-            elif user_rooms.get("status_code") != 404:
-                if user_rooms is None or user_rooms.get("status_code") != 200:
-                    return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+            elif user_rooms is None:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+
+            elif user_rooms.get("status_code") != 404 or user_rooms.get("status_code") != 200:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
         
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
@@ -83,8 +85,8 @@ def create_room(request, member_id):
             print(response)
             # ===============================
 
-        # data_ID = response.get("data").get("object_id")
         if response.get("status") == 200:
+            room_id = response.get("data").get("object_id")
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -118,7 +120,7 @@ def create_room(request, member_id):
                     data="centrifugo server not available",
                     status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
-        return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+        return Response(f"unable to create room. Reason: {response}", status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -385,50 +387,45 @@ def star_room(request, room_id, member_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def group_member_add(request, room_id):
+def group_member_add(request, room_id, member_id):
     """
     Adds a user to a group dm
     returns 201 response if succesful or the appropriate response otherwise
 
     :params: org id and room_id
-    :payload: room_id and member_id
+    :payload: room_id: str, members_id: list & room_name: str
     """
     ORG_ID = DB.organization_id
     serializer = AddMemberSerializer(data=request.data)
     if serializer.is_valid():
 
-        member_id = serializer.data['member_id']
+        members_id = serializer.data['members_id']
         room_id = serializer.data['room_id']
 
         room = DB.read('dm_rooms', {"_id": room_id})
         if room and isinstance(room, dict):
             room_members = room['room_user_ids']
-            # print("ROOM MEMBERS", room_members)
+            
+            room_creator = room_members[0]
+            # print("ROOM CREATOR", room_creator)
+            # print("ROOM MEMBERS BEFORE", room_members)
 
             if len(room_members) > 2:
-                if member_id not in room_members:
-                    room_members.append(member_id)
-                # print("ROOM MEMBERS", room_members)
-                room_creator = room_members[0]
-                # print("ROOM CREATOR", room_creator)
                 
+                # if member_id not in room_members:
+                    # room_members.append(member_id)
+                    
+                room_members.extend(members_id)
+                room_members = list(set(room_members))
                 
-                # url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
-                # payload = json.dumps({
-                # "org_id": f"{ORG_ID}",
-                # "private": True,
-                # "room_member_ids": room_members,
-                # "room_name": "Sarah"
-                # })
-                # headers = {"Content-Type": "application/json"}
-
-                # response = requests.request("POST", url, headers=headers, data=payload)
-                
+                if len(room_members) > 9:
+                    return Response("Max Number For Members In a Group is 9", status=status.HTTP_400_BAD_REQUEST)
+                # print("ROOM MEMBERS AFTER", room_members)                
                 
                 # =====================================================
                 # =====================================================
 
-                user_rooms = get_rooms(room_members[0], DB.organization_id)
+                user_rooms = get_rooms(room_creator, DB.organization_id)
                 if user_rooms and isinstance(user_rooms, list):
                     for room in user_rooms:
                         room_users = room["room_user_ids"]
@@ -464,7 +461,6 @@ def group_member_add(request, room_id):
                         "plugin_id": "dm.zuri.chat",
                         "data": {
                             "group_name": "DM",
-                            # "ID": f"{data_ID}",
                             "name": "DM Plugin",
                             "category": "direct messages",
                             "show_group": False,
@@ -496,7 +492,6 @@ def group_member_add(request, room_id):
                 # =====================================================
                 # =====================================================
 
-                # return Response(response.json(), status=response.status_code)
             else:
                 err_response = {"error": "Room is not a group room, Can only add users to group dm"}
                 return Response(err_response, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -652,11 +647,9 @@ def search_DM(request, member_id):
                     
                     message['destination_url'] = f"/dm/{message['room_id']}"
                     message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['title'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
-                    if 'sender_id' in message.keys(): del message['sender_id']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)

@@ -359,3 +359,37 @@ def pinned_message(request, message_id):
         )  # publish data to centrifugo
         if centrifugo_data.get("error", None) == None:
             return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="Returns all messages in the dm collection",
+    responses={
+        200: "success",
+        424: "Failed Dependency"
+    },
+)
+@api_view(["GET"])
+@db_init_with_credentials
+def all_messages(request):
+    """This endpoint is used to get all the messages in the dm_messages collection. 
+    Also returns a messages with the read and unread status"""
+    
+    res = DB.read("dm_messages")
+    if res and "status_code" not in res:
+        all_messages = res
+        read_messages = [message for message in all_messages if message["read"] == "true"]
+        print(read_messages)
+        unread_messages = [message for message in all_messages if message["read"] == "false"]
+        message_data = {
+            "all_messages": all_messages,
+            "read_messages": read_messages,
+            "unread_messages":unread_messages
+        }
+        return Response(message_data, status=status.HTTP_200_OK)
+
+    else:
+        return Response(f"something went wrong. message collection returned{res}",
+                        status=status.HTTP_424_FAILED_DEPENDENCY)
+
+    
