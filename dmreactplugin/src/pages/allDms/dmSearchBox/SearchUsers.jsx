@@ -1,11 +1,12 @@
+import { useHistory } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
 import React, { useState, useEffect, useRef } from 'react';
+
 import SelectedUsersTag from './SelectedUsersTag';
 import SearchedUsersModal from './SearchedUsersModal';
-import { useDispatch, useSelector } from 'react-redux';
-import { handleCreateDmRoom } from '../../Redux/Actions/dmActions';
-import { useHistory } from 'react-router';
+import { handleCreateDmRoom, handleSetRoom } from '../../../Redux/Actions/dmActions.js';
 
-const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
+const SearchUsers = ({ orgUsers }) => {
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [searchModalOpen, setSearchModalOpen] = useState(false);
@@ -14,6 +15,7 @@ const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
     const [roomLoading, setRoomLoading] = useState(false);
 
     const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
+    const authReducer = useSelector(({ authReducer }) => authReducer);
 
     const history = useHistory();
 
@@ -83,8 +85,8 @@ const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
         if (selectedUsers.length) {
             dispatch(
                 handleCreateDmRoom({
-                    org_id,
-                    member_id: loggedInUser_id,
+                    org_id: authReducer.organisation,
+                    member_id: authReducer.user._id,
                     user_ids: selectedUsersIds,
                     room_name,
                 })
@@ -106,9 +108,9 @@ const SearchUsers = ({ orgUsers, org_id, loggedInUser_id }) => {
     useEffect(() => {
         if (roomsReducer.room_id) {
             setRoomLoading(false);
-            const redirectTo = `/${org_id}/${roomsReducer.room_id}/${loggedInUser_id}`;
-
+            const redirectTo = `/${roomsReducer.room_id}`;
             history.push(redirectTo);
+            dispatch(handleSetRoom(null));
         }
     }, [roomsReducer]);
 
