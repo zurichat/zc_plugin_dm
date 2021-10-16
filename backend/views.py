@@ -48,7 +48,7 @@ def dm_install(request):
         return JsonResponse(
             {
                 "success": True,
-                "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
+                "data": {"redirect_url": "/message-noticeboard"},
                 "message": "sucessfully retrieved",
             },
             safe=False,
