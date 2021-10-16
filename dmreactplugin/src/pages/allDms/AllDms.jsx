@@ -2,8 +2,6 @@ import React, {useEffect} from 'react';
 import SearchUsers from './SearchUsers';
 import { useSelector } from 'react-redux';
 import './AllDms.css'
-import { useDispatch } from 'react-redux';
-import { handleGetAllUserDms } from '../../Redux/Actions/dmActions';
 
 
 const DefaultNoDms=()=>{
@@ -20,18 +18,6 @@ const AllDms = ({org_id, loggedInUser_id})=>{
     const membersReducer = useSelector(({ membersReducer }) => membersReducer);
     const orgUsers = membersReducer;
 
-    
-    const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(handleGetAllUserDms(org_id, loggedInUser_id))
-    
-  },[dispatch, org_id, loggedInUser_id])
-
-    // const allDmsReducer = useSelector(({ allDmsReducer }) => allDmsReducer);
-    // console.log(allDmsReducer)
-    // const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
-    // const { allRooms } = roomsReducer?.rooms;
     return(
       
         <div className='alldms'>
