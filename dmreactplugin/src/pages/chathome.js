@@ -1,8 +1,8 @@
 import React from 'react';
 
-import DmInputTextField from '../components/common/dmInputTextField/dmInputTextField';
-import DmFullProfile from '../components/DmFullProfile/DmFullProfile';
-import ThreeDotKebab from '../components/common/threeDotKebabMenu/threeDotKebab';
+import DmInputTextField from '../../old/components/common/dmInputTextField/dmInputTextField';
+import DmFullProfile from '../../old/components/DmFullProfile/DmFullProfile';
+import ThreeDotKebab from '../../old/components/common/threeDotKebabMenu/threeDotKebab';
 
 const ChatHome = () => {
     return (

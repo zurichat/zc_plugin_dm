@@ -80,7 +80,7 @@
 }
 
 .alldms-searchusers-content input {
-  width: 19rem;
+  width: 100%;
   outline: none;
   border: none;
 }

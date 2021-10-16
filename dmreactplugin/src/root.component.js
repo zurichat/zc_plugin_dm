@@ -5,7 +5,7 @@ import App from "./App";
 
 export default function Root(props) {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/dm">
       <Provider store={store}>
         <App />
       </Provider>
