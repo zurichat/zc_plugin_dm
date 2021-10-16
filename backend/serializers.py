@@ -160,7 +160,10 @@ class ScheduleMessageSerializer(serializers.Serializer):
 
 
 class AddMemberSerializer(serializers.Serializer):
-    member_id = serializers.CharField(max_length=128)
+    # member_id = serializers.CharField(max_length=128)
+    members_id = serializers.ListField(
+        child=serializers.CharField(max_length=128), allow_empty=False, required=True
+    )
     room_id = serializers.CharField(max_length=128)
     room_name = serializers.CharField(max_length=128, required=True)
     private = serializers.BooleanField(default=True, read_only=True)
