@@ -51,7 +51,7 @@ def message_create_get(request, room_id):
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
-            room = DB.read("dm_rooms", {"_id": room_id})
+            room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room:
                 messages = get_room_messages(room_id, DB.organization_id)
                 if date != None:
@@ -90,7 +90,7 @@ def message_create_get(request, room_id):
             data = serializer.data
             room_id = data["room_id"]  # room id gotten from client request
 
-            room = DB.read("dm_rooms", {"_id": room_id})
+            room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room and room.get("status_code", None) == None:
                 if data["sender_id"] in room.get("room_user_ids", []):
 
