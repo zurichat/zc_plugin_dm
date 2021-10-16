@@ -22,14 +22,26 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
     const user = actualUser && actualUser;
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [showModal,setShowModal] = useState(false);
+    
     const headerConfig = {
         name: `${user?.user_name}`, //Name on header
         icon: `${user?.image_url}`, //Image on header
-        eventTitle: () => {
-            console.log(user);
-            setModalIsOpen(true);
-            //Block of code to be triggered on title click
-        },
+        // eventTitle: () => {
+        //     console.log(user);
+        //     setModalIsOpen(true);
+        //     //Block of code to be triggered on title click
+        // },
+        roomInfo: {
+          // membersList:membersList,
+          addmembersevent: values => {
+            // values.filter(obj => obj.value === selectedValue)
+            // data.filter(obj => obj.value === selectedValue
+            console.warn("a plugin added",values)
+          },
+          removemembersevent:id=>{
+            console.warn("a plugin deleted",id)
+          }
+        }
     };
     const getLocalTime = () => {
         let date = new Date();
@@ -77,7 +89,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
 
             <FaAngleDown className='profileHeader__icon' />
           </div>
-        </header> */}
+        </header> 
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={() => setModalIsOpen(false)}
@@ -133,7 +145,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
                 <p>Integrations</p>
               </div>
             </div>
-            */}
+            *
           <Tabs className=".nav-tabs .nav-item.nav-link.active" defaultActiveKey="about" id="Member-tabs" className="mb-3">
             <Tab eventKey="about" title="About">
             <div className='profilePop__body'>
@@ -149,9 +161,9 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
                   <BsEnvelope />{' '}
                   <span className='profilePop__blue'> {user?.email}</span>
                 </p>
-                {/* <p className='d-flex align-items-center'>
+                <p className='d-flex align-items-center'>
                   <button >Add Members</button>
-                </p> */}
+                </p> 
                 <h2
                   className='profilePop__blue'
                   style={{ cursor: 'pointer' }}
@@ -191,7 +203,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid,org_id, room
           </div>
         </Modal>
       </div>
-      <AddPeopleModal setShowModal={setShowModal} showModal={showModal} room_id={room_id} org_id={org_id}/>
+      <AddPeopleModal setShowModal={setShowModal} showModal={showModal} room_id={room_id} org_id={org_id}/>*/}</div>
       </>
     )
 };
