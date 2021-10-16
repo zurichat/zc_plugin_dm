@@ -48,7 +48,7 @@ urlpatterns = [
     ),
     
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/member",
+        "api/v1/org/<str:org_id>/room/<str:room_id>/members/<str:member_id>",
         rooms.group_member_add,
         name="group_user_add",
     ),
