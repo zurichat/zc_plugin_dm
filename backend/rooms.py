@@ -385,7 +385,7 @@ def star_room(request, room_id, member_id):
 )
 @api_view(["POST"])
 @db_init_with_credentials
-def group_member_add(request, room_id):
+def group_member_add(request, room_id, member_id):
     """
     Adds a user to a group dm
     returns 201 response if succesful or the appropriate response otherwise
