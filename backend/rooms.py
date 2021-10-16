@@ -672,7 +672,7 @@ def search_DM(request, member_id):
     
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="searches for message by a user",
+    operation_summary="gets search suggestion for a user",
     responses={404: "Error: Not Found"},
 )
 @sync_to_async
@@ -718,7 +718,7 @@ def search_suggestions(request, member_id):
     return Response(response, status=status.HTTP_200_OK)
 
 
-
+@sync_to_async
 @api_view(["GET"])
 @db_init_with_credentials
 def all_dms(request, member_id):
@@ -729,28 +729,31 @@ def all_dms(request, member_id):
     if request.method =="GET":
         paginator = PageNumberPagination()
         paginator.page_size = 20
-        rooms=get_rooms(member_id, DB.organization_id)
+        rooms=DB.read_query("dm_rooms", query = {"room_user_ids":member_id} )
     
-        if rooms:
-            all_messages=[] #new code added
-
+        all_messages=[] #holds data to render
+        try:
             room_ids = [room['_id'] for room in rooms ]
-
-            for room in room_ids:
-                messages=get_room_messages(room, DB.organization_id)
-                try:
-                    current_message=messages[0]
-                    all_messages.append(current_message)
-                except TypeError:
-                    pass
             
-            if all_messages:
-                all_messages = all_messages[::-1]
-                response = paginator.paginate_queryset(all_messages, request)
+            query = {
+                "room_id":{"$in":room_ids}
+            }
+            
+            options = {
+                "sort":{'created_at': -1}
+            }
+            
+            messages=DB.read_query("dm_messages", query=query, options = options)
 
-                return paginator.get_paginated_response(response)
-            return Response("No messages in user rooms", status=status.HTTP_404_NOT_FOUND) 
-
-        else:
-            return Response("No user rooms", status=status.HTTP_404_NOT_FOUND)
+            for message in messages:
+                if message['room_id'] in room_ids:
+                    all_messages.append(message)
+                    room_ids.remove(message['room_id'])
+                        
+            response = paginator.paginate_queryset(all_messages, request)
+            return paginator.get_paginated_response(response)
+        
+        except:
+            response = paginator.paginate_queryset(all_messages, request)
+            return paginator.get_paginated_response(response)
 
