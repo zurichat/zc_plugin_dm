@@ -55,17 +55,12 @@ def message_create_get(request, room_id):
             if room:
                 messages = get_room_messages(room_id, DB.organization_id)
                 if date != None:
-                    messages_by_date = get_messages(messages, date)
-                    if messages_by_date == None or "message" in messages_by_date:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    else:
-                        messages_page = paginator.paginate_queryset(
-                            messages_by_date, request
-                        )
-                        return paginator.get_paginated_response(messages_page)
+                    messages_by_date = get_messages(room_id,DB.organization_id, date)
+                    
+                    messages_page = paginator.paginate_queryset(
+                            messages_by_date, request)
+                        
+                    return paginator.get_paginated_response(messages_page)
                 else:
                     if messages == None or "message" in messages:
                         return Response(

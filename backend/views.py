@@ -12,6 +12,7 @@ from rest_framework.views import (
     APIView,
     exception_handler,
 )
+from asgiref.sync import sync_to_async
 
 # Import Read Write function to Zuri Core
 from .resmodels import *
@@ -115,47 +116,50 @@ def verify_user(token):
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-
+@sync_to_async
+@api_view(['GET'])
 def side_bar(request):
     org_id = request.GET.get("org", None)
     user_id = request.GET.get("user", None)
     rooms = []
     starred_rooms = []
-    user_rooms = get_user_rooms(user_id)
+    user_rooms = get_rooms(user_id, org_id)
+    members = get_all_organization_members(org_id)
+    
     if user_rooms != None:
         for room in user_rooms:
             room_profile = {}
             room_profile["room_id"] = room["_id"]
-            room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
-            for id in room["room_user_ids"]:
-                if id != user_id:
-                    profile = get_user_profile(org_id, id)
-                    if profile["status"] == 200:
-                        if profile["data"]["user_name"]:
-                            room_profile["room_name"] = profile["data"][
-                                "user_name"
-                            ]
-                        else:
-                            room_profile["room_name"] = "no user name"
-                        if profile["data"]["image_url"]:
-                            room_profile["room_image"] = profile["data"][
-                                "image_url"
-                            ]
-                        else:
-                            room_profile[
-                                "room_image"
-                            ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                    else:
-                        room_profile["room_name"] = "no user name"
-                        room_profile[
-                            "room_image"
-                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                    star = requests.get(
-                        url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star"
-                    )
-                    if "status" in star.json():
-                        if star.json()["status"] == True:
-                            starred_rooms.append(room_profile)
+            room_profile["room_url"] = f"/dm/{room['_id']}"
+            if len(room['room_user_ids']) == 2:
+                user_id_set = set(room['room_user_ids']).difference({user_id})
+                partner_id = list(user_id_set)[0]
+                              
+                profile = get_member(members,partner_id)
+                
+            if profile and profile['user_name'] != "":
+                if profile["user_name"]:
+                    room_profile["room_name"] = profile["user_name"]
+                else:
+                    room_profile["room_name"] = "no user name"
+                if profile["image_url"]:
+                    room_profile["room_image"] = profile["image_url"]
+                else:
+                    room_profile[
+                        "room_image"
+                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                
+            else:
+                room_profile["room_name"] = "no user name"
+                room_profile[
+                    "room_image"
+                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+            # star = requests.get(
+                # url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star"
+            # )
+            # if "status" in star.json():
+            #     if star.json()["status"] == True:
+            #         starred_rooms.append(room_profile)
             rooms.append(room_profile)
 
     side_bar = {
@@ -167,14 +171,14 @@ def side_bar(request):
         "group_name": "DM",
         "category": "direct messages",
         "show_group": False,
-        "button_url": f"/dm/{org_id}/{user_id}/all-dms",
+        "button_url": f"/dm",
         "public_rooms": [],
         "starred": starred_rooms,
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
     }
-    return JsonResponse(side_bar, safe=False)
+    return Response(side_bar, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
