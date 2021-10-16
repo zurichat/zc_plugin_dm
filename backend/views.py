@@ -36,7 +36,7 @@ def dm_install(request):
     if request.method == "POST":
         token = request.headers["Authorization"]
         data = json.loads((request.body))
-        org_id = data["org_id"]
+        org_id = data["organisation_id"]
         user_id = data["user_id"]
         url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
         payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
@@ -48,7 +48,7 @@ def dm_install(request):
         return JsonResponse(
             {
                 "success": True,
-                "data": {"redirect_url": "https://zuri.chat/message-noticeboard"},
+                "data": {"redirect_url": "/message-noticeboard"},
                 "message": "sucessfully retrieved",
             },
             safe=False,
@@ -119,46 +119,44 @@ def verify_user(token):
 def side_bar(request):
     org_id = request.GET.get("org", None)
     user_id = request.GET.get("user", None)
-    user_rooms = get_rooms(user_id, org_id)
     rooms = []
     starred_rooms = []
+    user_rooms = get_user_rooms(user_id)
     if user_rooms != None:
         for room in user_rooms:
-            if "org_id" in room:
-                if org_id == room["org_id"]:
-                    room_profile = {}
-                    room_profile["room_id"] = room["_id"]
-                    room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
-                    for id in room["room_user_ids"]:
-                        if id != user_id:
-                            profile = get_user_profile(org_id, id)
-                            if profile["status"] == 200:
-                                if profile["data"]["user_name"]:
-                                    room_profile["room_name"] = profile["data"][
-                                        "user_name"
-                                    ]
-                                else:
-                                    room_profile["room_name"] = "no user name"
-                                if profile["data"]["image_url"]:
-                                    room_profile["room_image"] = profile["data"][
-                                        "image_url"
-                                    ]
-                                else:
-                                    room_profile[
-                                        "room_image"
-                                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            else:
-                                room_profile["room_name"] = "no user name"
-                                room_profile[
-                                    "room_image"
-                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                            star = requests.get(
-                                url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star"
-                            )
-                            if "status" in star.json():
-                                if star.json()["status"] == True:
-                                    starred_rooms.append(room_profile)
-                    rooms.append(room_profile)
+            room_profile = {}
+            room_profile["room_id"] = room["_id"]
+            room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{user_id}"
+            for id in room["room_user_ids"]:
+                if id != user_id:
+                    profile = get_user_profile(org_id, id)
+                    if profile["status"] == 200:
+                        if profile["data"]["user_name"]:
+                            room_profile["room_name"] = profile["data"][
+                                "user_name"
+                            ]
+                        else:
+                            room_profile["room_name"] = "no user name"
+                        if profile["data"]["image_url"]:
+                            room_profile["room_image"] = profile["data"][
+                                "image_url"
+                            ]
+                        else:
+                            room_profile[
+                                "room_image"
+                            ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                    else:
+                        room_profile["room_name"] = "no user name"
+                        room_profile[
+                            "room_image"
+                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                    star = requests.get(
+                        url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star"
+                    )
+                    if "status" in star.json():
+                        if star.json()["status"] == True:
+                            starred_rooms.append(room_profile)
+            rooms.append(room_profile)
 
     side_bar = {
         "name": "DM Plugin",

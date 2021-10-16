@@ -2,6 +2,7 @@ import json
 from typing import Dict, List
 import uuid
 import re
+from asgiref.sync import sync_to_async
 from django.http import response
 from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
@@ -40,6 +41,7 @@ from queue import LifoQueue
     operation_summary="Creates and get messages",
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
+@sync_to_async
 @api_view(["GET", "POST"])
 @db_init_with_credentials
 def message_create_get(request, room_id):
@@ -49,7 +51,7 @@ def message_create_get(request, room_id):
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
-            room = DB.read("dm_rooms", {"_id": room_id})
+            room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room:
                 messages = get_room_messages(room_id, DB.organization_id)
                 if date != None:
@@ -88,7 +90,7 @@ def message_create_get(request, room_id):
             data = serializer.data
             room_id = data["room_id"]  # room id gotten from client request
 
-            room = DB.read("dm_rooms", {"_id": room_id})
+            room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room and room.get("status_code", None) == None:
                 if data["sender_id"] in room.get("room_user_ids", []):
 

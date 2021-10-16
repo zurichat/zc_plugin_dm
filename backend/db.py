@@ -233,7 +233,7 @@ def get_rooms(user_id, org_id):
 def get_room_messages(room_id, org_id):
     helper = DataStorage()
     helper.organization_id = org_id
-    response = helper.read("dm_messages", {"room_id": room_id})
+    response = helper.read_query("dm_messages", query={"room_id": room_id})
     if response != None:
         if "status_code" in response:
             return response
@@ -277,7 +277,9 @@ def get_user_profile(org_id=None, user_id=None):
 
 def get_all_organization_members(org_id: str):
     headers = {"Authorization": header}
-    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/", headers=header)
+    response = requests.get(
+        f"https://api.zuri.chat/organizations/{org_id}/members/", headers=header
+    )
     if response.status_code == 200:
         return response.json()["data"]
     return None
@@ -389,3 +391,10 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
+
+
+
+def get_user_rooms(user_id):
+    response=DB.read_query(collection_name="dm_rooms",query={"room_user_ids":f"{user_id}"},options={"projection":{"room_user_ids":1,"_id":1}})
+    return response
+
