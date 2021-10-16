@@ -391,7 +391,7 @@ def group_member_add(request, room_id):
     returns 201 response if succesful or the appropriate response otherwise
 
     :params: org id and room_id
-    :payload: room_id and member_id
+    :payload: room_id: str, member_id: list & room_name: str
     """
     ORG_ID = DB.organization_id
     serializer = AddMemberSerializer(data=request.data)
