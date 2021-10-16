@@ -64,9 +64,11 @@ def create_room(request, member_id):
                                             }
                         return Response(data=response_output, status=status.HTTP_200_OK)
 
-            elif user_rooms.get("status_code") != 404:
-                if user_rooms is None or user_rooms.get("status_code") != 200:
-                    return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+            elif user_rooms is None:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
+
+            elif user_rooms.get("status_code") != 404 or user_rooms.get("status_code") != 200:
+                return Response("unable to read database", status=status.HTTP_424_FAILED_DEPENDENCY)
         
             fields = {"org_id": serializer.data["org_id"],
                       "room_user_ids": serializer.data["room_member_ids"],
@@ -83,8 +85,8 @@ def create_room(request, member_id):
             print(response)
             # ===============================
 
-        # data_ID = response.get("data").get("object_id")
         if response.get("status") == 200:
+            room_id = response.get("data").get("object_id")
             response_output = {
                     "event": "sidebar_update",
                     "plugin_id": "dm.zuri.chat",
@@ -118,7 +120,7 @@ def create_room(request, member_id):
                     data="centrifugo server not available",
                     status=status.HTTP_424_FAILED_DEPENDENCY,
                 )
-        return Response("data not sent", status=status.HTTP_424_FAILED_DEPENDENCY)
+        return Response(f"unable to create room. Reason: {response}", status=status.HTTP_424_FAILED_DEPENDENCY)
     return Response(data="Invalid data", status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -638,18 +640,11 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False 
                     if 'notes' in  message.keys(): del message['notes']
-                    if 'replied_message' in  message.keys(): del message['replied_message']
-                    if 'sent_from_thread' in message.keys(): del message['sent_from_thread']
-                    if 'reactions' in message.keys(): del message['reactions']
-                    if 'thread' in message.keys(): del message['thread']
-                    
                     message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
                     message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['title'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
-                    if 'sender_id' in message.keys(): del message['sender_id']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)
