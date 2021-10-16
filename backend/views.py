@@ -32,18 +32,19 @@ def index(request):
 def dm_install(request):
     """This endpoint is called when an organisation wants to install the
     DM plugin for their workspace."""
+    global installed_dm_install
     if request.method == "POST":
         token = request.headers["Authorization"]
         data = json.loads((request.body))
         org_id = data["org_id"]
         user_id = data["user_id"]
-    url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
-    payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
-    headers = {"Authorization": token, "Content-Type": "application/json"}
-    response = requests.post(url=url, headers=headers, data=payload)
-    installed = response.json()
+        url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
+        payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
+        headers = {"Authorization": token, "Content-Type": "application/json"}
+        response = requests.post(url=url, headers=headers, data=payload)
+        installed_dm_install = response.json()
 
-    if installed["status"] == 200:
+    if installed_dm_install["status"] == 200:
         return JsonResponse(
             {
                 "success": True,
@@ -52,9 +53,9 @@ def dm_install(request):
             },
             safe=False,
         )
-    elif installed["status"] == 400:
+    elif installed_dm_install["status"] == 400:
         return JsonResponse(
-            {"sucess": True, "message": installed["message"], "status": 200},
+            {"sucess": True, "message": installed_dm_install["message"], "status": 200},
             safe=False,
         )
     else:
