@@ -645,18 +645,11 @@ def search_DM(request, member_id):
                     if 'threads' in message.keys(): del message['threads']
                     if 'thread' not in message.keys(): message['thread'] = False 
                     if 'notes' in  message.keys(): del message['notes']
-                    if 'replied_message' in  message.keys(): del message['replied_message']
-                    if 'sent_from_thread' in message.keys(): del message['sent_from_thread']
-                    if 'reactions' in message.keys(): del message['reactions']
-                    if 'thread' in message.keys(): del message['thread']
-                    
                     message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
                     message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
-                    message['title'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
-                    if 'sender_id' in message.keys(): del message['sender_id']
                     
                 result = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result,key,users,request)

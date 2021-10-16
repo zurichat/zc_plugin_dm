@@ -213,6 +213,12 @@ urlpatterns = [
         members.user_profile,
         name="user_profile",
     ),
+    path(
+        "api/v1/org/<str:org_id>/messages",
+        messaging.all_messages,
+        name="all_messages",
+    ),
+
     path("api/v1/sync", sync.sync_notifier, name="sync_notifier"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
