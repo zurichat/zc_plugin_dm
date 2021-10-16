@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import './AllDms.css'
 import { useDispatch } from 'react-redux';
 import { handleGetAllUserDms } from '../../Redux/Actions/dmActions';
-import DmCard from './DmCard';
 
 
 const DefaultNoDms=()=>{
@@ -34,7 +33,7 @@ const AllDms = ({org_id, loggedInUser_id})=>{
     // const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
     // const { allRooms } = roomsReducer?.rooms;
     return(
-      // <Dmcard {...AllDms}/>
+      
         <div className='alldms'>
             <header className='alldms-header d-flex align-items-center'>
                 <div className='alldms-header-text d-flex align-items-center'>
