@@ -650,7 +650,7 @@ def search_DM(request, member_id):
                     if 'reactions' in message.keys(): del message['reactions']
                     if 'thread' in message.keys(): del message['thread']
                     
-                    message['destination_url'] = f"/dm/{org_id}/{message['room_id']}/{member_id}"
+                    message['destination_url'] = f"/dm/{message['room_id']}"
                     message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['title'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
