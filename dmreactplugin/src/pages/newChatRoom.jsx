@@ -5,7 +5,7 @@ import DmChatContainerBox from '../components/ChatContainer/dmChatContainerBox';
 import InputBoxField from '../components/dmBoxInputField';
 import PinnedMessage from '../components/common/pinnedMessage/dmPinnedMessages';
 import { useDispatch } from 'react-redux';
-// import { SubscribeToChannel } from '@zuri/utilities';
+import { SubscribeToChannel } from '@zuri/utilities';
 import {
   CommentBox,
   MessageInputBox,
@@ -28,123 +28,74 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
   const roomsReducer = useSelector(({ roomsReducer }) => roomsReducer);
   const membersReducer = useSelector(({ membersReducer }) => membersReducer);
   const { room_messages } = useSelector(({ roomsReducer }) => roomsReducer);
-  console.log('rm', room_messages);
-  const chatSidebarConfig = useMemo(() => ({
-    sendChatMessageHandler: (msg) => {
-      dispatch(
-        handleCreateRoomMessages(org_id, room_id, {
-          sender_id: loggedInUser_id,
-          room_id,
-          message: msg.message,
+  const chatSidebarConfig = useMemo(() => {
+    const currentUser = membersReducer?.find(
+      (member) => member._id === loggedInUser_id
+    );
+    return {
+      sendChatMessageHandler: (msg) => {
+        dispatch(
+          handleCreateRoomMessages(org_id, room_id, {
+            sender_id: loggedInUser_id,
+            room_id,
+            message: msg.richUiData.blocks[0].text,
+          })
+        );
+      },
+      currentUserData: {
+        username: currentUser?.user_name || 'John Doe',
+        imageUrl: '',
+      },
+      messages: room_messages?.results
+        ?.map((message) => {
+          const currentDate = new Date(message.created_at);
+          return {
+            username: currentUser?.user_name || 'John Doe',
+            id: message.id,
+            time: `${
+              currentDate.getHours() < 12
+                ? currentDate.getHours()
+                : currentDate.getHours() - 12
+            }:${currentDate.getMinutes()}${
+              currentDate.getHours() < 12 ? 'AM' : 'PM'
+            }`,
+            imageUrl: '',
+            emojis: [
+              { name: 'cool', count: 4, emoji: '😎' },
+              { name: 'celebrate', count: 1, emoji: '🎉' },
+            ],
+            richUiData: {
+              blocks: [
+                {
+                  data: {},
+                  depth: 0,
+                  entityRanges: [],
+                  inlineStyleRanges: [],
+                  key: '543og',
+                  text: message.message,
+                  type: 'unstyled',
+                },
+              ],
+              entityMap: {},
+            },
+          };
         })
-      );
-    },
-    // messages: [
-    //   { message: 'Cheeee', formatOptions: ['bold'] },
-    //   { message: 'first message', formatOptions: ['bold', 'italic'] },
-    //   {
-    //     message: 'lossdnnkebgekeng bk gf gkf  hfk gk fw',
-    //     formatOptions: ['italic'],
-    //   },
-    //   { message: 'hello world chat', formatOptions: [] },
-    //   { message: 'second message', formatOptions: ['bold', 'italic'] },
-    // ],
-    // messages: room_messages?.results?.reverse().map((msg) => {
-    //   console.log('lo', { ...msg, ormatOptions: ['bold', 'italic'] });
-    //   return { ...msg, formatOptions: ['bold', 'italic'] };
-    // }),
-    currentUserData: {
-      username: 'Aleey',
-      imageUrl: '',
-    },
-    messages: [
-      {
-        username: 'Pidoxy',
-        id: 7,
-        time: '7:05PM',
-        imageUrl: '',
-        emojis: [
-          { name: 'smiling', count: 4, emoji: '😋' },
-          { name: 'grining', count: 1, emoji: '😊' },
-        ],
-        richUiData: {
-          blocks: [
-            {
-              data: {},
-              depth: 0,
-              entityRanges: [],
-              inlineStyleRanges: [],
-              key: '543og',
-              text: 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;. Nulla porttitor accumstincidunt.',
-              type: 'unstyled',
-            },
-          ],
-          entityMap: {},
-        },
-      },
-      {
-        username: 'Fortune',
-        id: 7,
-        time: '9:35PM',
-        imageUrl: '',
-        emojis: [
-          { name: 'cool', count: 4, emoji: '😎' },
-          { name: 'celebrate', count: 1, emoji: '🎉' },
-        ],
-        richUiData: {
-          blocks: [
-            {
-              data: {},
-              depth: 0,
-              entityRanges: [],
-              inlineStyleRanges: [],
-              key: '543og',
-              text: 'Qwertitgv asfjf jheiuhie vehhoe trices posdf sjde dewl;. Nulla porttitor accumstincidunt.',
-              type: 'unstyled',
-            },
-          ],
-          entityMap: {},
-        },
-      },
-      {
-        username: 'Detoun',
-        id: 7,
-        time: '12:15PM',
-        imageUrl: '',
-        emojis: [
-          { name: 'cool', count: 9, emoji: '🥳' },
-          { name: 'celebrate', count: 11, emoji: '🥂' },
-        ],
-        richUiData: {
-          blocks: [
-            {
-              data: {},
-              depth: 0,
-              entityRanges: [],
-              inlineStyleRanges: [],
-              key: '543og',
-              text: 'Portiioe asfjf jgjgioef vehhoe rtuwodd posdf sjde dewl;. Nulla porttitor accumstincidunt.',
-              type: 'unstyled',
-            },
-          ],
-          entityMap: {},
-        },
-      },
-    ],
-    showChatSideBar: true,
-    chatHeader: 'Chats',
-  }));
+        .reverse(),
+      showChatSideBar: true,
+      chatHeader: 'Chats',
+    };
+  }, [room_messages, membersReducer]);
   const user2_id =
     roomsReducer?.room_info?.room_user_ids !== undefined &&
     roomsReducer?.room_info?.room_user_ids[1];
   const messages = room_messages?.results;
 
   const dispatch = useDispatch();
-  // useEffect(() => {
-  //   SubscribeToChannel(room_id, function (ctx) {
-  //     console.log('room_id', ctx);
-  //   });
-  // }, []);
+  useEffect(() => {
+    SubscribeToChannel(room_id, function (ctx) {
+      console.log('room_id', ctx);
+    });
+  }, []);
   useEffect(() => {
     dispatch(handleGetRoomMessages(org_id, room_id));
     dispatch(handleGetRoomInfo(org_id, room_id));
@@ -180,7 +131,9 @@ const ChatHome = ({ org_id, loggedInUser_id, room_id }) => {
             room_id={room_id}
             actualUser={actualUser}
           /> */}
-          {room_messages && <MessageBoard chatsConfig={chatSidebarConfig} />}
+          {room_messages && membersReducer && (
+            <MessageBoard chatsConfig={chatSidebarConfig} />
+          )}
         </div>
         <div className="dm-footer-input-field w-100 position-relative">
           {/* <InputBoxField
