@@ -47,14 +47,12 @@ def job():
     """
     # Retrieve the queue for synchronization
     queue = getQueue()
-    print(queue)
     if not queue:
         return Response(data="No data to update", status=status.HTTP_404_NOT_FOUND)
 
     # Process if new data to update
 
     last_queue_id = queue[len(queue) - 1]["id"]
-    print(last_queue_id)
 
     for data in queue:
         org_id = data["message"]["organization_id"]
@@ -66,7 +64,6 @@ def job():
                 "org_id": org_id,
                 "member_id": member_id,
             }
-            return Response(data=data, status=status.HTTP_200_OK)
 
         if data["event"] == "leave_organization":
             data = {
@@ -74,7 +71,6 @@ def job():
                 "org_id": org_id,
                 "member_id": member_id,
             }
-            return Response(data=data, status=status.HTTP_200_OK)
 
     # sync with last queue id
     response = update_queue_sync(queue_id=last_queue_id)
