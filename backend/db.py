@@ -233,7 +233,7 @@ def get_rooms(user_id, org_id):
 def get_room_messages(room_id, org_id):
     helper = DataStorage()
     helper.organization_id = org_id
-    response = helper.read("dm_messages", {"room_id": room_id})
+    response = helper.read_query("dm_messages", query={"room_id": room_id})
     if response != None:
         if "status_code" in response:
             return response
