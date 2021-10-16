@@ -2,6 +2,7 @@ import json
 from typing import Dict, List
 import uuid
 import re
+from asgiref.sync import sync_to_async
 from django.http import response
 from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
@@ -40,6 +41,7 @@ from queue import LifoQueue
     operation_summary="Creates and get messages",
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
+@sync_to_async
 @api_view(["GET", "POST"])
 @db_init_with_credentials
 def message_create_get(request, room_id):

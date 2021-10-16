@@ -74,7 +74,7 @@ class SearchPagination(pagination.PageNumberPagination):
     def get_paginated_response(self, data, query, filters, request):
         pagination_dict = OrderedDict([
             ('total_results', self.page.paginator.count),
-            ('page_size', self.get_page_size(request)),
+            ('page_size', len(data)),
             ('current_page', self.get_page_number(request, self.page.paginator)),
             ('first_page', 1),
             ('last_page',self.get_last_page(self.page.paginator.count, self.get_page_size(request))),

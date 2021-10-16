@@ -672,7 +672,7 @@ def search_DM(request, member_id):
     
 @swagger_auto_schema(
     methods=["get"],
-    operation_summary="searches for message by a user",
+    operation_summary="gets search suggestion for a user",
     responses={404: "Error: Not Found"},
 )
 @sync_to_async
@@ -718,7 +718,7 @@ def search_suggestions(request, member_id):
     return Response(response, status=status.HTTP_200_OK)
 
 
-
+@sync_to_async
 @api_view(["GET"])
 @db_init_with_credentials
 def all_dms(request, member_id):
