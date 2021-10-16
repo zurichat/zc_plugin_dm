@@ -32,8 +32,8 @@ def index(request):
 def dm_install(request):
     """This endpoint is called when an organisation wants to install the
     DM plugin for their workspace."""
+    global installed_dm_install
     if request.method == "POST":
-        global installed_dm_install
         token = request.headers["Authorization"]
         data = json.loads((request.body))
         org_id = data["org_id"]
