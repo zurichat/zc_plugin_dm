@@ -403,32 +403,27 @@ def group_member_add(request, room_id):
         room = DB.read('dm_rooms', {"_id": room_id})
         if room and isinstance(room, dict):
             room_members = room['room_user_ids']
-            # print("ROOM MEMBERS", room_members)
+            
+            room_creator = room_members[0]
+            # print("ROOM CREATOR", room_creator)
+            # print("ROOM MEMBERS BEFORE", room_members)
 
             if len(room_members) > 2:
-                if member_id not in room_members:
-                    room_members.append(member_id)
-                # print("ROOM MEMBERS", room_members)
-                room_creator = room_members[0]
-                # print("ROOM CREATOR", room_creator)
                 
+                # if member_id not in room_members:
+                    # room_members.append(member_id)
+                    
+                room_members.extend(member_id)
+                room_members = list(set(room_members))
                 
-                # url = f"https://dm.zuri.chat/api/v1/org/{ORG_ID}/users/{room_creator}/room"
-                # payload = json.dumps({
-                # "org_id": f"{ORG_ID}",
-                # "private": True,
-                # "room_member_ids": room_members,
-                # "room_name": "Sarah"
-                # })
-                # headers = {"Content-Type": "application/json"}
-
-                # response = requests.request("POST", url, headers=headers, data=payload)
-                
+                if len(room_members) > 9:
+                    return Response("Max Number For Members In a Group is 9", status=status.HTTP_400_BAD_REQUEST)
+                # print("ROOM MEMBERS AFTER", room_members)                
                 
                 # =====================================================
                 # =====================================================
 
-                user_rooms = get_rooms(room_members[0], DB.organization_id)
+                user_rooms = get_rooms(room_creator, DB.organization_id)
                 if user_rooms and isinstance(user_rooms, list):
                     for room in user_rooms:
                         room_users = room["room_user_ids"]
@@ -464,7 +459,6 @@ def group_member_add(request, room_id):
                         "plugin_id": "dm.zuri.chat",
                         "data": {
                             "group_name": "DM",
-                            # "ID": f"{data_ID}",
                             "name": "DM Plugin",
                             "category": "direct messages",
                             "show_group": False,
@@ -496,7 +490,6 @@ def group_member_add(request, room_id):
                 # =====================================================
                 # =====================================================
 
-                # return Response(response.json(), status=response.status_code)
             else:
                 err_response = {"error": "Room is not a group room, Can only add users to group dm"}
                 return Response(err_response, status=status.HTTP_406_NOT_ACCEPTABLE)
