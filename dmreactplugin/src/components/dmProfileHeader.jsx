@@ -1,47 +1,65 @@
 import React, { useState } from "react";
 import "../assets/css/dmProfileHeader.css";
-import Modal from "react-modal";
+// import Modal from "react-modal";
 import Parcel from "single-spa-react/parcel";
 import { pluginHeader } from "@zuri/plugin-header";
-import {
-    FaAngleDown,
-    FaRegBellSlash,
-    FaRegClock,
-    FaRegEnvelope,
-    FaTimes,
-} from "react-icons/fa";
-import { FiPhone } from "react-icons/fi";
-import { BsClock, BsX, BsEnvelope } from "react-icons/bs";
-import StarButtonButton from "./starPersonButton";
+// import {
+//     FaAngleDown,
+//     FaRegBellSlash,
+//     FaRegClock,
+//     FaRegEnvelope,
+//     FaTimes,
+// } from "react-icons/fa";
+// import { FiPhone } from "react-icons/fi";
+// import { BsClock, BsX, BsEnvelope } from "react-icons/bs";
+// import StarButtonButton from "./starPersonButton";
 
 const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
     const user = actualUser && actualUser;
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    //dummy data
+    const membersList = [
+      { _id: "61698477621db9b4275224fe", email: "Lynn" },
+      { _id: "6169847770e1730d5820d665", email: "Gomez"},
+      { _id: "61698477bf560718682b2d4d", email: "Clemons"},
+      { _id: "61698477267095a06c87cbbb", email: "Nettie"}
+    ]
+    // const [modalIsOpen, setModalIsOpen] = useState(false);
     const headerConfig = {
         name: `${user?.user_name}`, //Name on header
         icon: `${user?.image_url}`, //Image on header
-        eventTitle: () => {
-            console.log(user);
-            setModalIsOpen(true);
-            //Block of code to be triggered on title click
-        },
+        // eventTitle: () => {
+        //     console.log(user);
+        //     setModalIsOpen(true);
+        //     //Block of code to be triggered on title click
+        // },
+        roomInfo: {
+          membersList:membersList,
+          addmembersevent: values => {
+            // values.filter(obj => obj.value === selectedValue)
+            // data.filter(obj => obj.value === selectedValue
+            console.warn("a plugin added",values)
+          },
+          removemembersevent:id=>{
+            console.warn("a plugin deleted",id)
+          }
+        }
     };
-    const getLocalTime = () => {
-        let date = new Date();
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        let localTime =
-            hours > 12
-                ? hours - 12 + ":" + minutes + "PM"
-                : hours + ":" + minutes + "AM";
+    // const getLocalTime = () => {
+    //     let date = new Date();
+    //     let hours = date.getHours();
+    //     let minutes = date.getMinutes();
+    //     let localTime =
+    //         hours > 12
+    //             ? hours - 12 + ":" + minutes + "PM"
+    //             : hours + ":" + minutes + "AM";
 
-        return localTime + " Local Time";
-    };
-    const handleViewProfile = () => {
-        setNone("block");
-        setGrid("grid");
-        setModalIsOpen(false);
-    };
+    //     return localTime + " Local Time";
+    // };
+    // const handleViewProfile = () => {
+    //     setNone("block");
+    //     setGrid("grid");
+    //     setModalIsOpen(false);
+    // };
     return (
       <div>
         <Parcel
@@ -65,7 +83,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
 
             <FaAngleDown className='profileHeader__icon' />
           </div>
-        </header> */}
+        </header> 
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={() => setModalIsOpen(false)}
@@ -151,7 +169,7 @@ const dmProfileHeader = ({ actualUser, none, grid, setNone, setGrid }) => {
               </div>
             </div>
           </div>
-        </Modal>
+        </Modal>*/}
       </div>
     )
 };
