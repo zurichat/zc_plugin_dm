@@ -36,7 +36,7 @@ def dm_install(request):
     if request.method == "POST":
         token = request.headers["Authorization"]
         data = json.loads((request.body))
-        org_id = data["org_id"]
+        org_id = data["organisation_id"]
         user_id = data["user_id"]
         url = f"https://api.zuri.chat/organizations/{org_id}/plugins"
         payload = json.dumps({"plugin_id": f"{PLUGIN_ID}", "user_id": user_id})
