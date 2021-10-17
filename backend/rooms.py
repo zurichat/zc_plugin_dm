@@ -618,6 +618,7 @@ def search_DM(request, member_id):
                     
                     message['destination_url'] = f"/dm/{message['room_id']}"
                     message['room_name'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
+                    message['title'] =  members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['created_by'] = members_found[message['sender_id']]['user_name'] if members_found[message['sender_id']] else None
                     message['images_url'] = [members_found[message['sender_id']]['image_url'] if members_found[message['sender_id']] else None]
                     message['content'] = message['message']
