@@ -45,7 +45,6 @@ const ChatHome = () => {
   const currentUser = membersReducer.members?.find(
     (member) => member._id === authReducer.user._id
   );
-
   useEffect(() => {}), [];
 
   const chatSidebarConfig = {
@@ -61,7 +60,7 @@ const ChatHome = () => {
       );
     },
     currentUserData: {
-      username: 'John Doe',
+      username: currentUser?.user_name || 'John Doe',
       imageUrl: '',
     },
     messages: roomsReducer.room_messages?.results
@@ -71,10 +70,7 @@ const ChatHome = () => {
           id: message.id,
           time: moment(message.created_at).format('hh:mm A'),
           imageUrl: '',
-          emojis: [
-            { name: 'cool', count: 4, emoji: '😎' },
-            { name: 'celebrate', count: 1, emoji: '🎉' },
-          ],
+          emojis: [],
           richUiData: {
             blocks: [
               {
