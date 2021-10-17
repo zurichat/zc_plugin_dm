@@ -328,7 +328,7 @@ def sidebar_emitter(
     side_bar = {
         "name": "DM Plugin",
         "description": "Sends messages between users",
-        "plugin_id": "6135f65de2358b02686503a7",
+        "plugin_id": "dm.zuri.chat",
         "organisation_id": f"{org_id}",
         "user_id": f"{member_id}",
         "group_name": "DM",
