@@ -120,6 +120,7 @@ def verify_user(token):
 @api_view(['GET'])
 def side_bar(request):
     org_id = request.GET.get("org", None)
+    DB.organization_id = org_id
     user_id = request.GET.get("user", None)
     rooms = []
     starred_rooms = []
@@ -129,38 +130,42 @@ def side_bar(request):
     if user_rooms != None:
         for room in user_rooms:
             room_profile = {}
-            room_profile["room_id"] = room["_id"]
-            room_profile["room_url"] = f"/dm/{room['_id']}"
             if len(room['room_user_ids']) == 2:
+                room_profile["room_id"] = room["_id"]
+                room_profile["room_url"] = f"/dm/{room['_id']}"
                 user_id_set = set(room['room_user_ids']).difference({user_id})
-                partner_id = list(user_id_set)[0]
-                              
-                profile = get_member(members,partner_id)
+                partner_id = list(user_id_set)[0]              
                 
-            if profile and profile['user_name'] != "":
-                if profile["user_name"]:
-                    room_profile["room_name"] = profile["user_name"]
+                profile = get_member(members,partner_id)
+
+                if "user_name" in profile and profile['user_name'] != "":
+                    if profile["user_name"]:
+                        room_profile["room_name"] = profile["user_name"]
+                    else:
+                        room_profile["room_name"] = "no user name"
+                    if profile["image_url"]:
+                        room_profile["room_image"] = profile["image_url"]
+                    else:
+                        room_profile[
+                            "room_image"
+                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                    
                 else:
                     room_profile["room_name"] = "no user name"
-                if profile["image_url"]:
-                    room_profile["room_image"] = profile["image_url"]
-                else:
                     room_profile[
                         "room_image"
                     ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                
             else:
-                room_profile["room_name"] = "no user name"
+                room_profile["room_name"] = room["room_name"]
+                room_profile["room_id"] = room["_id"]
+                room_profile["room_url"] = f"/dm/{room['_id']}"
                 room_profile[
-                    "room_image"
-                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-            # star = requests.get(
-                # url=f"https://dm.zuri.chat/api/v1/org/{org_id}/rooms/{room['_id']}/members/{user_id}/star"
-            # )
-            # if "status" in star.json():
-            #     if star.json()["status"] == True:
-            #         starred_rooms.append(room_profile)
+                        "room_image"
+                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+
             rooms.append(room_profile)
+            if user_id in room["starred"]:
+                starred_rooms.append(room_profile)
 
     side_bar = {
         "name": "DM Plugin",
@@ -173,7 +178,7 @@ def side_bar(request):
         "show_group": False,
         "button_url": f"/dm",
         "public_rooms": [],
-        "starred": starred_rooms,
+        "starred_rooms": starred_rooms,
         "joined_rooms": rooms,
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
