@@ -111,14 +111,14 @@ const ChatHome = () => {
 		<div className="dm-plugin-full-page" style={{ display: grid }}>
 			<div className="dm-newchat-room">
 				<div className="dm-chatroom-header">
-					{/* <DmProfileHeader
+					<DmProfileHeader
 						user2_id={user2_id}
 						actualUser={actualUser}
 						none={none}
 						setNone={setNone}
 						grid={grid}
 						setGrid={setGrid}
-					/> */}
+					/>
 					<div className="dm-bookmark-head">
 						<div className="add-bookmark gap-2 d-flex flex-direction-column flex-flow align-items-center px-3 py-1">
 							<PinnedMessage
