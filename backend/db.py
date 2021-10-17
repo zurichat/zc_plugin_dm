@@ -326,6 +326,9 @@ def sidebar_emitter(
                 starred_rooms.append(room_profile)
                 
     side_bar = {
+        "event":"sidebar_update",
+        "plugin_id":"dm.zuri.chat",
+        "data":{
         "name": "DM Plugin",
         "description": "Sends messages between users",
         "plugin_id": "dm.zuri.chat",
@@ -338,6 +341,7 @@ def sidebar_emitter(
         "public_rooms": [],
         "starred_rooms": starred_rooms,
         "joined_rooms": rooms,
+        }
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
     }
