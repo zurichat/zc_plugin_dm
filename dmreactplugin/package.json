@@ -13,7 +13,6 @@
         "check-format": "prettier --check .",
         "test": "cross-env BABEL_ENV=test jest",
         "watch-tests": "cross-env BABEL_ENV=test jest --watch",
-        "prepare": "husky install",
         "coverage": "cross-env BABEL_ENV=test jest --coverage"
     },
     "devDependencies": {
@@ -55,6 +54,7 @@
         "babel": "^6.23.0",
         "cli": "^1.0.1",
         "emoji-mart": "^3.0.1",
+        "moment": "^2.29.1",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-icon": "^1.0.0",

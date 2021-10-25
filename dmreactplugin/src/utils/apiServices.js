@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { GetUserInfo } from "@zuri/utilities";
 
 const baseURL = 'https://dm.zuri.chat/api/v1';
 
@@ -8,11 +9,27 @@ const apiConfig = {
   headers: {
     'Content-Type': 'application/json',
   },
+  validateStatus: function (status) {
+    return status < 500; // Resolve only if the status code is less than 500
+  },
 };
 
 const $http = axios.create({ ...apiConfig });
 
 class APIServices {
+
+  async getLoggedInUser() {
+    return await GetUserInfo();
+  }
+
+  async getLoggedInUserOrganisation() {
+    return await GetUserInfo();
+  }
+
+  async getAllDms(org_id, member_id) {
+    return await $http.get(`/org/${org_id}/members/${member_id}/all_dms`);
+  }
+
   async getOrgUsers(org_id, data) {
     return await $http.get(`/org/${org_id}/members`, data, {
       withCredentials: true,
@@ -20,8 +37,6 @@ class APIServices {
   }
 
   async createChatRoom(org_id, member_id, data) {
-    console.log('here');
-    console.log(data);
     return await $http.post(`/org/${org_id}/users/${member_id}/room`, data);
   }
 
@@ -119,6 +134,13 @@ class APIServices {
   async getStarPersonInfo(org_id, room_id, message_id) {
     return await $http.get(
       `/org/${org_id}/rooms/${room_id}/members/${message_id}/star`
+    );
+  }
+
+  async addPeopleToRoom(org_id, room_id, data) {
+    return await $http.post(
+        `/org/${org_id}/rooms/${room_id}/member`,
+        data
     );
   }
 }

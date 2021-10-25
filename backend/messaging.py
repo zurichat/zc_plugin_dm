@@ -2,6 +2,7 @@ import json
 from typing import Dict, List
 import uuid
 import re
+from asgiref.sync import sync_to_async
 from django.http import response
 from django.utils.decorators import method_decorator
 from django.http.response import JsonResponse
@@ -40,6 +41,7 @@ from queue import LifoQueue
     operation_summary="Creates and get messages",
     responses={201: MessageResponse, 400: "Error: Bad Request"},
 )
+@sync_to_async
 @api_view(["GET", "POST"])
 @db_init_with_credentials
 def message_create_get(request, room_id):
@@ -49,21 +51,16 @@ def message_create_get(request, room_id):
         date = request.GET.get("date", None)
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
-            room = DB.read("dm_rooms", {"_id": room_id})
+            room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room:
                 messages = get_room_messages(room_id, DB.organization_id)
                 if date != None:
-                    messages_by_date = get_messages(messages, date)
-                    if messages_by_date == None or "message" in messages_by_date:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    else:
-                        messages_page = paginator.paginate_queryset(
-                            messages_by_date, request
-                        )
-                        return paginator.get_paginated_response(messages_page)
+                    messages_by_date = get_messages(room_id,DB.organization_id, date)
+                    
+                    messages_page = paginator.paginate_queryset(
+                            messages_by_date, request)
+                        
+                    return paginator.get_paginated_response(messages_page)
                 else:
                     if messages == None or "message" in messages:
                         return Response(
@@ -88,7 +85,7 @@ def message_create_get(request, room_id):
             data = serializer.data
             room_id = data["room_id"]  # room id gotten from client request
 
-            room = DB.read("dm_rooms", {"_id": room_id})
+            room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room and room.get("status_code", None) == None:
                 if data["sender_id"] in room.get("room_user_ids", []):
 
@@ -362,3 +359,37 @@ def pinned_message(request, message_id):
         )  # publish data to centrifugo
         if centrifugo_data.get("error", None) == None:
             return Response(data=data, status=status.HTTP_201_CREATED)
+
+
+@swagger_auto_schema(
+    methods=["get"],
+    operation_summary="Returns all messages in the dm collection",
+    responses={
+        200: "success",
+        424: "Failed Dependency"
+    },
+)
+@api_view(["GET"])
+@db_init_with_credentials
+def all_messages(request):
+    """This endpoint is used to get all the messages in the dm_messages collection. 
+    Also returns a messages with the read and unread status"""
+    
+    res = DB.read("dm_messages")
+    if res and "status_code" not in res:
+        all_messages = res
+        read_messages = [message for message in all_messages if message["read"] == "true"]
+        print(read_messages)
+        unread_messages = [message for message in all_messages if message["read"] == "false"]
+        message_data = {
+            "all_messages": all_messages,
+            "read_messages": read_messages,
+            "unread_messages":unread_messages
+        }
+        return Response(message_data, status=status.HTTP_200_OK)
+
+    else:
+        return Response(f"something went wrong. message collection returned{res}",
+                        status=status.HTTP_424_FAILED_DEPENDENCY)
+
+    
