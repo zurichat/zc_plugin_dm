@@ -40,13 +40,11 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM",
     ),
-    
     path(
         "api/v1/search-suggestions/<str:org_id>/<str:member_id>",
         rooms.search_suggestions,
-        name="search suggestions"
+        name="search suggestions",
     ),
-    
     path(
         "api/v1/org/<str:org_id>/room/<str:room_id>/members/<str:member_id>",
         rooms.group_member_add,
@@ -217,7 +215,11 @@ urlpatterns = [
         messaging.all_messages,
         name="all_messages",
     ),
-
+    path(
+        "api/v1/org/<str:org_id>/message/<str:message_id>/",
+        messaging.single_message,
+        name="message",
+    ),
     path("api/v1/sync", sync.sync_notifier, name="sync_notifier"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
