@@ -200,20 +200,20 @@ DB = DataStorage()
 
 # get rooms for a particular user
 def get_rooms(user_id, org_id):
-    """Get the rooms a user is in
-
-    Args:
-        user_id (str): The user id
-
-    Returns:
-        [List]: [description]
     """
+    This is a utility function that gets all the rooms linked to a user
+    It takes in two Args:
+        user_id (str): The ID of the user which is used as a query param to filter the room collection
+        org_id (str): The ID of the organisation the user belongs too
+    And returns:
+        a List of dicts containing the information of each room associated with the particular user.
+    """ 
 
     helper = DataStorage()
     helper.organization_id = org_id
-    query = {"room_user_ids":user_id}
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_rooms", query=query, options=options)
+    query = {"room_user_ids":user_id} # matches the room_user_ids field in the room document and uses user_id as filter param to query the list
+    options = {"sort":{"created_at":-1}} # modifies the query result by date sorting from the most recent
+    response = helper.read_query("dm_rooms", query=query, options=options) # queries the DM room collections with the query param and modifier
 
     if response and "status_code" not in response:
         return response
