@@ -25,18 +25,18 @@ const SearchedUsersModal = ({
                 <p className='notFound-text'>No matches Found</p>
             )}
             {
-                // searchedUsers.map((user)=>(
-                //     <div className="user" onClick = {()=>{onSelectUser(user)}}>
-                //         <div
-                //             className="user-picture"
-                //             style={{
-                //             backgroundImage:
-                //                 `url(${user.image_url})`,
-                //             }}
-                //         ></div>
-                //         <p><span>{user.user_name} O </span>{user.first_name} {user.last_name}</p>
-                //     </div>
-                // ))
+                searchedUsers.map((user)=>(
+                    <div className="user" onClick = {()=>{onSelectUser(user)}}>
+                        <div
+                            className="user-picture"
+                            style={{
+                            backgroundImage:
+                                `url(${user.image_url})`,
+                            }}
+                        ></div>
+                        <p><span>{user.user_name} O </span>{user.first_name} {user.last_name}</p>
+                    </div>
+                ))
             }
             {searchedUsers[0] && (
                 <div

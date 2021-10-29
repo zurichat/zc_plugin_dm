@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-  useLocation,
-} from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 // import css styles here
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,51 +11,39 @@ import ChatHome from './pages/newChatRoom';
 import AllDms from './pages/allDms/AllDms';
 
 // Import REDUX action
-import { useDispatch } from 'react-redux';
-import {
-  handleGetRoomMessages,
-  handleGetRooms,
-} from './Redux/Actions/dmActions';
-import { handleGetMembers } from './Redux/Actions/Members';
+import { handleGetLoggedInUser, handleGetLoggedInUserOrganisation } from './Redux/Actions/authActions';
+import { handleGetMembers } from './Redux/Actions/membersActions';
 
 const App = () => {
+  const authReducer = useSelector(({ authReducer }) => authReducer);
+  const membersReducer = useSelector(({ membersReducer }) => membersReducer);
   const dispatch = useDispatch();
 
-  let location = useLocation();
-
-  let [org_id, room_id, loggedInUser_id] = location.pathname
-    .split('/')
-    .filter((string) => string.length > 11);
+  useEffect(() => {
+    dispatch(handleGetLoggedInUser());
+    dispatch(handleGetLoggedInUserOrganisation());
+  }, []);
 
   useEffect(() => {
-    org_id &&
-      loggedInUser_id &&
-      dispatch(handleGetRooms(org_id, loggedInUser_id));
-    org_id && dispatch(handleGetMembers(org_id));
-  }, [location, org_id, loggedInUser_id]);
+    if (authReducer.organisation) {
+      dispatch(handleGetMembers(authReducer.organisation));
+    }
+  }, [authReducer.organisation]);
 
   return (
-    <Router basename="/dm">
-      <Switch>
-        <Route
-          exact
-          path={`/${org_id}/${room_id}/${loggedInUser_id}`}
-          render={() => (
-            <ChatHome
-              org_id={org_id}
-              loggedInUser_id={loggedInUser_id}
-              room_id={room_id}
-            />
-          )}
-        />
-        <Route
-          exact
-          path={`/${org_id}/${room_id}/all-dms`}
-          render={() => <AllDms org_id={org_id} loggedInUser_id={room_id} />}
-        />
-      </Switch>
-    </Router>
-  );
+    <>
+      {
+        authReducer.user && authReducer.organisation && membersReducer.members  ? (
+          <Switch>
+            <Route exact path="/" component={AllDms} />
+            <Route exact path="/:room_id" component={ChatHome} />
+          </Switch>
+        ) : (
+          <div>Loading...</div>
+        )
+      }
+    </>
+  )
 };
 
 export default App;

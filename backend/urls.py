@@ -19,7 +19,6 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/install", views.dm_install, name="install"),
-    # path("dm/uninstall", views.dm_uninstall, name="uninstall"),
     path("api/v1/sidebar", views.side_bar, name="sidebar"),
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/room",
@@ -41,8 +40,15 @@ urlpatterns = [
         rooms.search_DM,
         name="search DM",
     ),
+    
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/member",
+        "api/v1/search-suggestions/<str:org_id>/<str:member_id>",
+        rooms.search_suggestions,
+        name="search suggestions"
+    ),
+    
+    path(
+        "api/v1/org/<str:org_id>/room/<str:room_id>/members/<str:member_id>",
         rooms.group_member_add,
         name="group_user_add",
     ),
@@ -206,6 +212,12 @@ urlpatterns = [
         members.user_profile,
         name="user_profile",
     ),
+    path(
+        "api/v1/org/<str:org_id>/messages",
+        messaging.all_messages,
+        name="all_messages",
+    ),
+
     path("api/v1/sync", sync.sync_notifier, name="sync_notifier"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),

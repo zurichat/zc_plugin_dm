@@ -2,6 +2,8 @@ import re
 from urllib.parse import urlencode
 from django.http import response
 import requests, json
+from datetime import datetime, timedelta
+
 
 from requests import exceptions
 
@@ -209,62 +211,48 @@ def get_rooms(user_id, org_id):
 
     helper = DataStorage()
     helper.organization_id = org_id
-    response = helper.read("dm_rooms")
-    data = []
-    if response != None:
-        if "status_code" in response:
-            return response
-        for room in response:
-            if "room_user_ids" in room:
-                try:
-                    users_room_list = room["room_user_ids"]
-                    if user_id in users_room_list:
-                        data.append(room)
-                except Exception:
-                    pass
-        if len(data) == 0:
-            data = []
-            return data
-        return data
-    return data
+    query = {"room_user_ids":user_id}
+    options = {"sort":{"created_at":-1}}
+    response = helper.read_query("dm_rooms", query=query, options=options)
+
+    if response and "status_code" not in response:
+        return response
+    return []
 
 
 # get all the messages in a particular room
 def get_room_messages(room_id, org_id):
     helper = DataStorage()
     helper.organization_id = org_id
-    response = helper.read("dm_messages", {"room_id": room_id})
-    if response != None:
-        if "status_code" in response:
-            return response
-        if len(response) == 0:
-            response = None
-            return response
-        for message in response:
-            message["id"] = message.pop("_id")
-        response.reverse()
+    options = {"sort":{"created_at":-1}}
+    response = helper.read_query("dm_messages", query={"room_id": room_id}, options=options)
+    if response and "status_code" not in response:
         return response
-    return response
+    return []
 
 
 # get all the messages in a particular room filtered by date
-def get_messages(response, date):
-    res = []
-    if response != None:
-        if "status_code" in response:
-            return response
-        for message in response:
-            try:
-                query_date = message["created_at"].split("T")[0]
-                if query_date == date:
-                    res.append(message)
-            except Exception:
-                pass
-        if len(res) == 0:
-            res = None
-            return res
-        return res
-    return response
+def get_messages(room_id,org_id, date):
+    helper = DataStorage()
+    helper.organization_id = org_id
+    req_date = datetime.strptime(date, '%d-%m-%Y')
+    next_day = req_date + timedelta(days=1)
+    options = {"sort":{"created_at":-1}}
+    query = {
+        "$and":[
+        {"room_id":room_id},
+        {"created_at":{
+            "$gte":str(req_date),
+            "$lt": str(next_day)
+        }}
+        ]
+    }
+    
+    response = helper.read_query("dm_messages", query=query, options=options)
+    if response and "status_code" not in response:
+        return response
+    return []
+    
 
 
 def get_user_profile(org_id=None, user_id=None):
@@ -276,7 +264,9 @@ def get_user_profile(org_id=None, user_id=None):
 
 
 def get_all_organization_members(org_id: str):
-    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
+    response = requests.get(
+        f"https://api.zuri.chat/organizations/{org_id}/members/"
+    )
     if response.status_code == 200:
         return response.json()["data"]
     return None
@@ -286,51 +276,76 @@ def get_member(members: list, member_id: str):
     for member in members:
         if member["_id"] == member_id:
             return member
-    return None
+    return {}
 
 
 def sidebar_emitter(
     org_id, member_id, group_room_name=None
 ):  # group_room_name = None or a String of Names
-    user_rooms = get_rooms(user_id=member_id, org_id=org_id)
     rooms = []
+    starred_rooms = []
+    user_rooms = get_rooms(user_id=member_id, org_id=org_id)
+    members = get_all_organization_members(org_id)
+    
     if user_rooms != None:
         for room in user_rooms:
-            if org_id == room["org_id"]:
-                room_profile = {}
+            room_profile = {}
+            if len(room['room_user_ids']) == 2:
                 room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{org_id}/{room['_id']}/{member_id}"
-                for user_id in room["room_user_ids"]:
-                    if user_id != member_id:
-                        profile = get_user_profile(org_id, user_id)
-                        if profile["status"] == 200:
-                            # if group_room_name != None && Len of List after split > 2
-                            if group_room_name and len(group_room_name.split(",")) > 2:
-                                # overwrite room_name in profile to = String of Names
-                                room_profile["room_name"] = group_room_name
-                            else:
-                                if profile["data"]["user_name"]:
-                                    room_profile["room_name"] = profile["data"][
-                                        "user_name"
-                                    ]
-                                else:
-                                    room_profile["room_name"] = "no user name"
-                            if profile["data"]["image_url"]:
-                                room_profile["room_image"] = profile["data"][
-                                    "image_url"
-                                ]
-                            else:
-                                room_profile[
-                                    "room_image"
-                                ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                        else:
-                            room_profile["room_name"] = "no user name"
-                            room_profile[
-                                "room_image"
-                            ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                room_profile["room_url"] = f"/dm/{room['_id']}"
+                user_id_set = set(room['room_user_ids']).difference({member_id})
+                partner_id = list(user_id_set)[0]              
+                
+                profile = get_member(members,partner_id)
 
-                rooms.append(room_profile)
-    return rooms
+                if "user_name" in profile and profile['user_name'] != "":
+                    if profile["user_name"]:
+                        room_profile["room_name"] = profile["user_name"]
+                    else:
+                        room_profile["room_name"] = "no user name"
+                    if profile["image_url"]:
+                        room_profile["room_image"] = profile["image_url"]
+                    else:
+                        room_profile[
+                            "room_image"
+                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                    
+                else:
+                    room_profile["room_name"] = "no user name"
+                    room_profile[
+                        "room_image"
+                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+            else:
+                room_profile["room_name"] = room["room_name"]
+                room_profile["room_id"] = room["_id"]
+                room_profile["room_url"] = f"/dm/{room['_id']}"
+
+            rooms.append(room_profile)
+
+            if member_id in room["starred"]:
+                starred_rooms.append(room_profile)
+                
+    side_bar = {
+        "event":"sidebar_update",
+        "plugin_id":"dm.zuri.chat",
+        "data":{
+        "name": "DM Plugin",
+        "description": "Sends messages between users",
+        "plugin_id": "dm.zuri.chat",
+        "organisation_id": f"{org_id}",
+        "user_id": f"{member_id}",
+        "group_name": "DM",
+        "category": "direct messages",
+        "show_group": False,
+        "button_url": f"/dm",
+        "public_rooms": [],
+        "starred_rooms": starred_rooms,
+        "joined_rooms": rooms,
+        }
+        # List of rooms/collections created whenever a user starts a DM chat with another user
+        # This is what will be displayed by Zuri Main
+    }
+    return side_bar
 
 
 # gets starred rooms
@@ -358,7 +373,7 @@ def getQueue():
     Returns:
         [type]: [description]
     """
-    dm_plugin_url = "https://api.zuri.chat/marketplace/plugins/613ec51c15fb2424261b6658"
+    dm_plugin_url = f"https://api.zuri.chat/marketplace/plugins/{PLUGIN_ID}"
     try:
         response = requests.get(url=dm_plugin_url)
     except requests.exceptions.RequestException as e:
@@ -378,7 +393,7 @@ def update_queue_sync(queue_id: int):
     Returns:
         [type]: [description]
     """
-    patch_queue_url = "https://api.zuri.chat/plugins/613ec51c15fb2424261b6658/sync"
+    patch_queue_url = f"https://api.zuri.chat/plugins/{PLUGIN_ID}/sync"
     body = {"id": queue_id}
     try:
         response = requests.patch(url=patch_queue_url, json=body)
@@ -388,3 +403,5 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
+
+
