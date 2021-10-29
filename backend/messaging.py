@@ -190,17 +190,43 @@ def edit_message(request, message_id, room_id):
 @db_init_with_credentials
 def delete_message(request, message_id, room_id):
     """
-    This function deletes message in rooms using message
-    organization id (org_id), room id (room_id) and the message id (message_id).
+    Deletes a message from a room.
+
+    It access room with the 'room_id' and the message in the room with 'message_id' and then deletes the message if it exists.
+    The id of the organization (org_id) where the room is located is also needed.
+
+    Parameters:
+        org_id (str)        : This is the id of the organization th user belongs to.
+
+        room_id (str)       : This is the unique id of the room the message to be deleted is in.
+
+        message_id (str)    : This is the unique id of the message to be deleted from a given room.
+    
+    Returns:
+        A dict object indicating the the message has been deleted. Example:
+        {
+            "status"        : "success",
+            "event"         : "message_delete",
+            "room_id"       : "6169dbcef5998a09e3bbbcd3",
+            "message_id"    : "616ad4f989454c2006018af2"
+        }
+
+    Raises:
+        Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
+
+        IOError: An error occurred while deleteing the message.
     """
 
     if request.method == "DELETE":
         try:
-            message = DB.read("dm_messages", {"_id": message_id})
-            room = DB.read("dm_rooms", {"_id": room_id})
+            # Sends a get request to the database to fetch the message and the room of the message from.
+            message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
 
-            if room and message:
+            # Checks if the room exists and if the message exists in the room. 
+            # If this returns true, the message is deleted. Else an error message is returned.
+            if message:
                 response = DB.delete("dm_messages", message_id)
+                # if the delete operation was successful, it returns a success message.
                 if response.get("status") == 200:
                     response_output = {
                         "status": response["message"],
@@ -208,9 +234,11 @@ def delete_message(request, message_id, room_id):
                         "room_id": room_id,
                         "message_id": message_id,
                     }
+                    # This publishes the operation across all active devices in the room where the operation was performed.
                     centrifugo_data = centrifugo_client.publish(
                         room=room_id, data=response
                     )
+                    # Checks if the publish was successful and returns a success message if True, else an error message is returned.
                     if centrifugo_data and centrifugo_data.get("status_code") == 200:
                         return Response(response_output, status=status.HTTP_200_OK)
                     return Response(
@@ -219,6 +247,7 @@ def delete_message(request, message_id, room_id):
                     )
             return Response("message not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            # All exeptions are caught are returned here...
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 

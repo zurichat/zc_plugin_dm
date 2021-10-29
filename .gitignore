@@ -19,8 +19,7 @@ database.sqlite
 
 *.idea
 
-*Pipfile.lock
-Pipfile.lock
+Pipfile*
 # *media
 *.DS_Store
 /.vscode
