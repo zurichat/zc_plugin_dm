@@ -199,22 +199,19 @@ DB = DataStorage()
 
 
 # get rooms for a particular user
-def get_rooms(user_id, org_id):
-    """Get the rooms a user is in
-
-    Args:
-        user_id (str): The user id
-
-    Returns:
-        [List]: [description]
+def get_user_rooms(user_id):
+    """
+    This is a utility function that gets all the rooms linked to a user
+    It takes in one Args:
+        user_id (str): The ID of the user
+        org_id (str): The ID of the organization the user is in
+    And returns:
+        a List of dicts containing the information of each room associated with the particular user.
     """
 
-    helper = DataStorage()
-    helper.organization_id = org_id
-    query = {"room_user_ids":user_id}
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_rooms", query=query, options=options)
-
+    query = {"room_user_ids": user_id} #matches the room_user_ids field in the room document and uses user_id as filter param to query the list
+    options = {"sort": {"created_at":-1}} #modifies the query result by date sorting from the most recent
+    response = DB.read_query("dm_rooms", query=query, options=options) #queries the DM room collections with the query param and modifier
     if response and "status_code" not in response:
         return response
     return []
@@ -284,7 +281,7 @@ def sidebar_emitter(
 ):  # group_room_name = None or a String of Names
     rooms = []
     starred_rooms = []
-    user_rooms = get_rooms(user_id=member_id, org_id=org_id)
+    user_rooms = get_user_rooms(user_id=member_id)
     members = get_all_organization_members(org_id)
     
     if user_rooms != None:
@@ -349,9 +346,9 @@ def sidebar_emitter(
 
 
 # gets starred rooms
-def get_starred_rooms(member_id, org_id):
+def get_starred_rooms(member_id):
     """goes through database and returns starred rooms"""
-    response = get_rooms(member_id, org_id)
+    response = get_user_rooms(member_id)
     if response:
         data = []
         for room in response:
@@ -403,5 +400,3 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
-
-

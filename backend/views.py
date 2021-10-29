@@ -124,7 +124,7 @@ def side_bar(request):
     user_id = request.GET.get("user", None)
     rooms = []
     starred_rooms = []
-    user_rooms = get_rooms(user_id, org_id)
+    user_rooms = get_user_rooms(user_id)
     members = get_all_organization_members(org_id)
     
     if user_rooms != None:
