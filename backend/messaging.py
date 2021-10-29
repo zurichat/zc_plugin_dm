@@ -220,12 +220,11 @@ def delete_message(request, message_id, room_id):
     if request.method == "DELETE":
         try:
             # Sends a get request to the database to fetch the message and the room of the message from.
-            message = DB.read("dm_messages", {"_id": message_id})
-            room = DB.read("dm_rooms", {"_id": room_id})
+            message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
 
             # Checks if the room exists and if the message exists in the room. 
             # If this returns true, the message is deleted. Else an error message is returned.
-            if room and message:
+            if message:
                 response = DB.delete("dm_messages", message_id)
                 # if the delete operation was successful, it returns a success message.
                 if response.get("status") == 200:
