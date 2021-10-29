@@ -203,8 +203,7 @@ def get_user_rooms(user_id):
     """
     This is a utility function that gets all the rooms linked to a user
     It takes in one Args:
-        user_id (str): The ID of the user
-        org_id (str): The ID of the organization the user is in
+        user_id (str): The ID of the user which is used as a query param to filter the room collection
     And returns:
         a List of dicts containing the information of each room associated with the particular user.
     """
