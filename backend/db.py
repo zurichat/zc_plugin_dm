@@ -198,61 +198,87 @@ class DataStorage:
 DB = DataStorage()
 
 
-# get rooms for a particular user
-def get_rooms(user_id, org_id):
-    """Get the rooms a user is in
+def getOrg(org: str):
+    """ This is a helper function
+    :param org: organizational id
+    :type: string
+    :rtype: class object referrencing DataStorage
+    :return class object 
+    """
+    helper = DB
+    helper.organization_id = org
+    return helper
 
-    Args:
-        user_id (str): The user id
+def get_rooms(user_id: str, org_id: str):
+    """get rooms for a particular user
+    :param: user_id: user id 
+    :type: string
+    :param: org_id: organization id
+    :type: string
+    :rtype: list
+    :return: returns list of rooms if true else returns empty list if false
+    
+    """
+    response = getOrg(org_id).read_query(
+        "dm_rooms",
+        query={"room_user_ids": user_id},
+        options={"sort": {"created_at": -1}},
+    )
 
-    Returns:
-        [List]: [description]
+    if response and "status_code" not in response:
+        return response
+    return []
+
+
+def get_room_messages(room_id: str, org_id: str):
+    """
+    get all the messages in a particular room
+    :param: room_id: room id 
+    :type: string
+    :param: org_id: organization id
+    :type: string
+    :rtype: list
+    :return: returns list of rooms if true else returns empty list if false
+    
+    """
+    response = getOrg(org_id).read_query(
+        "dm_messages", query={"room_id": room_id}, options={"sort": {"created_at": -1}}
+    )
+    if response and "status_code" not in response:
+        return response
+    return []
+
+
+def get_messages(room_id: str, org_id: str, date):
+    """
+    get all the messages in a particular room filtered by date
+    :param: room_id: room id 
+    :type: string
+    :param: org_id: organization id
+    :type: string
+    :param: date
+    :type: datefield
+    :rtype: list
+    :return: list of messages ordered by date
+
+
     """
 
-    helper = DataStorage()
-    helper.organization_id = org_id
-    query = {"room_user_ids":user_id}
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_rooms", query=query, options=options)
-
-    if response and "status_code" not in response:
-        return response
-    return []
-
-
-# get all the messages in a particular room
-def get_room_messages(room_id, org_id):
-    helper = DataStorage()
-    helper.organization_id = org_id
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_messages", query={"room_id": room_id}, options=options)
-    if response and "status_code" not in response:
-        return response
-    return []
-
-
-# get all the messages in a particular room filtered by date
-def get_messages(room_id,org_id, date):
-    helper = DataStorage()
-    helper.organization_id = org_id
-    req_date = datetime.strptime(date, '%d-%m-%Y')
+    req_date = datetime.strptime(date, "%d-%m-%Y")
     next_day = req_date + timedelta(days=1)
-    options = {"sort":{"created_at":-1}}
     query = {
-        "$and":[
-        {"room_id":room_id},
-        {"created_at":{
-            "$gte":str(req_date),
-            "$lt": str(next_day)
-        }}
+        "$and": [
+            {"room_id": room_id},
+            {"created_at": {"$gte": str(req_date), "$lt": str(next_day)}},
         ]
     }
-    
-    response = helper.read_query("dm_messages", query=query, options=options)
+
+    response = getOrg(org_id).read_query(
+        "dm_messages", query=query, options={"sort": {"created_at": -1}}
+    )
     if response and "status_code" not in response:
         return response
     return []
-    
 
 
 def get_user_profile(org_id=None, user_id=None):
@@ -264,9 +290,7 @@ def get_user_profile(org_id=None, user_id=None):
 
 
 def get_all_organization_members(org_id: str):
-    response = requests.get(
-        f"https://api.zuri.chat/organizations/{org_id}/members/"
-    )
+    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
     if response.status_code == 200:
         return response.json()["data"]
     return None
@@ -286,19 +310,19 @@ def sidebar_emitter(
     starred_rooms = []
     user_rooms = get_rooms(user_id=member_id, org_id=org_id)
     members = get_all_organization_members(org_id)
-    
+
     if user_rooms != None:
         for room in user_rooms:
             room_profile = {}
-            if len(room['room_user_ids']) == 2:
+            if len(room["room_user_ids"]) == 2:
                 room_profile["room_id"] = room["_id"]
                 room_profile["room_url"] = f"/dm/{room['_id']}"
-                user_id_set = set(room['room_user_ids']).difference({member_id})
-                partner_id = list(user_id_set)[0]              
-                
-                profile = get_member(members,partner_id)
+                user_id_set = set(room["room_user_ids"]).difference({member_id})
+                partner_id = list(user_id_set)[0]
 
-                if "user_name" in profile and profile['user_name'] != "":
+                profile = get_member(members, partner_id)
+
+                if "user_name" in profile and profile["user_name"] != "":
                     if profile["user_name"]:
                         room_profile["room_name"] = profile["user_name"]
                     else:
@@ -309,7 +333,7 @@ def sidebar_emitter(
                         room_profile[
                             "room_image"
                         ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                    
+
                 else:
                     room_profile["room_name"] = "no user name"
                     room_profile[
@@ -324,23 +348,23 @@ def sidebar_emitter(
 
             if member_id in room["starred"]:
                 starred_rooms.append(room_profile)
-                
+
     side_bar = {
-        "event":"sidebar_update",
-        "plugin_id":"dm.zuri.chat",
-        "data":{
-        "name": "DM Plugin",
-        "description": "Sends messages between users",
+        "event": "sidebar_update",
         "plugin_id": "dm.zuri.chat",
-        "organisation_id": f"{org_id}",
-        "user_id": f"{member_id}",
-        "group_name": "DM",
-        "category": "direct messages",
-        "show_group": False,
-        "button_url": f"/dm",
-        "public_rooms": [],
-        "starred_rooms": starred_rooms,
-        "joined_rooms": rooms,
+        "data": {
+            "name": "DM Plugin",
+            "description": "Sends messages between users",
+            "plugin_id": "dm.zuri.chat",
+            "organisation_id": f"{org_id}",
+            "user_id": f"{member_id}",
+            "group_name": "DM",
+            "category": "direct messages",
+            "show_group": False,
+            "button_url": f"/dm",
+            "public_rooms": [],
+            "starred_rooms": starred_rooms,
+            "joined_rooms": rooms,
         }
         # List of rooms/collections created whenever a user starts a DM chat with another user
         # This is what will be displayed by Zuri Main
@@ -403,5 +427,3 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
-
-
