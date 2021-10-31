@@ -309,7 +309,7 @@ def all_messages(request):
         )
 
 
-class EditMessage(APIView):
+class MessageDetailsView(APIView):
     def get(self, request, message_id, org_id):
 
         """

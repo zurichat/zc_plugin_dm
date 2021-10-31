@@ -147,7 +147,7 @@ urlpatterns = [
     ),
     path(
         "api/v1/org/<str:org_id>/message/<str:message_id>",
-        messaging.EditMessage.as_view(),
+        messaging.MessageDetailsView.as_view(),
         name="thread_message_reaction",
     ),
     path(
