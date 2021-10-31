@@ -141,7 +141,7 @@ urlpatterns = [
         name="message_reactions",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions",
         reactions.ThreadEmoji.as_view(),
         name="edit_message",
     ),
