@@ -71,16 +71,6 @@ urlpatterns = [
         name="create_get_message",
     ),
     path(
-        "api/v1/org/<str:org_id>/updatemessage/<str:message_id>/room/<str:room_id>",
-        messaging.edit_message,
-        name="updateroom",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/message",
-        messaging.delete_message,
-        name="delete_message",
-    ),
-    path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/schedule-message",
         messaging.scheduled_messages,
         name="scheduled_messages",
@@ -151,8 +141,13 @@ urlpatterns = [
         name="message_reactions",
     ),
     path(
-        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>/threads/<str:thread_message_id>/reactions",
+        "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages/<str:message_id>",
         reactions.ThreadEmoji.as_view(),
+        name="edit_message",
+    ),
+    path(
+        "api/v1/org/<str:org_id>/message/<str:message_id>",
+        messaging.EditMessage.as_view(),
         name="thread_message_reaction",
     ),
     path(
@@ -214,11 +209,6 @@ urlpatterns = [
         "api/v1/org/<str:org_id>/messages",
         messaging.all_messages,
         name="all_messages",
-    ),
-    path(
-        "api/v1/org/<str:org_id>/message/<str:message_id>/",
-        messaging.single_message,
-        name="message",
     ),
     path("api/v1/sync", sync.sync_notifier, name="sync_notifier"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
