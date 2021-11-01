@@ -200,10 +200,12 @@ DB = DataStorage()
 
 def getOrg(org: str):
     """ This is a helper function
-    :param org: organizational id
-    :type: string
-    :rtype: class object referrencing DataStorage
-    :return class object 
+    Args: 
+        :param org: organizational's unique identifier
+        :type: string
+    Returns:
+        :rtype: class object referrencing DataStorage
+        :return class object 
     """
     helper = DB
     helper.organization_id = org
@@ -211,12 +213,14 @@ def getOrg(org: str):
 
 def get_rooms(user_id: str, org_id: str):
     """get rooms for a particular user
-    :param: user_id: user id 
-    :type: string
-    :param: org_id: organization id
-    :type: string
-    :rtype: list
-    :return: returns list of rooms if true else returns empty list if false
+    Args:
+        :param: user_id: user's unique identifier 
+        :type: string
+        :param: org_id: organization's unique identifier
+        :type: string
+    Returns:
+        :rtype: list
+        :return: returns list of rooms if Available else returns empty list if false
     
     """
     response = getOrg(org_id).read_query(
@@ -233,12 +237,14 @@ def get_rooms(user_id: str, org_id: str):
 def get_room_messages(room_id: str, org_id: str):
     """
     get all the messages in a particular room
-    :param: room_id: room id 
-    :type: string
-    :param: org_id: organization id
-    :type: string
-    :rtype: list
-    :return: returns list of rooms if true else returns empty list if false
+    Args:
+        :param: room_id: room's unique identifier
+        :type: string
+        :param: org_id: organization's unique identifier
+        :type: string
+    Returns:
+        :rtype: list
+        :return: returns list of rooms if true else returns empty list if false
     
     """
     response = getOrg(org_id).read_query(
@@ -252,14 +258,16 @@ def get_room_messages(room_id: str, org_id: str):
 def get_messages(room_id: str, org_id: str, date):
     """
     get all the messages in a particular room filtered by date
-    :param: room_id: room id 
-    :type: string
-    :param: org_id: organization id
-    :type: string
-    :param: date
-    :type: datefield
-    :rtype: list
-    :return: list of messages ordered by date
+    Args:
+        :param: room_id: room's unique identifier
+        :type: string
+        :param: org_id: organization's unique identifier
+        :type: string
+        :param: date
+        :type: datefield
+    Returns:
+        :rtype: list
+        :return: list of messages ordered by date
 
 
     """
