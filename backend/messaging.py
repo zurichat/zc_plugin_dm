@@ -35,105 +35,51 @@ from .decorators import db_init_with_credentials
 from queue import LifoQueue
 
 
-@swagger_auto_schema(
-    methods=["post", "get"],
-    query_serializer=GetMessageSerializer,
-    operation_summary="Creates and get messages",
-    responses={201: MessageResponse, 400: "Error: Bad Request"},
-)
-@sync_to_async
-@api_view(["GET", "POST"])
+
+
+@api_view(["GET"])
 @db_init_with_credentials
-def message_create_get(request, room_id):
-    if request.method == "GET":
-        paginator = PageNumberPagination()
-        paginator.page_size = 20
-        date = request.GET.get("date", None)
-        params_serializer = GetMessageSerializer(data=request.GET.dict())
-        if params_serializer.is_valid():
-            room = DB.read_query("dm_rooms", query={"_id": room_id})
-            if room:
-                messages = get_room_messages(room_id, DB.organization_id)
-                if date != None:
-                    messages_by_date = get_messages(room_id,DB.organization_id, date)
+def message_get(request, room_id):
+    """
+    Fetches messages
+
+    Fetches all available messages in the room with the specified id.
+
+    Args:
+        room_id (str): This is the id of the room where the request is to be passed.
+
+    Returns:
+        [list]: It returns a list of messages(dict objects).
+    """    
+    paginator = PageNumberPagination()
+    paginator.page_size = 20
+    date = request.GET.get("date", None)
+    params_serializer = GetMessageSerializer(data=request.GET.dict())
+    if params_serializer.is_valid():
+        room = DB.read_query("dm_rooms", query={"_id": room_id})
+        if room:
+            messages = get_room_messages(room_id, DB.organization_id)
+            if date != None:
+                messages_by_date = get_messages(room_id,DB.organization_id, date)
+                
+                messages_page = paginator.paginate_queryset(
+                        messages_by_date, request)
                     
-                    messages_page = paginator.paginate_queryset(
-                            messages_by_date, request)
-                        
-                    return paginator.get_paginated_response(messages_page)
-                else:
-                    if messages == None or "message" in messages:
-                        return Response(
-                            data="No messages available",
-                            status=status.HTTP_204_NO_CONTENT,
-                        )
-                    result_page = paginator.paginate_queryset(messages, request)
-                    return paginator.get_paginated_response(result_page)
+                return paginator.get_paginated_response(messages_page)
             else:
-                return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response(
-                params_serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
-
-    elif request.method == "POST":
-        request.data["room_id"] = room_id
-        print(request)
-        serializer = MessageSerializer(data=request.data)
-
-        if serializer.is_valid():
-            data = serializer.data
-            room_id = data["room_id"]  # room id gotten from client request
-
-            room = DB.read_query("dm_rooms", query={"_id": room_id})
-            if room and room.get("status_code", None) == None:
-                if data["sender_id"] in room.get("room_user_ids", []):
-
-                    response = DB.write("dm_messages", data=serializer.data)
-                    if response.get("status", None) == 200:
-
-                        response_output = {
-                            "status": response["message"],
-                            "event": "message_create",
-                            "message_id": response["data"]["object_id"],
-                            "room_id": room_id,
-                            "thread": False,
-                            "data": {
-                                "sender_id": data["sender_id"],
-                                "message": data["message"],
-                                "created_at": data["created_at"],
-                            },
-                        }
-                        try:
-                            centrifugo_data = centrifugo_client.publish(
-                                room=room_id, data=response_output
-                            )  # publish data to centrifugo
-                            if (
-                                centrifugo_data
-                                and centrifugo_data.get("status_code") == 200
-                            ):
-                                return Response(
-                                    data=response_output, status=status.HTTP_201_CREATED
-                                )
-                            else:
-                                return Response(
-                                    data="message not sent",
-                                    status=status.HTTP_424_FAILED_DEPENDENCY,
-                                )
-                        except:
-                            return Response(
-                                data="centrifugo server not available",
-                                status=status.HTTP_424_FAILED_DEPENDENCY,
-                            )
+                if messages == None or "message" in messages:
                     return Response(
-                        data="message not saved and not sent",
-                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                        data="No messages available",
+                        status=status.HTTP_204_NO_CONTENT,
                     )
-                return Response(
-                    "sender not in room", status=status.HTTP_400_BAD_REQUEST
-                )
-            return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+                result_page = paginator.paginate_queryset(messages, request)
+                return paginator.get_paginated_response(result_page)
+        else:
+            return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response(
+            params_serializer.errors, status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 @api_view(["GET", "PUT"])
