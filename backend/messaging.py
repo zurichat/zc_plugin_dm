@@ -50,23 +50,38 @@ def message_get(request, room_id):
 
     Returns:
         [list]: It returns a list of messages(dict objects).
-    """    
+    """   
+
+    # Set the page size for the response
     paginator = PageNumberPagination()
     paginator.page_size = 20
     date = request.GET.get("date", None)
+
+    # Serialize the request data i.e convert it to json
     params_serializer = GetMessageSerializer(data=request.GET.dict())
+
+    # check if the serialized params are valid. If true, run request.
     if params_serializer.is_valid():
+
+        # Check to see if the room exists in the database
         room = DB.read_query("dm_rooms", query={"_id": room_id})
         if room:
+            # If True, fetch the messages from the room
             messages = get_room_messages(room_id, DB.organization_id)
+
+            # Check to see if there are messages in the room.
             if date != None:
+                # If True, fetch the messages by creation date
                 messages_by_date = get_messages(room_id,DB.organization_id, date)
                 
+                # Paginate the response
                 messages_page = paginator.paginate_queryset(
                         messages_by_date, request)
-                    
+
+                # Return the response in pages
                 return paginator.get_paginated_response(messages_page)
             else:
+                # Else, return a message telliing the user that there's no messages in the room.
                 if messages == None or "message" in messages:
                     return Response(
                         data="No messages available",
@@ -75,8 +90,10 @@ def message_get(request, room_id):
                 result_page = paginator.paginate_queryset(messages, request)
                 return paginator.get_paginated_response(result_page)
         else:
+            # Else, return a message telling the user that the room doesn't exist.
             return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
     else:
+        # Else, return a bad request message
         return Response(
             params_serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )
