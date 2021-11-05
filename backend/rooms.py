@@ -483,7 +483,6 @@ def group_member_add(request, room_id, member_id):
     },
 )
 @api_view(["PUT"])
-#@db_init_with_credentials
 def close_conversation(request, org_id, room_id, member_id):
     """
     This function allows for the Closing of a DM room on the sidebar
