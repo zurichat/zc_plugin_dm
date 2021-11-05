@@ -198,65 +198,72 @@ class DataStorage:
 DB = DataStorage()
 
 
-# get rooms for a particular user
-def get_rooms(user_id: str, org_id: str):
-    """
-    A utility function that retrieves all the rooms linked to a user from the dm_rooms collection
-
+def get_org(org: str):
+    """This is a helper function
     Args:
-        collection: dm_rooms
-        user_id (str): a unique identifier used as a query param to filter the collection
-        org_id (str): uniquely identifies the organisation the user belongs too in the collection
-
+        org: organizational's unique identifier
     Returns:
-        A List of dicts containing the information of each room associated with the particular user.
-        example:
-            [{'_id': '616c0adb240d4baaf0fefd68',
-            'bookmark': [],
-            'closed': False,
-            'created_at': '2021-10-17T11:36:59.385987Z',
-            'org_id': '61695d8bb233d46cc8a9af48',
-            'pinned': [],
-            'private': True,
-            'room_name': 'any name',
-            'room_user_ids': ['616a8fe2f99355096b2de6a4', '61696f4f09dcfac4133ddaa3'],
-            'starred': []
-            }]
-
-    Raises:
-        None: no error handling, function returns an empty list if invalid params are parsed
+        class object referrencing DataStorage
     """
-    helper = DataStorage()
-    helper.organization_id = org_id
-    query = {"room_user_ids": user_id} # matches the room_user_ids field in the room document
-    options = {"sort": {"created_at": -1}} # query modifier, sorts from the most recent
-    user_rooms = helper.read_query("dm_rooms", query=query, options=options) # queries collection
+    helper = DB
+    helper.organization_id = org
+    return helper
+
+
+def get_rooms(user_id: str, org_id: str):
+    """get rooms for a particular user
+    Args:
+         user_id: user's unique identifier
+         org_id: organization's unique identifier
+    Returns:
+        return: returns list of rooms if Available else returns empty list if false
+
+    """
+    response = get_org(org_id).read_query(
+        "dm_rooms",
+        query={"room_user_ids": user_id},
+        options={"sort": {"created_at": -1}},
+    )
 
     if user_rooms and "status_code" not in user_rooms:
         return user_rooms
     return []
 
 
-# get all the messages in a particular room
-def get_room_messages(room_id, org_id):
-    helper = DataStorage()
-    helper.organization_id = org_id
-    options = {"sort": {"created_at": -1}}
-    response = helper.read_query(
-        "dm_messages", query={"room_id": room_id}, options=options
+def get_room_messages(room_id: str, org_id: str):
+    """
+    get all the messages in a particular room
+    Args:
+        room_id: room's unique identifier
+        org_id: organization's unique identifier
+    Returns:
+        return: returns list of rooms if true else returns empty list if false
+
+    """
+    response = get_org(org_id).read_query(
+        "dm_messages", query={"room_id": room_id}, options={"sort": {"created_at": -1}}
     )
     if response and "status_code" not in response:
         return response
     return []
 
 
-# get all the messages in a particular room filtered by date
-def get_messages(room_id, org_id, date):
-    helper = DataStorage()
-    helper.organization_id = org_id
+def get_messages(room_id: str, org_id: str, date):
+    """
+    get all the messages in a particular room filtered by date
+    Args:
+         room_id: room's unique identifier
+         org_id: organization's unique identifier
+         date: date to filter the messages
+
+    Returns:
+        return: list of messages ordered by date
+
+
+    """
+
     req_date = datetime.strptime(date, "%d-%m-%Y")
     next_day = req_date + timedelta(days=1)
-    options = {"sort": {"created_at": -1}}
     query = {
         "$and": [
             {"room_id": room_id},
@@ -264,7 +271,9 @@ def get_messages(room_id, org_id, date):
         ]
     }
 
-    response = helper.read_query("dm_messages", query=query, options=options)
+    response = get_org(org_id).read_query(
+        "dm_messages", query=query, options={"sort": {"created_at": -1}}
+    )
     if response and "status_code" not in response:
         return response
     return []
