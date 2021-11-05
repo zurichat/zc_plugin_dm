@@ -116,7 +116,8 @@ def verify_user(token):
 # user_id will be gotten from the logged in user
 # All data in the message_rooms will be automatically generated from zuri core
 
-@sync_to_async
+    
+
 @api_view(['GET'])
 def side_bar(request):
     org_id = request.GET.get("org", None)
@@ -126,7 +127,7 @@ def side_bar(request):
     starred_rooms = []
     user_rooms = get_rooms(user_id, org_id)
     members = get_all_organization_members(org_id)
-    
+
     if user_rooms != None:
         for room in user_rooms:
             room_profile = {}
@@ -135,21 +136,17 @@ def side_bar(request):
                 room_profile["room_url"] = f"/dm/{room['_id']}"
                 user_id_set = set(room['room_user_ids']).difference({user_id})
                 partner_id = list(user_id_set)[0]              
-                
+
                 profile = get_member(members,partner_id)
 
                 if "user_name" in profile and profile['user_name'] != "":
-                    if profile["user_name"]:
-                        room_profile["room_name"] = profile["user_name"]
-                    else:
-                        room_profile["room_name"] = "no user name"
-                    if profile["image_url"]:
-                        room_profile["room_image"] = profile["image_url"]
-                    else:
-                        room_profile[
-                            "room_image"
-                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                    
+                    room_profile["room_name"] = profile["user_name"] or "no user name"
+
+                    room_profile["room_image"] = (
+                        profile["image_url"]
+                        or "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+                    )
+
                 else:
                     room_profile["room_name"] = "no user name"
                     room_profile[
@@ -176,13 +173,12 @@ def side_bar(request):
         "group_name": "DM",
         "category": "direct messages",
         "show_group": False,
-        "button_url": f"/dm",
+        "button_url": '/dm',
         "public_rooms": [],
         "starred_rooms": starred_rooms,
         "joined_rooms": rooms,
-        # List of rooms/collections created whenever a user starts a DM chat with another user
-        # This is what will be displayed by Zuri Main
     }
+
     return Response(side_bar, status=status.HTTP_200_OK)
 
 
@@ -345,7 +341,7 @@ def send_reply(request, room_id, message_id):
     print(request)
     serializer = MessageSerializer(data=request.data)
     reply_response = DB.read("dm_messages", {"_id": message_id})
-    if reply_response and reply_response.get("status_code", None) == None:
+    if reply_response and reply_response.get("status_code", None) is None:
         replied_message = reply_response
     else:
         return Response(
@@ -359,7 +355,7 @@ def send_reply(request, room_id, message_id):
         room_id = data["room_id"]  # room id gotten from client request
 
         room = DB.read("dm_rooms", {"_id": room_id})
-        if room and room.get("status_code", None) == None:
+        if room and room.get("status_code", None) is None:
             if data["sender_id"] in room.get("room_user_ids", []):
                 data["replied_message"] = replied_message
                 response = DB.write("dm_messages", data=data)
