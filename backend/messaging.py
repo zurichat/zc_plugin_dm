@@ -55,11 +55,12 @@ def message_create_get(request, room_id):
             if room:
                 messages = get_room_messages(room_id, DB.organization_id)
                 if date != None:
-                    messages_by_date = get_messages(room_id,DB.organization_id, date)
-                    
+                    messages_by_date = get_messages(room_id, DB.organization_id, date)
+
                     messages_page = paginator.paginate_queryset(
-                            messages_by_date, request)
-                        
+                        messages_by_date, request
+                    )
+
                     return paginator.get_paginated_response(messages_page)
                 else:
                     if messages == None or "message" in messages:
@@ -78,7 +79,6 @@ def message_create_get(request, room_id):
 
     elif request.method == "POST":
         request.data["room_id"] = room_id
-        print(request)
         serializer = MessageSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -134,121 +134,6 @@ def message_create_get(request, room_id):
                 )
             return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "PUT"])
-@db_init_with_credentials
-def edit_message(request, message_id, room_id):
-    """
-    This is used to update message context using message id as identifier,
-    first --> we check if this message exist, if it does not exist we raise message doesnot exist,
-    if above message exists:
-        pass GET request to view the message one whats to edit.
-        or pass POST with data to update
-
-
-    """
-    if request.method == "GET":
-        try:
-            message = DB.read("dm_messages", {"id": message_id})
-            print(message)
-            return Response(message)
-        except:
-            return JsonResponse(
-                {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-    else:
-        message = DB.read("dm_messages", {"id": message_id})
-        room_serializer = MessageSerializer(message, data=request.data, partial=True)
-        if room_serializer.is_valid():
-            data = room_serializer.data
-            data = {"message": request.data["message"]}
-            # print(data)
-            response = DB.update("dm_messages", message_id, data)
-            if response.get("status") == 200:
-                data = {
-                    "sender_id": request.data["sender_id"],
-                    "message_id": message_id,
-                    "room_id": room_id,
-                    "message": request.data["message"],
-                    "event": "edited_message",
-                }
-                centrifugo_data = send_centrifugo_data(room=room_id, data=data)
-                if centrifugo_data.get("error", None) == None:
-                    return Response(data=data, status=status.HTTP_201_CREATED)
-                return Response(data)
-        return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@swagger_auto_schema(
-    methods=["delete"],
-    operation_summary="Deletes messages from rooms",
-    responses={400: "Error: Bad Request"},
-)
-@api_view(["DELETE"])
-@db_init_with_credentials
-def delete_message(request, message_id, room_id):
-    """
-    Deletes a message from a room.
-
-    It access room with the 'room_id' and the message in the room with 'message_id' and then deletes the message if it exists.
-    The id of the organization (org_id) where the room is located is also needed.
-
-    Parameters:
-        org_id (str)        : This is the id of the organization th user belongs to.
-
-        room_id (str)       : This is the unique id of the room the message to be deleted is in.
-
-        message_id (str)    : This is the unique id of the message to be deleted from a given room.
-    
-    Returns:
-        A dict object indicating the the message has been deleted. Example:
-        {
-            "status"        : "success",
-            "event"         : "message_delete",
-            "room_id"       : "6169dbcef5998a09e3bbbcd3",
-            "message_id"    : "616ad4f989454c2006018af2"
-        }
-
-    Raises:
-        Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
-
-        IOError: An error occurred while deleteing the message.
-    """
-
-    if request.method == "DELETE":
-        try:
-            # Sends a get request to the database to fetch the message and the room of the message from.
-            message = DB.read("dm_messages", {"_id": message_id, "room_id": room_id})
-
-            # Checks if the room exists and if the message exists in the room. 
-            # If this returns true, the message is deleted. Else an error message is returned.
-            if message:
-                response = DB.delete("dm_messages", message_id)
-                # if the delete operation was successful, it returns a success message.
-                if response.get("status") == 200:
-                    response_output = {
-                        "status": response["message"],
-                        "event": "message_delete",
-                        "room_id": room_id,
-                        "message_id": message_id,
-                    }
-                    # This publishes the operation across all active devices in the room where the operation was performed.
-                    centrifugo_data = centrifugo_client.publish(
-                        room=room_id, data=response
-                    )
-                    # Checks if the publish was successful and returns a success message if True, else an error message is returned.
-                    if centrifugo_data and centrifugo_data.get("status_code") == 200:
-                        return Response(response_output, status=status.HTTP_200_OK)
-                    return Response(
-                        data="message not sent",
-                        status=status.HTTP_424_FAILED_DEPENDENCY,
-                    )
-            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-        except Exception as e:
-            # All exeptions are caught are returned here...
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
 @swagger_auto_schema(
@@ -393,32 +278,211 @@ def pinned_message(request, message_id):
 @swagger_auto_schema(
     methods=["get"],
     operation_summary="Returns all messages in the dm collection",
-    responses={
-        200: "success",
-        424: "Failed Dependency"
-    },
+    responses={200: "success", 424: "Failed Dependency"},
 )
 @api_view(["GET"])
 @db_init_with_credentials
 def all_messages(request):
-    """This endpoint is used to get all the messages in the dm_messages collection. 
+    """This endpoint is used to get all the messages in the dm_messages collection.
     Also returns a messages with the read and unread status"""
-    
+
     res = DB.read("dm_messages")
     if res and "status_code" not in res:
         all_messages = res
-        read_messages = [message for message in all_messages if message["read"] == "true"]
-        print(read_messages)
-        unread_messages = [message for message in all_messages if message["read"] == "false"]
+        read_messages = [
+            message for message in all_messages if message["read"] == "true"
+        ]
+        unread_messages = [
+            message for message in all_messages if message["read"] == "false"
+        ]
         message_data = {
             "all_messages": all_messages,
             "read_messages": read_messages,
-            "unread_messages":unread_messages
+            "unread_messages": unread_messages,
         }
         return Response(message_data, status=status.HTTP_200_OK)
 
     else:
-        return Response(f"something went wrong. message collection returned{res}",
-                        status=status.HTTP_424_FAILED_DEPENDENCY)
+        return Response(
+            f"something went wrong. message collection returned{res}",
+            status=status.HTTP_424_FAILED_DEPENDENCY,
+        )
 
-    
+
+class MessageDetailsView(APIView):
+    def get(self, request, message_id, org_id):
+
+        """
+        Gets a single message from a room.
+        It access room with the 'message_id' and then displays the message if it exists.
+        The id of the organization (org_id) where the room is located is also needed.
+        Parameters:
+            org_id (str)        : This is the id of the organization th user belongs to.
+            message_id (str)    : This is the unique id of the message to be deleted from a given room.
+
+        Returns:
+            A dict object indicating the the message has been deleted. Example:
+            {
+                "status"        : "success",
+                "room_id"       : "6169dbcef5998a09e3bbbcd3",
+                "message_id"    : "616ad4f989454c2006018af2"
+                "message"       : "The message"
+            }
+        Raises:
+            Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
+            IOError: An error occurred while deleteing the message.
+        """
+        data_storage = DataStorage()
+        data_storage.organization_id = org_id
+        data = request.data
+        request.data["message_id"] = message_id
+
+        try:
+            message = data_storage.read("dm_messages", {"_id": message_id})
+
+            room_id = message["room_id"]
+            data = {
+                "status": "success",
+                "message": message,
+            }
+            return Response(data, status=status.HTTP_200_OK)
+
+        except:
+
+            return JsonResponse(
+                {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+    def put(self, request, message_id, org_id):
+        """
+        This is used to update message context using message id as identifier,
+
+        Updates a message from a room.
+        It access room with the 'room_id' and the message in the room with 'message_id' and then the new message.
+        The id of the organization (org_id) where the room is located is also needed.
+        Parameters:
+            org_id (str)        : This is the id of the organization th user belongs to.
+            message (str)       : This is the unique id of the message to be sent to a given room.
+            room_id(str)        : This is the unique id of the room in the message
+
+        Returns:
+            A dict object indicating the the message has been updated. Example:
+            {
+                "status"        : "success",
+                "room_id"       : "6169dbcef5998a09e3bbbcd3",
+                "message_id"    : "616ad4f989454c2006018af2"
+                "message"       : "The message"
+            }
+        Raises:
+            Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
+            IOError: An error occurred while deleteing the message.
+        """
+
+        data_storage = DataStorage()
+        data_storage.organization_id = org_id
+        data = request.data
+        data["message_id"] = message_id
+        room_id = data["room_id"]
+        message_get = data_storage.read("dm_messages", {"_id": message_id})
+
+        # Checks DB for message using the message_id
+        room_serializer = MessageSerializer(
+            message_get, data=request.data, partial=True
+        )
+
+        # validates room_serializer with MessageSerializer.
+        if room_serializer.is_valid():
+            room_data = room_serializer.data
+            new_data = {"message": data["message"]}
+            response = DB.update(
+                "dm_messages", message_id, new_data
+            )  # moves on to update the mesage
+
+            if response.get("status") == 200:
+                data = {
+                    "sender_id": request.data["sender_id"],
+                    "message_id": message_id,
+                    "room_id": room_id,
+                    "message": new_data["message"],
+                    "event": "edited_message",
+                }
+                centrifugo_data = send_centrifugo_data(room=room_id, data=data)
+
+                if centrifugo_data.get("error", None) == None:
+                    return Response(data=data, status=status.HTTP_201_CREATED)
+
+                return Response(data)
+
+        return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, message_id, org_id):
+        """
+        Deletes a message from a room.
+
+        It access room with the 'room_id' and the message in the room with 'message_id' and then deletes the message if it exists.
+        The id of the organization (org_id) where the room is located is also needed.
+
+        Parameters:
+            org_id (str)        : This is the id of the organization th user belongs to.
+
+            room_id (str)       : This is the unique id of the room the message to be deleted is in.
+
+            message_id (str)    : This is the unique id of the message to be deleted from a given room.
+
+        Returns:
+            A dict object indicating the the message has been deleted. Example:
+            {
+                "status"        : "success",
+                "event"         : "message_delete",
+                "room_id"       : "6169dbcef5998a09e3bbbcd3",
+                "message_id"    : "616ad4f989454c2006018af2"
+            }
+
+        Raises:
+            Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
+
+            IOError: An error occurred while deleteing the message.
+        """
+
+        try:
+            # Sends a get request to the database to fetch the message and the room of the message from.
+            data_storage = DataStorage()
+            data_storage.organization_id = org_id
+            data = request.data
+            data["message_id"] = message_id
+            message = data_storage.read("dm_messages", {"_id": message_id})
+            room_id = message["room_id"]
+
+            # Checks if the room exists and if the message exists in the room.
+            # If this returns true, the message is deleted. Else an error message is returned.
+            if message:
+                response = data_storage.delete("dm_messages", message_id)
+
+                # if the delete operation was successful, it returns a success message.
+                if response.get("status") == 200:
+                    response_output = {
+                        "status": response["message"],
+                        "event": "message_delete",
+                        "room_id": room_id,
+                        "message_id": message_id,
+                    }
+
+                    # This publishes the operation across all active devices in the room where the operation was performed.
+                    centrifugo_data = centrifugo_client.publish(
+                        room=room_id, data=response
+                    )
+
+                    # Checks if the publish was successful and returns a success message if True, else an error message is returned.
+                    if centrifugo_data.get("status_code") == 200:
+                        return Response(response_output, status=status.HTTP_200_OK)
+
+                    return Response(
+                        data="message not sent",
+                        status=status.HTTP_424_FAILED_DEPENDENCY,
+                    )
+
+            return Response("message not found", status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            # All exeptions are caught are returned here...
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
