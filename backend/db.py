@@ -275,7 +275,7 @@ def get_member(members: list, member_id: str):
     return {}
 
 
-def sidebar_emitter(org_id:str, member_id:str) -> dict:  
+def sidebar_emitter(org_id:str, member_id:str, group_room_name:str = None) -> dict:  
     """Function Emits data for the sidebar
     
     Args:
