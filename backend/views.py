@@ -123,62 +123,8 @@ def side_bar(request):
     org_id = request.GET.get("org", None)
     DB.organization_id = org_id
     user_id = request.GET.get("user", None)
-    rooms = []
-    starred_rooms = []
-    user_rooms = get_rooms(user_id, org_id)
-    members = get_all_organization_members(org_id)
-
-    if user_rooms != None:
-        for room in user_rooms:
-            room_profile = {}
-            if len(room['room_user_ids']) == 2:
-                room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{room['_id']}"
-                user_id_set = set(room['room_user_ids']).difference({user_id})
-                partner_id = list(user_id_set)[0]              
-
-                profile = get_member(members,partner_id)
-
-                if "user_name" in profile and profile['user_name'] != "":
-                    room_profile["room_name"] = profile["user_name"] or "no user name"
-
-                    room_profile["room_image"] = (
-                        profile["image_url"]
-                        or "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                    )
-
-                else:
-                    room_profile["room_name"] = "no user name"
-                    room_profile[
-                        "room_image"
-                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-            else:
-                room_profile["room_name"] = room["room_name"]
-                room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{room['_id']}"
-                room_profile[
-                        "room_image"
-                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-
-            rooms.append(room_profile)
-            if user_id in room["starred"]:
-                starred_rooms.append(room_profile)
-
-    side_bar = {
-        "name": "DM Plugin",
-        "description": "Sends messages between users",
-        "plugin_id": "dm.zuri.chat",
-        "organisation_id": f"{org_id}",
-        "user_id": f"{user_id}",
-        "group_name": "DM",
-        "category": "direct messages",
-        "show_group": False,
-        "button_url": '/dm',
-        "public_rooms": [],
-        "starred_rooms": starred_rooms,
-        "joined_rooms": rooms,
-    }
-
+   
+    side_bar = sidebar_emitter(org_id, user_id)
     return Response(side_bar, status=status.HTTP_200_OK)
 
 

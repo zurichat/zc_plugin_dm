@@ -281,6 +281,9 @@ def sidebar_emitter(org_id:str, member_id:str) -> dict:
     Args:
         org_id(str): org used to extract data 
         member_id(str): id of user logged in
+    
+    Returns:
+        sidebar(dict): data to be rendered on the sidebar
     """
     rooms = []
     starred_rooms = []
@@ -323,7 +326,7 @@ def get_user_sidebar_room_data(room: dict, member_id: str, members: list) -> dic
         member_id(str): id of user in the room
         members(list): list of all members in the org
         
-    Return:
+    Returns:
         room_profile(dict): data of room including group rooms
     """
     room_profile = {}
@@ -338,15 +341,14 @@ def get_user_sidebar_room_data(room: dict, member_id: str, members: list) -> dic
 
 
 def extract_user_room_data(room: dict, member_id: str, members: list) -> dict:
-    """
-    Func extracts out room data for other users in a room with a user
+    """Extracts room data for other users in a room with a user
     
     Args:
         room(dict): chat room user is present in
         member_id(str): id of user in the room
         members(list): list of all members in the org
         
-    Return:
+    Returns:
         room_profile(dict): the data of the room including other user excluding user logged in
     """
     room_profile = {"room_id": room["_id"], "room_url": f"/dm/{room['_id']}"}
