@@ -199,24 +199,41 @@ DB = DataStorage()
 
 
 # get rooms for a particular user
-def get_rooms(user_id, org_id):
-    """Get the rooms a user is in
+def get_rooms(user_id: str, org_id: str):
+    """
+    A utility function that retrieves all the rooms linked to a user from the dm_rooms collection
 
     Args:
-        user_id (str): The user id
+        collection: dm_rooms
+        user_id (str): a unique identifier used as a query param to filter the collection
+        org_id (str): uniquely identifies the organisation the user belongs too in the collection
 
     Returns:
-        [List]: [description]
-    """
+        A List of dicts containing the information of each room associated with the particular user.
+        example:
+            [{'_id': '616c0adb240d4baaf0fefd68',
+            'bookmark': [],
+            'closed': False,
+            'created_at': '2021-10-17T11:36:59.385987Z',
+            'org_id': '61695d8bb233d46cc8a9af48',
+            'pinned': [],
+            'private': True,
+            'room_name': 'any name',
+            'room_user_ids': ['616a8fe2f99355096b2de6a4', '61696f4f09dcfac4133ddaa3'],
+            'starred': []
+            }]
 
+    Raises:
+        None: no error handling, function returns an empty list if invalid params are parsed
+    """
     helper = DataStorage()
     helper.organization_id = org_id
-    query = {"room_user_ids":user_id}
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_rooms", query=query, options=options)
+    query = {"room_user_ids": user_id} # matches the room_user_ids field in the room document
+    options = {"sort": {"created_at": -1}} # query modifier, sorts from the most recent
+    user_rooms = helper.read_query("dm_rooms", query=query, options=options) # queries collection
 
-    if response and "status_code" not in response:
-        return response
+    if user_rooms and "status_code" not in user_rooms:
+        return user_rooms
     return []
 
 
