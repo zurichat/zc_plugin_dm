@@ -198,7 +198,7 @@ class DataStorage:
 DB = DataStorage()
 
 
-def getOrg(org: str):
+def get_org(org: str):
     """ This is a helper function
     Args: 
         :param org: organizational's unique identifier
@@ -223,7 +223,7 @@ def get_rooms(user_id: str, org_id: str):
         :return: returns list of rooms if Available else returns empty list if false
     
     """
-    response = getOrg(org_id).read_query(
+    response = get_org(org_id).read_query(
         "dm_rooms",
         query={"room_user_ids": user_id},
         options={"sort": {"created_at": -1}},
@@ -247,7 +247,7 @@ def get_room_messages(room_id: str, org_id: str):
         :return: returns list of rooms if true else returns empty list if false
     
     """
-    response = getOrg(org_id).read_query(
+    response = get_org(org_id).read_query(
         "dm_messages", query={"room_id": room_id}, options={"sort": {"created_at": -1}}
     )
     if response and "status_code" not in response:
@@ -281,7 +281,7 @@ def get_messages(room_id: str, org_id: str, date):
         ]
     }
 
-    response = getOrg(org_id).read_query(
+    response = get_org(org_id).read_query(
         "dm_messages", query=query, options={"sort": {"created_at": -1}}
     )
     if response and "status_code" not in response:
