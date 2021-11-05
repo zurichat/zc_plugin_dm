@@ -170,14 +170,14 @@ def room_info(request, room_id):
             room_user_ids = current_room["room_member_ids"]
         else:
             room_user_ids = ""
-        starred = current_room["starred"] if "starred" in current_room else ""
-        pinned = current_room["pinned"] if "pinned" in current_room else ""
-        bookmark = current_room["bookmark"] if "bookmark" in current_room else ""
-        private = current_room["private"] if "private" in current_room else ""
-        created_at = current_room["created_at"] if "created_at" in current_room else ""
+        starred = current_room.get("starred","")
+        pinned = current_room.get("pinned","")
+        bookmark = current_room.get("bookmark","")
+        private = current_room.get("private","")
+        created_at = current_room.get("created_at","")
         if "org_id" in current_room:
             org_id = current_room["org_id"]
-        room_name = current_room["room_name"] if "room_name" in current_room else ""
+        room_name = current_room.get("room_name","")
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
         elif len(room_user_ids) == 3:

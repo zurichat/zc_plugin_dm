@@ -119,13 +119,13 @@ def verify_user(token):
     
 
 @api_view(['GET'])
-def side_bar(request):
+def sidebar(request):
     org_id = request.GET.get("org", None)
     DB.organization_id = org_id
     user_id = request.GET.get("user", None)
    
-    side_bar = sidebar_emitter(org_id, user_id)
-    return Response(side_bar, status=status.HTTP_200_OK)
+    sidebar = sidebar_emitter(org_id, user_id)
+    return Response(sidebar, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(

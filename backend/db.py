@@ -276,14 +276,19 @@ def get_member(members: list, member_id: str):
 
 
 def sidebar_emitter(org_id:str, member_id:str, group_room_name:str = None) -> dict:  
-    """Function Emits data for the sidebar
+    """Function structures data for the sidebar
     
     Args:
         org_id(str): org used to extract data 
         member_id(str): id of user logged in
     
     Returns:
-        sidebar(dict): data to be rendered on the sidebar
+        A dict mapping keys to the data fetched. Example
+        {
+            "event":"event title",
+            "plugin_id":"dm.zuri.chat",
+            "data":{dict of custom data}
+        }
     """
     rooms = []
     starred_rooms = []
@@ -329,6 +334,7 @@ def get_user_sidebar_room_data(room: dict, member_id: str, members: list) -> dic
     Returns:
         room_profile(dict): data of room including group rooms
     """
+    
     room_profile = {}
     if len(room["room_user_ids"]) == 2:
         room_profile = extract_user_room_data(room, member_id, members)
