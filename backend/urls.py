@@ -19,7 +19,7 @@ urlpatterns = [
     path("api/v1/ping", views.PING, name="ping"),
     path("api/v1/info", views.info, name="plugin_info"),
     path("api/v1/install", views.dm_install, name="install"),
-    path("api/v1/sidebar", views.side_bar, name="sidebar"),
+    path("api/v1/sidebar", views.sidebar, name="sidebar"),
     path(
         "api/v1/org/<str:org_id>/users/<str:member_id>/room",
         rooms.create_room,
