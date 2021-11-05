@@ -225,8 +225,8 @@ def get_rooms(user_id: str, org_id: str):
         options={"sort": {"created_at": -1}},
     )
 
-    if response and "status_code" not in response:
-        return response
+    if user_rooms and "status_code" not in user_rooms:
+        return user_rooms
     return []
 
 
@@ -301,9 +301,21 @@ def get_member(members: list, member_id: str):
     return {}
 
 
-def sidebar_emitter(
-    org_id, member_id, group_room_name=None
-):  # group_room_name = None or a String of Names
+def sidebar_emitter(org_id:str, member_id:str, group_room_name:str = None) -> dict:  
+    """Function structures data for the sidebar
+    
+    Args:
+        org_id(str): org used to extract data 
+        member_id(str): id of user logged in
+    
+    Returns:
+        A dict mapping keys to the data fetched. Example
+        {
+            "event":"event title",
+            "plugin_id":"dm.zuri.chat",
+            "data":{dict of custom data}
+        }
+    """
     rooms = []
     starred_rooms = []
     user_rooms = get_rooms(user_id=member_id, org_id=org_id)
@@ -311,43 +323,13 @@ def sidebar_emitter(
 
     if user_rooms != None:
         for room in user_rooms:
-            room_profile = {}
-            if len(room["room_user_ids"]) == 2:
-                room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{room['_id']}"
-                user_id_set = set(room["room_user_ids"]).difference({member_id})
-                partner_id = list(user_id_set)[0]
-
-                profile = get_member(members, partner_id)
-
-                if "user_name" in profile and profile["user_name"] != "":
-                    if profile["user_name"]:
-                        room_profile["room_name"] = profile["user_name"]
-                    else:
-                        room_profile["room_name"] = "no user name"
-                    if profile["image_url"]:
-                        room_profile["room_image"] = profile["image_url"]
-                    else:
-                        room_profile[
-                            "room_image"
-                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-
-                else:
-                    room_profile["room_name"] = "no user name"
-                    room_profile[
-                        "room_image"
-                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-            else:
-                room_profile["room_name"] = room["room_name"]
-                room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{room['_id']}"
-
+            room_profile = get_user_sidebar_room_data(room, member_id, members)
             rooms.append(room_profile)
 
             if member_id in room["starred"]:
                 starred_rooms.append(room_profile)
 
-    side_bar = {
+    return {
         "event": "sidebar_update",
         "plugin_id": "dm.zuri.chat",
         "data": {
@@ -359,15 +341,69 @@ def sidebar_emitter(
             "group_name": "DM",
             "category": "direct messages",
             "show_group": False,
-            "button_url": f"/dm",
+            "button_url": "/dm",
             "public_rooms": [],
             "starred_rooms": starred_rooms,
             "joined_rooms": rooms,
-        }
-        # List of rooms/collections created whenever a user starts a DM chat with another user
-        # This is what will be displayed by Zuri Main
+        },
     }
-    return side_bar
+
+
+def get_user_sidebar_room_data(room: dict, member_id: str, members: list) -> dict:
+    """Produces data needed to be rendered on the sidebar
+    
+    Args:
+        room(dict): chat room user is present in
+        member_id(str): id of user in the room
+        members(list): list of all members in the org
+        
+    Returns:
+        room_profile(dict): data of room including group rooms
+    """
+    
+    room_profile = {}
+    if len(room["room_user_ids"]) == 2:
+        room_profile = extract_user_room_data(room, member_id, members)
+    else:
+        room_profile["room_name"] = room["room_name"]
+        room_profile["room_id"] = room["_id"]
+        room_profile["room_url"] = f"/dm/{room['_id']}"
+
+    return room_profile
+
+
+def extract_user_room_data(room: dict, member_id: str, members: list) -> dict:
+    """Extracts room data for other users in a room with a user
+    
+    Args:
+        room(dict): chat room user is present in
+        member_id(str): id of user in the room
+        members(list): list of all members in the org
+        
+    Returns:
+        room_profile(dict): the data of the room including other user excluding user logged in
+    """
+    room_profile = {"room_id": room["_id"], "room_url": f"/dm/{room['_id']}"}
+    user_id_set = set(room["room_user_ids"]).difference({member_id})
+    partner_id = list(user_id_set)[0]
+
+    profile = get_member(members, partner_id)
+
+    if "user_name" in profile and profile["user_name"] != "":
+        room_profile["room_name"] = profile["user_name"] or "no user name"
+        room_profile["room_image"] = (
+            profile["image_url"]
+            or "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+        )
+
+    else:
+        room_profile["room_name"] = "no user name"
+        room_profile[
+            "room_image"
+        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+
+    return room_profile
+
 
 
 # gets starred rooms
