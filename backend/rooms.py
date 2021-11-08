@@ -130,7 +130,7 @@ def user_rooms(request, user_id):
     """
     if request.method == "GET":
         res = get_rooms(user_id, DB.organization_id)
-        if res == None:
+        if res is None:
             return Response(
                 data="No rooms available", status=status.HTTP_204_NO_CONTENT
             )
@@ -162,7 +162,7 @@ def room_info(request, room_id):
     room_collection = "dm_rooms"
     current_room = DB.read(room_collection, {"_id": room_id})
 
-    if current_room and current_room.get("status_code", None) == None:
+    if current_room and current_room.get("status_code", None) is None:
 
         if "room_user_ids" in current_room:
             room_user_ids = current_room["room_user_ids"]
@@ -170,33 +170,14 @@ def room_info(request, room_id):
             room_user_ids = current_room["room_member_ids"]
         else:
             room_user_ids = ""
-        if "starred" in current_room:
-            starred = current_room["starred"]
-        else:
-            starred = ""
-        if "pinned" in current_room:
-            pinned = current_room["pinned"]
-        else:
-            pinned = ""
-        if "bookmark" in current_room:
-            bookmark = current_room["bookmark"]
-        else:
-            bookmark = ""
-        if "private" in current_room:
-            private = current_room["private"]
-        else:
-            private = ""
-        if "created_at" in current_room:
-            created_at = current_room["created_at"]
-        else:
-            created_at = ""
+        starred = current_room.get("starred","")
+        pinned = current_room.get("pinned","")
+        bookmark = current_room.get("bookmark","")
+        private = current_room.get("private","")
+        created_at = current_room.get("created_at","")
         if "org_id" in current_room:
             org_id = current_room["org_id"]
-        if "room_name" in current_room:
-            room_name = current_room["room_name"]
-        else:
-            room_name = ""
-
+        room_name = current_room.get("room_name","")
         if len(room_user_ids) > 3:
             text = f" and {len(room_user_ids)-2} others"
         elif len(room_user_ids) == 3:
@@ -301,9 +282,9 @@ def star_room(request, room_id, member_id):
 
                 response = DB.update("dm_rooms", room_id,{"starred":data})
 
-                if response and response.get("status_code",None) == None:
+                if response and response.get("status_code", None) is None:
                     response_output = sidebar_emitter(org_id=DB.organization_id, member_id=member_id)
-                    
+
                     try:
                         centrifugo_data = centrifugo_client.publish (
                             room=f"{DB.organization_id}_{member_id}_sidebar", data=response_output )  # publish data to centrifugo
@@ -483,7 +464,6 @@ def group_member_add(request, room_id, member_id):
     },
 )
 @api_view(["PUT"])
-#@db_init_with_credentials
 def close_conversation(request, org_id, room_id, member_id):
     """
     This function allows for the Closing of a DM room on the sidebar
