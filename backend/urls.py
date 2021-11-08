@@ -67,7 +67,7 @@ urlpatterns = [
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        messaging.message_get,
+        messaging.message_create_get,
         name="create_get_message",
     ),
     path(
