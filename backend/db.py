@@ -198,61 +198,104 @@ class DataStorage:
 DB = DataStorage()
 
 
-# get rooms for a particular user
-def get_rooms(user_id, org_id):
-    """Get the rooms a user is in
-
+def get_org(org: str):
+    """This is a helper function
     Args:
-        user_id (str): The user id
+        org: organizational's unique identifier
+    Returns:
+        class object referrencing DataStorage
+    """
+    helper = DB
+    helper.organization_id = org
+    return helper
+
+
+def get_user_rooms(user_id: str, org_id: str):
+    """
+    A utility function that retrieves all the rooms linked to a user from the dm_rooms collection
+    Args:
+        collection: dm_rooms
+        user_id (str): a unique identifier used as a query param to filter the collection
+        org_id (str): uniquely identifies the organisation the user belongs too in the collection
 
     Returns:
-        [List]: [description]
+        A List of dicts containing the information of each room associated with the particular user.
+        example:
+            [{'_id': '616c0adb240d4baaf0fefd68',
+            'bookmark': [],
+            'closed': False,
+            'created_at': '2021-10-17T11:36:59.385987Z',
+            'org_id': '61695d8bb233d46cc8a9af48',
+            'pinned': [],
+            'private': True,
+            'room_name': 'any name',
+            'room_user_ids': ['616a8fe2f99355096b2de6a4', '61696f4f09dcfac4133ddaa3'],
+            'starred': []
+            }]
+
+    Raises:
+        None: no error handling, function returns an empty list if invalid params are parsed
+    """
+    org = get_org(org_id) # initializes the DataStorage class with a unique organization identifier
+    query = {"room_user_ids": user_id} # matches the room_user_ids field in the room document
+    options = {"sort": {"created_at": -1}} # query modifier, sorts from the most recent
+
+    user_rooms = org.read_query(
+        "dm_rooms", query=query, options=options
+    )
+
+    if user_rooms and "status_code" not in user_rooms:
+        return user_rooms
+    return []
+
+
+def get_room_messages(room_id: str, org_id: str):
+    """
+    get all the messages in a particular room
+    Args:
+        room_id: room's unique identifier
+        org_id: organization's unique identifier
+    Returns:
+        return: returns list of rooms if true else returns empty list if false
+
+    """
+    response = get_org(org_id).read_query(
+        "dm_messages", query={"room_id": room_id}, options={"sort": {"created_at": -1}}
+    )
+    if response and "status_code" not in response:
+        return response
+    return []
+
+
+def get_messages(room_id: str, org_id: str, date):
+    """
+    get all the messages in a particular room filtered by date
+    Args:
+         room_id: room's unique identifier
+         org_id: organization's unique identifier
+         date: date to filter the messages
+
+    Returns:
+        return: list of messages ordered by date
+
+
     """
 
-    helper = DataStorage()
-    helper.organization_id = org_id
-    query = {"room_user_ids":user_id}
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_rooms", query=query, options=options)
-
-    if response and "status_code" not in response:
-        return response
-    return []
-
-
-# get all the messages in a particular room
-def get_room_messages(room_id, org_id):
-    helper = DataStorage()
-    helper.organization_id = org_id
-    options = {"sort":{"created_at":-1}}
-    response = helper.read_query("dm_messages", query={"room_id": room_id}, options=options)
-    if response and "status_code" not in response:
-        return response
-    return []
-
-
-# get all the messages in a particular room filtered by date
-def get_messages(room_id,org_id, date):
-    helper = DataStorage()
-    helper.organization_id = org_id
-    req_date = datetime.strptime(date, '%d-%m-%Y')
+    req_date = datetime.strptime(date, "%d-%m-%Y")
     next_day = req_date + timedelta(days=1)
-    options = {"sort":{"created_at":-1}}
     query = {
-        "$and":[
-        {"room_id":room_id},
-        {"created_at":{
-            "$gte":str(req_date),
-            "$lt": str(next_day)
-        }}
+        "$and": [
+            {"room_id": room_id},
+            {"created_at": {"$gte": str(req_date), "$lt": str(next_day)}},
         ]
     }
-    
-    response = helper.read_query("dm_messages", query=query, options=options)
+
+    response = get_org(org_id).read_query(
+        "dm_messages", query=query, options={"sort": {"created_at": -1}}
+    )
     if response and "status_code" not in response:
         return response
     return []
-    
 
 
 def get_user_profile(org_id=None, user_id=None):
@@ -264,9 +307,7 @@ def get_user_profile(org_id=None, user_id=None):
 
 
 def get_all_organization_members(org_id: str):
-    response = requests.get(
-        f"https://api.zuri.chat/organizations/{org_id}/members/"
-    )
+    response = requests.get(f"https://api.zuri.chat/organizations/{org_id}/members/")
     if response.status_code == 200:
         return response.json()["data"]
     return None
@@ -279,79 +320,115 @@ def get_member(members: list, member_id: str):
     return {}
 
 
-def sidebar_emitter(
-    org_id, member_id, group_room_name=None
-):  # group_room_name = None or a String of Names
+def sidebar_emitter(org_id:str, member_id:str, group_room_name:str = None) -> dict:  
+    """Function structures data for the sidebar
+    
+    Args:
+        org_id(str): org used to extract data 
+        member_id(str): id of user logged in
+    
+    Returns:
+        A dict mapping keys to the data fetched. Example
+        {
+            "event":"event title",
+            "plugin_id":"dm.zuri.chat",
+            "data":{dict of custom data}
+        }
+    """
     rooms = []
     starred_rooms = []
-    user_rooms = get_rooms(user_id=member_id, org_id=org_id)
+    user_rooms = get_user_rooms(user_id=member_id, org_id=org_id)
     members = get_all_organization_members(org_id)
-    
+
     if user_rooms != None:
         for room in user_rooms:
-            room_profile = {}
-            if len(room['room_user_ids']) == 2:
-                room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{room['_id']}"
-                user_id_set = set(room['room_user_ids']).difference({member_id})
-                partner_id = list(user_id_set)[0]              
-                
-                profile = get_member(members,partner_id)
-
-                if "user_name" in profile and profile['user_name'] != "":
-                    if profile["user_name"]:
-                        room_profile["room_name"] = profile["user_name"]
-                    else:
-                        room_profile["room_name"] = "no user name"
-                    if profile["image_url"]:
-                        room_profile["room_image"] = profile["image_url"]
-                    else:
-                        room_profile[
-                            "room_image"
-                        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-                    
-                else:
-                    room_profile["room_name"] = "no user name"
-                    room_profile[
-                        "room_image"
-                    ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
-            else:
-                room_profile["room_name"] = room["room_name"]
-                room_profile["room_id"] = room["_id"]
-                room_profile["room_url"] = f"/dm/{room['_id']}"
-
+            room_profile = get_user_sidebar_room_data(room, member_id, members)
             rooms.append(room_profile)
 
             if member_id in room["starred"]:
                 starred_rooms.append(room_profile)
-                
-    side_bar = {
-        "event":"sidebar_update",
-        "plugin_id":"dm.zuri.chat",
-        "data":{
-        "name": "DM Plugin",
-        "description": "Sends messages between users",
+
+    return {
+        "event": "sidebar_update",
         "plugin_id": "dm.zuri.chat",
-        "organisation_id": f"{org_id}",
-        "user_id": f"{member_id}",
-        "group_name": "DM",
-        "category": "direct messages",
-        "show_group": False,
-        "button_url": f"/dm",
-        "public_rooms": [],
-        "starred_rooms": starred_rooms,
-        "joined_rooms": rooms,
-        }
-        # List of rooms/collections created whenever a user starts a DM chat with another user
-        # This is what will be displayed by Zuri Main
+        "data": {
+            "name": "DM Plugin",
+            "description": "Sends messages between users",
+            "plugin_id": "dm.zuri.chat",
+            "organisation_id": f"{org_id}",
+            "user_id": f"{member_id}",
+            "group_name": "DM",
+            "category": "direct messages",
+            "show_group": False,
+            "button_url": "/dm",
+            "public_rooms": [],
+            "starred_rooms": starred_rooms,
+            "joined_rooms": rooms,
+        },
     }
-    return side_bar
+
+
+def get_user_sidebar_room_data(room: dict, member_id: str, members: list) -> dict:
+    """Produces data needed to be rendered on the sidebar
+    
+    Args:
+        room(dict): chat room user is present in
+        member_id(str): id of user in the room
+        members(list): list of all members in the org
+        
+    Returns:
+        room_profile(dict): data of room including group rooms
+    """
+    
+    room_profile = {}
+    if len(room["room_user_ids"]) == 2:
+        room_profile = extract_user_room_data(room, member_id, members)
+    else:
+        room_profile["room_name"] = room["room_name"]
+        room_profile["room_id"] = room["_id"]
+        room_profile["room_url"] = f"/dm/{room['_id']}"
+
+    return room_profile
+
+
+def extract_user_room_data(room: dict, member_id: str, members: list) -> dict:
+    """Extracts room data for other users in a room with a user
+    
+    Args:
+        room(dict): chat room user is present in
+        member_id(str): id of user in the room
+        members(list): list of all members in the org
+        
+    Returns:
+        room_profile(dict): the data of the room including other user excluding user logged in
+    """
+    room_profile = {"room_id": room["_id"], "room_url": f"/dm/{room['_id']}"}
+    user_id_set = set(room["room_user_ids"]).difference({member_id})
+    partner_id = list(user_id_set)[0]
+
+    profile = get_member(members, partner_id)
+
+    if "user_name" in profile and profile["user_name"] != "":
+        room_profile["room_name"] = profile["user_name"] or "no user name"
+        room_profile["room_image"] = (
+            profile["image_url"]
+            or "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+        )
+
+    else:
+        room_profile["room_name"] = "no user name"
+        room_profile[
+            "room_image"
+        ] = "https://cdn.iconscout.com/icon/free/png-256/account-avatar-profile-human-man-user-30448.png"
+
+    return room_profile
+
 
 
 # gets starred rooms
 def get_starred_rooms(member_id, org_id):
     """goes through database and returns starred rooms"""
-    response = get_rooms(member_id, org_id)
+    response = get_user_rooms(member_id, org_id)
     if response:
         data = []
         for room in response:
@@ -403,5 +480,3 @@ def update_queue_sync(queue_id: int):
         return response.json()
     else:
         return None
-
-
