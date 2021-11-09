@@ -54,7 +54,7 @@ def create_room(request, member_id):
         else:
             # print("            --------FAE-------              \n\r")
             user_ids = serializer.data["room_member_ids"]
-            user_rooms = get_rooms(user_ids[0], DB.organization_id)
+            user_rooms = get_user_rooms(user_ids[0], DB.organization_id)
             if isinstance(user_rooms, list):
                 for room in user_rooms:
                     room_users = room["room_user_ids"]
@@ -129,7 +129,7 @@ def user_rooms(request, user_id):
     if there is no room for the user_id it returns a 204 status response.
     """
     if request.method == "GET":
-        res = get_rooms(user_id, DB.organization_id)
+        res = get_user_rooms(user_id, DB.organization_id)
         if res is None:
             return Response(
                 data="No rooms available", status=status.HTTP_204_NO_CONTENT
@@ -377,7 +377,7 @@ def group_member_add(request, room_id, member_id):
                 # =====================================================
                 # =====================================================
 
-                user_rooms = get_rooms(room_creator, DB.organization_id)
+                user_rooms = get_user_rooms(room_creator, DB.organization_id)
                 if user_rooms and isinstance(user_rooms, list):
                     for room in user_rooms:
                         room_users = room["room_user_ids"]
