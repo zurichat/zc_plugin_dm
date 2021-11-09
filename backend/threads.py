@@ -575,7 +575,7 @@ def get_all_threads(request, member_id: str):
     threads_list = LifoQueue()
     # org_id = request.GET.get("")
 
-    rooms = get_rooms(user_id=member_id, org_id=DB.organization_id)
+    rooms = get_user_rooms(user_id=member_id, org_id=DB.organization_id)
     if rooms:
         # print(f"the room ", rooms)
         for room in rooms:
