@@ -66,6 +66,7 @@ class Messages(APIView):
         if params_serializer.is_valid():
 
             # Check to see if the room exists in the database
+            DB.organization_id = org_id
             room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room:
 
