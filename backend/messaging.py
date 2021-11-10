@@ -136,8 +136,6 @@ class Messages(APIView):
             400: Bad Request.
         """
         # specify the organizaiton id
-        data_storage = DataStorage()
-        data_storage.organization_id = org_id
 
         # add the room_id to the request data
         request.data["room_id"] = room_id
@@ -153,6 +151,7 @@ class Messages(APIView):
             room_id = data["room_id"]  # room id gotten from client request
 
             # Check to see if the room exists in the database
+            DB.organization_id = org_id
             room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room and room.get("status_code", None) == None:
                 # if true, check if the sender is in the specified room
