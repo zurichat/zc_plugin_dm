@@ -1,6 +1,9 @@
 from backend import sync
 from . import views, rooms, messaging, members, media, threads, booklinks, reactions
 from .testingapi import Test
+from .messaging import (
+    Messages
+)
 
 # from .views import EditMessage
 from django.urls import path
@@ -67,7 +70,7 @@ urlpatterns = [
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        messaging.message_create_get,
+        Messages.as_view(),
         name="create_get_message",
     ),
     path(
