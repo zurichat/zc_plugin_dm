@@ -1,16 +1,8 @@
 from backend import sync
 from . import views, rooms, messaging, members, media, threads, booklinks, reactions
-from .testingapi import Test
-from .messaging import (
-    Messages
-)
-
-# from .views import EditMessage
 from django.urls import path
-from django.conf import settings
 from django.conf.urls.static import static
 from django.conf import settings
-
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -70,7 +62,7 @@ urlpatterns = [
     ),
     path(
         "api/v1/org/<str:org_id>/rooms/<str:room_id>/messages",
-        Messages.as_view(),
+        messaging.MessageList.as_view(),
         name="create_get_message",
     ),
     path(
