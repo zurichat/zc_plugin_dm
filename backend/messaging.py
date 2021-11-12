@@ -34,35 +34,60 @@ from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
 from queue import LifoQueue
 
+class Messages(APIView):
+    queryset = None
+    serializer_class = MessageSerializer
+    def get(self, request, room_id, org_id):
+        """
+        Fetches all messages in a particular room of a particular organization.
 
-@swagger_auto_schema(
-    methods=["post", "get"],
-    query_serializer=GetMessageSerializer,
-    operation_summary="Creates and get messages",
-    responses={201: MessageResponse, 400: "Error: Bad Request"},
-)
-@sync_to_async
-@api_view(["GET", "POST"])
-@db_init_with_credentials
-def message_create_get(request, room_id):
-    if request.method == "GET":
+        Args:
+            request (dict): The request body usually containing the date
+            room_id (str): The id of the room where the request is being made
+            org_id (str): The id of the organization of the user
+
+        Returns:
+            list: Returns a list of available messages(dict objects)
+        
+         Raises:
+            204: No message in the specified room.
+            404: Room does not exist.
+            400: Bad Request.
+        """
+        # Set the page size for the response     
         paginator = PageNumberPagination()
         paginator.page_size = 20
         date = request.GET.get("date", None)
+
+        # Serialize the request data i.e convert it to json
         params_serializer = GetMessageSerializer(data=request.GET.dict())
+
+        # check if the serialized params are valid. If true, run request.
         if params_serializer.is_valid():
+
+            # Check to see if the room exists in the database
+            DB.organization_id = org_id
             room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room:
-                messages = get_room_messages(room_id, DB.organization_id)
+
+                # If True, fetch the messages from the room
+                messages = get_room_messages(room_id, org_id)
+
+                # Check to see if there are messages in the room.
                 if date != None:
-                    messages_by_date = get_messages(room_id, DB.organization_id, date)
 
+                    # If True, fetch the messages by creation date
+                    messages_by_date = get_messages(room_id, org_id, date)
+                    
+                    # Paginate the response
                     messages_page = paginator.paginate_queryset(
-                        messages_by_date, request
-                    )
-
+                            messages_by_date, request)
+                    
+                    # Return the response in pages
                     return paginator.get_paginated_response(messages_page)
                 else:
+
+                    # Else, return a message telliing the user that there's no messages in the room.
                     if messages == None or "message" in messages:
                         return Response(
                             data="No messages available",
@@ -71,27 +96,71 @@ def message_create_get(request, room_id):
                     result_page = paginator.paginate_queryset(messages, request)
                     return paginator.get_paginated_response(result_page)
             else:
+
+                # Else, return a message telling the user that the room doesn't exist.
                 return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         else:
+
+            # Else, return a bad request message
             return Response(
                 params_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-    elif request.method == "POST":
+
+    def post(self, request, room_id, org_id):
+        """
+        Create a message in a specified room of a specified organization.
+
+        Args:
+            request (dict): The request body
+            room_id (str): The id of the room where the request is being made
+            org_id (str): The id of the organization of the user
+
+        Returns:
+            201: {
+                    "status": response["message"],
+                    "event": "message_create",
+                    "message_id": "message_id",
+                    "room_id": room_id,
+                    "thread": False,
+                    "data": {
+                        "sender_id": data["sender_id"],
+                        "message": data["message"],
+                        "created_at": data["created_at"],
+                    },
+                }
+        
+         Raises:
+            424: failed dependency.
+            404: Sender not in room.
+            404: Room does not exist.
+            400: Bad Request.
+        """
+        # specify the organizaiton id
+
+        # add the room_id to the request data
         request.data["room_id"] = room_id
+        print(request)
+
+        # serialize the data
         serializer = MessageSerializer(data=request.data)
 
+        # check if the serialized data is valid
         if serializer.is_valid():
+            # if true continue
             data = serializer.data
             room_id = data["room_id"]  # room id gotten from client request
 
+            # Check to see if the room exists in the database
+            DB.organization_id = org_id
             room = DB.read_query("dm_rooms", query={"_id": room_id})
             if room and room.get("status_code", None) == None:
+                # if true, check if the sender is in the specified room
                 if data["sender_id"] in room.get("room_user_ids", []):
-
+                    # if true create the message
                     response = DB.write("dm_messages", data=serializer.data)
                     if response.get("status", None) == 200:
-
+                        # check if message was sent successfully. If true print response
                         response_output = {
                             "status": response["message"],
                             "event": "message_create",
@@ -125,14 +194,18 @@ def message_create_get(request, room_id):
                                 data="centrifugo server not available",
                                 status=status.HTTP_424_FAILED_DEPENDENCY,
                             )
+                    # else return failed dependency error
                     return Response(
                         data="message not saved and not sent",
                         status=status.HTTP_424_FAILED_DEPENDENCY,
                     )
+                # else return sender not found error
                 return Response(
-                    "sender not in room", status=status.HTTP_400_BAD_REQUEST
+                    "sender not in room", status=status.HTTP_404_NOT_FOUND
                 )
-            return Response("room not found", status=status.HTTP_400_BAD_REQUEST)
+            # else return room not found error
+            return Response("room not found", status=status.HTTP_404_NOT_FOUND)
+        # return bad request error
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -441,7 +514,7 @@ class MessageDetailsView(APIView):
         Raises:
             Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
 
-            IOError: An error occurred while deleteing the message.
+            IOError: An error occurred while deleting the message.
         """
 
         try:
