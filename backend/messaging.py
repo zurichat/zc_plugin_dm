@@ -19,15 +19,17 @@ from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
 
-class Messages(APIView):
+
+class MessageList(APIView):
     queryset = None
     serializer_class = MessageSerializer
+
     @swagger_auto_schema(
         operation_summary="Fetches all messages in a particular room of a particular organization",
         responses={
             200: "OK: Success!",
             400: "Error: Bad Request",
-            404: "Room does not exist".
+            404: "Room does not exist"
         },
     )
     def get(self, request, room_id: str, org_id: str):
