@@ -34,7 +34,7 @@ class MessageList(APIView):
         },
     )
     def get(self, request: dict, room_id: str, org_id: str) -> OrderedDict[str, Any]:
-        """ Fetches all messages in a particular room of a particular organization.
+        """Fetches all messages in a particular room of a particular organization.
 
         Args:
             request (dict): The incoming request object.
@@ -388,18 +388,29 @@ def all_messages(request):
 
 
 class MessageDetailsView(APIView):
+    @swagger_auto_schema(
+        operation_summary="Retrieves a message in a particular room of a particular organization.",
+        responses={
+            200: FilterMessageResponse,
+            204: "No message in the specified room",
+            400: "Error: Bad Request",
+            404: "No such room"
+        },
+    )
     def get(self, request: dict, message_id: str, org_id: str):
+        """Gets a single message from a room.
 
-        """
-        Gets a single message from a room.
         It access room with the 'message_id' and then displays the message if it exists.
         The id of the organization (org_id) where the room is located is also needed.
-        Parameters:
-            org_id (str)        : This is the id of the organization th user belongs to.
-            message_id (str)    : This is the unique id of the message to be deleted from a given room.
+
+        Args:
+            request (dict): The incoming request
+            org_id (str): This is the id of the organization th user belongs to.
+            message_id (str): This is the unique id of the message to be fetched.
 
         Returns:
-            A dict object indicating the the message has been deleted. Example:
+            A dict object the message data.
+            Example:
             {
                 "status"        : "success",
                 "room_id"       : "6169dbcef5998a09e3bbbcd3",
@@ -408,7 +419,6 @@ class MessageDetailsView(APIView):
             }
         Raises:
             Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
-            IOError: An error occurred while deleteing the message.
         """
         data_storage = DataStorage()
         data_storage.organization_id = org_id
@@ -417,16 +427,13 @@ class MessageDetailsView(APIView):
 
         try:
             message = data_storage.read("dm_messages", {"_id": message_id})
-
             room_id = message["room_id"]
             data = {
                 "status": "success",
                 "message": message,
             }
             return Response(data, status=status.HTTP_200_OK)
-
         except:
-
             return JsonResponse(
                 {"message": "The room does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
@@ -532,11 +539,9 @@ class MessageDetailsView(APIView):
             room_id = message["room_id"]
 
             # Checks if the room exists and if the message exists in the room.
-            # If this returns true, the message is deleted. Else an error message is returned.
             if message:
                 response = data_storage.delete("dm_messages", message_id)
-
-                # if the delete operation was successful, it returns a success message.
+                # Check if the delete operation was successful
                 if response.get("status") == 200:
                     response_output = {
                         "status": response["message"],
@@ -544,23 +549,18 @@ class MessageDetailsView(APIView):
                         "room_id": room_id,
                         "message_id": message_id,
                     }
-
-                    # This publishes the operation across all active devices in the room where the operation was performed.
+                    # Publish data via centrifugo
                     centrifugo_data = centrifugo_client.publish(
                         room=room_id, data=response
                     )
-
-                    # Checks if the publish was successful and returns a success message if True, else an error message is returned.
+                    # Checks if the publish was successful
                     if centrifugo_data.get("status_code") == 200:
                         return Response(response_output, status=status.HTTP_200_OK)
-
                     return Response(
                         data="message not sent",
                         status=status.HTTP_424_FAILED_DEPENDENCY,
                     )
 
             return Response("message not found", status=status.HTTP_404_NOT_FOUND)
-
         except Exception as e:
-            # All exeptions are caught are returned here...
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
