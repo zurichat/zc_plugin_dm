@@ -17,7 +17,8 @@ from datetime import datetime
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
-from typing import  OrderedDict, Any
+from typing import OrderedDict, Any
+
 
 class MessageList(APIView):
     queryset = None
@@ -71,6 +72,7 @@ class MessageList(APIView):
             404: Room does not exist.
             400: Bad Request.
         """
+
         # Set the page size for the response     
         paginator = PageNumberPagination()
         paginator.page_size = 20
@@ -122,7 +124,7 @@ class MessageList(APIView):
             404: "Room does not exist"
         },
     )
-    def post(self, request: dict, room_id, org_id) -> MessageResponse:
+    def post(self, request: dict, room_id: str, org_id: str) -> MessageResponse:
         """Creates a message in a specified room of a specified organization.
 
         Args:
@@ -131,48 +133,43 @@ class MessageList(APIView):
             org_id (str): The id of the organization of the user
 
         Returns:
-            A dict containing data about the message that was created
+            A dict containing data about the message that was created (MessageResponse).
             {
-                "status": response["message"],
+                "status": "success",
                 "event": "message_create",
-                "message_id": "message_id",
-                "room_id": room_id,
+                "message_id": "61696f43c4133ddga309dcf6",
+                "room_id": "61696f43c4193ddga309dcf7",
                 "thread": False,
                 "data": {
-                    "sender_id": data["sender_id"],
-                    "message": data["message"],
-                    "created_at": data["created_at"],
+                    "sender_id": "61696f43c4133ddaa309dcf6",
+                    "message": "Hi",
+                    "created_at": "2021-10-15T19:51:41.928908Z",
                 },
             }
         
          Raises:
-            424: failed dependency.
+            424: Failed dependency.
             404: Sender not in room.
             404: Room does not exist.
-            400: Bad Request.
+            400: Error: Bad Request.
         """
+
         # add the room_id to the request data
         request.data["room_id"] = room_id
-        print(request)
-
-        # serialize the data
         serializer = MessageSerializer(data=request.data)
-
-        # check if the serialized data is valid
         if serializer.is_valid():
             data = serializer.data
             room_id = data["room_id"]  # room id gotten from client request
 
-            # Check to see if the room exists in the database
             DB.organization_id = org_id
+            # Check to see if the room exists in the database
             room = DB.read_query("dm_rooms", query={"_id": room_id})
-            if room and room.get("status_code", None) == None:
-                # if true, check if the sender is in the specified room
+            if room and room.get("status_code", None) is None:
+                # Check if the sender is in the specified room
                 if data["sender_id"] in room.get("room_user_ids", []):
-                    # if true create the message
                     response = DB.write("dm_messages", data=serializer.data)
+                    # Check if message was sent successfully.
                     if response.get("status", None) == 200:
-                        # check if message was sent successfully. If true print response
                         response_output = {
                             "status": response["message"],
                             "event": "message_create",
@@ -198,22 +195,22 @@ class MessageList(APIView):
                                 )
                             else:
                                 return Response(
-                                    data="message not sent",
+                                    data="Message not sent",
                                     status=status.HTTP_424_FAILED_DEPENDENCY,
                                 )
                         except:
                             return Response(
-                                data="centrifugo server not available",
+                                data="Centrifugo server not available",
                                 status=status.HTTP_424_FAILED_DEPENDENCY,
                             )
                     return Response(
-                        data="message not saved and not sent",
+                        data="Message not saved and not sent",
                         status=status.HTTP_424_FAILED_DEPENDENCY,
                     )
                 return Response(
-                    "sender not in room", status=status.HTTP_404_NOT_FOUND
+                    "Sender not found in this room", status=status.HTTP_404_NOT_FOUND
                 )
-            return Response("room not found", status=status.HTTP_404_NOT_FOUND)
+            return Response("Room not found", status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -391,7 +388,7 @@ def all_messages(request):
 
 
 class MessageDetailsView(APIView):
-    def get(self, request, message_id, org_id):
+    def get(self, request: dict, message_id: str, org_id: str):
 
         """
         Gets a single message from a room.
@@ -489,7 +486,7 @@ class MessageDetailsView(APIView):
                 }
                 centrifugo_data = send_centrifugo_data(room=room_id, data=data)
 
-                if centrifugo_data.get("error", None) == None:
+                if centrifugo_data.get("error", None) is None:
                     return Response(data=data, status=status.HTTP_201_CREATED)
 
                 return Response(data)
