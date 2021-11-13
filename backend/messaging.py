@@ -12,36 +12,59 @@ from rest_framework.views import (
 )
 from .resmodels import *
 from .serializers import *
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from datetime import datetime
 from .centrifugo_handler import centrifugo_client
 from rest_framework.pagination import PageNumberPagination
 from .decorators import db_init_with_credentials
-
+from typing import  OrderedDict, Any
 
 class MessageList(APIView):
     queryset = None
     serializer_class = MessageSerializer
 
     @swagger_auto_schema(
-        operation_summary="Fetches all messages in a particular room of a particular organization",
+        operation_summary="Fetches all messages in a particular room of a particular organization.",
         responses={
-            200: "OK: Success!",
+            200: FilterMessageResponse(many=True),
+            204: "No message in the specified room",
             400: "Error: Bad Request",
-            404: "Room does not exist"
+            404: "No such room"
         },
     )
-    def get(self, request, room_id: str, org_id: str):
+    def get(self, request: dict, room_id: str, org_id: str) -> OrderedDict[str, Any]:
         """ Fetches all messages in a particular room of a particular organization.
 
         Args:
-            request (dict): The request body usually containing the date
-            room_id (str): The id of the room where the request is being made
-            org_id (str): The id of the organization of the user
+            request (dict): The incoming request object.
+            room_id (str): The id of the room where the request is being made.
+            org_id (str): The id of the organization of the user.
 
         Returns:
-            list: Returns a list of available messages(dict objects)
+            A list of available messages(list[FilterMessageResponse]).
+            {
+                "count": 6,
+                "next": null,
+                "previous": null,
+                "results": [
+                    {
+                        "_id": "618c0dd4660aa90fb295e368",
+                        "created_at": "2021-11-10T18:18:47.494000Z",
+                        "media": [],
+                        "message": "Cash App Load am",
+                        "pinned": false,
+                        "reactions": [],
+                        "read": false,
+                        "replied_message": [],
+                        "room_id": "6169dbcef5998a09e3bbbcd3",
+                        "saved_by": [],
+                        "sender_id": "61695d8bb2cc8a9af4833d47",
+                        "sent_from_thread": false,
+                        "threads": []
+                    },
+                    ...
+                ]
+            }
         
          Raises:
             204: No message in the specified room.
@@ -55,15 +78,17 @@ class MessageList(APIView):
 
         params_serializer = GetMessageSerializer(data=request.GET.dict())
         if params_serializer.is_valid():
-            # Check to see if the room exists in the database
             DB.organization_id = org_id
+            # Check if the room exists in the database
             room = DB.read_query("dm_rooms", query={"_id": room_id})
+            # FIXME: This statement will always be true
+            #   room is a non-empty dict
+            #   we should check if room contains a status_code key or not
             if room:
                 # Fetch the messages from the room
                 messages = get_room_messages(room_id, org_id)
 
-                # Check to see if there are messages in the room.
-                if date != None:
+                if date is not None:
                     messages_by_date = get_messages(room_id, org_id, date)
                     # Paginate the response
                     messages_page = paginator.paginate_queryset(
@@ -71,8 +96,7 @@ class MessageList(APIView):
 
                     return paginator.get_paginated_response(messages_page)
                 else:
-
-                    # Else, return a message telling the user that there's no messages in the room.
+                    # There's no messages in the room.
                     if messages is None or "message" in messages:
                         return Response(
                             data="No messages available",
@@ -81,15 +105,25 @@ class MessageList(APIView):
                     result_page = paginator.paginate_queryset(messages, request)
                     return paginator.get_paginated_response(result_page)
             else:
+                # FIXME: As a result, this branch will never be reached
+                #   because if room will always return True
                 return Response(data="No such room", status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(
                 params_serializer.errors, status=status.HTTP_400_BAD_REQUEST
             )
 
-    def post(self, request, room_id, org_id):
-        """
-        Create a message in a specified room of a specified organization.
+    @swagger_auto_schema(
+        operation_summary="Creates a message in a specified room of a specified organization.",
+        request_body=MessageSerializer,
+        responses={
+            201: MessageResponse,
+            400: "Error: Bad Request",
+            404: "Room does not exist"
+        },
+    )
+    def post(self, request: dict, room_id, org_id) -> MessageResponse:
+        """Creates a message in a specified room of a specified organization.
 
         Args:
             request (dict): The request body
@@ -97,18 +131,19 @@ class MessageList(APIView):
             org_id (str): The id of the organization of the user
 
         Returns:
-            201: {
-                    "status": response["message"],
-                    "event": "message_create",
-                    "message_id": "message_id",
-                    "room_id": room_id,
-                    "thread": False,
-                    "data": {
-                        "sender_id": data["sender_id"],
-                        "message": data["message"],
-                        "created_at": data["created_at"],
-                    },
-                }
+            A dict containing data about the message that was created
+            {
+                "status": response["message"],
+                "event": "message_create",
+                "message_id": "message_id",
+                "room_id": room_id,
+                "thread": False,
+                "data": {
+                    "sender_id": data["sender_id"],
+                    "message": data["message"],
+                    "created_at": data["created_at"],
+                },
+            }
         
          Raises:
             424: failed dependency.
@@ -116,8 +151,6 @@ class MessageList(APIView):
             404: Room does not exist.
             400: Bad Request.
         """
-        # specify the organizaiton id
-
         # add the room_id to the request data
         request.data["room_id"] = room_id
         print(request)
@@ -127,7 +160,6 @@ class MessageList(APIView):
 
         # check if the serialized data is valid
         if serializer.is_valid():
-            # if true continue
             data = serializer.data
             room_id = data["room_id"]  # room id gotten from client request
 
@@ -174,18 +206,14 @@ class MessageList(APIView):
                                 data="centrifugo server not available",
                                 status=status.HTTP_424_FAILED_DEPENDENCY,
                             )
-                    # else return failed dependency error
                     return Response(
                         data="message not saved and not sent",
                         status=status.HTTP_424_FAILED_DEPENDENCY,
                     )
-                # else return sender not found error
                 return Response(
                     "sender not in room", status=status.HTTP_404_NOT_FOUND
                 )
-            # else return room not found error
             return Response("room not found", status=status.HTTP_404_NOT_FOUND)
-        # return bad request error
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
