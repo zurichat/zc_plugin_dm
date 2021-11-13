@@ -500,18 +500,15 @@ class MessageDetailsView(APIView):
 
         return Response(room_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, message_id, org_id):
-        """
-        Deletes a message from a room.
+    def delete(self, request: dict, message_id: str, org_id: str):
+        """Deletes a message from a room.
 
         It access room with the 'room_id' and the message in the room with 'message_id' and then deletes the message if it exists.
         The id of the organization (org_id) where the room is located is also needed.
 
         Parameters:
             org_id (str)        : This is the id of the organization th user belongs to.
-
             room_id (str)       : This is the unique id of the room the message to be deleted is in.
-
             message_id (str)    : This is the unique id of the message to be deleted from a given room.
 
         Returns:
@@ -525,8 +522,6 @@ class MessageDetailsView(APIView):
 
         Raises:
             Not Found: If there is no message with specified id in the specified room, it returns 'message not found' and a '404' error message.
-
-            IOError: An error occurred while deleting the message.
         """
 
         try:
