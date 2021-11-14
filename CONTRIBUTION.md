@@ -3,7 +3,7 @@ Guidelines for contributing to this project. Must be strictly followed by all te
 This will guide you from cloning this repository to pushing your contributions.
 
 ## Forking
-Fork this repository to get a personal copy on your github account
+Fork this repository to get a personal copy on your GitHub account
 
 ## Cloning
 To clone the forked repository to your local machine, open command prompt and run:
@@ -18,7 +18,7 @@ cd zc_plugin_dm
 ```
 
 ## Set Upstream Remote
-To set upstream remote so you can pull changes from upstream to update your repo run:
+To set upstream remote, so you can pull changes from upstream to update your repo run:
 ```
 git remote add upstream https://github.com/zurichat/zc_plugin_dm
 ```
@@ -31,7 +31,7 @@ git checkout develop_test_2
 
 ## Checkout Your Feature Branch
 Feature Branching Workflow means you create a new branch for every feature or issue you are working on.
-It is goood practice for the branch name to end with the issue id.
+It is good practice for the branch name to end with the issue id.
 So if an issue id is **#5** and issue title is **Update ReadMe.md** then our branch name would be **update-readme-#5**.
 create and checkout feature branch by running:
 ```
@@ -39,7 +39,7 @@ git checkout -b issue-name-id
 ```
 
 ## Setup Development Environment
-To setup the development environment to run project run:
+To set up the development environment to run project run:
 #### install pipenv
 ```
 pip install pipenv
@@ -90,7 +90,7 @@ git commit -m "descriptive commit message"
 ```
 
 ## Pull Update from Remote
-Pull latest update from the upstream remote repo by running:
+Pull the latest update from the upstream remote repo by running:
 ```
 git pull upstream develop
 ```
@@ -103,6 +103,6 @@ git push origin update-readme-#5
 ```
 
 ## Make PR
-Goto your github account and make a **Pull Request** to merge your changes to upstream.
+Goto your GitHub account and make a **Pull Request** to merge your changes to upstream.
 
 ## Happy Contributing!!!
