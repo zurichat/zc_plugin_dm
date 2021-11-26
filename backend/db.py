@@ -351,20 +351,18 @@ def sidebar_emitter(org_id:str, member_id:str, group_room_name:str = None) -> di
     return {
         "event": "sidebar_update",
         "plugin_id": "dm.zuri.chat",
-        "data": {
-            "name": "DM Plugin",
-            "description": "Sends messages between users",
-            "plugin_id": "dm.zuri.chat",
-            "organisation_id": f"{org_id}",
-            "user_id": f"{member_id}",
-            "group_name": "DM",
-            "category": "direct messages",
-            "show_group": False,
-            "button_url": "/dm",
-            "public_rooms": [],
-            "starred_rooms": starred_rooms,
-            "joined_rooms": rooms,
-        },
+        "name": "DM Plugin",
+        "description": "Sends messages between users",
+        "plugin_id": "dm.zuri.chat",
+        "organisation_id": f"{org_id}",
+        "user_id": f"{member_id}",
+        "group_name": "DM",
+        "category": "direct messages",
+        "show_group": False,
+        "button_url": "/dm",
+        "public_rooms": [],
+        "starred_rooms": starred_rooms,
+        "joined_rooms": rooms,
     }
 
 
